@@ -1,6 +1,8 @@
 package com.fight2;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.handler.timer.ITimerCallback;
@@ -21,8 +23,14 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.BaseGameActivity;
 
 import android.content.res.AssetManager;
+import android.util.DisplayMetrics;
+import android.view.Display;
 
+import com.fight2.constant.ConfigEnum;
+import com.fight2.constant.SceneEnum;
 import com.fight2.scene.MainScene;
+import com.fight2.scene.TeamScene;
+import com.fight2.util.ConfigHelper;
 import com.fight2.util.TextureFactory;
 import com.fight2.util.TiledTextureFactory;
 
@@ -37,13 +45,22 @@ public class GameActivity extends BaseGameActivity {
     private ITexture splashTexture;
     private ITextureRegion splashTextureRegion;
     private Sprite splash;
-    private Scene splashScene;
-    private Scene mainScene;
+    private final Map<SceneEnum, Scene> scenes = new HashMap<SceneEnum, Scene>();
 
+    private Scene splashScene;
     private ProgressBar progressBar;
 
     @Override
     public EngineOptions onCreateEngineOptions() {
+        final DisplayMetrics displayMetrics = new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        final ConfigHelper configHelper = ConfigHelper.getInstance();
+        configHelper.setConfig(ConfigEnum.DeviceWidth, displayMetrics.widthPixels);
+        configHelper.setConfig(ConfigEnum.DeviceHeight, displayMetrics.heightPixels);
+        configHelper.setConfig(ConfigEnum.CameraWidth, CAMERA_WIDTH);
+        configHelper.setConfig(ConfigEnum.CameraHeight, CAMERA_HEIGHT);
+        configHelper.setConfig(ConfigEnum.CameraCenterX, CAMERA_CENTER_X);
+        configHelper.setConfig(ConfigEnum.CameraCenterY, CAMERA_CENTER_Y);
         camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
         return new EngineOptions(true, ScreenOrientation.LANDSCAPE_SENSOR, new CropResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera);
     }
@@ -55,7 +72,6 @@ public class GameActivity extends BaseGameActivity {
         this.splashTexture = new AssetBitmapTexture(textureManager, assetManager, "images/splashScreen.jpg");
         this.splashTextureRegion = TextureRegionFactory.extractFromTexture(this.splashTexture);
         this.splashTexture.load();
-
         pOnCreateResourcesCallback.onCreateResourcesFinished();
     }
 
@@ -112,7 +128,7 @@ public class GameActivity extends BaseGameActivity {
                 loadScenes();
                 splashScene.detachChildren();
                 splashScene.detachSelf();
-                mEngine.setScene(mainScene);
+                mEngine.setScene(scenes.get(SceneEnum.Main));
                 camera.setHUD(null);
             }
         }).start();
@@ -132,7 +148,10 @@ public class GameActivity extends BaseGameActivity {
     }
 
     protected void loadScenes() {
-        mainScene = new MainScene(this, this.getVertexBufferObjectManager(), CAMERA_WIDTH, CAMERA_HEIGHT);
+        final Scene mainScene = new MainScene(this, this.getVertexBufferObjectManager());
+        scenes.put(SceneEnum.Main, mainScene);
+        final Scene teamScene = new TeamScene(this, this.getVertexBufferObjectManager());
+        scenes.put(SceneEnum.Team, teamScene);
     }
 
     private void loadResources1() {
@@ -141,7 +160,7 @@ public class GameActivity extends BaseGameActivity {
             TiledTextureFactory.getInstance().loadResource(getTextureManager(), getAssets());
             for (int i = 0; i < 1000; i++) {
                 progressBar.setProgress(i * 0.1f);
-                Thread.sleep(5);
+                Thread.sleep(2);
             }
         } catch (final InterruptedException e) {
             e.printStackTrace();
@@ -150,4 +169,7 @@ public class GameActivity extends BaseGameActivity {
         }
     }
 
+    public Map<SceneEnum, Scene> getScenes() {
+        return scenes;
+    }
 }
