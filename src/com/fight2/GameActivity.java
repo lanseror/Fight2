@@ -24,6 +24,7 @@ import android.content.res.AssetManager;
 
 import com.fight2.scene.MainScene;
 import com.fight2.util.TextureFactory;
+import com.fight2.util.TiledTextureFactory;
 
 public class GameActivity extends BaseGameActivity {
     private static final int CAMERA_WIDTH = 1136;
@@ -137,6 +138,7 @@ public class GameActivity extends BaseGameActivity {
     private void loadResources1() {
         try {
             TextureFactory.getInstance().loadResource(getTextureManager(), getAssets());
+            TiledTextureFactory.getInstance().loadResource(getTextureManager(), getAssets());
             for (int i = 0; i < 1000; i++) {
                 progressBar.setProgress(i * 0.1f);
                 Thread.sleep(5);
