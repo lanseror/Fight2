@@ -151,10 +151,12 @@ public class GameActivity extends BaseGameActivity {
         scenes.put(SceneEnum.Main, mainScene);
         final Scene teamScene = new TeamScene(this);
         scenes.put(SceneEnum.Team, teamScene);
+        
     }
 
     private void loadResources1() {
         try {
+            Thread.sleep(1000);
             TextureFactory.getInstance().loadResource(getTextureManager(), getAssets());
             TiledTextureFactory.getInstance().loadResource(getTextureManager(), getAssets());
             for (int i = 0; i < 1000; i++) {

@@ -31,8 +31,8 @@ public enum TextureEnum {
     MAIN_TREE("images/main_tree.png", 1136, 640),
 
     // Team scene images.
-    TEAM_BG("images/main_backgroud.png", 960, 640),
-    TEAM_frame("images/team_frame.png", 850, 536),
+    TEAM_BG("images/team_backgroud.png", 1136, 640),
+    TEAM_FRAME("images/team_frame.png", 850, 536),
     TEAM_FRAME_GRID("images/team_frame_grid.png", 490, 98),
     TEAM_BUTTON_ORGANIZE("images/team_button_organize.png", 101, 43);
 
