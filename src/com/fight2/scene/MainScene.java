@@ -55,7 +55,7 @@ public class MainScene extends Scene {
         } catch (final IOException e) {
             e.printStackTrace();
         }
-        effectRegion = TextureRegionFactory.extractTiledFromTexture(texture, 5, 1);
+        effectRegion = TextureRegionFactory.extractTiledFromTexture(texture, 8, 1);
         texture.load();
         init();
     }
@@ -157,8 +157,8 @@ public class MainScene extends Scene {
         final Sprite pigeonSprite = createImageSprite(TextureEnum.MAIN_PIGEON, 16);
         this.attachChild(pigeonSprite);
 
-        final AnimatedSprite summonStoneEffect = new AnimatedSprite(570, 128, 120, 120, effectRegion, vbom);
-        summonStoneEffect.animate(250);
+        final AnimatedSprite summonStoneEffect = new AnimatedSprite(560, 120, effectRegion, vbom);
+        summonStoneEffect.animate(125);
         this.attachChild(summonStoneEffect);
 
         this.setOnSceneTouchListener(new IOnSceneTouchListener() {

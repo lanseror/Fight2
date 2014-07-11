@@ -137,12 +137,12 @@ public class GameActivity extends BaseGameActivity {
     private void loadResources1() {
         try {
             TextureFactory.getInstance().loadResource(getTextureManager(), getAssets());
-             for (int i = 0; i < 1000; i++) {
-             progressBar.setProgress(i * 0.1f);
-             Thread.sleep(10);
-             }
-             } catch (final InterruptedException e) {
-             e.printStackTrace();
+            for (int i = 0; i < 1000; i++) {
+                progressBar.setProgress(i * 0.1f);
+                Thread.sleep(5);
+            }
+        } catch (final InterruptedException e) {
+            e.printStackTrace();
         } catch (final IOException e) {
             e.printStackTrace();
         }
