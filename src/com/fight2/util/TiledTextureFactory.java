@@ -7,7 +7,6 @@ import java.util.Map;
 import org.andengine.opengl.texture.ITexture;
 import org.andengine.opengl.texture.TextureManager;
 import org.andengine.opengl.texture.bitmap.AssetBitmapTexture;
-import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.opengl.texture.region.TextureRegionFactory;
 
@@ -37,7 +36,7 @@ public class TiledTextureFactory {
         }
     }
 
-    public ITextureRegion getIextureRegion(final TiledTextureEnum textureEnum) {
+    public ITiledTextureRegion getIextureRegion(final TiledTextureEnum textureEnum) {
         return this.datas.get(textureEnum);
     }
 
