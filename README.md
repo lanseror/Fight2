@@ -1,4 +1,4 @@
 fight2
 ======
 
-A board game using andengine.
+A board game base on andengine.
