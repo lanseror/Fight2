@@ -8,7 +8,9 @@ public class Card {
     private int level;
     private int tier;// Evolution tier
     private int hp;
-    private int attack;
+    private int atk;// Attack value;
+    private String skill;
+    private int skillLevel;
     private int version;
 
     public String getId() {
@@ -67,12 +69,28 @@ public class Card {
         this.hp = hp;
     }
 
-    public int getAttack() {
-        return attack;
+    public int getAtk() {
+        return atk;
     }
 
-    public void setAttack(final int attack) {
-        this.attack = attack;
+    public void setAtk(final int atk) {
+        this.atk = atk;
+    }
+
+    public String getSkill() {
+        return skill;
+    }
+
+    public void setSkill(final String skill) {
+        this.skill = skill;
+    }
+
+    public int getSkillLevel() {
+        return skillLevel;
+    }
+
+    public void setSkillLevel(final int skillLevel) {
+        this.skillLevel = skillLevel;
     }
 
     public int getVersion() {
