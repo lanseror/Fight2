@@ -34,8 +34,11 @@ public enum TextureEnum {
     TEAM_BG("images/team_backgroud.png", 1136, 640),
     TEAM_FRAME("images/team_frame.png", 850, 536),
     TEAM_FRAME_GRID("images/team_frame_grid.png", 490, 98),
-    TEAM_BUTTON_ORGANIZE("images/team_button_organize.png", 101, 43);
+    TEAM_BUTTON_ORGANIZE("images/team_button_organize.png", 101, 43),
 
+    TEST_CARD1("card/card1.jpg", 101, 43),
+    TEST_CARD2("card/card2.jpg", 101, 43),
+    TEST_CARD3("card/card3.jpg", 101, 43);
     private final String url;
     private final float width;
     private final float height;
