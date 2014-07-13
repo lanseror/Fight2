@@ -149,8 +149,12 @@ public class GameActivity extends BaseGameActivity {
     protected void loadScenes() {
         final Scene mainScene = new MainScene(this);
         scenes.put(SceneEnum.Main, mainScene);
-        final Scene teamScene = new TeamScene(this);
-        scenes.put(SceneEnum.Team, teamScene);
+        try {
+            final Scene teamScene = new TeamScene(this);
+            scenes.put(SceneEnum.Team, teamScene);
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
 
     }
 

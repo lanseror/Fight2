@@ -1,5 +1,6 @@
 package com.fight2.scene;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -11,18 +12,21 @@ import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
-import org.andengine.entity.sprite.batch.SpriteGroup;
 import org.andengine.input.touch.TouchEvent;
+import org.andengine.opengl.texture.ITexture;
+import org.andengine.opengl.texture.bitmap.AssetBitmapTexture;
 import org.andengine.opengl.texture.region.ITextureRegion;
+import org.andengine.opengl.texture.region.TextureRegionFactory;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.algorithm.collision.EntityCollisionChecker;
-import org.andengine.util.debug.Debug;
 
 import android.util.SparseArray;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.ConfigEnum;
 import com.fight2.constant.TextureEnum;
+import com.fight2.entity.Card;
+import com.fight2.entity.GameUserSession;
 import com.fight2.util.ConfigHelper;
 import com.fight2.util.TextureFactory;
 
@@ -36,13 +40,12 @@ public class TeamScene extends Scene {
     private final int deviceWidth;
     private final int deviceHeight;
 
-    private final String[] actions = { "DOWN", "UP", "MOVE", "CANCEL", "OUTSIDE" };
-
     private final SparseArray<Sprite> gridOrders = new SparseArray<Sprite>();
     private final List<Float> gridYList = new ArrayList<Float>();
     private final List<Rectangle> gridCollisionList = new ArrayList<Rectangle>();
+    private final List<List<Card>> cardParties = GameUserSession.getInstance().getParties();
 
-    public TeamScene(final GameActivity activity) {
+    public TeamScene(final GameActivity activity) throws IOException {
         super();
         this.activity = activity;
         this.vbom = activity.getVertexBufferObjectManager();
@@ -56,7 +59,7 @@ public class TeamScene extends Scene {
         init();
     }
 
-    private void init() {
+    private void init() throws IOException {
         final Sprite bgSprite = createImageSprite2(TextureEnum.TEAM_BG, 0, 0);
         final Background background = new SpriteBackground(bgSprite);
         this.setBackground(background);
@@ -65,58 +68,31 @@ public class TeamScene extends Scene {
         final Sprite frameSprite = createImageSprite(TextureEnum.TEAM_FRAME, 0, frameY);
         this.attachChild(frameSprite);
 
-        final TextureFactory textureFactory = TextureFactory.getInstance();
-        final ITextureRegion card1Texture = textureFactory.getIextureRegion(TextureEnum.TEST_CARD1);
         final int cardWidth = 94;
         final int cardHeight = 94;
         final float cardY = 47f;
         final int gap = 37;
-        final Sprite card1 = new Sprite(49f, cardY, cardWidth, cardHeight, card1Texture, vbom);
-        final Sprite card11 = new Sprite(card1.getX() + gap + cardWidth, cardY, cardWidth, cardHeight, card1Texture, vbom);
-        final Sprite card111 = new Sprite(card11.getX() + gap + cardWidth, cardY, cardWidth, cardHeight, card1Texture, vbom);
-        final Sprite card1111 = new Sprite(card111.getX() + gap + cardWidth, cardY, cardWidth, cardHeight, card1Texture, vbom);
 
-        final Sprite gridSprite1 = createGridSprite(TextureEnum.TEAM_FRAME_GRID, 196, frameY + 322);
-        gridOrders.put(0, gridSprite1);
-        gridYList.add(gridSprite1.getY());
-        gridCollisionList.add(this.createGridCollisionArea(gridSprite1));
-        this.attachChild(gridSprite1);
-        this.registerTouchArea(gridSprite1);
-        gridSprite1.attachChild(card1);
-        gridSprite1.attachChild(card11);
-        gridSprite1.attachChild(card111);
-        gridSprite1.attachChild(card1111);
+        for (int partyIndex = 0; partyIndex < cardParties.size(); partyIndex++) {
+            final Sprite gridSprite = createGridSprite(TextureEnum.TEAM_FRAME_GRID, 196, frameY + 323 - partyIndex * 44);
+            gridOrders.put(partyIndex, gridSprite);
+            gridYList.add(gridSprite.getY());
+            gridCollisionList.add(this.createGridCollisionArea(gridSprite));
+            this.attachChild(gridSprite);
+            this.registerTouchArea(gridSprite);
 
-        final ITextureRegion card2Texture = textureFactory.getIextureRegion(TextureEnum.TEST_CARD2);
-        final Sprite card2 = new Sprite(49f, cardY, cardWidth, cardHeight, card2Texture, vbom);
-        final Sprite card22 = new Sprite(card2.getX() + gap + cardWidth, cardY, cardWidth, cardHeight, card2Texture, vbom);
-        final Sprite card222 = new Sprite(card22.getX() + gap + cardWidth, cardY, cardWidth, cardHeight, card2Texture, vbom);
-        final Sprite card2222 = new Sprite(card222.getX() + gap + cardWidth, cardY, cardWidth, cardHeight, card2Texture, vbom);
+            final List<Card> cards = cardParties.get(partyIndex);
+            for (int cardIndex = 0; cardIndex < cards.size(); cardIndex++) {
+                final Card card = cards.get(cardIndex);
+                if (card != null) {
+                    final ITextureRegion cardTextureRegion = createCardTexture(card.getImage());
+                    final Sprite cardSprite = new Sprite(49f + (gap + cardWidth) * cardIndex, cardY, cardWidth, cardHeight, cardTextureRegion, vbom);
+                    gridSprite.attachChild(cardSprite);
+                }
 
-        final Sprite gridSprite2 = createGridSprite(TextureEnum.TEAM_FRAME_GRID, 196, frameY + 179);
-        gridOrders.put(1, gridSprite2);
-        gridYList.add(gridSprite2.getY());
-        gridCollisionList.add(this.createGridCollisionArea(gridSprite2));
-        this.attachChild(gridSprite2);
-        this.registerTouchArea(gridSprite2);
-        gridSprite2.attachChild(card2);
-        gridSprite2.attachChild(card22);
-        gridSprite2.attachChild(card222);
-        gridSprite2.attachChild(card2222);
+            }
 
-        final ITextureRegion card3Texture = textureFactory.getIextureRegion(TextureEnum.TEST_CARD3);
-        final Sprite card3 = new Sprite(49f, cardY, cardWidth, cardHeight, card3Texture, vbom);
-        final Sprite card33 = new Sprite(card3.getX() + gap + cardWidth, cardY, cardWidth, cardHeight, card3Texture, vbom);
-        final Sprite card333 = new Sprite(card33.getX() + gap + cardWidth, cardY, cardWidth, cardHeight, card3Texture, vbom);
-        final Sprite gridSprite3 = createGridSprite(TextureEnum.TEAM_FRAME_GRID, 196, frameY + 35);
-        gridOrders.put(2, gridSprite3);
-        gridYList.add(gridSprite3.getY());
-        gridCollisionList.add(this.createGridCollisionArea(gridSprite3));
-        this.attachChild(gridSprite3);
-        this.registerTouchArea(gridSprite3);
-        gridSprite3.attachChild(card3);
-        gridSprite3.attachChild(card33);
-        gridSprite3.attachChild(card333);
+        }
 
         final Sprite organizeSprite = createImageSprite(TextureEnum.TEAM_BUTTON_ORGANIZE, 713, frameY + 340);
         this.attachChild(organizeSprite);
@@ -127,8 +103,13 @@ public class TeamScene extends Scene {
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
-        Debug.e("isTouchAreaBindingOnActionDownEnabled:  " + this.isTouchAreaBindingOnActionDownEnabled());
-        Debug.e("setTouchAreaBindingOnActionMoveEnabled:  " + this.isTouchAreaBindingOnActionMoveEnabled());
+    }
+
+    private ITextureRegion createCardTexture(final String imageUrl) throws IOException {
+        final ITexture texture = new AssetBitmapTexture(activity.getTextureManager(), activity.getAssets(), imageUrl);
+        final ITextureRegion textureRegion = TextureRegionFactory.extractFromTexture(texture);
+        texture.load();
+        return textureRegion;
     }
 
     private Rectangle createGridCollisionArea(final Sprite sprite) {
@@ -197,8 +178,6 @@ public class TeamScene extends Scene {
         final ITextureRegion texture = textureFactory.getIextureRegion(textureEnum);
         final float width = textureEnum.getWidth();
         final float height = textureEnum.getHeight();
-        final float pX = x + width * 0.5f;
-        final float pY = y + height * 0.5f;
         final Sprite sprite = new Sprite(cameraCenterX, cameraCenterY, width, height, texture, vbom);
         return sprite;
     }
