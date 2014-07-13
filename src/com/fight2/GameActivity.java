@@ -2,6 +2,7 @@ package com.fight2;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.andengine.engine.camera.Camera;
@@ -27,6 +28,8 @@ import android.util.DisplayMetrics;
 
 import com.fight2.constant.ConfigEnum;
 import com.fight2.constant.SceneEnum;
+import com.fight2.entity.Card;
+import com.fight2.entity.GameUserSession;
 import com.fight2.scene.MainScene;
 import com.fight2.scene.TeamScene;
 import com.fight2.util.ConfigHelper;
@@ -171,6 +174,17 @@ public class GameActivity extends BaseGameActivity {
             e.printStackTrace();
         } catch (final IOException e) {
             e.printStackTrace();
+        }
+
+        final GameUserSession session = GameUserSession.getInstance();
+        final List<List<Card>> parties = session.getParties();
+        for (int partyIndex = 0; partyIndex < parties.size(); partyIndex++) {
+            final List<Card> cards = parties.get(partyIndex);
+            for (int cardIndex = 0; cardIndex <4; cardIndex++) {
+                final Card card = new Card();
+                card.setImage("card/card" + (partyIndex + 1) + ".jpg");
+                cards.add(card);
+            }
         }
     }
 

@@ -74,7 +74,7 @@ public class TeamScene extends Scene {
         final int gap = 37;
 
         for (int partyIndex = 0; partyIndex < cardParties.size(); partyIndex++) {
-            final Sprite gridSprite = createGridSprite(TextureEnum.TEAM_FRAME_GRID, 196, frameY + 323 - partyIndex * 44);
+            final Sprite gridSprite = createGridSprite(TextureEnum.TEAM_FRAME_GRID, 196, frameY + 323 - partyIndex * 144);
             gridOrders.put(partyIndex, gridSprite);
             gridYList.add(gridSprite.getY());
             gridCollisionList.add(this.createGridCollisionArea(gridSprite));
@@ -94,11 +94,11 @@ public class TeamScene extends Scene {
 
         }
 
-        final Sprite organizeSprite = createImageSprite(TextureEnum.TEAM_BUTTON_ORGANIZE, 713, frameY + 340);
+        final Sprite organizeSprite = createImageSprite(TextureEnum.TEAM_ORGANIZE_BUTTON, 713, frameY + 340);
         this.attachChild(organizeSprite);
-        final Sprite organizeSprite2 = createImageSprite(TextureEnum.TEAM_BUTTON_ORGANIZE, 713, frameY + 197);
+        final Sprite organizeSprite2 = createImageSprite(TextureEnum.TEAM_ORGANIZE_BUTTON, 713, frameY + 197);
         this.attachChild(organizeSprite2);
-        final Sprite organizeSprite3 = createImageSprite(TextureEnum.TEAM_BUTTON_ORGANIZE, 713, frameY + 53);
+        final Sprite organizeSprite3 = createImageSprite(TextureEnum.TEAM_ORGANIZE_BUTTON, 713, frameY + 53);
         this.attachChild(organizeSprite3);
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
