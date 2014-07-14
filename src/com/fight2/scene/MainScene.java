@@ -1,5 +1,6 @@
 package com.fight2.scene;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,27 +12,16 @@ import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
-import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.texture.region.ITiledTextureRegion;
-import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.util.algorithm.collision.BaseCollisionChecker;
 
 import com.fight2.GameActivity;
-import com.fight2.constant.ConfigEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.constant.TiledTextureEnum;
-import com.fight2.util.ConfigHelper;
-import com.fight2.util.TextureFactory;
 import com.fight2.util.TiledTextureFactory;
 
-public class MainScene extends Scene {
-    private final GameActivity activity;
-    private final VertexBufferObjectManager vbom;
-    private final int cameraWidth;
-    private final int cameraHeight;
-    private final float cameraCenterX;
-    private final float cameraCenterY;
+public class MainScene extends BaseScene {
     private static final float[] GATE_VERTICES = { 20, 468, 548, 475, 506, 382, 451, 338, 60, 344 };
     private static final float[] CONGRESS_VERTICES = { 559, 416, 862, 633, 997, 496, 1003, 451, 930, 380 };
     private static final float[] ARENA_VERTICES = { 518, 392, 863, 386, 861, 283, 534, 270 };
@@ -44,113 +34,106 @@ public class MainScene extends Scene {
 
     private final Map<Sprite, Sprite> buttonSprites = new HashMap<Sprite, Sprite>();
 
-    public MainScene(final GameActivity activity) {
-        super();
-        this.activity = activity;
-        this.vbom = activity.getVertexBufferObjectManager();
-        final ConfigHelper configHelper = ConfigHelper.getInstance();
-        this.cameraWidth = configHelper.getInt(ConfigEnum.CameraWidth);
-        this.cameraHeight = configHelper.getInt(ConfigEnum.CameraHeight);
-        this.cameraCenterX = cameraWidth * 0.5f;
-        this.cameraCenterY = cameraHeight * 0.5f;
-        init();
+    public MainScene(final GameActivity activity) throws IOException {
+        super(activity);
     }
 
-    private void init() {
-        final Sprite bgSprite = createImageSprite(TextureEnum.MAIN_BG, 0);
+    @Override
+    protected void init() {
+        final Sprite bgSprite = createCameraImageSprite(TextureEnum.MAIN_BG, 0, 0);
         final Background background = new SpriteBackground(bgSprite);
         this.setBackground(background);
 
-        final Sprite gateSprite = createImageSprite(TextureEnum.MAIN_GATE, 0, 248);
-        final Sprite gateFcsSprite = createImageSprite(TextureEnum.MAIN_GATE_FCS, 0, 248);
+        final Sprite gateSprite = createCameraImageSprite(TextureEnum.MAIN_GATE, 0, 248);
+        final Sprite gateFcsSprite = createCameraImageSprite(TextureEnum.MAIN_GATE_FCS, 0, 248);
         gateFcsSprite.setVisible(false);
         this.attachChild(gateSprite);
         this.attachChild(gateFcsSprite);
         this.registerTouchArea(gateSprite);
         buttonSprites.put(gateSprite, gateFcsSprite);
 
-        final Sprite townSprite = createImageSprite(TextureEnum.MAIN_TOWN, 2);
+        final Sprite townSprite = createCameraImageSprite(TextureEnum.MAIN_TOWN, 0, 0);
         this.attachChild(townSprite);
 
-        final Sprite congressSprite = createImageSprite(TextureEnum.MAIN_CONGRESS, 517, 157);
+        final Sprite congressSprite = createCameraImageSprite(TextureEnum.MAIN_CONGRESS, 517, 157);
         this.attachChild(congressSprite);
-        final Sprite congressFcsSprite = createImageSprite(TextureEnum.MAIN_CONGRESS_FCS, 517, 157);
+        final Sprite congressFcsSprite = createCameraImageSprite(TextureEnum.MAIN_CONGRESS_FCS, 517, 157);
         congressFcsSprite.setVisible(false);
         this.attachChild(congressFcsSprite);
         this.registerTouchArea(congressSprite);
         buttonSprites.put(congressSprite, congressFcsSprite);
 
-        final Sprite arenaSprite = createImageSprite(TextureEnum.MAIN_ARENA, 496, 161);
+        final Sprite arenaSprite = createCameraImageSprite(TextureEnum.MAIN_ARENA, 496, 161);
         this.attachChild(arenaSprite);
-        final Sprite arenaFcsSprite = createImageSprite(TextureEnum.MAIN_ARENA_FCS, 496, 161);
+        final Sprite arenaFcsSprite = createCameraImageSprite(TextureEnum.MAIN_ARENA_FCS, 496, 161);
         arenaFcsSprite.setVisible(false);
         this.attachChild(arenaFcsSprite);
         this.registerTouchArea(arenaSprite);
         buttonSprites.put(arenaSprite, arenaFcsSprite);
 
-        final Sprite treeSprite = createImageSprite(TextureEnum.MAIN_TREE, 5);
+        final Sprite treeSprite = createCameraImageSprite(TextureEnum.MAIN_TREE, 0, 0);
         this.attachChild(treeSprite);
 
-        final Sprite houseCenterSprite = createImageSprite(TextureEnum.MAIN_HOUSE_CENTER, 6);
+        final Sprite houseCenterSprite = createCameraImageSprite(TextureEnum.MAIN_HOUSE_CENTER, 0, 0);
         this.attachChild(houseCenterSprite);
 
-        final Sprite hotelSprite = createImageSprite(TextureEnum.MAIN_HOTEL, 194, 94);
+        final Sprite hotelSprite = createCameraImageSprite(TextureEnum.MAIN_HOTEL, 194, 94);
         this.attachChild(hotelSprite);
-        final Sprite hotelFcsSprite = createImageSprite(TextureEnum.MAIN_HOTEL_FCS, 194, 94);
+        final Sprite hotelFcsSprite = createCameraImageSprite(TextureEnum.MAIN_HOTEL_FCS, 194, 94);
         hotelFcsSprite.setVisible(false);
         this.attachChild(hotelFcsSprite);
         this.registerTouchArea(hotelSprite);
         buttonSprites.put(hotelSprite, hotelFcsSprite);
 
-        final Sprite trainingCampSprite = createImageSprite(TextureEnum.MAIN_TRAINING_CAMP, 562, 94);
+        final Sprite trainingCampSprite = createCameraImageSprite(TextureEnum.MAIN_TRAINING_CAMP, 562, 94);
         this.attachChild(trainingCampSprite);
-        final Sprite trainingCampFcsSprite = createImageSprite(TextureEnum.MAIN_TRAINING_CAMP_FCS, 562, 94);
+        final Sprite trainingCampFcsSprite = createCameraImageSprite(TextureEnum.MAIN_TRAINING_CAMP_FCS, 562, 94);
         trainingCampFcsSprite.setVisible(false);
         this.attachChild(trainingCampFcsSprite);
         this.registerTouchArea(trainingCampSprite);
         buttonSprites.put(trainingCampSprite, trainingCampFcsSprite);
 
-        final Sprite guildSprite = createImageSprite(TextureEnum.MAIN_GUILD, 918, 64);
+        final Sprite guildSprite = createCameraImageSprite(TextureEnum.MAIN_GUILD, 918, 64);
         this.attachChild(guildSprite);
-        final Sprite guildFcsSprite = createImageSprite(TextureEnum.MAIN_GUILD_FCS, 918, 64);
+        final Sprite guildFcsSprite = createCameraImageSprite(TextureEnum.MAIN_GUILD_FCS, 918, 64);
         guildFcsSprite.setVisible(false);
         this.attachChild(guildFcsSprite);
         this.registerTouchArea(guildSprite);
         buttonSprites.put(guildSprite, guildFcsSprite);
 
-        final Sprite billboardSprite = createImageSprite(TextureEnum.MAIN_BILLBOARD, 419, 70);
+        final Sprite billboardSprite = createCameraImageSprite(TextureEnum.MAIN_BILLBOARD, 419, 70);
         this.attachChild(billboardSprite);
-        final Sprite billboardFcsSprite = createImageSprite(TextureEnum.MAIN_BILLBOARD_FCS, 419, 70);
+        final Sprite billboardFcsSprite = createCameraImageSprite(TextureEnum.MAIN_BILLBOARD_FCS, 419, 70);
         billboardFcsSprite.setVisible(false);
         this.attachChild(billboardFcsSprite);
         this.registerTouchArea(billboardSprite);
         buttonSprites.put(billboardSprite, billboardFcsSprite);
 
-        final Sprite peopleSprite = createImageSprite(TextureEnum.MAIN_PEOPLE, 11);
+        final Sprite peopleSprite = createCameraImageSprite(TextureEnum.MAIN_PEOPLE, 0, 0);
         this.attachChild(peopleSprite);
 
-        final Sprite summonStoneSprite = createImageSprite(TextureEnum.MAIN_SUMMON_STONE, 412, 0);
+        final Sprite summonStoneSprite = createCameraImageSprite(TextureEnum.MAIN_SUMMON_STONE, 412, 0);
         this.attachChild(summonStoneSprite);
-        final Sprite summonStoneFcsSprite = createImageSprite(TextureEnum.MAIN_SUMMON_STONE_FCS, 412, 0);
+        final Sprite summonStoneFcsSprite = createCameraImageSprite(TextureEnum.MAIN_SUMMON_STONE_FCS, 412, 0);
         summonStoneFcsSprite.setVisible(false);
         this.attachChild(summonStoneFcsSprite);
         this.registerTouchArea(summonStoneSprite);
         buttonSprites.put(summonStoneSprite, summonStoneFcsSprite);
 
-        final Sprite mailBoxSprite = createImageSprite(TextureEnum.MAIN_MAIL_BOX, 747, 0);
+        final Sprite mailBoxSprite = createCameraImageSprite(TextureEnum.MAIN_MAIL_BOX, 747, 0);
         this.attachChild(mailBoxSprite);
-        final Sprite mailBoxFcsSprite = createImageSprite(TextureEnum.MAIN_MAIL_BOX_FCS, 747, 0);
+        final Sprite mailBoxFcsSprite = createCameraImageSprite(TextureEnum.MAIN_MAIL_BOX_FCS, 747, 0);
         mailBoxFcsSprite.setVisible(false);
         this.attachChild(mailBoxFcsSprite);
         buttonSprites.put(mailBoxSprite, mailBoxFcsSprite);
 
-        final Sprite houseLeftSprite = createImageSprite(TextureEnum.MAIN_HOUSE_LEFT, 14);
+        final Sprite houseLeftSprite = createCameraImageSprite(TextureEnum.MAIN_HOUSE_LEFT, 0, 0);
         this.attachChild(houseLeftSprite);
 
         // final Sprite sunshineSprite = createImageSprite(TextureEnum.MAIN_SUNSHINE, 15);
         // this.attachChild(sunshineSprite);
 
-        final Sprite pigeonSprite = createImageSprite(TextureEnum.MAIN_PIGEON, 16);
+        final Sprite pigeonSprite = createCameraImageSprite(TextureEnum.MAIN_PIGEON, 0, 0);
         this.attachChild(pigeonSprite);
 
         final ITiledTextureRegion summonEffect = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.MAIN_SUMMON_STONE_EFFECT);
@@ -223,25 +206,6 @@ public class MainScene extends Scene {
                 unfocusSprite(gateSprite);
             }
         });
-    }
-
-    private Sprite createImageSprite(final TextureEnum textureEnum, final int pZIndex) {
-        final TextureFactory textureFactory = TextureFactory.getInstance();
-        final ITextureRegion texture = textureFactory.getIextureRegion(textureEnum);
-        final Sprite sprite = new Sprite(cameraCenterX, cameraCenterY, cameraWidth, cameraHeight, texture, vbom);
-        sprite.setZIndex(pZIndex);
-        return sprite;
-    }
-
-    private Sprite createImageSprite(final TextureEnum textureEnum, final float x, final float y) {
-        final TextureFactory textureFactory = TextureFactory.getInstance();
-        final ITextureRegion texture = textureFactory.getIextureRegion(textureEnum);
-        final float width = textureEnum.getWidth();
-        final float height = textureEnum.getHeight();
-        final float pX = x + width * 0.5f;
-        final float pY = y + height * 0.5f;
-        final Sprite sprite = new Sprite(pX, pY, width, height, texture, vbom);
-        return sprite;
     }
 
     private void focusSprite(final Sprite sprite) {

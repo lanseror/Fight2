@@ -150,9 +150,9 @@ public class GameActivity extends BaseGameActivity {
     }
 
     protected void loadScenes() {
-        final Scene mainScene = new MainScene(this);
-        scenes.put(SceneEnum.Main, mainScene);
         try {
+            final Scene mainScene = new MainScene(this);
+            scenes.put(SceneEnum.Main, mainScene);
             final Scene partyScene = new PartyScene(this);
             scenes.put(SceneEnum.Party, partyScene);
         } catch (final IOException e) {
@@ -180,7 +180,7 @@ public class GameActivity extends BaseGameActivity {
         final List<List<Card>> parties = session.getParties();
         for (int partyIndex = 0; partyIndex < parties.size(); partyIndex++) {
             final List<Card> cards = parties.get(partyIndex);
-            for (int cardIndex = 0; cardIndex <4; cardIndex++) {
+            for (int cardIndex = 0; cardIndex < 4; cardIndex++) {
                 final Card card = new Card();
                 card.setImage("card/card" + (partyIndex + 1) + ".jpg");
                 cards.add(card);
