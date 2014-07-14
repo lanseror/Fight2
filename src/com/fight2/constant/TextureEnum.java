@@ -30,12 +30,12 @@ public enum TextureEnum {
     MAIN_TRAINING_CAMP_FCS("images/main_training_camp_fcs.png", 387, 219),
     MAIN_TREE("images/main_tree.png", 1136, 640),
 
-    // Team scene images.
-    TEAM_BG("images/team_backgroud.png", 1136, 640),
-    TEAM_FRAME("images/team_frame.png", 850, 536),
-    TEAM_FRAME_GRID("images/team_frame_grid.png", 490, 98),
-    TEAM_ORGANIZE_BUTTON("images/team_organize_button.png", 101, 43),
-    TEAM_ORGANIZE_BG("images/team_organize_backgroud.png", 1136, 640),
+    // Party scene images.
+    PARTY_BG("images/party_backgroud.png", 1136, 640),
+    PARTY_FRAME("images/party_frame.png", 850, 536),
+    PARTY_FRAME_GRID("images/party_frame_grid.png", 490, 98),
+    PARTY_EDIT_BUTTON("images/party_edit_button.png", 101, 43),
+    PARTY_EDIT_BG("images/party_edit_backgroud.png", 1136, 640),
 
     // Common images.
     COMMON_BACK_BUTTON("button/button_back.jpg", 100, 100),

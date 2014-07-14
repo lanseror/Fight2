@@ -31,7 +31,7 @@ import com.fight2.constant.SceneEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
 import com.fight2.scene.MainScene;
-import com.fight2.scene.TeamScene;
+import com.fight2.scene.PartyScene;
 import com.fight2.util.ConfigHelper;
 import com.fight2.util.TextureFactory;
 import com.fight2.util.TiledTextureFactory;
@@ -153,8 +153,8 @@ public class GameActivity extends BaseGameActivity {
         final Scene mainScene = new MainScene(this);
         scenes.put(SceneEnum.Main, mainScene);
         try {
-            final Scene teamScene = new TeamScene(this);
-            scenes.put(SceneEnum.Team, teamScene);
+            final Scene partyScene = new PartyScene(this);
+            scenes.put(SceneEnum.Party, partyScene);
         } catch (final IOException e) {
             e.printStackTrace();
         }

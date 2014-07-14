@@ -30,7 +30,7 @@ import com.fight2.entity.GameUserSession;
 import com.fight2.util.ConfigHelper;
 import com.fight2.util.TextureFactory;
 
-public class TeamScene extends Scene {
+public class PartyScene extends Scene {
     private final GameActivity activity;
     private final VertexBufferObjectManager vbom;
     private final float cameraCenterX;
@@ -45,7 +45,7 @@ public class TeamScene extends Scene {
     private final List<Rectangle> gridCollisionList = new ArrayList<Rectangle>();
     private final List<List<Card>> cardParties = GameUserSession.getInstance().getParties();
 
-    public TeamScene(final GameActivity activity) throws IOException {
+    public PartyScene(final GameActivity activity) throws IOException {
         super();
         this.activity = activity;
         this.vbom = activity.getVertexBufferObjectManager();
@@ -60,12 +60,12 @@ public class TeamScene extends Scene {
     }
 
     private void init() throws IOException {
-        final Sprite bgSprite = createImageSprite2(TextureEnum.TEAM_BG, 0, 0);
+        final Sprite bgSprite = createImageSprite2(TextureEnum.PARTY_BG, 0, 0);
         final Background background = new SpriteBackground(bgSprite);
         this.setBackground(background);
 
-        final float frameY = cameraHeight - TextureEnum.TEAM_FRAME.getHeight();
-        final Sprite frameSprite = createImageSprite(TextureEnum.TEAM_FRAME, 0, frameY);
+        final float frameY = cameraHeight - TextureEnum.PARTY_FRAME.getHeight();
+        final Sprite frameSprite = createImageSprite(TextureEnum.PARTY_FRAME, 0, frameY);
         this.attachChild(frameSprite);
 
         final int cardWidth = 94;
@@ -74,7 +74,7 @@ public class TeamScene extends Scene {
         final int gap = 37;
 
         for (int partyIndex = 0; partyIndex < cardParties.size(); partyIndex++) {
-            final Sprite gridSprite = createGridSprite(TextureEnum.TEAM_FRAME_GRID, 196, frameY + 323 - partyIndex * 144);
+            final Sprite gridSprite = createGridSprite(TextureEnum.PARTY_FRAME_GRID, 196, frameY + 323 - partyIndex * 144);
             gridOrders.put(partyIndex, gridSprite);
             gridYList.add(gridSprite.getY());
             gridCollisionList.add(this.createGridCollisionArea(gridSprite));
@@ -94,11 +94,11 @@ public class TeamScene extends Scene {
 
         }
 
-        final Sprite organizeSprite = createImageSprite(TextureEnum.TEAM_ORGANIZE_BUTTON, 713, frameY + 340);
+        final Sprite organizeSprite = createImageSprite(TextureEnum.PARTY_EDIT_BUTTON, 713, frameY + 340);
         this.attachChild(organizeSprite);
-        final Sprite organizeSprite2 = createImageSprite(TextureEnum.TEAM_ORGANIZE_BUTTON, 713, frameY + 197);
+        final Sprite organizeSprite2 = createImageSprite(TextureEnum.PARTY_EDIT_BUTTON, 713, frameY + 197);
         this.attachChild(organizeSprite2);
-        final Sprite organizeSprite3 = createImageSprite(TextureEnum.TEAM_ORGANIZE_BUTTON, 713, frameY + 53);
+        final Sprite organizeSprite3 = createImageSprite(TextureEnum.PARTY_EDIT_BUTTON, 713, frameY + 53);
         this.attachChild(organizeSprite3);
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
@@ -130,7 +130,7 @@ public class TeamScene extends Scene {
             @Override
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 this.setZIndex(100);
-                TeamScene.this.sortChildren();
+                PartyScene.this.sortChildren();
                 final float touchY = pSceneTouchEvent.getY();
                 if (pSceneTouchEvent.isActionMove()) {
                     this.setPosition(pX, touchY);
@@ -151,7 +151,7 @@ public class TeamScene extends Scene {
                 if (pSceneTouchEvent.isActionUp() || pSceneTouchEvent.isActionOutside() || pSceneTouchEvent.isActionCancel()) {
                     this.setPosition(pX, gridYList.get(gridOrders.indexOfValue(this)));
                     this.setZIndex(IEntity.ZINDEX_DEFAULT);
-                    TeamScene.this.sortChildren();
+                    PartyScene.this.sortChildren();
                 }
 
                 return true;

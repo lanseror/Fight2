@@ -197,7 +197,7 @@ public class MainScene extends Scene {
                         unfocusSprite(guildSprite);
                     } else if (checkContains(CAMP_VERTICES, x, y)) {
                         unfocusSprite(trainingCampSprite);
-                        engine.setScene(scenes.get(SceneEnum.Team));
+                        engine.setScene(scenes.get(SceneEnum.Party));
                     } else if (checkContains(HOTEL_VERTICES, x, y)) {
                         unfocusSprite(hotelSprite);
                     } else if (checkContains(ARENA_VERTICES, x, y)) {
