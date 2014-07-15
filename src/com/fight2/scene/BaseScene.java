@@ -15,6 +15,7 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import com.fight2.GameActivity;
 import com.fight2.constant.ConfigEnum;
 import com.fight2.constant.TextureEnum;
+import com.fight2.entity.F2ButtonSprite;
 import com.fight2.util.ConfigHelper;
 import com.fight2.util.TextureFactory;
 
@@ -27,6 +28,8 @@ public abstract class BaseScene extends Scene {
     protected final int cameraHeight;
     protected final int deviceWidth;
     protected final int deviceHeight;
+    protected final int simulatedWidth;
+    protected final int simulatedHeight;
 
     public BaseScene(final GameActivity activity) throws IOException {
         super();
@@ -39,7 +42,8 @@ public abstract class BaseScene extends Scene {
         this.cameraHeight = configHelper.getInt(ConfigEnum.CameraHeight);
         this.deviceWidth = configHelper.getInt(ConfigEnum.DeviceWidth);
         this.deviceHeight = configHelper.getInt(ConfigEnum.DeviceHeight);
-        init();
+        this.simulatedWidth = configHelper.getInt(ConfigEnum.SimulatedWidth);
+        this.simulatedHeight = configHelper.getInt(ConfigEnum.SimulatedHeight);
     }
 
     protected abstract void init() throws IOException;
@@ -64,6 +68,17 @@ public abstract class BaseScene extends Scene {
         return sprite;
     }
 
+    protected F2ButtonSprite createRealScreenF2ButtonSprite(final TextureEnum normalTextureEnum, final float x, final float y) {
+        final TextureFactory textureFactory = TextureFactory.getInstance();
+        final ITextureRegion texture = textureFactory.getIextureRegion(normalTextureEnum);
+        final float width = normalTextureEnum.getWidth();
+        final float height = normalTextureEnum.getHeight();
+        final float pX = x + width * 0.5f;
+        final float pY = y + height * 0.5f;
+        final F2ButtonSprite sprite = new F2ButtonSprite(pX, pY, texture, vbom);
+        return sprite;
+    }
+
     protected Sprite createCameraImageSprite(final TextureEnum textureEnum, final float x, final float y) {
         final TextureFactory textureFactory = TextureFactory.getInstance();
         final ITextureRegion texture = textureFactory.getIextureRegion(textureEnum);
@@ -74,4 +89,5 @@ public abstract class BaseScene extends Scene {
         final Sprite sprite = new Sprite(pX, pY, width, height, texture, vbom);
         return sprite;
     }
+
 }

@@ -1,6 +1,8 @@
 package com.fight2;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,12 +59,18 @@ public class GameActivity extends BaseGameActivity {
         final DisplayMetrics displayMetrics = new DisplayMetrics();
         this.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         final ConfigHelper configHelper = ConfigHelper.getInstance();
-        configHelper.setConfig(ConfigEnum.DeviceWidth, displayMetrics.widthPixels);
-        configHelper.setConfig(ConfigEnum.DeviceHeight, displayMetrics.heightPixels);
+        final int deviceWidth = displayMetrics.widthPixels > displayMetrics.heightPixels ? displayMetrics.widthPixels : displayMetrics.heightPixels;
+        final int deviceHeight = displayMetrics.widthPixels > displayMetrics.heightPixels ? displayMetrics.heightPixels : displayMetrics.widthPixels;
+        configHelper.setConfig(ConfigEnum.DeviceWidth, deviceWidth);
+        configHelper.setConfig(ConfigEnum.DeviceHeight, deviceHeight);
         configHelper.setConfig(ConfigEnum.CameraWidth, CAMERA_WIDTH);
         configHelper.setConfig(ConfigEnum.CameraHeight, CAMERA_HEIGHT);
         configHelper.setConfig(ConfigEnum.CameraCenterX, CAMERA_CENTER_X);
         configHelper.setConfig(ConfigEnum.CameraCenterY, CAMERA_CENTER_Y);
+        final BigDecimal factor = BigDecimal.valueOf(CAMERA_HEIGHT).divide(BigDecimal.valueOf(deviceHeight), 2, RoundingMode.HALF_DOWN);
+        final int simulatedWidth = BigDecimal.valueOf(deviceWidth).multiply(factor).intValue();
+        configHelper.setConfig(ConfigEnum.SimulatedWidth, simulatedWidth);
+        configHelper.setConfig(ConfigEnum.SimulatedHeight, CAMERA_HEIGHT);
         camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
         return new EngineOptions(true, ScreenOrientation.LANDSCAPE_SENSOR, new CropResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera);
     }
@@ -180,6 +188,7 @@ public class GameActivity extends BaseGameActivity {
         final List<List<Card>> parties = session.getParties();
         for (int partyIndex = 0; partyIndex < parties.size(); partyIndex++) {
             final List<Card> cards = parties.get(partyIndex);
+            cards.clear();
             for (int cardIndex = 0; cardIndex < 4; cardIndex++) {
                 final Card card = new Card();
                 card.setImage("card/card" + (partyIndex + 1) + ".jpg");
