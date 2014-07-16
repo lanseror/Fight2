@@ -41,9 +41,9 @@ public enum TextureEnum {
     COMMON_BACK_BUTTON_NORMAL("button/button_back.jpg", 100, 100),
     COMMON_BACK_BUTTON_PRESSED("button/button_back.jpg", 120, 120),
 
-    TEST_CARD1("card/card1.jpg", 101, 43),
-    TEST_CARD2("card/card2.jpg", 101, 43),
-    TEST_CARD3("card/card3.jpg", 101, 43);
+    TEST_CARD1("card/card1.jpg", 100, 100),
+    TEST_CARD2("card/card2.jpg", 100, 100),
+    TEST_CARD3("card/card3.jpg", 100, 100);
     private final String url;
     private final float width;
     private final float height;
