@@ -67,6 +67,7 @@ public class GameActivity extends BaseGameActivity {
         configHelper.setConfig(ConfigEnum.CameraHeight, CAMERA_HEIGHT);
         configHelper.setConfig(ConfigEnum.CameraCenterX, CAMERA_CENTER_X);
         configHelper.setConfig(ConfigEnum.CameraCenterY, CAMERA_CENTER_Y);
+        configHelper.setConfig(ConfigEnum.DPI, displayMetrics.densityDpi);
         final BigDecimal factor = BigDecimal.valueOf(CAMERA_HEIGHT).divide(BigDecimal.valueOf(deviceHeight), 2, RoundingMode.HALF_DOWN);
         final int simulatedWidth = BigDecimal.valueOf(deviceWidth).multiply(factor).intValue();
         configHelper.setConfig(ConfigEnum.SimulatedWidth, simulatedWidth);

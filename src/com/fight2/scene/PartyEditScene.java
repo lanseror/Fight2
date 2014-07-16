@@ -6,7 +6,6 @@ import java.math.RoundingMode;
 import java.util.Map;
 
 import org.andengine.engine.handler.BaseEntityUpdateHandler;
-import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.engine.handler.physics.PhysicsHandler;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.primitive.Rectangle;
@@ -22,17 +21,24 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 
 import com.fight2.GameActivity;
+import com.fight2.constant.ConfigEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.F2ButtonSprite;
 import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
+import com.fight2.util.ConfigHelper;
 
 public class PartyEditScene extends BaseScene {
+    private final static int BASE_PX = 600;
+    private final int factor;
+
     final Map<SceneEnum, Scene> scenes = this.activity.getScenes();
     private PhysicsHandler mPhysicsHandler;
 
     public PartyEditScene(final GameActivity activity) throws IOException {
         super(activity);
+        final BigDecimal devicePX = BigDecimal.valueOf(ConfigHelper.getInstance().getInt(ConfigEnum.DPI));
+        factor = BigDecimal.valueOf(BASE_PX).divide(devicePX, 2, RoundingMode.HALF_UP).intValue() * 300;
         init();
     }
 
@@ -66,7 +72,7 @@ public class PartyEditScene extends BaseScene {
                 // Debug.e("Action:" + action);
                 switch (action) {
                 case MotionEvent.ACTION_UP:
-                    velocityTracker.computeCurrentVelocity(800);
+                    velocityTracker.computeCurrentVelocity(factor);
                     final float velocityX = velocityTracker.getXVelocity();
                     Debug.e("velocityX:" + velocityX);
                     if (velocityTracker != null) {

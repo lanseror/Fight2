@@ -8,5 +8,6 @@ public enum ConfigEnum {
     CameraCenterX,
     CameraCenterY,
     SimulatedWidth,
-    SimulatedHeight;
+    SimulatedHeight,
+    DPI;
 }
