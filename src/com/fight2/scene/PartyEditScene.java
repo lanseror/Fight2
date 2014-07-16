@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Map;
 
+import org.andengine.engine.handler.BaseEntityUpdateHandler;
+import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.engine.handler.physics.PhysicsHandler;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.primitive.Rectangle;
@@ -13,9 +15,6 @@ import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
-import org.andengine.input.touch.detector.ScrollDetector;
-import org.andengine.input.touch.detector.ScrollDetector.IScrollDetectorListener;
-import org.andengine.input.touch.detector.SurfaceScrollDetector;
 import org.andengine.util.adt.color.Color;
 import org.andengine.util.debug.Debug;
 
@@ -31,7 +30,6 @@ import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
 public class PartyEditScene extends BaseScene {
     final Map<SceneEnum, Scene> scenes = this.activity.getScenes();
     private PhysicsHandler mPhysicsHandler;
-    private final SurfaceScrollDetector scrollDetector = new SurfaceScrollDetector(new CardPackScrollDetectorListener());
 
     public PartyEditScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -65,19 +63,19 @@ public class PartyEditScene extends BaseScene {
                     velocityTracker = VelocityTracker.obtain();
                 }
                 velocityTracker.addMovement(motionEvent);
-                Debug.e("Action:" + action);
+                // Debug.e("Action:" + action);
                 switch (action) {
                 case MotionEvent.ACTION_UP:
-                    velocityTracker.computeCurrentVelocity(220);
+                    velocityTracker.computeCurrentVelocity(800);
                     final float velocityX = velocityTracker.getXVelocity();
+                    Debug.e("velocityX:" + velocityX);
                     if (velocityTracker != null) {
                         velocityTracker.recycle();
                         velocityTracker = null;
                     }
 
                     PartyEditScene.this.mPhysicsHandler.setVelocityX(velocityX);
-                    PartyEditScene.this.mPhysicsHandler.setAccelerationX(velocityX > 0 ? -1500 : 1500);
-                    Debug.e("velocityX:" + velocityX);
+                    PartyEditScene.this.mPhysicsHandler.setAccelerationX(velocityX > 0 ? -1300 : 1300);
                     break;
 
                 }
@@ -86,12 +84,33 @@ public class PartyEditScene extends BaseScene {
         };
         cardPack.setColor(Color.TRANSPARENT);
 
+        final Rectangle cardZoom = new Rectangle(300, 180, 240, 250, vbom);
+        cardZoom.setColor(Color.BLACK);
+        this.attachChild(cardZoom);
+
         for (int i = 0; i < 50; i++) {
             final Sprite card = createRealScreenImageSprite(TextureEnum.TEST_CARD1, 10, 20);
             card.setWidth(120);
             card.setHeight(180);
             card.setPosition(60 + 130 * i, 120);
             cardPack.attachChild(card);
+
+            this.registerUpdateHandler(new BaseEntityUpdateHandler(card) {
+                @Override
+                protected void onUpdate(final float pSecondsElapsed, final IEntity pCard) {
+                    final float distance = cardZoom.getWidth() * 0.5f + pCard.getWidth() * 0.5f;
+                    final IEntity pCardPackp = pCard.getParent();
+                    final float x = pCard.getX() + pCardPackp.getX() - pCardPackp.getWidth() * 0.5f;
+                    final float diff = Math.abs(x - cardZoom.getX());
+                    if (diff < distance) {
+                        final BigDecimal bdDiff = BigDecimal.valueOf(distance - diff);
+                        final BigDecimal bdDistance = BigDecimal.valueOf(distance);
+                        pCard.setScale(1 + bdDiff.divide(bdDistance, 4, RoundingMode.HALF_UP).floatValue());
+                    } else {
+                        pCard.setScale(1);
+                    }
+                }
+            });
         }
 
         mPhysicsHandler = new PhysicsHandler(cardPack) {
@@ -100,15 +119,11 @@ public class PartyEditScene extends BaseScene {
                 final float accelerationX = this.getAccelerationX();
                 if (this.isEnabled() && accelerationX != 0) {
                     final float velocityX = this.getVelocityX();
-                    final BigDecimal bigVelocityX = BigDecimal.valueOf(velocityX);
-                    final BigDecimal bigAccelerationX = BigDecimal.valueOf(accelerationX);
+                    final float testVelocityX = mVelocityX + accelerationX * pSecondsElapsed;
                     if (velocityX == 0) {
-                        Debug.e("velocityX1:" + velocityX);
-                        this.setAccelerationX(0);
-                    } else if (Math.abs(bigVelocityX.divide(bigAccelerationX, 2, RoundingMode.HALF_UP)) < 2) {
-                        Debug.e("velocityX2:" + velocityX);
-                        this.setAccelerationX(0);
-                        this.setVelocityX(0);
+                        this.reset();
+                    } else if (Math.abs(mVelocityX) + Math.abs(testVelocityX) > Math.abs(mVelocityX + testVelocityX)) {
+                        this.reset();
                     }
                 }
                 super.onUpdate(pSecondsElapsed, pEntity);
@@ -119,27 +134,6 @@ public class PartyEditScene extends BaseScene {
         this.registerTouchArea(cardPack);
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
-    }
-
-    class CardPackScrollDetectorListener implements IScrollDetectorListener {
-
-        @Override
-        public void onScrollStarted(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void onScroll(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
-            // TODO Auto-generated method stub
-
-        }
-
-        @Override
-        public void onScrollFinished(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
-            // TODO Auto-generated method stub
-
-        }
-
+        this.setTouchAreaBindingOnActionMoveEnabled(true);
     }
 }
