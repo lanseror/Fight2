@@ -24,8 +24,8 @@ import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.F2ButtonSprite;
-import com.fight2.entity.GameUserSession;
 import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
+import com.fight2.entity.GameUserSession;
 import com.fight2.util.TextureFactory;
 
 public class PartyScene extends BaseScene {
