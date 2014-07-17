@@ -103,12 +103,16 @@ public class PartyEditScene extends BaseScene {
         cardZoom.setColor(Color.BLACK);
         this.attachChild(cardZoom);
 
+        final int initCardX = 60;
+        final int cardWidth = 120;
+        final int cardY = 120;
+        final int cardGap = 10;
         for (int i = 0; i < 50; i++) {
             final Sprite card = createRealScreenImageSprite(TextureEnum.TEST_CARD1, 10, 20);
             card.setTag(i);
-            card.setWidth(120);
+            card.setWidth(cardWidth);
             card.setHeight(180);
-            card.setPosition(60 + 130 * i, 120);
+            card.setPosition(initCardX + (cardGap + cardWidth) * i, cardY);
             cardPack.attachChild(card);
 
             this.registerUpdateHandler(new BaseEntityUpdateHandler(card) {
@@ -136,14 +140,18 @@ public class PartyEditScene extends BaseScene {
                         }
 
                         if (isLeftmostZoomCard) {
-                            final int maxAdjustCard = 6;
+                            float cardLeft = initCardX - cardWidth * 0.5f + (cardGap + cardWidth) * currentCardIndex;
+                            final int maxAdjustCard = 8;
                             for (int indexDff = 0; indexDff < maxAdjustCard; indexDff++) {
-                                final int cardIndex = currentCardIndex - indexDff;
-                                if (cardIndex < 0) {
+                                final int cardIndex = currentCardIndex + indexDff;
+                                if (cardIndex >= pCardPack.getChildCount()) {
                                     break;
                                 }
                                 final IEntity adjustCard = pCardPack.getChildByIndex(cardIndex);
-
+                                final float adjustWidth = adjustCard.getScaleX() * currentCard.getWidth();
+                                final float adjustCardX = cardLeft + adjustWidth * 0.5f;
+                                adjustCard.setX(adjustCardX);
+                                cardLeft += adjustWidth + cardGap * adjustCard.getScaleX();
                             }
                         }
 
