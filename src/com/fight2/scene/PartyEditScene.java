@@ -62,8 +62,7 @@ public class PartyEditScene extends BaseScene {
         this.attachChild(backButton);
         this.registerTouchArea(backButton);
 
-        final int cardPackLeftX = 100;
-        final Rectangle cardPack = new Rectangle(cardPackLeftX + 10500 * 0.5f, 180, 10500, 250, vbom) {
+        final Rectangle cardPack = new Rectangle(100 + 10500 * 0.5f, 180, 10500, 250, vbom) {
             private VelocityTracker velocityTracker;
 
             @Override
@@ -101,32 +100,22 @@ public class PartyEditScene extends BaseScene {
         cardPack.setColor(Color.TRANSPARENT);
 
         final Rectangle cardZoom = new Rectangle(180 + 240 * 0.5f, 180, 240, 250, vbom);
-        cardZoom.setColor(Color.BLACK);
+        cardZoom.setColor(Color.TRANSPARENT);
         this.attachChild(cardZoom);
 
-        final int cardStartX = 200;
+        final int initCardX = 200;
         final int cardWidth = 120;
         final int cardY = 120;
-        final int cardGap = 10;
-        int cardAppendX = cardStartX;
+        final int cardGap = 20;
         for (int i = 0; i < 50; i++) {
             final Sprite card = createRealScreenImageSprite(TextureEnum.TEST_CARD1, 10, 20);
             card.setTag(i);
             card.setWidth(cardWidth);
             card.setHeight(180);
-            card.setPosition(cardAppendX, cardY);
+            card.setPosition(initCardX + (cardGap + cardWidth) * i, cardY);
             cardPack.attachChild(card);
 
-            if (i == 0) {
-                cardAppendX += 2 * cardGap + 1.5f * cardWidth;
-            } else {
-                cardAppendX += cardGap + cardWidth;
-            }
-
             this.registerUpdateHandler(new BaseEntityUpdateHandler(card) {
-                private int leftmostZoomCardIndex = 0;
-                private final int zoomGap = 2 * cardGap;
-
                 @Override
                 protected void onUpdate(final float pSecondsElapsed, final IEntity currentCard) {
                     final float cardZoomX = cardZoom.getX();
@@ -135,13 +124,13 @@ public class PartyEditScene extends BaseScene {
                     final IEntity pCardPack = currentCard.getParent();
                     final float x = currentCard.getX() + pCardPack.getX() - pCardPack.getWidth() * 0.5f;
                     final float diff = Math.abs(x - cardZoomX);
-                    final int currentCardIndex = currentCard.getTag();
                     if (diff < distance) {
                         final BigDecimal bdDiff = BigDecimal.valueOf(distance - diff);
                         final BigDecimal bdDistance = BigDecimal.valueOf(distance);
                         final float scale = 1 + bdDiff.divide(bdDistance, 4, RoundingMode.HALF_UP).floatValue();
                         currentCard.setScale(scale);
 
+                        final int currentCardIndex = currentCard.getTag();
                         boolean isLeftmostZoomCard = true;
                         if (currentCardIndex > 0) {
                             final IEntity previousCard = pCardPack.getChildByIndex(currentCardIndex - 1);
@@ -151,55 +140,22 @@ public class PartyEditScene extends BaseScene {
                         }
 
                         if (isLeftmostZoomCard) {
-                            leftmostZoomCardIndex = currentCardIndex;
-
-                            float cardLeftWithGap = currentCard.getX() + (cardGap + cardWidth * 0.5f) * currentCard.getScaleX();
-                            final int maxAdjustCard = 10;
-                            for (int indexDff = 1; indexDff < maxAdjustCard; indexDff++) {
+                            float cardLeft = initCardX - cardWidth * 0.5f + (cardGap + cardWidth) * currentCardIndex;
+                            final int maxAdjustCard = 8;
+                            for (int indexDff = 0; indexDff < maxAdjustCard; indexDff++) {
                                 final int cardIndex = currentCardIndex + indexDff;
                                 if (cardIndex >= pCardPack.getChildCount()) {
                                     break;
                                 }
                                 final IEntity adjustCard = pCardPack.getChildByIndex(cardIndex);
                                 final float adjustWidth = adjustCard.getScaleX() * currentCard.getWidth();
-                                final float adjustCardX = cardLeftWithGap + adjustWidth * 0.5f;
+                                final float adjustCardX = cardLeft + adjustWidth * 0.5f;
                                 adjustCard.setX(adjustCardX);
-                                cardLeftWithGap += adjustWidth + cardGap * adjustCard.getScaleX();
-                            }
-                        } else {
-                            final IEntity leftmostZoomCard = pCardPack.getChildByIndex(leftmostZoomCardIndex);
-                            final float zoomCardCap = currentCard.getX() - leftmostZoomCard.getX() - cardWidth * leftmostZoomCard.getScaleX() - cardWidth
-                                    * scale;
-                            if (zoomCardCap < zoomGap) {
-                                currentCard.setX(currentCard.getX() + 1f);
+                                cardLeft += adjustWidth + cardGap * adjustCard.getScaleX();
                             }
                         }
+
                     } else {
-                        final int indexDiff = leftmostZoomCardIndex - currentCardIndex;
-                        final IEntity leftmostZoomCard = pCardPack.getChildByIndex(leftmostZoomCardIndex);
-                        final float leftmostZoomCardLeft = leftmostZoomCard.getX() - zoomGap - cardWidth * leftmostZoomCard.getScaleX() * 0.5f;
-                        final float leftmostZoomCardRight = leftmostZoomCard.getX() + zoomGap + cardWidth * leftmostZoomCard.getScaleX() * 0.5f;
-
-                        if (indexDiff > 2 || indexDiff < -8) {
-                            currentCard.setX(cardStartX + cardGap + cardWidth * 0.5f + (cardGap + cardWidth) * currentCardIndex);
-                        } else if (indexDiff == 1) {
-                            currentCard.setX(leftmostZoomCardLeft - cardWidth * 0.5f);
-                        } else if (indexDiff == 2) {
-                            currentCard.setX(leftmostZoomCardLeft - cardWidth * 0.5f - cardWidth - cardGap);
-                        } else if (indexDiff == -1) {
-                            currentCard.setX(leftmostZoomCardRight + cardWidth * 0.5f);
-                        } else if (indexDiff < -1) {
-                            final IEntity previousCardCard = pCardPack.getChildByIndex(currentCardIndex - 1);
-                            final float previousCardScale = previousCardCard.getScaleX();
-                            float calculateX;
-                            if (previousCardScale > 1.01f) {
-                                calculateX = previousCardCard.getX() + zoomGap + cardWidth * previousCardScale * 0.5f + cardWidth * 0.5f;
-                            } else {
-                                calculateX = previousCardCard.getX() + cardGap + cardWidth;
-                            }
-                            currentCard.setX(calculateX);
-                        }
-
                         currentCard.setScale(1);
                     }
                 }
