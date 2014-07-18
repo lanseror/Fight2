@@ -18,6 +18,7 @@ import org.andengine.input.touch.detector.ScrollDetector;
 import org.andengine.input.touch.detector.ScrollDetector.IScrollDetectorListener;
 import org.andengine.input.touch.detector.SurfaceScrollDetector;
 import org.andengine.util.adt.color.Color;
+import org.andengine.util.debug.Debug;
 
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
@@ -96,24 +97,30 @@ public class PartyEditScene extends BaseScene {
                 return true;
             }
         };
-        this.scrollDetector = new SurfaceScrollDetector(new CardScrollDetectorListener(cardPack));
         cardPack.setColor(Color.TRANSPARENT);
 
         final Rectangle cardZoom = new Rectangle(180 + 240 * 0.5f, 180, 240, 250, vbom);
         cardZoom.setColor(Color.TRANSPARENT);
         this.attachChild(cardZoom);
+        this.scrollDetector = new SurfaceScrollDetector(new CardScrollDetectorListener(cardPack, cardZoom));
 
         final int initCardX = 200;
         final int cardWidth = 120;
         final int cardY = 120;
         final int cardGap = 20;
+        float appendX = initCardX;
         for (int i = 0; i < 50; i++) {
             final Sprite card = createRealScreenImageSprite(TextureEnum.TEST_CARD1, 10, 20);
             card.setTag(i);
             card.setWidth(cardWidth);
             card.setHeight(180);
-            card.setPosition(initCardX + (cardGap + cardWidth) * i, cardY);
+            card.setPosition(appendX, cardY);
             cardPack.attachChild(card);
+            if (i == 0) {
+                appendX += 1.5 * (cardGap + cardWidth);
+            } else {
+                appendX += cardGap + cardWidth;
+            }
 
             this.registerUpdateHandler(new BaseEntityUpdateHandler(card) {
                 @Override
@@ -140,7 +147,7 @@ public class PartyEditScene extends BaseScene {
                         }
 
                         if (isLeftmostZoomCard) {
-                            float cardLeft = initCardX - cardWidth * 0.5f + (cardGap + cardWidth) * currentCardIndex;
+                            float cardLeft = initCardX - cardWidth + (cardGap + cardWidth) * currentCardIndex;
                             final int maxAdjustCard = 8;
                             for (int indexDff = 0; indexDff < maxAdjustCard; indexDff++) {
                                 final int cardIndex = currentCardIndex + indexDff;
@@ -164,18 +171,26 @@ public class PartyEditScene extends BaseScene {
 
         mPhysicsHandler = new PhysicsHandler(cardPack) {
             @Override
-            protected void onUpdate(final float pSecondsElapsed, final IEntity pEntity) {
+            protected void onUpdate(final float pSecondsElapsed, final IEntity pCardPack) {
                 final float accelerationX = this.getAccelerationX();
                 if (this.isEnabled() && accelerationX != 0) {
                     final float velocityX = this.getVelocityX();
                     final float testVelocityX = mVelocityX + accelerationX * pSecondsElapsed;
+                    final float cardZoomX = cardZoom.getX();
+                    final IEntity firstCard = pCardPack.getFirstChild();
+                    final IEntity lastCard = pCardPack.getLastChild();
+                    final float firstCardX = firstCard.getX() + pCardPack.getX() - pCardPack.getWidth() * 0.5f;
+                    final float lastCardX = lastCard.getX() + pCardPack.getX() - pCardPack.getWidth() * 0.5f;
                     if (velocityX == 0) {
                         this.reset();
                     } else if (Math.abs(mVelocityX) + Math.abs(testVelocityX) > Math.abs(mVelocityX + testVelocityX)) {
+                        // This make sure it will not go back automatically.
+                        this.reset();
+                    } else if (firstCardX >= cardZoomX || lastCardX <= cardZoomX) {
                         this.reset();
                     }
                 }
-                super.onUpdate(pSecondsElapsed, pEntity);
+                super.onUpdate(pSecondsElapsed, pCardPack);
             }
         };
         this.registerUpdateHandler(mPhysicsHandler);
@@ -188,9 +203,11 @@ public class PartyEditScene extends BaseScene {
 
     class CardScrollDetectorListener implements IScrollDetectorListener {
         private final IEntity cardPack;
+        private final float cardZoomX;
 
-        public CardScrollDetectorListener(final IEntity cardPack) {
+        public CardScrollDetectorListener(final IEntity cardPack, final IEntity cardZoom) {
             this.cardPack = cardPack;
+            this.cardZoomX = cardZoom.getX();
         }
 
         @Override
@@ -199,7 +216,18 @@ public class PartyEditScene extends BaseScene {
 
         @Override
         public void onScroll(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
-            cardPack.setX(cardPack.getX() + pDistanceX);
+
+            final IEntity firstCard = cardPack.getFirstChild();
+            final IEntity lastCard = cardPack.getLastChild();
+            final float firstCardX = firstCard.getX() + cardPack.getX() - cardPack.getWidth() * 0.5f;
+            final float lastCardX = lastCard.getX() + cardPack.getX() - cardPack.getWidth() * 0.5f;
+            if (firstCardX >= cardZoomX && pDistanceX > 0) {
+                Debug.e("firstCardX > cardZoomX:" + firstCardX + "->" + cardZoomX + "->" + firstCard.getScaleX());
+            } else if (lastCardX <= cardZoomX && pDistanceX < 0) {
+                Debug.e("lastCardX < cardZoomX:" + lastCardX + "->" + cardZoomX);
+            } else {
+                cardPack.setX(cardPack.getX() + pDistanceX);
+            }
 
         }
 
