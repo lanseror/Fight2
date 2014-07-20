@@ -73,6 +73,7 @@ public class GameActivity extends BaseGameActivity {
         configHelper.setConfig(ConfigEnum.SimulatedWidth, simulatedWidth);
         configHelper.setConfig(ConfigEnum.SimulatedHeight, CAMERA_HEIGHT);
         camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
+        camera.setZClippingPlanes(-240, 240);
         return new EngineOptions(true, ScreenOrientation.LANDSCAPE_SENSOR, new CropResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera);
     }
 
@@ -80,7 +81,7 @@ public class GameActivity extends BaseGameActivity {
     public void onCreateResources(final OnCreateResourcesCallback pOnCreateResourcesCallback) throws IOException {
         final TextureManager textureManager = this.getTextureManager();
         final AssetManager assetManager = this.getAssets();
-        this.splashTexture = new AssetBitmapTexture(textureManager, assetManager, "images/splashScreen.jpg");
+        this.splashTexture = new AssetBitmapTexture(textureManager, assetManager, "images/common_splash_screen.png");
         this.splashTextureRegion = TextureRegionFactory.extractFromTexture(this.splashTexture);
         this.splashTexture.load();
         pOnCreateResourcesCallback.onCreateResourcesFinished();

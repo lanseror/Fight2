@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.andengine.engine.Engine;
-import org.andengine.entity.primitive.Line;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
@@ -14,7 +13,6 @@ import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITiledTextureRegion;
-import org.andengine.util.adt.color.Color;
 import org.andengine.util.algorithm.collision.BaseCollisionChecker;
 
 import com.fight2.GameActivity;
