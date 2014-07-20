@@ -19,8 +19,6 @@ import org.andengine.input.touch.TouchEvent;
 import org.andengine.input.touch.detector.ScrollDetector;
 import org.andengine.input.touch.detector.ScrollDetector.IScrollDetectorListener;
 import org.andengine.input.touch.detector.SurfaceScrollDetector;
-import org.andengine.opengl.texture.region.ITextureRegion;
-import org.andengine.opengl.util.GLState;
 import org.andengine.util.adt.color.Color;
 import org.andengine.util.debug.Debug;
 import org.andengine.util.modifier.IModifier;
@@ -35,10 +33,11 @@ import com.fight2.constant.TextureEnum;
 import com.fight2.entity.F2ButtonSprite;
 import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.ConfigHelper;
-import com.fight2.util.TextureFactory;
 
 public class PartyEditScene extends BaseScene {
     private final static int BASE_PX = 600;
+    final int cardGap = 20;
+    final int cardWidth = 120;
     private final int factor;
     private SurfaceScrollDetector scrollDetector;
 
@@ -69,7 +68,7 @@ public class PartyEditScene extends BaseScene {
         this.attachChild(backButton);
         this.registerTouchArea(backButton);
 
-        final Rectangle cardPack = new Rectangle(100 + 10500 * 0.5f, 180, 10500, 250, vbom) {
+        final Rectangle cardPack = new Rectangle(300, 180, 21000, 250, vbom) {
             private VelocityTracker velocityTracker;
 
             @Override
@@ -110,13 +109,12 @@ public class PartyEditScene extends BaseScene {
         this.attachChild(cardZoom);
         this.scrollDetector = new SurfaceScrollDetector(new CardScrollDetectorListener(cardPack, cardZoom));
 
-        final int initCardX = 200;
-        final int cardWidth = 120;
+        final float initCardX = cardZoom.getX() - (cardPack.getX() - 0.5f * cardPack.getWidth());
         final int cardY = 120;
-        final int cardGap = 20;
+
         float appendX = initCardX;
         for (int i = 0; i < 50; i++) {
-            final Sprite card = createCardSprite(TextureEnum.TEST_CARD1, 10, 20);
+            final Sprite card = createRealScreenImageSprite(TextureEnum.TEST_CARD1, 10, 20);
             card.setTag(i);
             card.setWidth(cardWidth);
             card.setHeight(180);
@@ -153,9 +151,9 @@ public class PartyEditScene extends BaseScene {
                         }
 
                         if (isLeftmostZoomCard) {
-                            float cardLeft = initCardX - cardWidth + (cardGap + cardWidth) * currentCardIndex;
-                            final int maxAdjustCard = 8;
-                            for (int indexDff = 0; indexDff < maxAdjustCard; indexDff++) {
+                            float cardLeft = currentCard.getX() + currentCard.getScaleX() * cardWidth * 0.5f + cardGap * currentCard.getScaleX();
+                            final int maxAdjustCard = pCardPack.getChildCount();
+                            for (int indexDff = 1; indexDff < maxAdjustCard; indexDff++) {
                                 final int cardIndex = currentCardIndex + indexDff;
                                 if (cardIndex >= pCardPack.getChildCount()) {
                                     break;
@@ -166,6 +164,15 @@ public class PartyEditScene extends BaseScene {
                                 adjustCard.setX(adjustCardX);
                                 cardLeft += adjustWidth + cardGap * adjustCard.getScaleX();
                             }
+                            // for (int indexDff = 1; indexDff < maxAdjustCard; indexDff++) {
+                            // final int cardIndex = currentCardIndex - indexDff;
+                            // if (cardIndex < 0) {
+                            // break;
+                            // }
+                            // final IEntity adjustCard = pCardPack.getChildByIndex(cardIndex);
+                            // final float moveX = toContainerOuterX(adjustCard) - cardZoom.getX() - 1.5f * cardWidth - cardGap;
+                            // adjustCard.setX(adjustCard.getX() - moveX);
+                            // }
                         }
 
                     } else {
@@ -249,18 +256,35 @@ public class PartyEditScene extends BaseScene {
                 final IEntity minDiffCard = cardPack.getChildByIndex(minDiffIndex);
                 final float minDiffZoomX = toContainerOuterX(minDiffCard) - cardZoomX;
 
-                Debug.e("cardPackX:" + cardPackX);
-                Debug.e("minDiffIndex:" + minDiffIndex);
-                Debug.e("minDiffZoomX:" + minDiffZoomX);
-                final MoveModifier modifier = new MoveModifier(0.5f, cardPackX, cardPackY, cardPackX - minDiffZoomX, cardPackY, new IEntityModifierListener() {
+                IEntity leftmostZoomCard = minDiffCard;
+                boolean isLeftmostZoomCard = true;
+                if (minDiffIndex > 0) {
+                    final IEntity previousCard = cardPack.getChildByIndex(minDiffIndex - 1);
+                    if (previousCard.collidesWith(cardZoom)) {
+                        leftmostZoomCard = previousCard;
+                        isLeftmostZoomCard = false;
+                    }
+                }
+                float moveDistance = minDiffZoomX;
+                if (!isLeftmostZoomCard) {
+                    moveDistance = toContainerOuterX(leftmostZoomCard) - (cardZoomX - cardZoom.getWidth() * 0.5f - cardGap - 0.5f * cardWidth);
+                }
+
+               // Debug.e("isLeftmostZoomCard:" + isLeftmostZoomCard);
+               // Debug.e("Shoud move:" + moveDistance);
+                final MoveModifier modifier = new MoveModifier(0.1f, cardPackX, cardPackY, cardPackX - moveDistance, cardPackY, new IEntityModifierListener() {
                     @Override
                     public void onModifierStarted(final IModifier<IEntity> pModifier, final IEntity pItem) {
-                        Debug.e("minDiffCard Started:" + minDiffCard.getScaleX());
+                       // Debug.e("cardZoomX:" + cardZoomX);
+//                        Debug.e("minDiffCardX Started:" + toContainerOuterX(minDiffCard));
+                        // Debug.e("minDiffCard Started:" + minDiffCard.getScaleX());
                     }
 
                     @Override
                     public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
-                        Debug.e("minDiffCard Finished:" + minDiffCard.getScaleX());
+//                        Debug.e("cardZoomX:" + cardZoomX);
+                        Debug.e("minDiffCardX Finished:" + toContainerOuterX(minDiffCard));
+                        // Debug.e("minDiffCard Finished:" + minDiffCard.getScaleX());
                     }
 
                 });
@@ -273,34 +297,6 @@ public class PartyEditScene extends BaseScene {
                 });
             }
         }
-    }
-
-    protected Sprite createCardSprite(final TextureEnum textureEnum, final float x, final float y) {
-        final TextureFactory textureFactory = TextureFactory.getInstance();
-        final ITextureRegion texture = textureFactory.getIextureRegion(textureEnum);
-        final float width = textureEnum.getWidth();
-        final float height = textureEnum.getHeight();
-        final BigDecimal factor = BigDecimal.valueOf(this.cameraHeight).divide(BigDecimal.valueOf(deviceHeight), 2, RoundingMode.HALF_DOWN);
-        final float fakeWidth = BigDecimal.valueOf(this.deviceWidth).multiply(factor).floatValue();
-        final float pX = (this.cameraWidth - fakeWidth) / 2 + x + width * 0.5f;
-        final float pY = y + height * 0.5f;
-        final Sprite sprite = new Sprite(pX, pY, width, height, texture, vbom) {
-            @Override
-            protected void applyRotation(final GLState pGLState) {
-                final float rotation = this.mRotation;
-
-                if (rotation != 0) {
-                    final float localRotationCenterX = this.mLocalRotationCenterX;
-                    final float localRotationCenterY = this.mLocalRotationCenterY;
-
-                    pGLState.translateModelViewGLMatrixf(localRotationCenterX, localRotationCenterY, 0);
-                    /* Note we are applying rotation around the y-axis and not the z-axis anymore! */
-                    pGLState.rotateModelViewGLMatrixf(-rotation, 0, 1, 0);
-                    pGLState.translateModelViewGLMatrixf(-localRotationCenterX, -localRotationCenterY, 0);
-                }
-            }
-        };
-        return sprite;
     }
 
     class CardScrollDetectorListener implements IScrollDetectorListener {
