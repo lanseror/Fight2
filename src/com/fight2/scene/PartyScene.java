@@ -76,13 +76,15 @@ public class PartyScene extends BaseScene {
 
         }
 
-        final Sprite editSprite = createEditSprite(TextureEnum.PARTY_EDIT_BUTTON, 713, frameY + 340);
+        final Sprite editSprite = createEditSprite(TextureEnum.PARTY_EDIT_BUTTON, 713, frameY + 340, 1);
         this.attachChild(editSprite);
         this.registerTouchArea(editSprite);
-        final Sprite editSprite2 = createRealScreenImageSprite(TextureEnum.PARTY_EDIT_BUTTON, 713, frameY + 197);
+        final Sprite editSprite2 = createEditSprite(TextureEnum.PARTY_EDIT_BUTTON, 713, frameY + 197, 2);
         this.attachChild(editSprite2);
-        final Sprite editSprite3 = createRealScreenImageSprite(TextureEnum.PARTY_EDIT_BUTTON, 713, frameY + 53);
+        this.registerTouchArea(editSprite2);
+        final Sprite editSprite3 = createEditSprite(TextureEnum.PARTY_EDIT_BUTTON, 713, frameY + 53, 3);
         this.attachChild(editSprite3);
+        this.registerTouchArea(editSprite3);
 
         final F2ButtonSprite backButton = createRealScreenF2ButtonSprite(TextureEnum.COMMON_BACK_BUTTON_NORMAL, this.simulatedWidth - 100, 20);
         backButton.setOnClickListener(new F2OnClickListener() {
@@ -103,7 +105,7 @@ public class PartyScene extends BaseScene {
         return area;
     }
 
-    private Sprite createEditSprite(final TextureEnum textureEnum, final float x, final float y) {
+    private Sprite createEditSprite(final TextureEnum textureEnum, final float x, final float y, final int partyNumber) {
         final TextureFactory textureFactory = TextureFactory.getInstance();
         final ITextureRegion texture = textureFactory.getIextureRegion(textureEnum);
         final float width = textureEnum.getWidth();
@@ -117,7 +119,7 @@ public class PartyScene extends BaseScene {
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 if (pSceneTouchEvent.isActionDown()) {
                     try {
-                        final Scene editScene = new PartyEditScene(activity);
+                        final Scene editScene = new PartyEditScene(activity, partyNumber);
                         activity.getEngine().setScene(editScene);
                     } catch (final IOException e) {
                         e.printStackTrace();

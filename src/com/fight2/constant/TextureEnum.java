@@ -36,6 +36,7 @@ public enum TextureEnum {
     PARTY_FRAME_GRID("images/party_frame_grid.png", 490, 98),
     PARTY_EDIT_BUTTON("images/party_edit_button.png", 101, 43),
     PARTY_EDIT_BG("images/party_edit_backgroud.png", 1136, 640),
+    PARTY_EDIT_SWITCH_BUTTON("images/party_edit_switch_button.jpg", 100, 100),
 
     // Common images.
     COMMON_BACK_BUTTON_NORMAL("button/button_back.jpg", 100, 100),
