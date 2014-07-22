@@ -6,17 +6,14 @@ import java.util.List;
 public class GameUserSession {
     private final static GameUserSession INSTANCE = new GameUserSession();
     private String name;
-    private final List<List<Card>> parties;
+    private final Card[][] parties;
+    private final List<Card> cards = new ArrayList<Card>();
 
     private GameUserSession() {
-        parties = new ArrayList<List<Card>>(3);
-        for (int i = 0; i < 3; i++) {
-            final List<Card> party = new ArrayList<Card>(4);
-            parties.add(party);
-        }
+        parties = new Card[3][4];
     }
 
-    public List<List<Card>> getParties() {
+    public Card[][] getParties() {
         return parties;
     }
 
@@ -30,6 +27,10 @@ public class GameUserSession {
 
     public void setName(final String name) {
         this.name = name;
+    }
+
+    public List<Card> getCards() {
+        return cards;
     }
 
 }

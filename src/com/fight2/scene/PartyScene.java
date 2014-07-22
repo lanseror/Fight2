@@ -32,7 +32,7 @@ public class PartyScene extends BaseScene {
     private final SparseArray<Sprite> gridOrders = new SparseArray<Sprite>();
     private final List<Float> gridYList = new ArrayList<Float>();
     private final List<Rectangle> gridCollisionList = new ArrayList<Rectangle>();
-    private final List<List<Card>> cardParties = GameUserSession.getInstance().getParties();
+    private final Card[][] cardParties = GameUserSession.getInstance().getParties();
     final Map<SceneEnum, Scene> scenes = this.activity.getScenes();
 
     public PartyScene(final GameActivity activity) throws IOException {
@@ -55,7 +55,7 @@ public class PartyScene extends BaseScene {
         final float cardY = 47f;
         final int gap = 37;
 
-        for (int partyIndex = 0; partyIndex < cardParties.size(); partyIndex++) {
+        for (int partyIndex = 0; partyIndex < cardParties.length; partyIndex++) {
             final Sprite gridSprite = createGridSprite(TextureEnum.PARTY_FRAME_GRID, 196, frameY + 323 - partyIndex * 144);
             gridOrders.put(partyIndex, gridSprite);
             gridYList.add(gridSprite.getY());
@@ -63,9 +63,9 @@ public class PartyScene extends BaseScene {
             this.attachChild(gridSprite);
             this.registerTouchArea(gridSprite);
 
-            final List<Card> cards = cardParties.get(partyIndex);
-            for (int cardIndex = 0; cardIndex < cards.size(); cardIndex++) {
-                final Card card = cards.get(cardIndex);
+            final Card[] cards = cardParties[partyIndex];
+            for (int cardIndex = 0; cardIndex < cards.length; cardIndex++) {
+                final Card card = cards[cardIndex];
                 if (card != null) {
                     final ITextureRegion cardTextureRegion = createCardTexture(card.getImage());
                     final Sprite cardSprite = new Sprite(49f + (gap + cardWidth) * cardIndex, cardY, cardWidth, cardHeight, cardTextureRegion, vbom);

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.andengine.engine.camera.Camera;
@@ -187,16 +186,7 @@ public class GameActivity extends BaseGameActivity {
         }
 
         final GameUserSession session = GameUserSession.getInstance();
-        final List<List<Card>> parties = session.getParties();
-        for (int partyIndex = 0; partyIndex < parties.size(); partyIndex++) {
-            final List<Card> cards = parties.get(partyIndex);
-            cards.clear();
-            for (int cardIndex = 0; cardIndex < 4; cardIndex++) {
-                final Card card = new Card();
-                card.setImage("card/card" + (partyIndex + 1) + ".jpg");
-                cards.add(card);
-            }
-        }
+        final Card[][] parties = session.getParties();
     }
 
     public Map<SceneEnum, Scene> getScenes() {
