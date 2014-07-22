@@ -1,4 +1,4 @@
-package com.fight2;
+package com.fight2.entity;
 
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.camera.hud.HUD;

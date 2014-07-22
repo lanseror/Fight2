@@ -31,6 +31,7 @@ import com.fight2.constant.ConfigEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
+import com.fight2.entity.ProgressBar;
 import com.fight2.scene.MainScene;
 import com.fight2.scene.PartyScene;
 import com.fight2.util.ConfigHelper;
