@@ -30,7 +30,6 @@ import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.widget.Toast;
 
-import com.fight2.F2ScrollDetector;
 import com.fight2.GameActivity;
 import com.fight2.constant.ConfigEnum;
 import com.fight2.constant.SceneEnum;
@@ -39,6 +38,7 @@ import com.fight2.entity.Card;
 import com.fight2.entity.F2ButtonSprite;
 import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.GameUserSession;
+import com.fight2.input.touch.detector.F2ScrollDetector;
 import com.fight2.util.ConfigHelper;
 import com.fight2.util.TextureFactory;
 

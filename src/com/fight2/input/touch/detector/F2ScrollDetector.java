@@ -1,4 +1,4 @@
-package com.fight2;
+package com.fight2.input.touch.detector;
 
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.input.touch.detector.SurfaceScrollDetector;
