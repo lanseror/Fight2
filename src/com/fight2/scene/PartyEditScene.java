@@ -206,8 +206,6 @@ public class PartyEditScene extends BaseScene {
 
         final Rectangle touchArea = new Rectangle(1136 * 0.5f, 160, 1136, 320, vbom) {
             private VelocityTracker velocityTracker;
-            private final float[] downPoint = new float[2];
-            private int downPointerId;
 
             @Override
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
@@ -223,9 +221,6 @@ public class PartyEditScene extends BaseScene {
                 switch (action) {
                     case MotionEvent.ACTION_DOWN:
                         PartyEditScene.this.mPhysicsHandler.reset();
-                        downPoint[0] = pSceneTouchEvent.getX();
-                        downPoint[1] = pSceneTouchEvent.getY();
-                        downPointerId = pSceneTouchEvent.getPointerID();
                         break;
                     case MotionEvent.ACTION_CANCEL:
                     case MotionEvent.ACTION_UP:
@@ -239,15 +234,8 @@ public class PartyEditScene extends BaseScene {
                             velocityTracker = null;
                         }
                         final int flag = velocityX > 0 ? 1 : -1;
-                        final IEntity focusedCard = (IEntity) cardZoom.getUserData();
-
                         if (Math.abs(velocityX) > Math.abs(velocityY)) {
                             PartyEditScene.this.mPhysicsHandler.setVelocityX(Math.abs(velocityX) > max_velocity ? flag * max_velocity : velocityX);
-                        } else if (-velocityY > Math.abs(velocityX) && focusedCard.getScaleX() > 1.8) {
-                            if (downPointerId == pSceneTouchEvent.getPointerID() && focusedCard.contains(downPoint[0], downPoint[1])) {
-                                // add2Party(focusedCard);
-                            }
-
                         }
                         PartyEditScene.this.mPhysicsHandler.setAccelerationX(velocityX > 0 ? -ACCELERATION : ACCELERATION);
                         break;
@@ -302,60 +290,6 @@ public class PartyEditScene extends BaseScene {
         final IEntity container = entry.getParent();
         final float outerY = entry.getY() + container.getY() - container.getHeight() * 0.5f;
         return outerY;
-    }
-
-    private void add2Party(final IEntity focusedCard) {
-        final Card[] partyCards = GameUserSession.getInstance().getParties()[partyNumber - 1];
-        boolean hasPosition = false;
-        for (int partyCardIndex = 0; partyCardIndex < partyCards.length; partyCardIndex++) {
-            final Card partyCard = partyCards[partyCardIndex];
-            if (partyCard == null) {
-                hasPosition = true;
-                final Sprite copyCard = createRealScreenImageSprite(TextureEnum.TEST_CARD1, 10, 20);
-                copyCard.setPosition(toContainerOuterX(focusedCard), toContainerOuterY(focusedCard));
-                copyCard.setWidth(focusedCard.getWidth());
-                copyCard.setHeight(focusedCard.getHeight());
-                PartyEditScene.this.attachChild(copyCard);
-                final Card cardEntry = new Card();
-                cardEntry.setImage("card/card1.jpg");
-                partyCards[partyCardIndex] = cardEntry;
-                final Rectangle cardFrame = cardFrames[partyCardIndex];
-                final MoveModifier modifier = new MoveModifier(0.2f, copyCard.getX(), copyCard.getY(), cardFrame.getX(), cardFrame.getY(),
-                        new IEntityModifierListener() {
-                            @Override
-                            public void onModifierStarted(final IModifier<IEntity> pModifier, final IEntity pItem) {
-                                // Debug.e("cardZoomX:" + cardZoomX);
-                                // Debug.e("minDiffCardX Started:" + toContainerOuterX(minDiffCard));
-                                // Debug.e("minDiffCard Started:" + minDiffCard.getScaleX());
-                            }
-
-                            @Override
-                            public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
-                                // Debug.e("cardZoomX:" + cardZoomX);
-                                // Debug.e("minDiffCardX Finished:" + toContainerOuterX(minDiffCard));
-                                // Debug.e("minDiffCard Finished:" + minDiffCard.getScaleX());
-                            }
-
-                        });
-                activity.runOnUpdateThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        copyCard.clearEntityModifiers();
-                        copyCard.registerEntityModifier(modifier);
-                    }
-                });
-                break;
-            }
-        }
-        if (!hasPosition) {
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(activity, "队伍已满！", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-
     }
 
     class MoveFinishedListener {
@@ -430,77 +364,6 @@ public class PartyEditScene extends BaseScene {
                 });
             }
         }
-    }
-
-    class CardScrollDetectorListener implements IScrollDetectorListener {
-        private final IEntity cardZoom;
-
-        public CardScrollDetectorListener(final IEntity cardZoom) {
-            this.cardZoom = cardZoom;
-        }
-
-        @Override
-        public void onScrollStarted(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
-        }
-
-        @Override
-        public void onScroll(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
-            final IEntity card = (IEntity) cardZoom.getUserData();
-            // Debug.e("CardScrollDetectorListener onScrollFinished");
-            // Debug.e("CardScrollDetectorListener pDistanceY:" + pDistanceY);
-            // Debug.e("CardScrollDetectorListener pDistanceX:" + pDistanceX);
-            // Debug.e("CardScrollDetectorListener ScaleX:" + card.getScaleX());
-            if (Math.abs(pDistanceY) > Math.abs(pDistanceX) && card.getScaleX() > 1.8) {
-                card.setAlpha(0.5f);
-                final Sprite copyCard = createRealScreenImageSprite(TextureEnum.TEST_CARD1, 10, 20);
-                copyCard.setPosition(toContainerOuterX(card), toContainerOuterY(card));
-                copyCard.setWidth(card.getWidth());
-                copyCard.setHeight(card.getHeight());
-                attachChild(copyCard);
-                final Card[] partyCards = GameUserSession.getInstance().getParties()[partyNumber - 1];
-                for (int partyCardIndex = 0; partyCardIndex < partyCards.length; partyCardIndex++) {
-                    final Card partyCard = partyCards[partyCardIndex];
-                    if (partyCard == null) {
-                        final Card cardEntry = new Card();
-                        cardEntry.setImage("card/card1.jpg");
-                        partyCards[partyCardIndex] = cardEntry;
-                        final Rectangle cardFrame = cardFrames[partyCardIndex];
-                        final MoveModifier modifier = new MoveModifier(0.2f, copyCard.getX(), copyCard.getY(), cardFrame.getX(), cardFrame.getY(),
-                                new IEntityModifierListener() {
-                                    @Override
-                                    public void onModifierStarted(final IModifier<IEntity> pModifier, final IEntity pItem) {
-                                        // Debug.e("cardZoomX:" + cardZoomX);
-                                        // Debug.e("minDiffCardX Started:" + toContainerOuterX(minDiffCard));
-                                        // Debug.e("minDiffCard Started:" + minDiffCard.getScaleX());
-                                    }
-
-                                    @Override
-                                    public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
-                                        // Debug.e("cardZoomX:" + cardZoomX);
-                                        // Debug.e("minDiffCardX Finished:" + toContainerOuterX(minDiffCard));
-                                        // Debug.e("minDiffCard Finished:" + minDiffCard.getScaleX());
-                                    }
-
-                                });
-                        activity.runOnUpdateThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                copyCard.clearEntityModifiers();
-                                copyCard.registerEntityModifier(modifier);
-                            }
-                        });
-                        break;
-                    }
-                }
-
-            }
-        }
-
-        @Override
-        public void onScrollFinished(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
-
-        }
-
     }
 
     class CardPackScrollDetectorListener implements IScrollDetectorListener {
@@ -600,7 +463,7 @@ public class PartyEditScene extends BaseScene {
                                     @Override
                                     public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
                                         pItem.detachSelf();
-                                        copyCard=null;
+                                        copyCard = null;
                                         focusedCard.setAlpha(1);
                                         // Debug.e("cardZoomX:" + cardZoomX);
                                         // Debug.e("minDiffCardX Finished:" + toContainerOuterX(minDiffCard));
