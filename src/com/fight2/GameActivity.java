@@ -191,6 +191,7 @@ public class GameActivity extends BaseGameActivity {
         final List<Card> cards = session.getCards();
         for (int i = 1; i < 8; i++) {
             final Card cardEntry = new Card();
+            cardEntry.setId(i);
             cardEntry.setImage("card/card" + i + ".jpg");
             cards.add(cardEntry);
         }

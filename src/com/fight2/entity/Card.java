@@ -1,7 +1,7 @@
 package com.fight2.entity;
 
 public class Card {
-    private String id;
+    private int id;
     private String image;
     private String name;
     private int star;
@@ -13,11 +13,11 @@ public class Card {
     private int skillLevel;
     private int version;
 
-    public String getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(final String id) {
+    public void setId(final int id) {
         this.id = id;
     }
 

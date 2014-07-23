@@ -61,6 +61,7 @@ public class PartyEditScene extends BaseScene {
     private PhysicsHandler mPhysicsHandler;
     private final Font mFont;
     private final Map<Card, IEntity> removedCards = new HashMap<Card, IEntity>();
+    private final IEntity[] addedCards = new IEntity[4];
 
     public PartyEditScene(final GameActivity activity, final int partyNumber) throws IOException {
         super(activity);
@@ -104,17 +105,118 @@ public class PartyEditScene extends BaseScene {
         partyNumberText = new Text(110, 450, mFont, String.valueOf(partyNumber), vbom);
         this.attachChild(partyNumberText);
 
-        for (int i = 0; i < 4; i++) {
-            cardFrames[i] = new Rectangle(230 + 135 * i, 480, 120, 120, vbom);
-            this.attachChild(cardFrames[i]);
-        }
-
         final Rectangle cardPack = new Rectangle(300, 180, 21000, 250, vbom);
         cardPack.setColor(Color.TRANSPARENT);
 
         final Rectangle cardZoom = new Rectangle(180 + 240 * 0.5f, 180, 240, 250, vbom);
         cardZoom.setColor(Color.TRANSPARENT);
         this.scrollDetector = new F2ScrollDetector(new CardPackScrollDetectorListener(cardPack, cardZoom));
+
+        for (int i = 0; i < 4; i++) {
+            final int frameIndex = i;
+            cardFrames[i] = new Rectangle(230 + 135 * i, 480, 120, 120, vbom) {
+                private IEntity movingCard = null;
+
+                @Override
+                public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                    final float touchX = pSceneTouchEvent.getX();
+                    final float touchY = pSceneTouchEvent.getY();
+                    final MotionEvent motionEvent = pSceneTouchEvent.getMotionEvent();
+                    final int action = motionEvent.getAction();
+                    switch (action) {
+                        case MotionEvent.ACTION_DOWN:
+                            movingCard = addedCards[frameIndex];
+                            if (movingCard != null) {
+                                movingCard.setZIndex(100);
+                                PartyEditScene.this.sortChildren();
+                            }
+                            break;
+                        case MotionEvent.ACTION_MOVE:
+                            if (movingCard != null) {
+                                movingCard.setPosition(touchX, touchY);
+                            }
+                            break;
+                        case MotionEvent.ACTION_CANCEL:
+                        case MotionEvent.ACTION_UP:
+                            if (movingCard == null) {
+                                break;
+                            }
+                            boolean collidedWithOthers = false;
+                            for (int i = 0; i < cardFrames.length; i++) {
+                                final IEntity cardFrame = cardFrames[i];
+                                if (i != frameIndex && cardFrame.contains(touchX, touchY)) {
+                                    collidedWithOthers = true;
+                                    movingCard.setPosition(cardFrame);
+                                    final IEntity toCard = addedCards[i];
+                                    addedCards[frameIndex] = toCard;
+                                    if (toCard != null) {
+                                        toCard.setPosition(this);
+                                    }
+                                    addedCards[i] = movingCard;
+                                    break;
+                                }
+                            }
+                            if (!collidedWithOthers) {
+                                if (touchY < this.getY() - 50) {
+                                    final Card movingCardEntry = (Card) movingCard.getUserData();
+                                    final IEntity revertCard = removedCards.remove(movingCardEntry);
+                                    final Card revertCardEntry = (Card) revertCard.getUserData();
+                                    int pCardIndex = 0;
+                                    for (; pCardIndex < cardPack.getChildCount(); pCardIndex++) {
+                                        final IEntity tempCard = cardPack.getChildByIndex(pCardIndex);
+                                        final Card tempCardEntry = (Card) tempCard.getUserData();
+                                        if (revertCardEntry.getId() <= tempCardEntry.getId()) {
+                                            break;
+                                        }
+                                    }
+                                    final IEntity focusedCard = (IEntity) cardZoom.getUserData();
+                                    final Card focusedCardEnty = (Card) (focusedCard != null ? focusedCard.getUserData() : null);
+                                    if (cardPack.getChildCount() == 0) {
+                                        revertCard.setPosition(cardZoom);
+                                        cardPack.attachChild(revertCard);
+                                        revertCard.setAlpha(1f);
+                                        cardZoom.setUserData(revertCard);
+                                    } else if (focusedCardEnty != null) {
+                                        if (revertCardEntry.getId() <= focusedCardEnty.getId()) {
+                                            final IEntity leftMostCard = cardPack.getChildByIndex(0);
+                                            if (leftMostCard == focusedCardEnty) {
+                                                final float revertX = cardZoom.getX() - cardZoom.getWidth() * 0.5f - CARD_GAP - CARD_WIDTH * 0.5f;
+                                                revertCard.setPosition(revertX, revertCard.getY());
+                                            } else if (pCardIndex == 0) {
+                                                final float revertX = leftMostCard.getX() - CARD_GAP - CARD_WIDTH;
+                                                revertCard.setPosition(revertX, revertCard.getY());
+                                            } else {
+                                                revertCard.setPosition(cardPack.getChildByIndex(pCardIndex - 1));
+                                            }
+
+                                            for (int i = 0; i < pCardIndex; i++) {
+                                                final IEntity adjustCard = cardPack.getChildByIndex(i);
+                                                adjustCard.setPosition(adjustCard.getX() - CARD_GAP - CARD_WIDTH, adjustCard.getY());
+                                            }
+                                            cardPack.attachChild(revertCard);
+                                            revertCard.setAlpha(1f);
+                                            revertCard.setScale(1);
+                                        } else {
+                                            final IEntity rightMostCard = cardPack.getChildByIndex(cardPack.getChildCount() - 1);
+
+                                        }
+                                    }
+
+                                } else {
+                                    movingCard.setPosition(this);
+                                }
+                            }
+                            movingCard.setZIndex(IEntity.ZINDEX_DEFAULT);
+                            movingCard = null;
+                            break;
+
+                    }
+                    return true;
+                }
+            };
+            this.attachChild(cardFrames[i]);
+            this.registerTouchArea(cardFrames[i]);
+        }
 
         final float initCardX = cardZoom.getX() - (cardPack.getX() - 0.5f * cardPack.getWidth());
         final int cardY = 120;
@@ -421,6 +523,7 @@ public class PartyEditScene extends BaseScene {
                     copyCard.setPosition(toContainerOuterX(focusedCard), toContainerOuterY(focusedCard));
                     copyCard.setWidth(focusedCard.getWidth());
                     copyCard.setHeight(focusedCard.getHeight());
+                    copyCard.setUserData(sessionCard);
                     PartyEditScene.this.attachChild(copyCard);
 
                 }
@@ -502,6 +605,7 @@ public class PartyEditScene extends BaseScene {
                             Debug.e("Add card");
                             final Card cardEntry = (Card) focusedCard.getUserData();
                             partyCards[cardGridIndex] = cardEntry;
+                            addedCards[cardGridIndex] = copyCard;
                             cardGrid = cardFrames[cardGridIndex];
                             final MoveModifier modifier = new MoveModifier(0.1f, copyCard.getX(), copyCard.getY(), cardGrid.getX(), cardGrid.getY(),
                                     new IEntityModifierListener() {
