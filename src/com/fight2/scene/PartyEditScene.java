@@ -74,6 +74,12 @@ public class PartyEditScene extends BaseScene {
     }
 
     @Override
+    public void updateScene() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
     protected void init() throws IOException {
         final Sprite bgSprite = createCameraImageSprite(TextureEnum.PARTY_EDIT_BG, 0, 0);
         final Background background = new SpriteBackground(bgSprite);
@@ -90,7 +96,6 @@ public class PartyEditScene extends BaseScene {
         final Sprite switchButton = createSwitchButton(this.simulatedWidth - 100, 380);
         this.attachChild(switchButton);
         this.registerTouchArea(switchButton);
-
         partyNumberText = new Text(110, 450, mFont, String.valueOf(partyNumber), vbom);
         this.attachChild(partyNumberText);
 
@@ -395,29 +400,12 @@ public class PartyEditScene extends BaseScene {
             final IEntity focusedCard = (IEntity) cardZoom.getUserData();
             if (focusedCard.contains(initX, initY) && Math.abs(initDistanceY) > Math.abs(initDistanceX)) {
                 focusedCard.setAlpha(0.5f);
-                final Card[] partyCards = GameUserSession.getInstance().getParties()[partyNumber - 1];
-                boolean hasPosition = false;
-                for (int partyCardIndex = 0; partyCardIndex < partyCards.length; partyCardIndex++) {
-                    final Card partyCard = partyCards[partyCardIndex];
-                    if (partyCard == null) {
-                        hasPosition = true;
-                        copyCard = createRealScreenImageSprite(TextureEnum.TEST_CARD1, 10, 20);
-                        copyCard.setPosition(toContainerOuterX(focusedCard), toContainerOuterY(focusedCard));
-                        copyCard.setWidth(focusedCard.getWidth());
-                        copyCard.setHeight(focusedCard.getHeight());
-                        PartyEditScene.this.attachChild(copyCard);
-                        break;
-                    }
-                }
-                if (!hasPosition) {
-                    copyCard = null;
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(activity, "队伍已满！", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
+                copyCard = createRealScreenImageSprite(TextureEnum.TEST_CARD1, 10, 20);
+                copyCard.setPosition(toContainerOuterX(focusedCard), toContainerOuterY(focusedCard));
+                copyCard.setWidth(focusedCard.getWidth());
+                copyCard.setHeight(focusedCard.getHeight());
+                PartyEditScene.this.attachChild(copyCard);
+
             }
         }
 
@@ -451,38 +439,14 @@ public class PartyEditScene extends BaseScene {
             if (focusedCard.getScaleX() > 1.8) {
                 if (pPointerID == initPointerID && copyCard != null && focusedCard.contains(initX, initY) && Math.abs(initDistanceY) > Math.abs(initDistanceX)) {
                     if (finishedY < toContainerOuterY(focusedCard)) {
-                        final MoveModifier revertModifier = new MoveModifier(0.1f, copyCard.getX(), copyCard.getY(), toContainerOuterX(focusedCard),
-                                toContainerOuterY(focusedCard), new IEntityModifierListener() {
-                                    @Override
-                                    public void onModifierStarted(final IModifier<IEntity> pModifier, final IEntity pItem) {
-                                        // Debug.e("cardZoomX:" + cardZoomX);
-                                        // Debug.e("minDiffCardX Started:" + toContainerOuterX(minDiffCard));
-                                        // Debug.e("minDiffCard Started:" + minDiffCard.getScaleX());
-                                    }
-
-                                    @Override
-                                    public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
-                                        pItem.detachSelf();
-                                        copyCard = null;
-                                        focusedCard.setAlpha(1);
-                                        // Debug.e("cardZoomX:" + cardZoomX);
-                                        // Debug.e("minDiffCardX Finished:" + toContainerOuterX(minDiffCard));
-                                        // Debug.e("minDiffCard Finished:" + minDiffCard.getScaleX());
-                                    }
-
-                                });
-                        activity.runOnUpdateThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                copyCard.clearEntityModifiers();
-                                copyCard.registerEntityModifier(revertModifier);
-                            }
-                        });
+                        revertCard(focusedCard);
                     } else {
                         final Card[] partyCards = GameUserSession.getInstance().getParties()[partyNumber - 1];
+                        boolean hasPosition = false;
                         for (int partyCardIndex = 0; partyCardIndex < partyCards.length; partyCardIndex++) {
                             final Card partyCard = partyCards[partyCardIndex];
                             if (partyCard == null) {
+                                hasPosition = true;
                                 final Card cardEntry = new Card();
                                 cardEntry.setImage("card/card1.jpg");
                                 partyCards[partyCardIndex] = cardEntry;
@@ -514,10 +478,50 @@ public class PartyEditScene extends BaseScene {
                                 break;
                             }
                         }
+                        if (!hasPosition) {
+                            revertCard(focusedCard);
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(activity, "队伍已满！", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                        }
                     }
                 }
             }
         }
 
+        private void revertCard(final IEntity focusedCard) {
+            final MoveModifier revertModifier = new MoveModifier(0.1f, copyCard.getX(), copyCard.getY(), toContainerOuterX(focusedCard),
+                    toContainerOuterY(focusedCard), new IEntityModifierListener() {
+                        @Override
+                        public void onModifierStarted(final IModifier<IEntity> pModifier, final IEntity pItem) {
+                            // Debug.e("cardZoomX:" + cardZoomX);
+                            // Debug.e("minDiffCardX Started:" + toContainerOuterX(minDiffCard));
+                            // Debug.e("minDiffCard Started:" + minDiffCard.getScaleX());
+                        }
+
+                        @Override
+                        public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
+                            pItem.detachSelf();
+                            copyCard = null;
+                            focusedCard.setAlpha(1);
+                            // Debug.e("cardZoomX:" + cardZoomX);
+                            // Debug.e("minDiffCardX Finished:" + toContainerOuterX(minDiffCard));
+                            // Debug.e("minDiffCard Finished:" + minDiffCard.getScaleX());
+                        }
+
+                    });
+            activity.runOnUpdateThread(new Runnable() {
+                @Override
+                public void run() {
+                    copyCard.clearEntityModifiers();
+                    copyCard.registerEntityModifier(revertModifier);
+                }
+            });
+        }
+
     }
+
 }

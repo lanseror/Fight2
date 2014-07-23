@@ -175,4 +175,10 @@ public class PartyScene extends BaseScene {
         return sprite;
     }
 
+    @Override
+    public void updateScene() {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

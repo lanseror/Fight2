@@ -224,4 +224,10 @@ public class MainScene extends BaseScene {
     private boolean checkContains(final float[] pVertices, final float pX, final float pY) {
         return BaseCollisionChecker.checkContains(pVertices, pVertices.length / 2, pX, pY);
     }
+
+    @Override
+    public void updateScene() {
+        // TODO Auto-generated method stub
+        
+    }
 }
