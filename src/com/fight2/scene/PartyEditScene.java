@@ -253,9 +253,9 @@ public class PartyEditScene extends BaseScene {
                                     Debug.e("cardPack.getChildCount():" + cardPack.getChildCount());
                                     if (cardPack.getChildCount() == 0) {
                                         revertCard.setTag(0);
-                                        revertCard.setPosition(cardZoom);
-                                        cardPack.attachChild(revertCard);
-                                        revertCard.setAlpha(1f);
+                                        final float cardZoomX = cardZoom.getX();
+                                        final float cardPackLeft = cardPack.getX() - cardPack.getWidth() * 0.5f;
+                                        revertCard.setPosition(cardZoomX - cardPackLeft, CARD_Y);
                                         cardZoom.setUserData(revertCard);
                                     } else {
                                         if (pCardIndex >= cardPack.getChildCount()) {
@@ -278,32 +278,32 @@ public class PartyEditScene extends BaseScene {
                                             }
                                         }
                                         revertCard.setTag(pCardIndex);
-
-                                        cardPack.attachChild(revertCard);
-                                        revertCard.setAlpha(1f);
-                                        final Card[] partyCards = GameUserSession.getInstance().getParties()[partyNumber - 1];
-                                        GameUserSession.getInstance().getCards().add(partyCards[frameIndex]);
-                                        partyCards[frameIndex] = null;
-                                        cardPack.sortChildren(new IEntityComparator() {
-                                            @Override
-                                            public int compare(final IEntity lhs, final IEntity rhs) {
-                                                final int leftTag = lhs.getTag();
-                                                final int rightTag = rhs.getTag();
-                                                return leftTag < rightTag ? -1 : 1;
-                                            }
-
-                                        });
-
-                                        activity.runOnUpdateThread(new Runnable() {
-
-                                            @Override
-                                            public void run() {
-                                                addedCards[frameIndex].detachSelf();
-                                                addedCards[frameIndex] = null;
-                                            }
-
-                                        });
                                     }
+                                    cardPack.attachChild(revertCard);
+                                    revertCard.setAlpha(1f);
+                                    final Card[] partyCards = GameUserSession.getInstance().getParties()[partyNumber - 1];
+                                    GameUserSession.getInstance().getCards().add(partyCards[frameIndex]);
+                                    partyCards[frameIndex] = null;
+                                    cardPack.sortChildren(new IEntityComparator() {
+                                        @Override
+                                        public int compare(final IEntity lhs, final IEntity rhs) {
+                                            final int leftTag = lhs.getTag();
+                                            final int rightTag = rhs.getTag();
+                                            return leftTag < rightTag ? -1 : 1;
+                                        }
+
+                                    });
+
+                                    activity.runOnUpdateThread(new Runnable() {
+
+                                        @Override
+                                        public void run() {
+                                            addedCards[frameIndex].detachSelf();
+                                            addedCards[frameIndex] = null;
+                                        }
+
+                                    });
+
                                 } else {
                                     movingCard.setPosition(this);
                                 }
