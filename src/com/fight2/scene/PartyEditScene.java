@@ -10,6 +10,7 @@ import java.util.Map;
 import org.andengine.engine.handler.BaseEntityUpdateHandler;
 import org.andengine.engine.handler.physics.PhysicsHandler;
 import org.andengine.entity.IEntity;
+import org.andengine.entity.IEntityComparator;
 import org.andengine.entity.modifier.IEntityModifier.IEntityModifierListener;
 import org.andengine.entity.modifier.MoveModifier;
 import org.andengine.entity.primitive.Rectangle;
@@ -48,6 +49,7 @@ public class PartyEditScene extends BaseScene {
     private final static int BASE_PX = 600;
     private final static int CARD_GAP = 20;
     private final static int CARD_WIDTH = 120;
+    private final int CARD_Y = 120;
     private final static float DISTANCE_15CARDS = (CARD_WIDTH + CARD_GAP) * 14.5f;
     private final static int ACCELERATION = 1300;
     private final float max_velocity;
@@ -63,6 +65,8 @@ public class PartyEditScene extends BaseScene {
     private final Map<Card, IEntity> removedCards = new HashMap<Card, IEntity>();
     private final IEntity[] addedCards = new IEntity[4];
 
+    private final Rectangle cardZoom;
+
     public PartyEditScene(final GameActivity activity, final int partyNumber) throws IOException {
         super(activity);
         this.partyNumber = partyNumber;
@@ -74,11 +78,84 @@ public class PartyEditScene extends BaseScene {
                 48, Color.WHITE_ARGB_PACKED_INT);
         this.mFont.load();
 
+        cardZoom = new Rectangle(180 + 240 * 0.5f, 180, 240, 250, vbom);
+
         init();
+        updateScene();
     }
 
     @Override
     public void updateScene() {
+        final Card[] partyCards = GameUserSession.getInstance().getParties()[partyNumber - 1];
+        for (int i = 0; i < partyCards.length; i++) {
+            final Card cardEntry = partyCards[i];
+            if (cardEntry != null) {
+                final IEntity card = createRealScreenCardSprite(cardEntry, 10, 20);
+                card.setPosition(cardFrames[i]);
+                card.setWidth(CARD_WIDTH);
+                card.setHeight(180);
+                card.setUserData(cardEntry);
+                this.attachChild(card);
+                addedCards[i] = card;
+
+                final Sprite removedCard = createRealScreenCardSprite(cardEntry, 10, 20);
+                removedCard.setTag(i);
+                removedCard.setWidth(CARD_WIDTH);
+                removedCard.setHeight(180);
+                removedCard.setPosition(0, CARD_Y);
+                removedCard.setUserData(cardEntry);
+                removedCards.put(cardEntry, removedCard);
+                this.registerUpdateHandler(new BaseEntityUpdateHandler(removedCard) {
+                    @Override
+                    protected void onUpdate(final float pSecondsElapsed, final IEntity currentCard) {
+                        final float cardZoomX = cardZoom.getX();
+                        final float distance = cardZoom.getWidth() * 0.5f + currentCard.getWidth() * 0.5f;
+                        // final float cardZoomLeft = cardZoom.getWidth() * 0.5f + currentCard.getWidth() * 0.5f;
+                        final IEntity pCardPack = currentCard.getParent();
+                        if (pCardPack == null) {
+                            return;
+                        }
+                        final float x = currentCard.getX() + pCardPack.getX() - pCardPack.getWidth() * 0.5f;
+                        final float diff = Math.abs(x - cardZoomX);
+                        if (diff < distance) {
+                            final BigDecimal bdDiff = BigDecimal.valueOf(distance - diff);
+                            final BigDecimal bdDistance = BigDecimal.valueOf(distance);
+                            final float scale = 1 + bdDiff.divide(bdDistance, 4, RoundingMode.HALF_UP).floatValue();
+                            currentCard.setScale(scale);
+
+                            final int currentCardIndex = currentCard.getTag();
+                            boolean isLeftmostZoomCard = true;
+                            if (currentCardIndex > 0) {
+                                final IEntity previousCard = pCardPack.getChildByIndex(currentCardIndex - 1);
+                                if (previousCard.collidesWith(cardZoom)) {
+                                    isLeftmostZoomCard = false;
+                                }
+                            }
+
+                            if (isLeftmostZoomCard) {
+                                float cardLeft = currentCard.getX() + currentCard.getScaleX() * CARD_WIDTH * 0.5f + CARD_GAP * currentCard.getScaleX();
+                                final int maxAdjustCard = pCardPack.getChildCount();
+                                for (int indexDff = 1; indexDff < maxAdjustCard; indexDff++) {
+                                    final int cardIndex = currentCardIndex + indexDff;
+                                    if (cardIndex >= pCardPack.getChildCount()) {
+                                        break;
+                                    }
+                                    final IEntity adjustCard = pCardPack.getChildByIndex(cardIndex);
+                                    final float adjustWidth = adjustCard.getScaleX() * currentCard.getWidth();
+                                    final float adjustCardX = cardLeft + adjustWidth * 0.5f;
+                                    adjustCard.setX(adjustCardX);
+                                    cardLeft += adjustWidth + CARD_GAP * adjustCard.getScaleX();
+                                }
+                            }
+
+                        } else {
+                            currentCard.setScale(1);
+                        }
+                    }
+                });
+            }
+
+        }
         // TODO Auto-generated method stub
 
     }
@@ -108,7 +185,6 @@ public class PartyEditScene extends BaseScene {
         final Rectangle cardPack = new Rectangle(300, 180, 21000, 250, vbom);
         cardPack.setColor(Color.TRANSPARENT);
 
-        final Rectangle cardZoom = new Rectangle(180 + 240 * 0.5f, 180, 240, 250, vbom);
         cardZoom.setColor(Color.TRANSPARENT);
         this.scrollDetector = new F2ScrollDetector(new CardPackScrollDetectorListener(cardPack, cardZoom));
 
@@ -169,39 +245,65 @@ public class PartyEditScene extends BaseScene {
                                             break;
                                         }
                                     }
-                                    final IEntity focusedCard = (IEntity) cardZoom.getUserData();
-                                    final Card focusedCardEnty = (Card) (focusedCard != null ? focusedCard.getUserData() : null);
+                                    for (int j = 0; j < cardPack.getChildCount(); j++) {
+                                        final IEntity tempCard = cardPack.getChildByIndex(j);
+                                        Debug.e("Tag:" + tempCard.getTag());
+                                    }
+                                    Debug.e("pCardIndex:" + pCardIndex);
+                                    Debug.e("cardPack.getChildCount():" + cardPack.getChildCount());
                                     if (cardPack.getChildCount() == 0) {
+                                        revertCard.setTag(0);
                                         revertCard.setPosition(cardZoom);
                                         cardPack.attachChild(revertCard);
                                         revertCard.setAlpha(1f);
                                         cardZoom.setUserData(revertCard);
-                                    } else if (focusedCardEnty != null) {
-                                        if (revertCardEntry.getId() <= focusedCardEnty.getId()) {
-                                            final IEntity leftMostCard = cardPack.getChildByIndex(0);
-                                            if (leftMostCard == focusedCardEnty) {
-                                                final float revertX = cardZoom.getX() - cardZoom.getWidth() * 0.5f - CARD_GAP - CARD_WIDTH * 0.5f;
-                                                revertCard.setPosition(revertX, revertCard.getY());
-                                            } else if (pCardIndex == 0) {
-                                                final float revertX = leftMostCard.getX() - CARD_GAP - CARD_WIDTH;
-                                                revertCard.setPosition(revertX, revertCard.getY());
-                                            } else {
-                                                revertCard.setPosition(cardPack.getChildByIndex(pCardIndex - 1));
-                                            }
-
-                                            for (int i = 0; i < pCardIndex; i++) {
-                                                final IEntity adjustCard = cardPack.getChildByIndex(i);
-                                                adjustCard.setPosition(adjustCard.getX() - CARD_GAP - CARD_WIDTH, adjustCard.getY());
-                                            }
-                                            cardPack.attachChild(revertCard);
-                                            revertCard.setAlpha(1f);
-                                            revertCard.setScale(1);
+                                    } else {
+                                        if (pCardIndex >= cardPack.getChildCount()) {
+                                            final IEntity previousCard = cardPack.getChildByIndex(pCardIndex - 1);
+                                            final float adjustScale = previousCard.getScaleX();
+                                            final float adjustX = adjustScale * (CARD_GAP * 0.5f + CARD_WIDTH * 0.5f) + CARD_GAP * 0.5f + CARD_WIDTH * 0.5f;
+                                            revertCard.setPosition(previousCard.getX() + adjustX, revertCard.getY());
                                         } else {
-                                            final IEntity rightMostCard = cardPack.getChildByIndex(cardPack.getChildCount() - 1);
-
+                                            final IEntity replacedCard = cardPack.getChildByIndex(pCardIndex);
+                                            if (replacedCard == cardZoom.getUserData()) {
+                                                cardZoom.setUserData(revertCard);
+                                            }
+                                            revertCard.setPosition(replacedCard);
+                                            for (int i = pCardIndex; i < cardPack.getChildCount(); i++) {
+                                                final IEntity adjustCard = cardPack.getChildByIndex(i);
+                                                final float adjustScale = adjustCard.getScaleX();
+                                                final float adjustX = adjustScale * (CARD_GAP * 0.5f + CARD_WIDTH * 0.5f) + CARD_GAP * 0.5f + CARD_WIDTH * 0.5f;
+                                                adjustCard.setPosition(adjustCard.getX() + adjustX, adjustCard.getY());
+                                                adjustCard.setTag(i + 1);
+                                            }
                                         }
-                                    }
+                                        revertCard.setTag(pCardIndex);
 
+                                        cardPack.attachChild(revertCard);
+                                        revertCard.setAlpha(1f);
+                                        final Card[] partyCards = GameUserSession.getInstance().getParties()[partyNumber - 1];
+                                        GameUserSession.getInstance().getCards().add(partyCards[frameIndex]);
+                                        partyCards[frameIndex] = null;
+                                        cardPack.sortChildren(new IEntityComparator() {
+                                            @Override
+                                            public int compare(final IEntity lhs, final IEntity rhs) {
+                                                final int leftTag = lhs.getTag();
+                                                final int rightTag = rhs.getTag();
+                                                return leftTag < rightTag ? -1 : 1;
+                                            }
+
+                                        });
+
+                                        activity.runOnUpdateThread(new Runnable() {
+
+                                            @Override
+                                            public void run() {
+                                                addedCards[frameIndex].detachSelf();
+                                                addedCards[frameIndex] = null;
+                                            }
+
+                                        });
+                                    }
                                 } else {
                                     movingCard.setPosition(this);
                                 }
@@ -219,7 +321,6 @@ public class PartyEditScene extends BaseScene {
         }
 
         final float initCardX = cardZoom.getX() - (cardPack.getX() - 0.5f * cardPack.getWidth());
-        final int cardY = 120;
 
         final GameUserSession session = GameUserSession.getInstance();
         final List<Card> sessionCards = session.getCards();
@@ -230,7 +331,7 @@ public class PartyEditScene extends BaseScene {
             card.setTag(i);
             card.setWidth(CARD_WIDTH);
             card.setHeight(180);
-            card.setPosition(appendX, cardY);
+            card.setPosition(appendX, CARD_Y);
             card.setUserData(sessionCard);
             cardPack.attachChild(card);
             if (i == 0) {
@@ -516,7 +617,7 @@ public class PartyEditScene extends BaseScene {
                 initDistanceY = pDistanceY;
                 final IEntity focusedCard = (IEntity) cardZoom.getUserData();
                 if (scrollable && focusedCard.contains(initX, initY) && Math.abs(initDistanceY) > Math.abs(initDistanceX)) {
-                    Debug.e("Create copyCard");
+                    // Debug.e("Create copyCard");
                     focusedCard.setAlpha(0.5f);
                     final Card sessionCard = (Card) focusedCard.getUserData();
                     copyCard = createRealScreenCardSprite(sessionCard, 10, 20);
@@ -557,9 +658,9 @@ public class PartyEditScene extends BaseScene {
 
         @Override
         public void onScrollFinished(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
-            Debug.e("Scroll Finished");
+            // Debug.e("Scroll Finished");
             if (cardPack.getChildCount() == 0 && !scrollable) {
-                Debug.e("cardPack.getChildCount = 0");
+                // Debug.e("cardPack.getChildCount = 0");
                 return;
             }
             final F2ScrollDetector scrollDetector = (F2ScrollDetector) pScollDetector;
@@ -568,11 +669,11 @@ public class PartyEditScene extends BaseScene {
             final float finishedY = touchEvent.getY();
             final IEntity focusedCard = (IEntity) cardZoom.getUserData();
             if (focusedCard.getScaleX() > 1.8) {
-                Debug.e("focusedCard.getScaleX() > 1.8");
+                // Debug.e("focusedCard.getScaleX() > 1.8");
                 if (pPointerID == initPointerID && copyCard != null && focusedCard.contains(initX, initY) && Math.abs(initDistanceY) > Math.abs(initDistanceX)) {
 
                     if (finishedY < toContainerOuterY(focusedCard)) {
-                        Debug.e("Y < focusedCard will revert");
+                        // Debug.e("Y < focusedCard will revert");
                         revertCard(focusedCard);
                     } else {
                         final Card[] partyCards = GameUserSession.getInstance().getParties()[partyNumber - 1];
@@ -602,7 +703,7 @@ public class PartyEditScene extends BaseScene {
 
                         if (collidedWithGrid || hasPosition) {
                             scrollable = false;
-                            Debug.e("Add card");
+                            // Debug.e("Add card");
                             final Card cardEntry = (Card) focusedCard.getUserData();
                             partyCards[cardGridIndex] = cardEntry;
                             addedCards[cardGridIndex] = copyCard;
@@ -642,6 +743,7 @@ public class PartyEditScene extends BaseScene {
                                                 public void run() {
                                                     focusedCard.detachSelf();
                                                     removedCards.put(cardEntry, focusedCard);
+                                                    GameUserSession.getInstance().getCards().remove(cardEntry);
                                                 }
                                             });
                                             scrollable = true;
@@ -658,7 +760,7 @@ public class PartyEditScene extends BaseScene {
                             });
                         } else {
                             scrollable = false;
-                            Debug.e("NoPosition will revert");
+                            // Debug.e("NoPosition will revert");
                             revertCard(focusedCard);
                             activity.runOnUiThread(new Runnable() {
                                 @Override
@@ -669,12 +771,12 @@ public class PartyEditScene extends BaseScene {
                         }
                     }
                 } else if (copyCard != null) {
-                    Debug.e("Directly revert");
+                    // Debug.e("Directly revert");
                     scrollable = false;
                     revertCard(focusedCard);
                 }
             } else if (copyCard != null) {
-                Debug.e("CoDirectly revert");
+                // Debug.e("CoDirectly revert");
                 scrollable = false;
                 revertCard(focusedCard);
             }
@@ -694,7 +796,7 @@ public class PartyEditScene extends BaseScene {
                                 @Override
                                 public void run() {
                                     pItem.detachSelf();
-                                    Debug.e("revertCard");
+                                    // Debug.e("revertCard");
                                     copyCard = null;
                                     focusedCard.setAlpha(1);
                                     scrollable = true;

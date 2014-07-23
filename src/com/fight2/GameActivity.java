@@ -189,6 +189,7 @@ public class GameActivity extends BaseGameActivity {
 
         final GameUserSession session = GameUserSession.getInstance();
         final List<Card> cards = session.getCards();
+        cards.clear();
         for (int i = 1; i < 8; i++) {
             final Card cardEntry = new Card();
             cardEntry.setId(i);
