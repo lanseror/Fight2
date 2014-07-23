@@ -3,6 +3,8 @@ package com.fight2.scene;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.andengine.engine.handler.BaseEntityUpdateHandler;
@@ -11,7 +13,6 @@ import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.IEntityModifier.IEntityModifierListener;
 import org.andengine.entity.modifier.MoveModifier;
 import org.andengine.entity.primitive.Rectangle;
-import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
@@ -23,6 +24,7 @@ import org.andengine.opengl.font.Font;
 import org.andengine.opengl.font.FontFactory;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.util.adt.color.Color;
+import org.andengine.util.debug.Debug;
 import org.andengine.util.modifier.IModifier;
 
 import android.graphics.Typeface;
@@ -55,9 +57,10 @@ public class PartyEditScene extends BaseScene {
     private Text partyNumberText;
     private final Rectangle[] cardFrames = new Rectangle[4];
 
-    final Map<SceneEnum, Scene> scenes = this.activity.getScenes();
+    final Map<SceneEnum, BaseScene> scenes = this.activity.getScenes();
     private PhysicsHandler mPhysicsHandler;
     private final Font mFont;
+    private final Map<Card, IEntity> removedCards = new HashMap<Card, IEntity>();
 
     public PartyEditScene(final GameActivity activity, final int partyNumber) throws IOException {
         super(activity);
@@ -89,7 +92,9 @@ public class PartyEditScene extends BaseScene {
         backButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                activity.getEngine().setScene(scenes.get(SceneEnum.Party));
+                final BaseScene partyScene = scenes.get(SceneEnum.Party);
+                partyScene.updateScene();
+                activity.getEngine().setScene(partyScene);
             }
         });
 
@@ -114,14 +119,17 @@ public class PartyEditScene extends BaseScene {
         final float initCardX = cardZoom.getX() - (cardPack.getX() - 0.5f * cardPack.getWidth());
         final int cardY = 120;
 
+        final GameUserSession session = GameUserSession.getInstance();
+        final List<Card> sessionCards = session.getCards();
         float appendX = initCardX;
-        for (int i = 0; i < 50; i++) {
-
-            final Sprite card = createRealScreenImageSprite(TextureEnum.TEST_CARD1, 10, 20);
+        for (int i = 0; i < sessionCards.size(); i++) {
+            final Card sessionCard = sessionCards.get(i);
+            final Sprite card = createRealScreenCardSprite(sessionCard, 10, 20);
             card.setTag(i);
             card.setWidth(CARD_WIDTH);
             card.setHeight(180);
             card.setPosition(appendX, cardY);
+            card.setUserData(sessionCard);
             cardPack.attachChild(card);
             if (i == 0) {
                 appendX += 1.5 * (CARD_GAP + CARD_WIDTH);
@@ -137,6 +145,9 @@ public class PartyEditScene extends BaseScene {
                     final float distance = cardZoom.getWidth() * 0.5f + currentCard.getWidth() * 0.5f;
                     // final float cardZoomLeft = cardZoom.getWidth() * 0.5f + currentCard.getWidth() * 0.5f;
                     final IEntity pCardPack = currentCard.getParent();
+                    if (pCardPack == null) {
+                        return;
+                    }
                     final float x = currentCard.getX() + pCardPack.getX() - pCardPack.getWidth() * 0.5f;
                     final float diff = Math.abs(x - cardZoomX);
                     if (diff < distance) {
@@ -182,29 +193,31 @@ public class PartyEditScene extends BaseScene {
 
             @Override
             protected void onUpdate(final float pSecondsElapsed, final IEntity pCardPack) {
-                final float accelerationX = this.getAccelerationX();
-                final float velocityX = this.getVelocityX();
-                final float cardZoomX = cardZoom.getX();
-                final IEntity firstCard = pCardPack.getFirstChild();
-                final IEntity lastCard = pCardPack.getLastChild();
-                final float firstCardX = toContainerOuterX(firstCard);
-                final float lastCardX = toContainerOuterX(lastCard);
-                if (this.isEnabled() && accelerationX != 0) {
-                    final float testVelocityX = mVelocityX + accelerationX * pSecondsElapsed;
-                    if (velocityX == 0) {
-                        this.reset();
-                        moveFinishedListener.update();
-                    } else if (Math.abs(mVelocityX) + Math.abs(testVelocityX) > Math.abs(mVelocityX + testVelocityX)) {
-                        // This make sure it will not go back automatically.
-                        this.reset();
-                        moveFinishedListener.update();
-                    } else if (firstCardX >= cardZoomX || lastCardX <= cardZoomX) {
-                        this.reset();
-                        moveFinishedListener.update();
+                if (pCardPack.getChildCount() != 0) {
+                    final float accelerationX = this.getAccelerationX();
+                    final float velocityX = this.getVelocityX();
+                    final float cardZoomX = cardZoom.getX();
+                    final IEntity firstCard = pCardPack.getFirstChild();
+                    final IEntity lastCard = pCardPack.getLastChild();
+                    final float firstCardX = toContainerOuterX(firstCard);
+                    final float lastCardX = toContainerOuterX(lastCard);
+                    if (this.isEnabled() && accelerationX != 0) {
+                        final float testVelocityX = mVelocityX + accelerationX * pSecondsElapsed;
+                        if (velocityX == 0) {
+                            this.reset();
+                            moveFinishedListener.update();
+                        } else if (Math.abs(mVelocityX) + Math.abs(testVelocityX) > Math.abs(mVelocityX + testVelocityX)) {
+                            // This make sure it will not go back automatically.
+                            this.reset();
+                            moveFinishedListener.update();
+                        } else if (firstCardX >= cardZoomX || lastCardX <= cardZoomX) {
+                            this.reset();
+                            moveFinishedListener.update();
+                        }
                     }
-                }
 
-                super.onUpdate(pSecondsElapsed, pCardPack);
+                    super.onUpdate(pSecondsElapsed, pCardPack);
+                }
             }
         };
         this.registerUpdateHandler(mPhysicsHandler);
@@ -381,6 +394,7 @@ public class PartyEditScene extends BaseScene {
         private float initDistanceX;
         private float initDistanceY;
         private Sprite copyCard;
+        private boolean scrollable = true;
 
         public CardPackScrollDetectorListener(final IEntity cardPack, final IEntity cardZoom) {
             this.cardPack = cardPack;
@@ -391,94 +405,156 @@ public class PartyEditScene extends BaseScene {
         @Override
         public void onScrollStarted(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
             initPointerID = pPointerID;
-            final F2ScrollDetector scrollDetector = (F2ScrollDetector) pScollDetector;
-            final TouchEvent touchEvent = scrollDetector.getSceneTouchEvent();
-            initX = touchEvent.getX();
-            initY = touchEvent.getY();
-            initDistanceX = pDistanceX;
-            initDistanceY = pDistanceY;
-            final IEntity focusedCard = (IEntity) cardZoom.getUserData();
-            if (focusedCard.contains(initX, initY) && Math.abs(initDistanceY) > Math.abs(initDistanceX)) {
-                focusedCard.setAlpha(0.5f);
-                copyCard = createRealScreenImageSprite(TextureEnum.TEST_CARD1, 10, 20);
-                copyCard.setPosition(toContainerOuterX(focusedCard), toContainerOuterY(focusedCard));
-                copyCard.setWidth(focusedCard.getWidth());
-                copyCard.setHeight(focusedCard.getHeight());
-                PartyEditScene.this.attachChild(copyCard);
+            if (cardPack.getChildCount() != 0) {
+                final F2ScrollDetector scrollDetector = (F2ScrollDetector) pScollDetector;
+                final TouchEvent touchEvent = scrollDetector.getSceneTouchEvent();
+                initX = touchEvent.getX();
+                initY = touchEvent.getY();
+                initDistanceX = pDistanceX;
+                initDistanceY = pDistanceY;
+                final IEntity focusedCard = (IEntity) cardZoom.getUserData();
+                if (scrollable && focusedCard.contains(initX, initY) && Math.abs(initDistanceY) > Math.abs(initDistanceX)) {
+                    Debug.e("Create copyCard");
+                    focusedCard.setAlpha(0.5f);
+                    final Card sessionCard = (Card) focusedCard.getUserData();
+                    copyCard = createRealScreenCardSprite(sessionCard, 10, 20);
+                    copyCard.setPosition(toContainerOuterX(focusedCard), toContainerOuterY(focusedCard));
+                    copyCard.setWidth(focusedCard.getWidth());
+                    copyCard.setHeight(focusedCard.getHeight());
+                    PartyEditScene.this.attachChild(copyCard);
 
+                }
             }
         }
 
         @Override
         public void onScroll(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
-            final IEntity focusedCard = (IEntity) cardZoom.getUserData();
-            if (pPointerID == initPointerID && copyCard != null && focusedCard.contains(initX, initY) && Math.abs(initDistanceY) > Math.abs(initDistanceX)) {
-                copyCard.setX(copyCard.getX() + pDistanceX);
-                copyCard.setY(copyCard.getY() - pDistanceY);
-            } else if (Math.abs(pDistanceX) > Math.abs(pDistanceY)) {
-                final IEntity firstCard = cardPack.getFirstChild();
-                final IEntity lastCard = cardPack.getLastChild();
-                final float firstCardX = firstCard.getX() + cardPack.getX() - cardPack.getWidth() * 0.5f;
-                final float lastCardX = lastCard.getX() + cardPack.getX() - cardPack.getWidth() * 0.5f;
-                if (firstCardX >= cardZoomX && pDistanceX > 0) {
-                    // Debug.e("firstCardX > cardZoomX:" + firstCardX + "->" + cardZoomX + "->" + firstCard.getScaleX());
-                } else if (lastCardX <= cardZoomX && pDistanceX < 0) {
-                    // Debug.e("lastCardX < cardZoomX:" + lastCardX + "->" + cardZoomX);
-                } else {
-                    cardPack.setX(cardPack.getX() + pDistanceX);
+            if (cardPack.getChildCount() != 0 && scrollable) {
+                final IEntity focusedCard = (IEntity) cardZoom.getUserData();
+                if (pPointerID == initPointerID && copyCard != null && focusedCard.contains(initX, initY) && Math.abs(initDistanceY) > Math.abs(initDistanceX)) {
+                    final F2ScrollDetector scrollDetector = (F2ScrollDetector) pScollDetector;
+                    final TouchEvent touchEvent = scrollDetector.getSceneTouchEvent();
+                    copyCard.setX(touchEvent.getX());
+                    copyCard.setY(touchEvent.getY());
+                } else if (Math.abs(pDistanceX) > Math.abs(pDistanceY)) {
+                    final IEntity firstCard = cardPack.getFirstChild();
+                    final IEntity lastCard = cardPack.getLastChild();
+                    final float firstCardX = firstCard.getX() + cardPack.getX() - cardPack.getWidth() * 0.5f;
+                    final float lastCardX = lastCard.getX() + cardPack.getX() - cardPack.getWidth() * 0.5f;
+                    if (firstCardX >= cardZoomX && pDistanceX > 0) {
+                        // Debug.e("firstCardX > cardZoomX:" + firstCardX + "->" + cardZoomX + "->" + firstCard.getScaleX());
+                    } else if (lastCardX <= cardZoomX && pDistanceX < 0) {
+                        // Debug.e("lastCardX < cardZoomX:" + lastCardX + "->" + cardZoomX);
+                    } else {
+                        cardPack.setX(cardPack.getX() + pDistanceX);
+                    }
                 }
             }
         }
 
         @Override
         public void onScrollFinished(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
+            Debug.e("Scroll Finished");
+            if (cardPack.getChildCount() == 0 && !scrollable) {
+                Debug.e("cardPack.getChildCount = 0");
+                return;
+            }
             final F2ScrollDetector scrollDetector = (F2ScrollDetector) pScollDetector;
             final TouchEvent touchEvent = scrollDetector.getSceneTouchEvent();
+            final float finishedX = touchEvent.getX();
             final float finishedY = touchEvent.getY();
             final IEntity focusedCard = (IEntity) cardZoom.getUserData();
             if (focusedCard.getScaleX() > 1.8) {
+                Debug.e("focusedCard.getScaleX() > 1.8");
                 if (pPointerID == initPointerID && copyCard != null && focusedCard.contains(initX, initY) && Math.abs(initDistanceY) > Math.abs(initDistanceX)) {
+
                     if (finishedY < toContainerOuterY(focusedCard)) {
+                        Debug.e("Y < focusedCard will revert");
                         revertCard(focusedCard);
                     } else {
                         final Card[] partyCards = GameUserSession.getInstance().getParties()[partyNumber - 1];
-                        boolean hasPosition = false;
-                        for (int partyCardIndex = 0; partyCardIndex < partyCards.length; partyCardIndex++) {
-                            final Card partyCard = partyCards[partyCardIndex];
-                            if (partyCard == null) {
-                                hasPosition = true;
-                                final Card cardEntry = new Card();
-                                cardEntry.setImage("card/card1.jpg");
-                                partyCards[partyCardIndex] = cardEntry;
-                                final Rectangle cardFrame = cardFrames[partyCardIndex];
-                                final MoveModifier modifier = new MoveModifier(0.2f, copyCard.getX(), copyCard.getY(), cardFrame.getX(), cardFrame.getY(),
-                                        new IEntityModifierListener() {
-                                            @Override
-                                            public void onModifierStarted(final IModifier<IEntity> pModifier, final IEntity pItem) {
-                                                // Debug.e("cardZoomX:" + cardZoomX);
-                                                // Debug.e("minDiffCardX Started:" + toContainerOuterX(minDiffCard));
-                                                // Debug.e("minDiffCard Started:" + minDiffCard.getScaleX());
-                                            }
-
-                                            @Override
-                                            public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
-                                                // Debug.e("cardZoomX:" + cardZoomX);
-                                                // Debug.e("minDiffCardX Finished:" + toContainerOuterX(minDiffCard));
-                                                // Debug.e("minDiffCard Finished:" + minDiffCard.getScaleX());
-                                            }
-
-                                        });
-                                activity.runOnUpdateThread(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        copyCard.clearEntityModifiers();
-                                        copyCard.registerEntityModifier(modifier);
-                                    }
-                                });
+                        boolean collidedWithGrid = false;
+                        boolean isReplace = false;
+                        Rectangle cardGrid = null;
+                        int cardGridIndex = 0;
+                        for (; cardGridIndex < cardFrames.length; cardGridIndex++) {
+                            if (cardFrames[cardGridIndex].contains(copyCard.getX(), copyCard.getY())) {
+                                collidedWithGrid = true;
+                                isReplace = (partyCards[cardGridIndex] == null ? false : true);
                                 break;
                             }
                         }
-                        if (!hasPosition) {
+
+                        boolean hasPosition = false;
+                        if (!collidedWithGrid) {
+                            for (int partyCardIndex = 0; partyCardIndex < partyCards.length; partyCardIndex++) {
+                                final Card partyCard = partyCards[partyCardIndex];
+                                if (partyCard == null) {
+                                    hasPosition = true;
+                                    cardGridIndex = partyCardIndex;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (collidedWithGrid || hasPosition) {
+                            scrollable = false;
+                            Debug.e("Add card");
+                            final Card cardEntry = (Card) focusedCard.getUserData();
+                            partyCards[cardGridIndex] = cardEntry;
+                            cardGrid = cardFrames[cardGridIndex];
+                            final MoveModifier modifier = new MoveModifier(0.1f, copyCard.getX(), copyCard.getY(), cardGrid.getX(), cardGrid.getY(),
+                                    new IEntityModifierListener() {
+                                        @Override
+                                        public void onModifierStarted(final IModifier<IEntity> pModifier, final IEntity pItem) {
+                                            scrollable = false;
+                                        }
+
+                                        @Override
+                                        public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
+                                            focusedCard.setAlpha(0);
+
+                                            final int focusedCardIndex = focusedCard.getTag();
+                                            for (int cardPackIndex = focusedCardIndex + 1; cardPackIndex < cardPack.getChildCount(); cardPackIndex++) {
+                                                final IEntity previousCard = cardPack.getChildByIndex(cardPackIndex - 1);
+                                                final IEntity currentCard = cardPack.getChildByIndex(cardPackIndex);
+                                                currentCard.setTag(cardPackIndex - 1);
+                                                if (cardPackIndex == focusedCardIndex + 1) {
+                                                    cardZoom.setUserData(currentCard);
+                                                }
+                                                final float duration = (cardPackIndex == focusedCardIndex + 1 ? 0.1f : 0.2f);
+                                                final MoveModifier cardEditModifier = new MoveModifier(duration, currentCard.getX(), currentCard.getY(),
+                                                        previousCard.getX(), previousCard.getY());
+                                                activity.runOnUpdateThread(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        currentCard.clearEntityModifiers();
+                                                        currentCard.registerEntityModifier(cardEditModifier);
+                                                    }
+                                                });
+                                            }
+                                            activity.runOnUpdateThread(new Runnable() {
+                                                @Override
+                                                public void run() {
+                                                    focusedCard.detachSelf();
+                                                    removedCards.put(cardEntry, focusedCard);
+                                                }
+                                            });
+                                            scrollable = true;
+                                        }
+
+                                    });
+                            activity.runOnUpdateThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    copyCard.clearEntityModifiers();
+                                    copyCard.registerEntityModifier(modifier);
+                                    copyCard = null;
+                                }
+                            });
+                        } else {
+                            scrollable = false;
+                            Debug.e("NoPosition will revert");
                             revertCard(focusedCard);
                             activity.runOnUiThread(new Runnable() {
                                 @Override
@@ -488,7 +564,15 @@ public class PartyEditScene extends BaseScene {
                             });
                         }
                     }
+                } else if (copyCard != null) {
+                    Debug.e("Directly revert");
+                    scrollable = false;
+                    revertCard(focusedCard);
                 }
+            } else if (copyCard != null) {
+                Debug.e("CoDirectly revert");
+                scrollable = false;
+                revertCard(focusedCard);
             }
         }
 
@@ -497,19 +581,21 @@ public class PartyEditScene extends BaseScene {
                     toContainerOuterY(focusedCard), new IEntityModifierListener() {
                         @Override
                         public void onModifierStarted(final IModifier<IEntity> pModifier, final IEntity pItem) {
-                            // Debug.e("cardZoomX:" + cardZoomX);
-                            // Debug.e("minDiffCardX Started:" + toContainerOuterX(minDiffCard));
-                            // Debug.e("minDiffCard Started:" + minDiffCard.getScaleX());
+                            scrollable = false;
                         }
 
                         @Override
                         public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
-                            pItem.detachSelf();
-                            copyCard = null;
-                            focusedCard.setAlpha(1);
-                            // Debug.e("cardZoomX:" + cardZoomX);
-                            // Debug.e("minDiffCardX Finished:" + toContainerOuterX(minDiffCard));
-                            // Debug.e("minDiffCard Finished:" + minDiffCard.getScaleX());
+                            activity.runOnUpdateThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    pItem.detachSelf();
+                                    Debug.e("revertCard");
+                                    copyCard = null;
+                                    focusedCard.setAlpha(1);
+                                    scrollable = true;
+                                }
+                            });
                         }
 
                     });
@@ -524,4 +610,53 @@ public class PartyEditScene extends BaseScene {
 
     }
 
+    private Sprite createPartyCardSprite(final Card cardEntry, final IEntity cardFrameGrid) {
+        final Sprite partyCardSprite = createRealScreenImageSprite(TextureEnum.TEST_CARD1, 10, 20);
+        partyCardSprite.setPosition(cardFrameGrid.getX(), cardFrameGrid.getY());
+        partyCardSprite.setWidth(cardFrameGrid.getWidth());
+        partyCardSprite.setHeight(cardFrameGrid.getHeight());
+        return partyCardSprite;
+
+    }
+
+    class PartyCardScrollDetectorListener implements IScrollDetectorListener {
+
+        @Override
+        public void onScrollStarted(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void onScroll(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
+            // TODO Auto-generated method stub
+
+        }
+
+        @Override
+        public void onScrollFinished(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
+            // TODO Auto-generated method stub
+
+        }
+
+    }
+
+    protected Sprite createRealScreenCardSprite(final Card card, final float x, final float y) {
+        final float width = CARD_WIDTH;
+        final float height = 180;
+        final BigDecimal factor = BigDecimal.valueOf(this.cameraHeight).divide(BigDecimal.valueOf(deviceHeight), 2, RoundingMode.HALF_DOWN);
+        final float fakeWidth = BigDecimal.valueOf(this.deviceWidth).multiply(factor).floatValue();
+        final float pX = (this.cameraWidth - fakeWidth) / 2 + x + width * 0.5f;
+        final float pY = y + height * 0.5f;
+        Sprite sprite = null;
+        final TextureFactory textureFactory = TextureFactory.getInstance();
+        try {
+            final ITextureRegion texture = textureFactory.createIextureRegion(activity.getTextureManager(), activity.getAssets(), card.getImage());
+            sprite = new Sprite(pX, pY, width, height, texture, vbom);
+        } catch (final IOException e) {
+            Debug.e(e);
+        }
+
+        return sprite;
+    }
 }

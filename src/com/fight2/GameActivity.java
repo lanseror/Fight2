@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.andengine.engine.camera.Camera;
@@ -32,6 +33,7 @@ import com.fight2.constant.SceneEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.ProgressBar;
+import com.fight2.scene.BaseScene;
 import com.fight2.scene.MainScene;
 import com.fight2.scene.PartyScene;
 import com.fight2.util.ConfigHelper;
@@ -49,7 +51,7 @@ public class GameActivity extends BaseGameActivity {
     private ITexture splashTexture;
     private ITextureRegion splashTextureRegion;
     private Sprite splash;
-    private final Map<SceneEnum, Scene> scenes = new HashMap<SceneEnum, Scene>();
+    private final Map<SceneEnum, BaseScene> scenes = new HashMap<SceneEnum, BaseScene>();
 
     private Scene splashScene;
     private ProgressBar progressBar;
@@ -161,9 +163,9 @@ public class GameActivity extends BaseGameActivity {
 
     protected void loadScenes() {
         try {
-            final Scene mainScene = new MainScene(this);
+            final BaseScene mainScene = new MainScene(this);
             scenes.put(SceneEnum.Main, mainScene);
-            final Scene partyScene = new PartyScene(this);
+            final BaseScene partyScene = new PartyScene(this);
             scenes.put(SceneEnum.Party, partyScene);
         } catch (final IOException e) {
             e.printStackTrace();
@@ -173,7 +175,6 @@ public class GameActivity extends BaseGameActivity {
 
     private void loadResources1() {
         try {
-            Thread.sleep(1000);
             TextureFactory.getInstance().loadResource(getTextureManager(), getAssets());
             TiledTextureFactory.getInstance().loadResource(getTextureManager(), getAssets());
             for (int i = 0; i < 1000; i++) {
@@ -187,10 +188,15 @@ public class GameActivity extends BaseGameActivity {
         }
 
         final GameUserSession session = GameUserSession.getInstance();
-        final Card[][] parties = session.getParties();
+        final List<Card> cards = session.getCards();
+        for (int i = 1; i < 8; i++) {
+            final Card cardEntry = new Card();
+            cardEntry.setImage("card/card" + i + ".jpg");
+            cards.add(cardEntry);
+        }
     }
 
-    public Map<SceneEnum, Scene> getScenes() {
+    public Map<SceneEnum, BaseScene> getScenes() {
         return scenes;
     }
 }

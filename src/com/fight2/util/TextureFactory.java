@@ -39,4 +39,10 @@ public class TextureFactory {
         return this.datas.get(textureEnum);
     }
 
+    public ITextureRegion createIextureRegion(final TextureManager textureManager, final AssetManager assetManager, final String url) throws IOException {
+        final ITexture texture = new AssetBitmapTexture(textureManager, assetManager, url);
+        final ITextureRegion textureRegion = TextureRegionFactory.extractFromTexture(texture);
+        texture.load();
+        return textureRegion;
+    }
 }

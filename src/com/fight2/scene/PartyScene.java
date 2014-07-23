@@ -16,6 +16,7 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.util.algorithm.collision.EntityCollisionChecker;
+import org.andengine.util.debug.Debug;
 
 import android.util.SparseArray;
 
@@ -33,7 +34,7 @@ public class PartyScene extends BaseScene {
     private final List<Float> gridYList = new ArrayList<Float>();
     private final List<Rectangle> gridCollisionList = new ArrayList<Rectangle>();
     private final Card[][] cardParties = GameUserSession.getInstance().getParties();
-    final Map<SceneEnum, Scene> scenes = this.activity.getScenes();
+    final Map<SceneEnum, BaseScene> scenes = this.activity.getScenes();
 
     public PartyScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -50,31 +51,7 @@ public class PartyScene extends BaseScene {
         final Sprite frameSprite = createRealScreenImageSprite(TextureEnum.PARTY_FRAME, 0, frameY);
         this.attachChild(frameSprite);
 
-        final int cardWidth = 94;
-        final int cardHeight = 94;
-        final float cardY = 47f;
-        final int gap = 37;
-
-        for (int partyIndex = 0; partyIndex < cardParties.length; partyIndex++) {
-            final Sprite gridSprite = createGridSprite(TextureEnum.PARTY_FRAME_GRID, 196, frameY + 323 - partyIndex * 144);
-            gridOrders.put(partyIndex, gridSprite);
-            gridYList.add(gridSprite.getY());
-            gridCollisionList.add(this.createGridCollisionArea(gridSprite));
-            this.attachChild(gridSprite);
-            this.registerTouchArea(gridSprite);
-
-            final Card[] cards = cardParties[partyIndex];
-            for (int cardIndex = 0; cardIndex < cards.length; cardIndex++) {
-                final Card card = cards[cardIndex];
-                if (card != null) {
-                    final ITextureRegion cardTextureRegion = createCardTexture(card.getImage());
-                    final Sprite cardSprite = new Sprite(49f + (gap + cardWidth) * cardIndex, cardY, cardWidth, cardHeight, cardTextureRegion, vbom);
-                    gridSprite.attachChild(cardSprite);
-                }
-
-            }
-
-        }
+        updateScene();
 
         final Sprite editSprite = createEditSprite(TextureEnum.PARTY_EDIT_BUTTON, 713, frameY + 340, 1);
         this.attachChild(editSprite);
@@ -177,8 +154,36 @@ public class PartyScene extends BaseScene {
 
     @Override
     public void updateScene() {
-        // TODO Auto-generated method stub
-        
+        final float frameY = cameraHeight - TextureEnum.PARTY_FRAME.getHeight();
+        final int cardWidth = 94;
+        final int cardHeight = 94;
+        final float cardY = 47f;
+        final int gap = 37;
+        for (int partyIndex = 0; partyIndex < cardParties.length; partyIndex++) {
+            final Sprite gridSprite = createGridSprite(TextureEnum.PARTY_FRAME_GRID, 196, frameY + 323 - partyIndex * 144);
+            gridOrders.put(partyIndex, gridSprite);
+            gridYList.add(gridSprite.getY());
+            gridCollisionList.add(this.createGridCollisionArea(gridSprite));
+            this.attachChild(gridSprite);
+            this.registerTouchArea(gridSprite);
+
+            final Card[] cards = cardParties[partyIndex];
+            for (int cardIndex = 0; cardIndex < cards.length; cardIndex++) {
+                final Card card = cards[cardIndex];
+                if (card != null) {
+                    try {
+                        final ITextureRegion cardTextureRegion = createCardTexture(card.getImage());
+                        final Sprite cardSprite = new Sprite(49f + (gap + cardWidth) * cardIndex, cardY, cardWidth, cardHeight, cardTextureRegion, vbom);
+                        gridSprite.attachChild(cardSprite);
+                    } catch (final IOException e) {
+                        Debug.e(e);
+                    }
+                }
+
+            }
+
+        }
+
     }
 
 }

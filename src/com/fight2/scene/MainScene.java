@@ -143,7 +143,7 @@ public class MainScene extends BaseScene {
         this.attachChild(summonStoneEffect);
 
         final Engine engine = this.activity.getEngine();
-        final Map<SceneEnum, Scene> scenes = this.activity.getScenes();
+        final Map<SceneEnum, BaseScene> scenes = this.activity.getScenes();
         this.setOnSceneTouchListener(new IOnSceneTouchListener() {
             @Override
             public boolean onSceneTouchEvent(final Scene pScene, final TouchEvent pSceneTouchEvent) {
