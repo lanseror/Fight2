@@ -92,4 +92,8 @@ public abstract class BaseScene extends Scene {
         return sprite;
     }
 
+    public GameActivity getActivity() {
+        return activity;
+    }
+
 }
