@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -196,11 +197,25 @@ public class GameActivity extends BaseGameActivity {
             cardEntry.setImage("card/card" + i + ".jpg");
             cards.add(cardEntry);
         }
+        final Card webCardEntry = new Card();
+        webCardEntry.setId(8);
+        webCardEntry.setImage("http://pic2.duowan.com/nds/0908/114026838388/114027110862.jpg");
+        cards.add(webCardEntry);
+
         // Clear parties;
         final Card[][] parties = session.getParties();
         for (final Card[] party : parties) {
             for (int i = 0; i < party.length; i++) {
-                party[i] = null;
+                final Card partyCard = party[i];
+                if (partyCard != null) {
+                    final Iterator<Card> it = cards.iterator();
+                    while (it.hasNext()) {
+                        final Card card = it.next();
+                        if (card.getId() == partyCard.getId()) {
+                            it.remove();
+                        }
+                    }
+                }
             }
 
         }

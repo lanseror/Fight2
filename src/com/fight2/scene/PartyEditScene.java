@@ -167,6 +167,7 @@ public class PartyEditScene extends BaseScene {
                             if (movingCard == null) {
                                 break;
                             }
+                            final Card[] partyCards = GameUserSession.getInstance().getParties()[partyNumber - 1];
                             boolean collidedWithOthers = false;
                             for (int i = 0; i < cardFrames.length; i++) {
                                 final IEntity cardFrame = cardFrames[i];
@@ -175,6 +176,9 @@ public class PartyEditScene extends BaseScene {
                                     movingCard.setPosition(cardFrame);
                                     final IEntity toCard = addedCards[i];
                                     addedCards[frameIndex] = toCard;
+                                    final Card tempPartyCard = partyCards[frameIndex];
+                                    partyCards[frameIndex] = partyCards[i];
+                                    partyCards[i] = tempPartyCard;
                                     if (toCard != null) {
                                         toCard.setPosition(this);
                                     }
@@ -185,7 +189,6 @@ public class PartyEditScene extends BaseScene {
                             if (!collidedWithOthers) {
                                 if (touchY < this.getY() - 50) {
                                     revertCardToCardPack(movingCard);
-                                    final Card[] partyCards = GameUserSession.getInstance().getParties()[partyNumber - 1];
                                     partyCards[frameIndex] = null;
                                     activity.runOnUpdateThread(new Runnable() {
 

@@ -127,16 +127,19 @@ public class PartyScene extends BaseScene {
                 if (pSceneTouchEvent.isActionMove()) {
                     this.setPosition(pX, touchY);
                     final int thisOrder = gridOrders.indexOfValue(this);
-                    for (int i = 0; i < gridCollisionList.size(); i++) {
-                        if (thisOrder == i) {
+                    for (int collisionIndex = 0; collisionIndex < gridCollisionList.size(); collisionIndex++) {
+                        if (thisOrder == collisionIndex) {
                             continue;
                         }
-                        final Rectangle collissionGrid = gridCollisionList.get(i);
+                        final Rectangle collissionGrid = gridCollisionList.get(collisionIndex);
                         if (EntityCollisionChecker.checkContains(collissionGrid, pX, touchY)) {
-                            final Sprite collissionSprite = gridOrders.get(i);
+                            final Sprite collissionSprite = gridOrders.get(collisionIndex);
                             gridOrders.put(thisOrder, collissionSprite);
-                            gridOrders.put(i, this);
+                            gridOrders.put(collisionIndex, this);
                             collissionSprite.setPosition(pX, gridYList.get(thisOrder));
+                            final Card[] tempParty = cardParties[thisOrder];
+                            cardParties[thisOrder] = cardParties[collisionIndex];
+                            cardParties[collisionIndex] = tempParty;
                         }
                     }
                 }
