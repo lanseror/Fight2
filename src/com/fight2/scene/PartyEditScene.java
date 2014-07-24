@@ -13,6 +13,7 @@ import org.andengine.entity.IEntityComparator;
 import org.andengine.entity.modifier.IEntityModifier.IEntityModifierListener;
 import org.andengine.entity.modifier.MoveModifier;
 import org.andengine.entity.primitive.Rectangle;
+import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
@@ -63,6 +64,7 @@ public class PartyEditScene extends BaseScene {
     final IEntity[] addedCards = new IEntity[4];
 
     final Rectangle cardZoom;
+    final Rectangle cardPack;
 
     public PartyEditScene(final GameActivity activity, final int partyNumber) throws IOException {
         super(activity);
@@ -76,6 +78,7 @@ public class PartyEditScene extends BaseScene {
         this.mFont.load();
 
         cardZoom = new Rectangle(180 + 240 * 0.5f, 180, 240, 250, vbom);
+        cardPack = new Rectangle(300, 180, 21000, 250, vbom);
         init();
         updateScene();
     }
@@ -130,7 +133,6 @@ public class PartyEditScene extends BaseScene {
         partyNumberText = new Text(110, 450, mFont, String.valueOf(partyNumber), vbom);
         this.attachChild(partyNumberText);
 
-        final Rectangle cardPack = new Rectangle(300, 180, 21000, 250, vbom);
         cardPack.setColor(Color.TRANSPARENT);
 
         cardZoom.setColor(Color.TRANSPARENT);
@@ -182,87 +184,9 @@ public class PartyEditScene extends BaseScene {
                             }
                             if (!collidedWithOthers) {
                                 if (touchY < this.getY() - 50) {
-                                    final Card movingCardEntry = (Card) movingCard.getUserData();
-                                    final IEntity revertCard = removedCards.remove(movingCardEntry);
-                                    final Card revertCardEntry = (Card) revertCard.getUserData();
-                                    int pCardIndex = 0;
-                                    for (; pCardIndex < cardPack.getChildCount(); pCardIndex++) {
-                                        final IEntity tempCard = cardPack.getChildByIndex(pCardIndex);
-                                        final Card tempCardEntry = (Card) tempCard.getUserData();
-                                        if (revertCardEntry.getId() <= tempCardEntry.getId()) {
-                                            break;
-                                        }
-                                    }
-                                    final IEntity focusedCard = (IEntity) cardZoom.getUserData();
-                                    final Card focusedCardEnty = (Card) (focusedCard != null ? focusedCard.getUserData() : null);
-                                    final float cardZoomX = cardZoom.getX();
-                                    final float cardPackLeft = cardPack.getX() - cardPack.getWidth() * 0.5f;
-                                    final float focusedX = cardZoomX - cardPackLeft;
-                                    if (cardPack.getChildCount() == 0) {
-                                        revertCard.setTag(0);
-                                        revertCard.setPosition(focusedX, CARD_Y);
-                                        cardZoom.setUserData(revertCard);
-                                    } else if (focusedCardEnty != null) {
-                                        revertCard.setScale(1);
-                                        if (revertCardEntry.getId() <= focusedCardEnty.getId()) {
-                                            final IEntity leftMostCard = cardPack.getChildByIndex(0);
-                                            if (leftMostCard == focusedCard) {
-                                                final float revertX = focusedX - CARD_GAP - CARD_WIDTH * 1.5f;
-                                                revertCard.setPosition(revertX, revertCard.getY());
-                                            } else if (pCardIndex == 0) {
-                                                final float revertX = leftMostCard.getX() - CARD_GAP - CARD_WIDTH;
-                                                revertCard.setPosition(revertX, revertCard.getY());
-                                            } else {
-                                                revertCard.setPosition(cardPack.getChildByIndex(pCardIndex - 1));
-                                            }
-
-                                            for (int i = 0; i < pCardIndex; i++) {
-                                                final IEntity adjustCard = cardPack.getChildByIndex(i);
-                                                adjustCard.setPosition(adjustCard.getX() - CARD_GAP - CARD_WIDTH, adjustCard.getY());
-                                            }
-                                            revertCard.setTag(pCardIndex);
-                                            for (int i = pCardIndex; i < cardPack.getChildCount(); i++) {
-                                                final IEntity adjustCard = cardPack.getChildByIndex(i);
-                                                adjustCard.setTag(adjustCard.getTag() + 1);
-                                            }
-
-                                        } else {
-                                            final IEntity rightMostCard = cardPack.getChildByIndex(cardPack.getChildCount() - 1);
-                                            if (rightMostCard == focusedCard) {
-                                                final float revertX = focusedX + (CARD_GAP + CARD_WIDTH) * 1.5f;
-                                                revertCard.setPosition(revertX, revertCard.getY());
-                                            } else if (pCardIndex == cardPack.getChildCount()) {
-                                                final float revertX = rightMostCard.getX() + CARD_GAP + CARD_WIDTH;
-                                                revertCard.setPosition(revertX, revertCard.getY());
-                                            } else {
-                                                revertCard.setPosition(cardPack.getChildByIndex(pCardIndex));
-                                            }
-
-                                            for (int i = pCardIndex; i < cardPack.getChildCount(); i++) {
-                                                final IEntity adjustCard = cardPack.getChildByIndex(i);
-                                                adjustCard.setPosition(adjustCard.getX() + CARD_GAP - CARD_WIDTH, adjustCard.getY());
-                                                adjustCard.setTag(adjustCard.getTag() + 1);
-                                            }
-                                            revertCard.setTag(pCardIndex);
-
-                                        }
-                                    }
-
-                                    cardPack.attachChild(revertCard);
-                                    revertCard.setAlpha(1f);
+                                    revertCardToCardPack(movingCard);
                                     final Card[] partyCards = GameUserSession.getInstance().getParties()[partyNumber - 1];
-                                    GameUserSession.getInstance().getCards().add(partyCards[frameIndex]);
                                     partyCards[frameIndex] = null;
-                                    cardPack.sortChildren(new IEntityComparator() {
-                                        @Override
-                                        public int compare(final IEntity lhs, final IEntity rhs) {
-                                            final int leftTag = lhs.getTag();
-                                            final int rightTag = rhs.getTag();
-                                            return leftTag < rightTag ? -1 : 1;
-                                        }
-
-                                    });
-
                                     activity.runOnUpdateThread(new Runnable() {
 
                                         @Override
@@ -414,7 +338,13 @@ public class PartyEditScene extends BaseScene {
             @Override
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 if (pSceneTouchEvent.isActionDown()) {
-                    partyNumberText.setText(String.valueOf(partyNumber++ % 3 + 1));
+                    try {
+                        final Scene editScene = new PartyEditScene(activity, partyNumber++ % 3 + 1);
+                        activity.getEngine().setScene(editScene);
+                    } catch (final IOException e) {
+                        Debug.e(e);
+                    }
+
                     return true;
                 }
                 return false;
@@ -514,5 +444,64 @@ public class PartyEditScene extends BaseScene {
         }
 
         return sprite;
+    }
+
+    protected void revertCardToCardPack(final IEntity inCardFrameSprite) {
+        final Card replaceCardEntry = (Card) inCardFrameSprite.getUserData();
+        final IEntity revertCard = removedCards.remove(replaceCardEntry);
+        final IEntity focusedCard = (IEntity) cardZoom.getUserData();
+        final float cardZoomX = cardZoom.getX();
+        final float cardPackLeft = cardPack.getX() - cardPack.getWidth() * 0.5f;
+        final float focusedX = cardZoomX - cardPackLeft;
+        final float focusedLeftCardX = focusedX - 1.5f * PartyEditScene.CARD_WIDTH - PartyEditScene.CARD_GAP;
+        final float focusedRightCardX = focusedX + 1.5f * (PartyEditScene.CARD_WIDTH + PartyEditScene.CARD_GAP);
+        if (cardPack.getChildCount() == 0) {
+            revertCard.setTag(0);
+            revertCard.setPosition(focusedX, PartyEditScene.CARD_Y);
+            cardZoom.setUserData(revertCard);
+            cardPack.attachChild(revertCard);
+        } else {
+            cardPack.attachChild(revertCard);
+            cardPack.sortChildren(new IEntityComparator() {
+                @Override
+                public int compare(final IEntity lhs, final IEntity rhs) {
+                    final Card leftCard = (Card) lhs.getUserData();
+                    final Card rightCard = (Card) rhs.getUserData();
+                    return Integer.valueOf(leftCard.getId()).compareTo(rightCard.getId());
+                }
+
+            });
+            // Find focusedCard index
+            int focusedCardIndex = 0;
+            for (; focusedCardIndex < cardPack.getChildCount(); focusedCardIndex++) {
+                if (focusedCard == cardPack.getChildByIndex(focusedCardIndex)) {
+                    break;
+                }
+            }
+            focusedCard.setX(focusedX);
+            focusedCard.setTag(focusedCardIndex);
+
+            // Move left side cards
+            float leftAdjustX = focusedLeftCardX;
+            for (int i = focusedCardIndex - 1; i >= 0; i--) {
+                final IEntity adjustCard = cardPack.getChildByIndex(i);
+                adjustCard.setX(leftAdjustX);
+                adjustCard.setTag(i);
+                leftAdjustX -= PartyEditScene.CARD_WIDTH + PartyEditScene.CARD_GAP;
+            }
+            // Move right side cards
+            float rightAdjustX = focusedRightCardX;
+            for (int i = focusedCardIndex + 1; i < cardPack.getChildCount(); i++) {
+                final IEntity adjustCard = cardPack.getChildByIndex(i);
+                adjustCard.setX(rightAdjustX);
+                adjustCard.setTag(i);
+                rightAdjustX += PartyEditScene.CARD_WIDTH + PartyEditScene.CARD_GAP;
+            }
+
+        }
+
+        revertCard.setAlpha(1f);
+        revertCard.setScale(1f);
+        GameUserSession.getInstance().getCards().add(replaceCardEntry);
     }
 }

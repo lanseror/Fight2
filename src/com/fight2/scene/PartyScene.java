@@ -179,7 +179,6 @@ public class PartyScene extends BaseScene {
                 final Card card = cards[cardIndex];
                 if (card != null) {
                     try {
-                        Debug.e("AddCard:" + partyIndex + ">" + cardIndex);
                         final ITextureRegion cardTextureRegion = createCardTexture(card.getImage());
                         final Sprite cardSprite = new Sprite(49f + (gap + cardWidth) * cardIndex, cardY, cardWidth, cardHeight, cardTextureRegion, vbom);
                         gridSprite.attachChild(cardSprite);
