@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.andengine.engine.handler.BaseEntityUpdateHandler;
 import org.andengine.engine.handler.physics.PhysicsHandler;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.IEntityComparator;
@@ -47,9 +46,9 @@ import com.fight2.util.TextureFactory;
 
 public class PartyEditScene extends BaseScene {
     private final static int BASE_PX = 600;
-    private final static int CARD_GAP = 20;
-    private final static int CARD_WIDTH = 120;
-    private final int CARD_Y = 120;
+    public final static int CARD_GAP = 20;
+    public final static int CARD_WIDTH = 120;
+    public final static int CARD_Y = 120;
     private final static float DISTANCE_15CARDS = (CARD_WIDTH + CARD_GAP) * 14.5f;
     private final static int ACCELERATION = 1300;
     private final float max_velocity;
@@ -65,7 +64,7 @@ public class PartyEditScene extends BaseScene {
     private final Map<Card, IEntity> removedCards = new HashMap<Card, IEntity>();
     private final IEntity[] addedCards = new IEntity[4];
 
-    private final Rectangle cardZoom;
+    final Rectangle cardZoom;
 
     public PartyEditScene(final GameActivity activity, final int partyNumber) throws IOException {
         super(activity);
@@ -79,7 +78,6 @@ public class PartyEditScene extends BaseScene {
         this.mFont.load();
 
         cardZoom = new Rectangle(180 + 240 * 0.5f, 180, 240, 250, vbom);
-
         init();
         updateScene();
     }
@@ -105,58 +103,10 @@ public class PartyEditScene extends BaseScene {
                 removedCard.setPosition(0, CARD_Y);
                 removedCard.setUserData(cardEntry);
                 removedCards.put(cardEntry, removedCard);
-                this.registerUpdateHandler(new BaseEntityUpdateHandler(removedCard) {
-                    @Override
-                    protected void onUpdate(final float pSecondsElapsed, final IEntity currentCard) {
-                        final float cardZoomX = cardZoom.getX();
-                        final float distance = cardZoom.getWidth() * 0.5f + currentCard.getWidth() * 0.5f;
-                        // final float cardZoomLeft = cardZoom.getWidth() * 0.5f + currentCard.getWidth() * 0.5f;
-                        final IEntity pCardPack = currentCard.getParent();
-                        if (pCardPack == null) {
-                            return;
-                        }
-                        final float x = currentCard.getX() + pCardPack.getX() - pCardPack.getWidth() * 0.5f;
-                        final float diff = Math.abs(x - cardZoomX);
-                        if (diff < distance) {
-                            final BigDecimal bdDiff = BigDecimal.valueOf(distance - diff);
-                            final BigDecimal bdDistance = BigDecimal.valueOf(distance);
-                            final float scale = 1 + bdDiff.divide(bdDistance, 4, RoundingMode.HALF_UP).floatValue();
-                            currentCard.setScale(scale);
-
-                            final int currentCardIndex = currentCard.getTag();
-                            boolean isLeftmostZoomCard = true;
-                            if (currentCardIndex > 0) {
-                                final IEntity previousCard = pCardPack.getChildByIndex(currentCardIndex - 1);
-                                if (previousCard.collidesWith(cardZoom)) {
-                                    isLeftmostZoomCard = false;
-                                }
-                            }
-
-                            if (isLeftmostZoomCard) {
-                                float cardLeft = currentCard.getX() + currentCard.getScaleX() * CARD_WIDTH * 0.5f + CARD_GAP * currentCard.getScaleX();
-                                final int maxAdjustCard = pCardPack.getChildCount();
-                                for (int indexDff = 1; indexDff < maxAdjustCard; indexDff++) {
-                                    final int cardIndex = currentCardIndex + indexDff;
-                                    if (cardIndex >= pCardPack.getChildCount()) {
-                                        break;
-                                    }
-                                    final IEntity adjustCard = pCardPack.getChildByIndex(cardIndex);
-                                    final float adjustWidth = adjustCard.getScaleX() * currentCard.getWidth();
-                                    final float adjustCardX = cardLeft + adjustWidth * 0.5f;
-                                    adjustCard.setX(adjustCardX);
-                                    cardLeft += adjustWidth + CARD_GAP * adjustCard.getScaleX();
-                                }
-                            }
-
-                        } else {
-                            currentCard.setScale(1);
-                        }
-                    }
-                });
+                this.registerUpdateHandler(new CardUpdateHandler(cardZoom, removedCard));
             }
 
         }
-        // TODO Auto-generated method stub
 
     }
 
@@ -341,54 +291,7 @@ public class PartyEditScene extends BaseScene {
                 appendX += CARD_GAP + CARD_WIDTH;
             }
 
-            this.registerUpdateHandler(new BaseEntityUpdateHandler(card) {
-                @Override
-                protected void onUpdate(final float pSecondsElapsed, final IEntity currentCard) {
-                    final float cardZoomX = cardZoom.getX();
-                    final float distance = cardZoom.getWidth() * 0.5f + currentCard.getWidth() * 0.5f;
-                    // final float cardZoomLeft = cardZoom.getWidth() * 0.5f + currentCard.getWidth() * 0.5f;
-                    final IEntity pCardPack = currentCard.getParent();
-                    if (pCardPack == null) {
-                        return;
-                    }
-                    final float x = currentCard.getX() + pCardPack.getX() - pCardPack.getWidth() * 0.5f;
-                    final float diff = Math.abs(x - cardZoomX);
-                    if (diff < distance) {
-                        final BigDecimal bdDiff = BigDecimal.valueOf(distance - diff);
-                        final BigDecimal bdDistance = BigDecimal.valueOf(distance);
-                        final float scale = 1 + bdDiff.divide(bdDistance, 4, RoundingMode.HALF_UP).floatValue();
-                        currentCard.setScale(scale);
-
-                        final int currentCardIndex = currentCard.getTag();
-                        boolean isLeftmostZoomCard = true;
-                        if (currentCardIndex > 0) {
-                            final IEntity previousCard = pCardPack.getChildByIndex(currentCardIndex - 1);
-                            if (previousCard.collidesWith(cardZoom)) {
-                                isLeftmostZoomCard = false;
-                            }
-                        }
-
-                        if (isLeftmostZoomCard) {
-                            float cardLeft = currentCard.getX() + currentCard.getScaleX() * CARD_WIDTH * 0.5f + CARD_GAP * currentCard.getScaleX();
-                            final int maxAdjustCard = pCardPack.getChildCount();
-                            for (int indexDff = 1; indexDff < maxAdjustCard; indexDff++) {
-                                final int cardIndex = currentCardIndex + indexDff;
-                                if (cardIndex >= pCardPack.getChildCount()) {
-                                    break;
-                                }
-                                final IEntity adjustCard = pCardPack.getChildByIndex(cardIndex);
-                                final float adjustWidth = adjustCard.getScaleX() * currentCard.getWidth();
-                                final float adjustCardX = cardLeft + adjustWidth * 0.5f;
-                                adjustCard.setX(adjustCardX);
-                                cardLeft += adjustWidth + CARD_GAP * adjustCard.getScaleX();
-                            }
-                        }
-
-                    } else {
-                        currentCard.setScale(1);
-                    }
-                }
-            });
+            this.registerUpdateHandler(new CardUpdateHandler(cardZoom, card));
         }
 
         mPhysicsHandler = new PhysicsHandler(cardPack) {

@@ -159,11 +159,18 @@ public class PartyScene extends BaseScene {
         final int cardHeight = 94;
         final float cardY = 47f;
         final int gap = 37;
+        gridOrders.clear();
+        gridYList.clear();
+        gridCollisionList.clear();
         for (int partyIndex = 0; partyIndex < cardParties.length; partyIndex++) {
             final Sprite gridSprite = createGridSprite(TextureEnum.PARTY_FRAME_GRID, 196, frameY + 323 - partyIndex * 144);
+            gridSprite.setTag(888 + partyIndex);
             gridOrders.put(partyIndex, gridSprite);
             gridYList.add(gridSprite.getY());
             gridCollisionList.add(this.createGridCollisionArea(gridSprite));
+            final IEntity oldGridSprite = this.getChildByTag(888 + partyIndex);
+            this.unregisterTouchArea(oldGridSprite);
+            this.detachChild(oldGridSprite);
             this.attachChild(gridSprite);
             this.registerTouchArea(gridSprite);
 
@@ -172,6 +179,7 @@ public class PartyScene extends BaseScene {
                 final Card card = cards[cardIndex];
                 if (card != null) {
                     try {
+                        Debug.e("AddCard:" + partyIndex + ">" + cardIndex);
                         final ITextureRegion cardTextureRegion = createCardTexture(card.getImage());
                         final Sprite cardSprite = new Sprite(49f + (gap + cardWidth) * cardIndex, cardY, cardWidth, cardHeight, cardTextureRegion, vbom);
                         gridSprite.attachChild(cardSprite);
