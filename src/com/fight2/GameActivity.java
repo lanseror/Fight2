@@ -196,6 +196,14 @@ public class GameActivity extends BaseGameActivity {
             cardEntry.setImage("card/card" + i + ".jpg");
             cards.add(cardEntry);
         }
+        // Clear parties;
+        final Card[][] parties = session.getParties();
+        for (final Card[] party : parties) {
+            for (int i = 0; i < party.length; i++) {
+                party[i] = null;
+            }
+
+        }
     }
 
     public Map<SceneEnum, BaseScene> getScenes() {
