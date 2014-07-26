@@ -38,6 +38,7 @@ import com.fight2.scene.BaseScene;
 import com.fight2.scene.MainScene;
 import com.fight2.scene.PartyScene;
 import com.fight2.util.ConfigHelper;
+import com.fight2.util.AccountUtils;
 import com.fight2.util.TextureFactory;
 import com.fight2.util.TiledTextureFactory;
 
@@ -82,6 +83,7 @@ public class GameActivity extends BaseGameActivity {
 
     @Override
     public void onCreateResources(final OnCreateResourcesCallback pOnCreateResourcesCallback) throws IOException {
+        checkInstallation();
         final TextureManager textureManager = this.getTextureManager();
         final AssetManager assetManager = this.getAssets();
         this.splashTexture = new AssetBitmapTexture(textureManager, assetManager, "images/common_splash_screen.png");
@@ -90,10 +92,17 @@ public class GameActivity extends BaseGameActivity {
         pOnCreateResourcesCallback.onCreateResourcesFinished();
     }
 
+    private void checkInstallation() throws IOException {
+        if (!AccountUtils.isInstalled(this)) {
+            AccountUtils.install(this);
+        }
+    }
+
     @Override
     public void onCreateScene(final OnCreateSceneCallback pOnCreateSceneCallback) throws IOException {
         this.mEngine.registerUpdateHandler(new FPSLogger());
         final VertexBufferObjectManager vbom = this.getVertexBufferObjectManager();
+
         initProgressBar(vbom);
         initSplashScene(vbom);
         loadAdditionResources();
