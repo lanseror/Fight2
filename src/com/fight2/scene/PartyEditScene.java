@@ -439,12 +439,8 @@ public class PartyEditScene extends BaseScene {
         final float pY = y + height * 0.5f;
         Sprite sprite = null;
         final TextureFactory textureFactory = TextureFactory.getInstance();
-        try {
-            final ITextureRegion texture = textureFactory.createIextureRegion(activity.getTextureManager(), activity.getAssets(), card.getImage());
-            sprite = new Sprite(pX, pY, width, height, texture, vbom);
-        } catch (final IOException e) {
-            Debug.e(e);
-        }
+        final ITextureRegion texture = textureFactory.getIextureRegion(card.getImage());
+        sprite = new Sprite(pX, pY, width, height, texture, vbom);
 
         return sprite;
     }

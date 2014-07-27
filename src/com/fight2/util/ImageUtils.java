@@ -22,7 +22,7 @@ public class ImageUtils {
         final String[] columns = { ImageOpenHelper.VALUE };
         final String[] args = { webUrl };
         final Cursor cursor = database.query(ImageOpenHelper.TABLE_NAME, columns, ImageOpenHelper.KEY + "=?", args, null, null, null);
-        if (cursor != null) {
+        if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             localString = cursor.getString(0);
         }
@@ -39,7 +39,7 @@ public class ImageUtils {
     }
 
     public static String downloadAndSave(final String webUrl, final Context context) throws IOException {
-        final URL url = new URL(webUrl);
+        final URL url = new URL(AccountUtils.HOST_URL + webUrl);
 
         InputStream input = null;
         FileOutputStream output = null;

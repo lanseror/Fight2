@@ -1,11 +1,9 @@
 package com.fight2.util;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.andengine.opengl.texture.ITexture;
@@ -13,17 +11,20 @@ import org.andengine.opengl.texture.TextureManager;
 import org.andengine.opengl.texture.bitmap.AssetBitmapTexture;
 import org.andengine.opengl.texture.bitmap.BitmapTexture;
 import org.andengine.opengl.texture.region.ITextureRegion;
-import org.andengine.opengl.texture.region.TextureRegion;
 import org.andengine.opengl.texture.region.TextureRegionFactory;
 import org.andengine.util.adt.io.in.IInputStreamOpener;
 
 import android.content.res.AssetManager;
 
+import com.fight2.GameActivity;
 import com.fight2.constant.TextureEnum;
+import com.fight2.entity.Card;
+import com.fight2.entity.GameUserSession;
 
 public class TextureFactory {
     private static TextureFactory INSTANCE = new TextureFactory();
     private final Map<TextureEnum, ITextureRegion> datas = new HashMap<TextureEnum, ITextureRegion>();
+    private final Map<String, ITextureRegion> cardDatas = new HashMap<String, ITextureRegion>();
 
     private TextureFactory() {
         // Private the constructor;
@@ -42,35 +43,34 @@ public class TextureFactory {
         }
     }
 
+    public void loadCardsResource(final GameActivity activity) throws IOException {
+        final GameUserSession session = GameUserSession.getInstance();
+        final List<Card> cards = session.getCards();
+        for (final Card card : cards) {
+            final String image = card.getImage();
+            final ITextureRegion textureRegion = createIextureRegion(activity, image);
+            cardDatas.put(image, textureRegion);
+        }
+
+    }
+
     public ITextureRegion getIextureRegion(final TextureEnum textureEnum) {
         return this.datas.get(textureEnum);
     }
 
-    public ITextureRegion createIextureRegion(final TextureManager textureManager, final AssetManager assetManager, final String url) throws IOException {
-        if (url.startsWith("http")) {
-            final ITexture mTexture = new BitmapTexture(textureManager, new IInputStreamOpener() {
-                @Override
-                public InputStream open() throws IOException {
+    public ITextureRegion getIextureRegion(final String imageString) {
+        return this.cardDatas.get(imageString);
+    }
 
-                    final URL webUrl = new URL(url);
+    private ITextureRegion createIextureRegion(final GameActivity activity, final String image) throws IOException {
+        final ITexture mTexture = new BitmapTexture(activity.getTextureManager(), new IInputStreamOpener() {
+            @Override
+            public InputStream open() throws IOException {
+                return activity.openFileInput(image);
+            }
+        });
 
-                    final HttpURLConnection connection = (HttpURLConnection) webUrl.openConnection();
-                    connection.setDoInput(true);
-                    connection.connect();
-                    final InputStream input = connection.getInputStream();
-                    final BufferedInputStream in = new BufferedInputStream(input);
-                    return in;
-                }
-            });
-            mTexture.load();
-            final TextureRegion MyImageFromWeb = TextureRegionFactory.extractFromTexture(mTexture);
-
-            return MyImageFromWeb;
-        } else {
-            final ITexture texture = new AssetBitmapTexture(textureManager, assetManager, url);
-            final ITextureRegion textureRegion = TextureRegionFactory.extractFromTexture(texture);
-            texture.load();
-            return textureRegion;
-        }
+        mTexture.load();
+        return TextureRegionFactory.extractFromTexture(mTexture);
     }
 }

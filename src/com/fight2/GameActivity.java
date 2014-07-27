@@ -94,7 +94,7 @@ public class GameActivity extends BaseGameActivity {
     public void onCreateResources(final OnCreateResourcesCallback pOnCreateResourcesCallback) throws IOException {
         checkInstallation();
         final String installUUID = AccountUtils.readInstallUUID(this);
-        AccountUtils.login(installUUID);
+        AccountUtils.login(installUUID, this);
         final TextureManager textureManager = this.getTextureManager();
         final AssetManager assetManager = this.getAssets();
         this.splashTexture = new AssetBitmapTexture(textureManager, assetManager, "images/common_splash_screen.png");
@@ -197,6 +197,7 @@ public class GameActivity extends BaseGameActivity {
     private void loadResources1() {
         try {
             TextureFactory.getInstance().loadResource(getTextureManager(), getAssets());
+            TextureFactory.getInstance().loadCardsResource(this);
             TiledTextureFactory.getInstance().loadResource(getTextureManager(), getAssets());
             for (int i = 0; i < 1000; i++) {
                 progressBar.setProgress(i * 0.1f);

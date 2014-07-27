@@ -14,12 +14,13 @@ import org.json.JSONObject;
 
 import android.content.Context;
 
+import com.fight2.GameActivity;
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
 
 public class AccountUtils {
     private static final String INSTALLATION = "INSTALLATION";
-    private static final String HOST_URL = "http://192.168.1.178:8080/Fight2Server";
+    public static final String HOST_URL = "http://192.168.1.178:8080/Fight2Server";
 
     private static File getInstallationFile(final Context context) {
         return new File(context.getFilesDir(), INSTALLATION);
@@ -65,7 +66,7 @@ public class AccountUtils {
 
     }
 
-    public static void login(final String installUUID) throws IOException {
+    public static void login(final String installUUID, final GameActivity activity) throws IOException {
         final String loginUrl = HOST_URL + "/user/login.action?installUUID=" + installUUID;
         final String cardUrl = HOST_URL + "/card/my-cards";
         final String partyUrl = HOST_URL + "/party/my-parties";
@@ -78,15 +79,18 @@ public class AccountUtils {
             // Get cards.
             final List<Card> cards = session.getCards();
             cards.clear();
+
             final JSONArray cardJsonArray = HttpUtils.getJSONArrayFromUrl(cardUrl);
             for (int cardIndex = 0; cardIndex < cardJsonArray.length(); cardIndex++) {
                 final JSONObject cardJson = cardJsonArray.getJSONObject(cardIndex);
+                final String avatar = ImageUtils.getLocalString(cardJson.getString("avatar"), activity);
+                final String image = ImageUtils.getLocalString(cardJson.getString("image"), activity);
                 final Card card = new Card();
                 card.setId(cardJson.getInt("id"));
                 card.setAtk(cardJson.getInt("atk"));
-                card.setAvatar(HOST_URL + cardJson.getString("avatar"));
+                card.setAvatar(avatar);
                 card.setHp(cardJson.getInt("hp"));
-                card.setImage(HOST_URL + cardJson.getString("image"));
+                card.setImage(image);
                 card.setName(cardJson.getString("name"));
                 card.setSkill(cardJson.optString("skill"));
                 cards.add(card);
