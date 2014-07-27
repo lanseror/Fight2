@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.andengine.engine.Engine;
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.handler.timer.ITimerCallback;
 import org.andengine.engine.handler.timer.TimerHandler;
@@ -37,8 +38,9 @@ import com.fight2.entity.ProgressBar;
 import com.fight2.scene.BaseScene;
 import com.fight2.scene.MainScene;
 import com.fight2.scene.PartyScene;
-import com.fight2.util.ConfigHelper;
 import com.fight2.util.AccountUtils;
+import com.fight2.util.ConfigHelper;
+import com.fight2.util.ImageOpenHelper;
 import com.fight2.util.TextureFactory;
 import com.fight2.util.TiledTextureFactory;
 
@@ -57,6 +59,13 @@ public class GameActivity extends BaseGameActivity {
 
     private Scene splashScene;
     private ProgressBar progressBar;
+    private ImageOpenHelper dbHelper;
+
+    @Override
+    public Engine onCreateEngine(final EngineOptions pEngineOptions) {
+        dbHelper = new ImageOpenHelper(this);
+        return super.onCreateEngine(pEngineOptions);
+    }
 
     @Override
     public EngineOptions onCreateEngineOptions() {
@@ -224,4 +233,9 @@ public class GameActivity extends BaseGameActivity {
     public Map<SceneEnum, BaseScene> getScenes() {
         return scenes;
     }
+
+    public ImageOpenHelper getDbHelper() {
+        return dbHelper;
+    }
+
 }
