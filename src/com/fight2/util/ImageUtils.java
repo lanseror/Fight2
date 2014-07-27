@@ -4,10 +4,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Map;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.fight2.GameActivity;
@@ -15,25 +15,21 @@ import com.fight2.GameActivity;
 public class ImageUtils {
 
     public static String getLocalString(final String webUrl, final GameActivity activity) throws IOException {
-        String localString = null;
 
-        final ImageOpenHelper dbHelper = activity.getDbHelper();
-        final SQLiteDatabase database = dbHelper.getWritableDatabase();
-        final String[] columns = { ImageOpenHelper.VALUE };
-        final String[] args = { webUrl };
-        final Cursor cursor = database.query(ImageOpenHelper.TABLE_NAME, columns, ImageOpenHelper.KEY + "=?", args, null, null, null);
-        if (cursor != null && cursor.getCount() > 0) {
-            cursor.moveToFirst();
-            localString = cursor.getString(0);
-        }
-        if (localString == null || localString.endsWith("")) {
+        final Map<String, String> imageDatas = TextureFactory.getInstance().getImageDatas();
+        String localString = imageDatas.get(webUrl);
+
+        if (localString == null || localString.equals("")) {
             localString = downloadAndSave(webUrl, activity);
             final ContentValues values = new ContentValues();
             values.put(ImageOpenHelper.KEY, webUrl);
             values.put(ImageOpenHelper.VALUE, localString);
+            final ImageOpenHelper dbHelper = activity.getDbHelper();
+            final SQLiteDatabase database = dbHelper.getWritableDatabase();
             database.insert(ImageOpenHelper.TABLE_NAME, null, values);
+            database.close();
+            imageDatas.put(webUrl, localString);
         }
-        database.close();
 
         return localString;
     }

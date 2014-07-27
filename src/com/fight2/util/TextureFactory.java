@@ -15,6 +15,8 @@ import org.andengine.opengl.texture.region.TextureRegionFactory;
 import org.andengine.util.adt.io.in.IInputStreamOpener;
 
 import android.content.res.AssetManager;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.TextureEnum;
@@ -25,6 +27,7 @@ public class TextureFactory {
     private static TextureFactory INSTANCE = new TextureFactory();
     private final Map<TextureEnum, ITextureRegion> datas = new HashMap<TextureEnum, ITextureRegion>();
     private final Map<String, ITextureRegion> cardDatas = new HashMap<String, ITextureRegion>();
+    private final Map<String, String> imageDatas = new HashMap<String, String>();
 
     private TextureFactory() {
         // Private the constructor;
@@ -43,13 +46,32 @@ public class TextureFactory {
         }
     }
 
+    public void initImageData(final GameActivity activity) throws IOException {
+        final ImageOpenHelper dbHelper = activity.getDbHelper();
+        final String selectQuery = "SELECT * FROM " + ImageOpenHelper.TABLE_NAME;
+
+        final SQLiteDatabase db = dbHelper.getWritableDatabase();
+        final Cursor cursor = db.rawQuery(selectQuery, null);
+        if (cursor.moveToFirst()) {
+            do {
+                imageDatas.put(cursor.getString(0), cursor.getString(1));
+            } while (cursor.moveToNext());
+        }
+    }
+
+    public Map<String, String> getImageDatas() {
+        return imageDatas;
+    }
+
     public void loadCardsResource(final GameActivity activity) throws IOException {
         final GameUserSession session = GameUserSession.getInstance();
         final List<Card> cards = session.getCards();
         for (final Card card : cards) {
             final String image = card.getImage();
-            final ITextureRegion textureRegion = createIextureRegion(activity, image);
-            cardDatas.put(image, textureRegion);
+            if (!cardDatas.containsKey(image)) {
+                final ITextureRegion textureRegion = createIextureRegion(activity, image);
+                cardDatas.put(image, textureRegion);
+            }
         }
 
     }

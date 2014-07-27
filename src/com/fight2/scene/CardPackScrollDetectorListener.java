@@ -95,7 +95,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
     @Override
     public void onScrollFinished(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
         // Debug.e("Scroll Finished");
-        if (cardPack.getChildCount() == 0 && !scrollable) {
+        if (cardPack.getChildCount() == 0 || !scrollable) {
             // Debug.e("cardPack.getChildCount = 0");
             return;
         }

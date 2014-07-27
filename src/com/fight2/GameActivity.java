@@ -93,8 +93,6 @@ public class GameActivity extends BaseGameActivity {
     @Override
     public void onCreateResources(final OnCreateResourcesCallback pOnCreateResourcesCallback) throws IOException {
         checkInstallation();
-        final String installUUID = AccountUtils.readInstallUUID(this);
-        AccountUtils.login(installUUID, this);
         final TextureManager textureManager = this.getTextureManager();
         final AssetManager assetManager = this.getAssets();
         this.splashTexture = new AssetBitmapTexture(textureManager, assetManager, "images/common_splash_screen.png");
@@ -116,7 +114,6 @@ public class GameActivity extends BaseGameActivity {
 
         initProgressBar(vbom);
         initSplashScene(vbom);
-        loadAdditionResources();
 
         pOnCreateSceneCallback.onCreateSceneFinished(splashScene);
     }
@@ -152,6 +149,19 @@ public class GameActivity extends BaseGameActivity {
         splashScene.attachChild(splash);
     }
 
+    @Override
+    public void onPopulateScene(final Scene pScene, final OnPopulateSceneCallback pOnPopulateSceneCallback) {
+        mEngine.registerUpdateHandler(new TimerHandler(1f, new ITimerCallback() {
+            @Override
+            public void onTimePassed(final TimerHandler pTimerHandler) {
+                mEngine.unregisterUpdateHandler(pTimerHandler);
+
+            }
+        }));
+
+        pOnPopulateSceneCallback.onPopulateSceneFinished();
+    }
+
     /**
      * Load other resources, include remote resources.
      */
@@ -170,16 +180,9 @@ public class GameActivity extends BaseGameActivity {
     }
 
     @Override
-    public void onPopulateScene(final Scene pScene, final OnPopulateSceneCallback pOnPopulateSceneCallback) {
-        mEngine.registerUpdateHandler(new TimerHandler(1f, new ITimerCallback() {
-            @Override
-            public void onTimePassed(final TimerHandler pTimerHandler) {
-                mEngine.unregisterUpdateHandler(pTimerHandler);
-
-            }
-        }));
-
-        pOnPopulateSceneCallback.onPopulateSceneFinished();
+    public synchronized void onResumeGame() {
+        super.onResumeGame();
+        loadAdditionResources();
     }
 
     protected void loadScenes() {
@@ -196,8 +199,12 @@ public class GameActivity extends BaseGameActivity {
 
     private void loadResources1() {
         try {
-            TextureFactory.getInstance().loadResource(getTextureManager(), getAssets());
-            TextureFactory.getInstance().loadCardsResource(this);
+            final TextureFactory textureFactory = TextureFactory.getInstance();
+            textureFactory.initImageData(this);
+            final String installUUID = AccountUtils.readInstallUUID(this);
+            AccountUtils.login(installUUID, this);
+            textureFactory.loadResource(getTextureManager(), getAssets());
+            textureFactory.loadCardsResource(this);
             TiledTextureFactory.getInstance().loadResource(getTextureManager(), getAssets());
             for (int i = 0; i < 1000; i++) {
                 progressBar.setProgress(i * 0.1f);
