@@ -16,7 +16,6 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.util.algorithm.collision.EntityCollisionChecker;
-import org.andengine.util.debug.Debug;
 
 import android.util.SparseArray;
 
@@ -181,13 +180,9 @@ public class PartyScene extends BaseScene {
             for (int cardIndex = 0; cardIndex < cards.length; cardIndex++) {
                 final Card card = cards[cardIndex];
                 if (card != null) {
-                    try {
-                        final ITextureRegion cardTextureRegion = createCardTexture(card.getImage());
-                        final Sprite cardSprite = new Sprite(49f + (gap + cardWidth) * cardIndex, cardY, cardWidth, cardHeight, cardTextureRegion, vbom);
-                        gridSprite.attachChild(cardSprite);
-                    } catch (final IOException e) {
-                        Debug.e(e);
-                    }
+                    final ITextureRegion cardTextureRegion = TextureFactory.getInstance().getIextureRegion(card.getImage());
+                    final Sprite cardSprite = new Sprite(49f + (gap + cardWidth) * cardIndex, cardY, cardWidth, cardHeight, cardTextureRegion, vbom);
+                    gridSprite.attachChild(cardSprite);
                 }
 
             }
