@@ -2,6 +2,7 @@ package com.fight2.entity;
 
 public class Card {
     private int id;
+    private String avatar;
     private String image;
     private String name;
     private int star;
@@ -19,6 +20,14 @@ public class Card {
 
     public void setId(final int id) {
         this.id = id;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(final String avatar) {
+        this.avatar = avatar;
     }
 
     public String getImage() {

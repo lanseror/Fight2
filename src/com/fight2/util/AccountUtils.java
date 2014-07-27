@@ -67,22 +67,39 @@ public class AccountUtils {
 
     public static void login(final String installUUID) throws IOException {
         final String loginUrl = HOST_URL + "/user/login.action?installUUID=" + installUUID;
+        final String cardUrl = HOST_URL + "/card/my-cards";
         final String partyUrl = HOST_URL + "/party/my-parties";
 
         try {
             final JSONObject loginJson = HttpUtils.getJSONFromUrl(loginUrl);
             final GameUserSession session = GameUserSession.getInstance();
             session.setName(loginJson.getString("name"));
+
+            // Get cards.
             final List<Card> cards = session.getCards();
             cards.clear();
+            final JSONArray cardJsonArray = HttpUtils.getJSONArrayFromUrl(cardUrl);
+            for (int cardIndex = 0; cardIndex < cardJsonArray.length(); cardIndex++) {
+                final JSONObject cardJson = cardJsonArray.getJSONObject(cardIndex);
+                final Card card = new Card();
+                card.setId(cardJson.getInt("id"));
+                card.setAtk(cardJson.getInt("atk"));
+                card.setAvatar(HOST_URL + cardJson.getString("avatar"));
+                card.setHp(cardJson.getInt("hp"));
+                card.setImage(HOST_URL + cardJson.getString("image"));
+                card.setName(cardJson.getString("name"));
+                card.setSkill(cardJson.optString("skill"));
+                cards.add(card);
+            }
+
             final Card[][] parties = session.getParties();
             final JSONArray partyJsonArray = HttpUtils.getJSONArrayFromUrl(partyUrl);
             for (int partyIndex = 0; partyIndex < partyJsonArray.length(); partyIndex++) {
                 final Card[] party = parties[partyIndex];
-                final JSONArray cardJsonArray = partyJsonArray.getJSONArray(partyIndex);
-                for (int cardIndex = 0; cardIndex < cardJsonArray.length(); cardIndex++) {
-                    final JSONObject cardJson = cardJsonArray.optJSONObject(cardIndex);
-                    System.out.println(cardJson);
+                final JSONArray partyCardJsonArray = partyJsonArray.getJSONArray(partyIndex);
+                for (int partyCardIndex = 0; partyCardIndex < partyCardJsonArray.length(); partyCardIndex++) {
+                    final JSONObject partyCardJson = partyCardJsonArray.optJSONObject(partyCardIndex);
+                    System.out.println(partyCardJson);
                 }
             }
 
