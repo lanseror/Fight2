@@ -84,6 +84,8 @@ public class GameActivity extends BaseGameActivity {
     @Override
     public void onCreateResources(final OnCreateResourcesCallback pOnCreateResourcesCallback) throws IOException {
         checkInstallation();
+        final String installUUID = AccountUtils.readInstallUUID(this);
+        AccountUtils.login(installUUID);
         final TextureManager textureManager = this.getTextureManager();
         final AssetManager assetManager = this.getAssets();
         this.splashTexture = new AssetBitmapTexture(textureManager, assetManager, "images/common_splash_screen.png");
@@ -94,7 +96,7 @@ public class GameActivity extends BaseGameActivity {
 
     private void checkInstallation() throws IOException {
         if (!AccountUtils.isInstalled(this)) {
-            AccountUtils.install(this);
+            AccountUtils.installAndRegister(this);
         }
     }
 

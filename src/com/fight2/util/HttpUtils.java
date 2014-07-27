@@ -9,8 +9,10 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,22 +20,35 @@ public class HttpUtils {
     private static final HttpClient HTTP_CLIENT = new DefaultHttpClient();
 
     public static JSONObject getJSONFromUrl(final String url) throws ClientProtocolException, IOException, JSONException {
-        // Making HTTP request
-        final HttpPost httpPost = new HttpPost(url);
-        final HttpResponse httpResponse = HTTP_CLIENT.execute(httpPost);
-        final HttpEntity httpEntity = httpResponse.getEntity();
-        final InputStream inputStream = httpEntity.getContent();
-        final StringBuilder jsonString = new StringBuilder();
-        final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            jsonString.append(line);
-        }
-        inputStream.close();
-        // try parse the string to a JSON object
-        final JSONObject jObj = new JSONObject(jsonString.toString());
+        final String jsonString = getJSONString(url);
+        final JSONObject jsonObj = new JSONObject(jsonString);
+        return jsonObj;
+    }
 
-        return jObj;
+    private static String getJSONString(final String url) throws ClientProtocolException, IOException {
+        // Making HTTP request
+        final StringBuilder jsonString = new StringBuilder();
+        try {
+            final HttpGet httpGet = new HttpGet(url);
+            final HttpResponse httpResponse = HTTP_CLIENT.execute(httpGet);
+            final HttpEntity httpEntity = httpResponse.getEntity();
+            final InputStream inputStream = httpEntity.getContent();
+            final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                jsonString.append(line);
+            }
+            inputStream.close();
+        } catch (final ConnectTimeoutException e) {
+            throw new RuntimeException(e);
+        }
+        return jsonString.toString();
+    }
+
+    public static JSONArray getJSONArrayFromUrl(final String url) throws ClientProtocolException, IOException, JSONException {
+        final String jsonString = getJSONString(url);
+        final JSONArray jsonArray = new JSONArray(jsonString);
+        return jsonArray;
     }
 
 }
