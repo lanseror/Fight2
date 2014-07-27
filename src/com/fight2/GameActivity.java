@@ -167,6 +167,7 @@ public class GameActivity extends BaseGameActivity {
      */
     private void loadAdditionResources() {
         new Thread(new Runnable() {
+
             @Override
             public void run() {
                 loadResources1();
@@ -176,12 +177,13 @@ public class GameActivity extends BaseGameActivity {
                 mEngine.setScene(scenes.get(SceneEnum.Main));
                 camera.setHUD(null);
             }
+
         }).start();
     }
 
     @Override
-    public synchronized void onResumeGame() {
-        super.onResumeGame();
+    public synchronized void onGameCreated() {
+        super.onGameCreated();
         loadAdditionResources();
     }
 
