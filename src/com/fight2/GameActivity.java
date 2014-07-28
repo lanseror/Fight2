@@ -26,6 +26,7 @@ import org.andengine.opengl.texture.region.TextureRegionFactory;
 import org.andengine.opengl.util.GLState;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.BaseGameActivity;
+import org.andengine.util.debug.Debug;
 
 import android.content.res.AssetManager;
 import android.util.DisplayMetrics;
@@ -203,19 +204,18 @@ public class GameActivity extends BaseGameActivity {
         try {
             final TextureFactory textureFactory = TextureFactory.getInstance();
             textureFactory.initImageData(this);
+            progressBar.increase(10);
             final String installUUID = AccountUtils.readInstallUUID(this);
             AccountUtils.login(installUUID, this);
-            textureFactory.loadResource(getTextureManager(), getAssets());
+            progressBar.increase(40);
+            textureFactory.loadResource(getTextureManager(), getAssets(), progressBar);
+           // progressBar.increase(80);
             textureFactory.loadCardsResource(this);
+            progressBar.increase(90);
             TiledTextureFactory.getInstance().loadResource(getTextureManager(), getAssets());
-            for (int i = 0; i < 1000; i++) {
-                progressBar.setProgress(i * 0.1f);
-                Thread.sleep(2);
-            }
-        } catch (final InterruptedException e) {
-            e.printStackTrace();
+            progressBar.increase(100);
         } catch (final IOException e) {
-            e.printStackTrace();
+            Debug.e(e);
         }
 
         final GameUserSession session = GameUserSession.getInstance();

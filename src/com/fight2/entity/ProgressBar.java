@@ -5,6 +5,7 @@ import org.andengine.engine.camera.hud.HUD;
 import org.andengine.entity.primitive.Line;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
+import org.andengine.util.debug.Debug;
 
 /**
  * @author Jong - Yonatan
@@ -26,6 +27,7 @@ public class ProgressBar extends HUD {
 
     private final float initX;
     private final float initY;
+    private int progress = 0;
 
     // ===========================================================
     // Constructors
@@ -44,7 +46,7 @@ public class ProgressBar extends HUD {
         this.mFrameLines[3] = new Line(pX - pWidth * 0.5f, pY - pHeight * 0.5f, pX - pWidth * 0.5f, pY + pHeight * 0.5f, FRAME_LINE_WIDTH, vbo); // Left line.
 
         this.mProgressRectangle = new Rectangle(pX, pY, 0.0001f, pHeight, vbo);
-        
+
         super.attachChild(this.mBackgroundRectangle); // This one is drawn first.
         super.attachChild(this.mProgressRectangle); // The progress is drawn afterwards.
         for (int i = 0; i < this.mFrameLines.length; i++)
@@ -75,12 +77,24 @@ public class ProgressBar extends HUD {
      * @param pProgress
      *            is <b> BETWEEN </b> 0 - 100.
      */
-    public void setProgress(final float pProgress) {
+    private void setProgress(final float pProgress) {
         if (pProgress < 0)
             this.mProgressRectangle.setWidth(0); // This is an internal check for my specific game, you can remove it.
         final float width = this.mPixelsPerPercentRatio * pProgress;
         this.mProgressRectangle.setPosition(initX + width * 0.5f, initY);
         this.mProgressRectangle.setWidth(width);
+    }
+
+    public void increase(final int progressNum) {
+        for (int i = this.progress * 10; i < progressNum * 10; i++) {
+            this.setProgress(i * 0.1f);
+            try {
+                Thread.sleep(2);
+            } catch (final InterruptedException e) {
+                Debug.e(e);
+            }
+        }
+        this.progress = progressNum;
     }
     // ===========================================================
     // Methods for/from SuperClass/Interfaces

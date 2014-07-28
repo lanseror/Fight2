@@ -22,6 +22,7 @@ import com.fight2.GameActivity;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
+import com.fight2.entity.ProgressBar;
 
 public class TextureFactory {
     private static TextureFactory INSTANCE = new TextureFactory();
@@ -37,12 +38,17 @@ public class TextureFactory {
         return INSTANCE;
     }
 
-    public void loadResource(final TextureManager textureManager, final AssetManager assetManager) throws IOException {
+    public void loadResource(final TextureManager textureManager, final AssetManager assetManager, final ProgressBar progressBar) throws IOException {
+        final int initProgress = 40;
+        final int total = 40;
+        final int length = TextureEnum.values().length;
+        int i = 0;
         for (final TextureEnum textureEnum : TextureEnum.values()) {
             final ITexture texture = new AssetBitmapTexture(textureManager, assetManager, textureEnum.getUrl());
             final ITextureRegion textureRegion = TextureRegionFactory.extractFromTexture(texture);
             texture.load();
             datas.put(textureEnum, textureRegion);
+            progressBar.increase(initProgress + 40 * ++i / length);
         }
     }
 
