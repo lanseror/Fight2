@@ -4,14 +4,22 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
+import org.andengine.util.debug.Debug;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,6 +51,30 @@ public class HttpUtils {
             throw new RuntimeException(e);
         }
         return jsonString.toString();
+    }
+
+    public static boolean postJSONString(final String url, final String json) throws ClientProtocolException, IOException {
+        boolean isOk = false;
+        try {
+            final HttpPost httpPost = new HttpPost(url);
+            final List<NameValuePair> params = new ArrayList<NameValuePair>();
+            params.add(new BasicNameValuePair("jsonMsg", json));
+            final UrlEncodedFormEntity formEntity = new UrlEncodedFormEntity(params);
+            httpPost.setEntity(formEntity);
+
+            final HttpResponse httpResponse = HTTP_CLIENT.execute(httpPost);
+            final int statusCode = httpResponse.getStatusLine().getStatusCode();
+
+            if (statusCode == HttpStatus.SC_OK) {
+                isOk = true;
+            } else {
+                Debug.e("Post status ==> :" + String.valueOf(statusCode));
+                isOk = false;
+            }
+        } catch (final ConnectTimeoutException e) {
+            throw new RuntimeException(e);
+        }
+        return isOk;
     }
 
     public static JSONArray getJSONArrayFromUrl(final String url) throws ClientProtocolException, IOException, JSONException {

@@ -29,6 +29,7 @@ import org.andengine.util.modifier.IModifier;
 import android.graphics.Typeface;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
+import android.widget.Toast;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.ConfigEnum;
@@ -40,6 +41,7 @@ import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.GameUserSession;
 import com.fight2.input.touch.detector.F2ScrollDetector;
 import com.fight2.util.ConfigHelper;
+import com.fight2.util.PartyUtils;
 import com.fight2.util.SpriteUtils;
 import com.fight2.util.TextureFactory;
 
@@ -121,9 +123,20 @@ public class PartyEditScene extends BaseScene {
         backButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                final BaseScene partyScene = scenes.get(SceneEnum.Party);
-                partyScene.updateScene();
-                activity.getEngine().setScene(partyScene);
+                final boolean isSaveOk = PartyUtils.saveParties();
+                if (isSaveOk) {
+                    final BaseScene partyScene = scenes.get(SceneEnum.Party);
+                    partyScene.updateScene();
+                    activity.getEngine().setScene(partyScene);
+                } else {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(activity, "队伍保存失败！", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+
             }
         });
 
