@@ -40,6 +40,7 @@ public enum TextureEnum {
 
     // Summon scene images.
     SUMMON_BG("images/summon_backgroud.jpg", 1136, 640),
+    SUMMON_SUMMON_BUTTON("images/summon_summon_button.jpg", 300, 90),
 
     // Common images.
     COMMON_BACK_BUTTON_NORMAL("button/button_back.jpg", 100, 100),

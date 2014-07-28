@@ -82,6 +82,13 @@ public class TextureFactory {
 
     }
 
+    public void addCardResource(final GameActivity activity, final String image) throws IOException {
+        if (!cardDatas.containsKey(image)) {
+            final ITextureRegion textureRegion = createIextureRegion(activity, image);
+            cardDatas.put(image, textureRegion);
+        }
+    }
+
     public ITextureRegion getIextureRegion(final TextureEnum textureEnum) {
         return this.datas.get(textureEnum);
     }

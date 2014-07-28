@@ -175,6 +175,7 @@ public class MainScene extends BaseScene {
                         unfocusSprite(mailBoxSprite);
                     } else if (checkContains(SUMMON_VERTICES, x, y)) {
                         unfocusSprite(summonStoneSprite);
+                        engine.setScene(scenes.get(SceneEnum.Summon));
                     } else if (checkContains(BILLBOARD_VERTICES, x, y)) {
                         unfocusSprite(billboardSprite);
                     } else if (checkContains(GUILD_VERTICES, x, y)) {
@@ -228,6 +229,6 @@ public class MainScene extends BaseScene {
     @Override
     public void updateScene() {
         // TODO Auto-generated method stub
-        
+
     }
 }

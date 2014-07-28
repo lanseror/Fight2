@@ -39,6 +39,7 @@ import com.fight2.entity.ProgressBar;
 import com.fight2.scene.BaseScene;
 import com.fight2.scene.MainScene;
 import com.fight2.scene.PartyScene;
+import com.fight2.scene.SummonScene;
 import com.fight2.util.AccountUtils;
 import com.fight2.util.ConfigHelper;
 import com.fight2.util.ImageOpenHelper;
@@ -194,8 +195,10 @@ public class GameActivity extends BaseGameActivity {
             scenes.put(SceneEnum.Main, mainScene);
             final BaseScene partyScene = new PartyScene(this);
             scenes.put(SceneEnum.Party, partyScene);
+            final BaseScene summonScene = new SummonScene(this);
+            scenes.put(SceneEnum.Summon, summonScene);
         } catch (final IOException e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
     }
@@ -209,8 +212,8 @@ public class GameActivity extends BaseGameActivity {
             AccountUtils.login(installUUID, this);
             progressBar.increase(50);
             textureFactory.loadResource(getTextureManager(), getAssets(), progressBar);
-           // progressBar.increase(90);
-            
+            // progressBar.increase(90);
+
             TiledTextureFactory.getInstance().loadResource(getTextureManager(), getAssets());
             progressBar.increase(100);
         } catch (final IOException e) {

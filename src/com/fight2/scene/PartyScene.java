@@ -27,7 +27,7 @@ import com.fight2.entity.Card;
 import com.fight2.entity.F2ButtonSprite;
 import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.GameUserSession;
-import com.fight2.util.PartyUtils;
+import com.fight2.util.CardUtils;
 import com.fight2.util.TextureFactory;
 
 public class PartyScene extends BaseScene {
@@ -68,7 +68,7 @@ public class PartyScene extends BaseScene {
         backButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                final boolean isSaveOk = PartyUtils.saveParties();
+                final boolean isSaveOk = CardUtils.saveParties();
                 if (isSaveOk) {
                     final BaseScene intentScene = scenes.get(SceneEnum.Main);
                     intentScene.updateScene();
