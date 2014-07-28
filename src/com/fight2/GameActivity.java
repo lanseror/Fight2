@@ -207,11 +207,10 @@ public class GameActivity extends BaseGameActivity {
             progressBar.increase(10);
             final String installUUID = AccountUtils.readInstallUUID(this);
             AccountUtils.login(installUUID, this);
-            progressBar.increase(40);
+            progressBar.increase(50);
             textureFactory.loadResource(getTextureManager(), getAssets(), progressBar);
-           // progressBar.increase(80);
-            textureFactory.loadCardsResource(this);
-            progressBar.increase(90);
+           // progressBar.increase(90);
+            
             TiledTextureFactory.getInstance().loadResource(getTextureManager(), getAssets());
             progressBar.increase(100);
         } catch (final IOException e) {

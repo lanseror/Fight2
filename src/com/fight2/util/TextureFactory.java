@@ -39,7 +39,7 @@ public class TextureFactory {
     }
 
     public void loadResource(final TextureManager textureManager, final AssetManager assetManager, final ProgressBar progressBar) throws IOException {
-        final int initProgress = 40;
+        final int initProgress = 50;
         final int total = 40;
         final int length = TextureEnum.values().length;
         int i = 0;
@@ -48,7 +48,7 @@ public class TextureFactory {
             final ITextureRegion textureRegion = TextureRegionFactory.extractFromTexture(texture);
             texture.load();
             datas.put(textureEnum, textureRegion);
-            progressBar.increase(initProgress + 40 * ++i / length);
+            progressBar.increase(initProgress + total * ++i / length);
         }
     }
 

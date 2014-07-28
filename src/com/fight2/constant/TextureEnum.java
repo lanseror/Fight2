@@ -38,6 +38,9 @@ public enum TextureEnum {
     PARTY_EDIT_BG("images/party_edit_backgroud.png", 1136, 640),
     PARTY_EDIT_SWITCH_BUTTON("images/party_edit_switch_button.jpg", 100, 100),
 
+    // Summon scene images.
+    SUMMON_BG("images/summon_backgroud.jpg", 1136, 640),
+
     // Common images.
     COMMON_BACK_BUTTON_NORMAL("button/button_back.jpg", 100, 100),
     COMMON_BACK_BUTTON_PRESSED("button/button_back.jpg", 120, 120),

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -95,6 +96,7 @@ public class AccountUtils {
                 card.setSkill(cardJson.optString("skill"));
                 cards.add(card);
             }
+            TextureFactory.getInstance().loadCardsResource(activity);
 
             final Card[][] parties = session.getParties();
             final JSONArray partyJsonArray = HttpUtils.getJSONArrayFromUrl(partyUrl);
@@ -102,8 +104,19 @@ public class AccountUtils {
                 final Card[] party = parties[partyIndex];
                 final JSONArray partyCardJsonArray = partyJsonArray.getJSONArray(partyIndex);
                 for (int partyCardIndex = 0; partyCardIndex < partyCardJsonArray.length(); partyCardIndex++) {
-                    final JSONObject partyCardJson = partyCardJsonArray.optJSONObject(partyCardIndex);
-                    System.out.println(partyCardJson);
+                    final int partyCardId = partyCardJsonArray.getInt(partyCardIndex);
+                    if (partyCardId == -1) {
+                        party[partyCardIndex] = null;
+                    } else {
+                        final Iterator<Card> it = cards.iterator();
+                        while (it.hasNext()) {
+                            final Card card = it.next();
+                            if (partyCardId == card.getId()) {
+                                it.remove();
+                                party[partyCardIndex] = card;
+                            }
+                        }
+                    }
                 }
             }
 
