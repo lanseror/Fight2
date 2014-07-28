@@ -18,6 +18,7 @@ import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.util.algorithm.collision.EntityCollisionChecker;
 
 import android.util.SparseArray;
+import android.widget.Toast;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.SceneEnum;
@@ -26,6 +27,7 @@ import com.fight2.entity.Card;
 import com.fight2.entity.F2ButtonSprite;
 import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.GameUserSession;
+import com.fight2.util.PartyUtils;
 import com.fight2.util.TextureFactory;
 
 public class PartyScene extends BaseScene {
@@ -66,7 +68,19 @@ public class PartyScene extends BaseScene {
         backButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                activity.getEngine().setScene(scenes.get(SceneEnum.Main));
+                final boolean isSaveOk = PartyUtils.saveParties();
+                if (isSaveOk) {
+                    final BaseScene intentScene = scenes.get(SceneEnum.Main);
+                    intentScene.updateScene();
+                    activity.getEngine().setScene(intentScene);
+                } else {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(activity, "队伍保存失败！", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
             }
         });
         this.attachChild(backButton);
