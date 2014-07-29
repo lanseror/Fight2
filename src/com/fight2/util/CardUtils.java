@@ -14,10 +14,9 @@ import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
 
 public class CardUtils {
-    public static final String HOST_URL = "http://192.168.1.178:8080/Fight2Server";
 
     public static boolean saveParties() {
-        final String url = HOST_URL + "/party/edit";
+        final String url = HttpUtils.HOST_URL + "/party/edit";
         final GameUserSession session = GameUserSession.getInstance();
         final Card[][] parties = session.getParties();
         final JSONArray partyJson = new JSONArray();
@@ -44,7 +43,7 @@ public class CardUtils {
     }
 
     public static Card summon(final GameActivity activity) {
-        final String url = HOST_URL + "/card/summon";
+        final String url = HttpUtils.HOST_URL + "/card/summon";
         final GameUserSession session = GameUserSession.getInstance();
         final List<Card> cards = session.getCards();
         try {

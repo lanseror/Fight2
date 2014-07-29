@@ -21,7 +21,6 @@ import com.fight2.entity.GameUserSession;
 
 public class AccountUtils {
     private static final String INSTALLATION = "INSTALLATION";
-    public static final String HOST_URL = "http://192.168.1.178:8080/Fight2Server";
 
     private static File getInstallationFile(final Context context) {
         return new File(context.getFilesDir(), INSTALLATION);
@@ -43,7 +42,7 @@ public class AccountUtils {
 
     public static String installAndRegister(final Context context) {
         final String id = UUID.randomUUID().toString();
-        final String webUrl = HOST_URL + "/user/register.action?installUUID=" + id;
+        final String webUrl = HttpUtils.HOST_URL + "/user/register.action?installUUID=" + id;
 
         try {
             final JSONObject jsonObj = HttpUtils.getJSONFromUrl(webUrl);
@@ -68,9 +67,9 @@ public class AccountUtils {
     }
 
     public static void login(final String installUUID, final GameActivity activity) throws IOException {
-        final String loginUrl = HOST_URL + "/user/login.action?installUUID=" + installUUID;
-        final String cardUrl = HOST_URL + "/card/my-cards";
-        final String partyUrl = HOST_URL + "/party/my-parties";
+        final String loginUrl = HttpUtils.HOST_URL + "/user/login.action?installUUID=" + installUUID;
+        final String cardUrl = HttpUtils.HOST_URL + "/card/my-cards";
+        final String partyUrl = HttpUtils.HOST_URL + "/party/my-parties";
 
         try {
             final JSONObject loginJson = HttpUtils.getJSONFromUrl(loginUrl);
