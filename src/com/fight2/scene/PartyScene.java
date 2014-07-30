@@ -31,11 +31,13 @@ import com.fight2.util.CardUtils;
 import com.fight2.util.TextureFactory;
 
 public class PartyScene extends BaseScene {
-    private final SparseArray<Sprite> gridOrders = new SparseArray<Sprite>();
+    private final SparseArray<IEntity> gridOrders = new SparseArray<IEntity>();
     private final List<Float> gridYList = new ArrayList<Float>();
     private final List<Rectangle> gridCollisionList = new ArrayList<Rectangle>();
     private final Card[][] cardParties = GameUserSession.getInstance().getParties();
-    final Map<SceneEnum, BaseScene> scenes = this.activity.getScenes();
+    private final Map<SceneEnum, BaseScene> scenes = this.activity.getScenes();
+    private final float topbarY = cameraHeight - TextureEnum.PARTY_TOPBAR.getHeight();
+    private final float frameY = topbarY - TextureEnum.PARTY_FRAME.getHeight();
 
     public PartyScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -48,19 +50,21 @@ public class PartyScene extends BaseScene {
         final Background background = new SpriteBackground(bgSprite);
         this.setBackground(background);
 
-        final float frameY = cameraHeight - TextureEnum.PARTY_FRAME.getHeight();
+        final Sprite topbarSprite = createRealScreenImageSprite(TextureEnum.PARTY_TOPBAR, 0, topbarY);
+        this.attachChild(topbarSprite);
+
         final Sprite frameSprite = createRealScreenImageSprite(TextureEnum.PARTY_FRAME, 0, frameY);
         this.attachChild(frameSprite);
 
         updateScene();
 
-        final Sprite editSprite = createEditSprite(TextureEnum.PARTY_EDIT_BUTTON, 713, frameY + 340, 1);
+        final Sprite editSprite = createEditSprite(TextureEnum.PARTY_EDIT_BUTTON, 850, frameY + 340, 1);
         this.attachChild(editSprite);
         this.registerTouchArea(editSprite);
-        final Sprite editSprite2 = createEditSprite(TextureEnum.PARTY_EDIT_BUTTON, 713, frameY + 197, 2);
+        final Sprite editSprite2 = createEditSprite(TextureEnum.PARTY_EDIT_BUTTON, 850, frameY + 197, 2);
         this.attachChild(editSprite2);
         this.registerTouchArea(editSprite2);
-        final Sprite editSprite3 = createEditSprite(TextureEnum.PARTY_EDIT_BUTTON, 713, frameY + 53, 3);
+        final Sprite editSprite3 = createEditSprite(TextureEnum.PARTY_EDIT_BUTTON, 850, frameY + 53, 3);
         this.attachChild(editSprite3);
         this.registerTouchArea(editSprite3);
 
@@ -90,7 +94,7 @@ public class PartyScene extends BaseScene {
         this.setTouchAreaBindingOnActionMoveEnabled(true);
     }
 
-    private Rectangle createGridCollisionArea(final Sprite sprite) {
+    private Rectangle createGridCollisionArea(final IEntity sprite) {
         final Rectangle area = new Rectangle(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight() * 0.65f, vbom);
         return area;
     }
@@ -122,16 +126,14 @@ public class PartyScene extends BaseScene {
         return sprite;
     }
 
-    private Sprite createGridSprite(final TextureEnum textureEnum, final float x, final float y) {
-        final TextureFactory textureFactory = TextureFactory.getInstance();
-        final ITextureRegion texture = textureFactory.getIextureRegion(textureEnum);
+    private IEntity createGridEntity(final TextureEnum textureEnum, final float x, final float y) {
         final float width = textureEnum.getWidth();
         final float height = textureEnum.getHeight();
         final BigDecimal factor = BigDecimal.valueOf(this.cameraHeight).divide(BigDecimal.valueOf(deviceHeight), 2, RoundingMode.HALF_DOWN);
         final float fakeWidth = BigDecimal.valueOf(this.deviceWidth).multiply(factor).floatValue();
         final float pX = (this.cameraWidth - fakeWidth) / 2 + x + width * 0.5f;
         final float pY = y + height * 0.5f;
-        final Sprite sprite = new Sprite(pX, pY, width, height, texture, vbom) {
+        final IEntity grid = new Rectangle(pX, pY, width, height, vbom) {
             @Override
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 this.setZIndex(100);
@@ -146,7 +148,7 @@ public class PartyScene extends BaseScene {
                         }
                         final Rectangle collissionGrid = gridCollisionList.get(collisionIndex);
                         if (EntityCollisionChecker.checkContains(collissionGrid, pX, touchY)) {
-                            final Sprite collissionSprite = gridOrders.get(collisionIndex);
+                            final IEntity collissionSprite = gridOrders.get(collisionIndex);
                             gridOrders.put(thisOrder, collissionSprite);
                             gridOrders.put(collisionIndex, this);
                             collissionSprite.setPosition(pX, gridYList.get(thisOrder));
@@ -165,42 +167,55 @@ public class PartyScene extends BaseScene {
                 return true;
             }
         };
+        grid.setAlpha(0);
+        return grid;
+    }
+
+    private Sprite createGridSprite(final TextureEnum textureEnum, final float x, final float y) {
+        final TextureFactory textureFactory = TextureFactory.getInstance();
+        final ITextureRegion texture = textureFactory.getIextureRegion(textureEnum);
+        final float width = textureEnum.getWidth();
+        final float height = textureEnum.getHeight();
+        final Sprite sprite = new Sprite(x, y, width, height, texture, vbom);
         return sprite;
     }
 
     @Override
     public void updateScene() {
-        final float frameY = cameraHeight - TextureEnum.PARTY_FRAME.getHeight();
-        final int cardWidth = 94;
-        final int cardHeight = 94;
-        final float cardY = 47f;
-        final int gap = 37;
+        final float gridHeight = TextureEnum.PARTY_FRAME_GRID.getHeight();
+        final int cardWidth = 135;
+        final int cardHeight = 135;
+        final float cardY = gridHeight * 0.5f;
+        final int gridGap = 15;
+        final int gap = 18;
         gridOrders.clear();
         gridYList.clear();
         gridCollisionList.clear();
         for (int partyIndex = 0; partyIndex < cardParties.length; partyIndex++) {
-            final Sprite gridSprite = createGridSprite(TextureEnum.PARTY_FRAME_GRID, 196, frameY + 323 - partyIndex * 144);
-            gridSprite.setTag(888 + partyIndex);
-            gridOrders.put(partyIndex, gridSprite);
-            gridYList.add(gridSprite.getY());
-            gridCollisionList.add(this.createGridCollisionArea(gridSprite));
+            final IEntity gridEntity = createGridEntity(TextureEnum.PARTY_FRAME_GRID, 153, frameY + 337 - partyIndex * (gridHeight + gridGap));
+            final Sprite gridSprite = createGridSprite(TextureEnum.PARTY_FRAME_GRID, gridEntity.getWidth() * 0.5f, gridEntity.getHeight() * 0.5f);
+            gridEntity.setTag(888 + partyIndex);
+            gridOrders.put(partyIndex, gridEntity);
+            gridYList.add(gridEntity.getY());
+            gridCollisionList.add(this.createGridCollisionArea(gridEntity));
             final IEntity oldGridSprite = this.getChildByTag(888 + partyIndex);
             this.unregisterTouchArea(oldGridSprite);
             this.detachChild(oldGridSprite);
-            this.attachChild(gridSprite);
-            this.registerTouchArea(gridSprite);
+            this.attachChild(gridEntity);
+            this.registerTouchArea(gridEntity);
 
             final Card[] cards = cardParties[partyIndex];
             for (int cardIndex = 0; cardIndex < cards.length; cardIndex++) {
                 final Card card = cards[cardIndex];
                 if (card != null) {
                     final ITextureRegion cardTextureRegion = TextureFactory.getInstance().getIextureRegion(card.getImage());
-                    final Sprite cardSprite = new Sprite(49f + (gap + cardWidth) * cardIndex, cardY, cardWidth, cardHeight, cardTextureRegion, vbom);
-                    gridSprite.attachChild(cardSprite);
+                    final Sprite cardSprite = new Sprite(83f + (gap + cardWidth) * cardIndex, cardY, cardWidth, cardHeight, cardTextureRegion, vbom);
+                    gridEntity.attachChild(cardSprite);
                 }
 
             }
 
+            gridEntity.attachChild(gridSprite);
         }
 
     }

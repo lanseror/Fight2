@@ -205,6 +205,7 @@ public class GameActivity extends BaseGameActivity {
 
     private void loadResources1() {
         try {
+            TiledTextureFactory.getInstance().loadResource(getTextureManager(), getAssets());
             final TextureFactory textureFactory = TextureFactory.getInstance();
             textureFactory.initImageData(this);
             progressBar.increase(10);
@@ -214,7 +215,7 @@ public class GameActivity extends BaseGameActivity {
             textureFactory.loadResource(getTextureManager(), getAssets(), progressBar);
             // progressBar.increase(90);
 
-            TiledTextureFactory.getInstance().loadResource(getTextureManager(), getAssets());
+            
             progressBar.increase(100);
         } catch (final IOException e) {
             Debug.e(e);

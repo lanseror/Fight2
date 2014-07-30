@@ -32,8 +32,9 @@ public enum TextureEnum {
 
     // Party scene images.
     PARTY_BG("images/party_backgroud.png", 1136, 640),
-    PARTY_FRAME("images/party_frame.png", 850, 536),
-    PARTY_FRAME_GRID("images/party_frame_grid.png", 490, 98),
+    PARTY_TOPBAR("images/party_topbar.png", 725, 73),
+    PARTY_FRAME("images/party_frame.png", 783, 492),
+    PARTY_FRAME_GRID("images/party_frame_grid.png", 618, 148),
     PARTY_EDIT_BUTTON("images/party_edit_button.png", 101, 43),
     PARTY_EDIT_BG("images/party_edit_backgroud.png", 1136, 640),
     PARTY_EDIT_SWITCH_BUTTON("images/party_edit_switch_button.jpg", 100, 100),
@@ -43,8 +44,8 @@ public enum TextureEnum {
     SUMMON_SUMMON_BUTTON("images/summon_summon_button.jpg", 300, 90),
 
     // Common images.
-    COMMON_BACK_BUTTON_NORMAL("button/button_back.jpg", 100, 100),
-    COMMON_BACK_BUTTON_PRESSED("button/button_back.jpg", 120, 120),
+    COMMON_BACK_BUTTON_NORMAL("images/common_back_button.png", 130, 133),
+    COMMON_BACK_BUTTON_PRESSED("images/common_back_button_fcs.png", 130, 133),
 
     TEST_CARD1("card/card1.jpg", 100, 100),
     TEST_CARD2("card/card2.jpg", 100, 100),
