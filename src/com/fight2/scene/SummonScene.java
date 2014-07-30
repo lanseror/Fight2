@@ -1,7 +1,6 @@
 package com.fight2.scene;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
@@ -18,10 +17,10 @@ import com.fight2.entity.Card;
 import com.fight2.entity.F2ButtonSprite;
 import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.CardUtils;
+import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
 
 public class SummonScene extends BaseScene {
-    final Map<SceneEnum, BaseScene> scenes = this.activity.getScenes();
 
     public SummonScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -34,11 +33,12 @@ public class SummonScene extends BaseScene {
         final Background background = new SpriteBackground(bgSprite);
         this.setBackground(background);
 
-        final F2ButtonSprite backButton = createRealScreenF2ButtonSprite(TextureEnum.COMMON_BACK_BUTTON_NORMAL, this.simulatedWidth - 100, 250);
+        final F2ButtonSprite backButton = createALBF2ButtonSprite(TextureEnum.COMMON_BACK_BUTTON_NORMAL, TextureEnum.COMMON_BACK_BUTTON_PRESSED,
+                this.simulatedWidth - 100, 250);
         backButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                activity.getEngine().setScene(scenes.get(SceneEnum.Main));
+                ResourceManager.getInstance().setCurrentScene(SceneEnum.Main);
             }
         });
         this.attachChild(backButton);

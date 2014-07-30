@@ -1,6 +1,8 @@
 package com.fight2.constant;
 
 public enum TextureEnum {
+    // Splash scene images.
+    SPLASH_BG("images/common_splash_screen.png", 1136, 640),
 
     // Main scene images.
     MAIN_BG("images/main_backgroud.png", 1136, 640),
@@ -35,9 +37,12 @@ public enum TextureEnum {
     PARTY_TOPBAR("images/party_topbar.png", 725, 73),
     PARTY_FRAME("images/party_frame.png", 783, 492),
     PARTY_FRAME_GRID("images/party_frame_grid.png", 618, 148),
-    PARTY_EDIT_BUTTON("images/party_edit_button.png", 101, 43),
+    PARTY_EDIT_BUTTON("images/party_edit_button.png", 130, 132),
+    PARTY_EDIT_BUTTON_PRESSED("images/party_edit_button_fcs.png", 130, 132),
     PARTY_EDIT_BG("images/party_edit_backgroud.png", 1136, 640),
     PARTY_EDIT_SWITCH_BUTTON("images/party_edit_switch_button.jpg", 100, 100),
+    PARTY_RECHARGE("images/party_recharge.png", 224, 77),
+    PARTY_RECHARGE_PRESSED("images/party_recharge_fcs.png", 224, 77),
 
     // Summon scene images.
     SUMMON_BG("images/summon_backgroud.jpg", 1136, 640),

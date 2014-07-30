@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.andengine.engine.Engine;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
@@ -19,6 +18,7 @@ import com.fight2.GameActivity;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.constant.TiledTextureEnum;
+import com.fight2.util.ResourceManager;
 import com.fight2.util.TiledTextureFactory;
 
 public class MainScene extends BaseScene {
@@ -142,8 +142,6 @@ public class MainScene extends BaseScene {
         summonStoneEffect.animate(125);
         this.attachChild(summonStoneEffect);
 
-        final Engine engine = this.activity.getEngine();
-        final Map<SceneEnum, BaseScene> scenes = this.activity.getScenes();
         this.setOnSceneTouchListener(new IOnSceneTouchListener() {
             @Override
             public boolean onSceneTouchEvent(final Scene pScene, final TouchEvent pSceneTouchEvent) {
@@ -175,14 +173,14 @@ public class MainScene extends BaseScene {
                         unfocusSprite(mailBoxSprite);
                     } else if (checkContains(SUMMON_VERTICES, x, y)) {
                         unfocusSprite(summonStoneSprite);
-                        engine.setScene(scenes.get(SceneEnum.Summon));
+                        ResourceManager.getInstance().setCurrentScene(SceneEnum.Summon);
                     } else if (checkContains(BILLBOARD_VERTICES, x, y)) {
                         unfocusSprite(billboardSprite);
                     } else if (checkContains(GUILD_VERTICES, x, y)) {
                         unfocusSprite(guildSprite);
                     } else if (checkContains(CAMP_VERTICES, x, y)) {
                         unfocusSprite(trainingCampSprite);
-                        engine.setScene(scenes.get(SceneEnum.Party));
+                        ResourceManager.getInstance().setCurrentScene(SceneEnum.Party);
                     } else if (checkContains(HOTEL_VERTICES, x, y)) {
                         unfocusSprite(hotelSprite);
                     } else if (checkContains(ARENA_VERTICES, x, y)) {

@@ -143,11 +143,14 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                         // Debug.e("Add card");
                         final Card cardEntry = (Card) focusedCard.getUserData();
                         partyCards[cardGridIndex] = cardEntry;
-                        this.partyEditScene.addedCards[cardGridIndex] = copyCard;
+                        final IEntity avatar = partyEditScene.createCardAvatarSprite(cardEntry, 10, 20);
+                       
+                        this.partyEditScene.addedCards[cardGridIndex] = avatar;
                         cardGrid = this.partyEditScene.cardFrames[cardGridIndex];
+                        avatar.setPosition(cardGrid);
 
                         final IEntityModifierListener modifierListener = isReplace ? new ReplacePartyCardModifierListener(focusedCard, cardEntry,
-                                replaceCardSprite) : new AddPartyCardModifierListener(focusedCard, cardEntry);
+                                replaceCardSprite) : new AddPartyCardModifierListener(focusedCard, cardEntry, avatar);
                         final MoveModifier modifier = new MoveModifier(0.1f, copyCard.getX(), copyCard.getY(), cardGrid.getX(), cardGrid.getY(),
                                 modifierListener);
                         partyEditScene.getActivity().runOnUpdateThread(new Runnable() {
@@ -217,10 +220,12 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
     protected class AddPartyCardModifierListener implements IEntityModifierListener {
         private final IEntity focusedCard;
         private final Card cardEntry;
+        private final IEntity avatar;
 
-        protected AddPartyCardModifierListener(final IEntity focusedCard, final Card cardEntry) {
+        protected AddPartyCardModifierListener(final IEntity focusedCard, final Card cardEntry, final IEntity avatar) {
             this.focusedCard = focusedCard;
             this.cardEntry = cardEntry;
+            this.avatar = avatar;
         }
 
         @Override
@@ -278,8 +283,12 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                     focusedCard.detachSelf();
                     CardPackScrollDetectorListener.this.partyEditScene.removedCards.put(cardEntry, focusedCard);
                     GameUserSession.getInstance().getCards().remove(cardEntry);
+                    partyEditScene.attachChild(avatar);
+                    pItem.detachSelf();
+
                 }
             });
+
             scrollable = true;
         }
     }

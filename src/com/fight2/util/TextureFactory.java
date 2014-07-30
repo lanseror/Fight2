@@ -72,7 +72,13 @@ public class TextureFactory {
     public void loadCardsResource(final GameActivity activity) throws IOException {
         final GameUserSession session = GameUserSession.getInstance();
         final List<Card> cards = session.getCards();
+        cardDatas.clear();
         for (final Card card : cards) {
+            final String avatar = card.getAvatar();
+            if (!cardDatas.containsKey(avatar)) {
+                final ITextureRegion textureRegion = createIextureRegion(activity, avatar);
+                cardDatas.put(avatar, textureRegion);
+            }
             final String image = card.getImage();
             if (!cardDatas.containsKey(image)) {
                 final ITextureRegion textureRegion = createIextureRegion(activity, image);

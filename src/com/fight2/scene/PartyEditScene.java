@@ -42,6 +42,7 @@ import com.fight2.entity.GameUserSession;
 import com.fight2.input.touch.detector.F2ScrollDetector;
 import com.fight2.util.ConfigHelper;
 import com.fight2.util.CardUtils;
+import com.fight2.util.ResourceManager;
 import com.fight2.util.SpriteUtils;
 import com.fight2.util.TextureFactory;
 
@@ -59,7 +60,6 @@ public class PartyEditScene extends BaseScene {
     private Text partyNumberText;
     final Rectangle[] cardFrames = new Rectangle[4];
 
-    final Map<SceneEnum, BaseScene> scenes = this.activity.getScenes();
     private PhysicsHandler mPhysicsHandler;
     private final Font mFont;
     final Map<Card, IEntity> removedCards = new HashMap<Card, IEntity>();
@@ -91,10 +91,8 @@ public class PartyEditScene extends BaseScene {
         for (int i = 0; i < partyCards.length; i++) {
             final Card cardEntry = partyCards[i];
             if (cardEntry != null) {
-                final IEntity card = createRealScreenCardSprite(cardEntry, 10, 20);
+                final IEntity card = createCardAvatarSprite(cardEntry, 10, 20);
                 card.setPosition(cardFrames[i]);
-                card.setWidth(CARD_WIDTH);
-                card.setHeight(180);
                 card.setUserData(cardEntry);
                 this.attachChild(card);
                 addedCards[i] = card;
@@ -119,15 +117,14 @@ public class PartyEditScene extends BaseScene {
         final Background background = new SpriteBackground(bgSprite);
         this.setBackground(background);
 
-        final F2ButtonSprite backButton = createRealScreenF2ButtonSprite(TextureEnum.COMMON_BACK_BUTTON_NORMAL, this.simulatedWidth - 100, 250);
+        final F2ButtonSprite backButton = createALBF2ButtonSprite(TextureEnum.COMMON_BACK_BUTTON_NORMAL, TextureEnum.COMMON_BACK_BUTTON_PRESSED,
+                this.simulatedWidth - 100, 250);
         backButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 final boolean isSaveOk = CardUtils.saveParties();
                 if (isSaveOk) {
-                    final BaseScene partyScene = scenes.get(SceneEnum.Party);
-                    partyScene.updateScene();
-                    activity.getEngine().setScene(partyScene);
+                    ResourceManager.getInstance().setCurrentScene(SceneEnum.Party);
                 } else {
                     activity.runOnUiThread(new Runnable() {
                         @Override
@@ -453,6 +450,21 @@ public class PartyEditScene extends BaseScene {
         Sprite sprite = null;
         final TextureFactory textureFactory = TextureFactory.getInstance();
         final ITextureRegion texture = textureFactory.getIextureRegion(card.getImage());
+        sprite = new Sprite(pX, pY, width, height, texture, vbom);
+
+        return sprite;
+    }
+
+    protected Sprite createCardAvatarSprite(final Card card, final float x, final float y) {
+        final float width = 135;
+        final float height = 135;
+        final BigDecimal factor = BigDecimal.valueOf(this.cameraHeight).divide(BigDecimal.valueOf(deviceHeight), 2, RoundingMode.HALF_DOWN);
+        final float fakeWidth = BigDecimal.valueOf(this.deviceWidth).multiply(factor).floatValue();
+        final float pX = (this.cameraWidth - fakeWidth) / 2 + x + width * 0.5f;
+        final float pY = y + height * 0.5f;
+        Sprite sprite = null;
+        final TextureFactory textureFactory = TextureFactory.getInstance();
+        final ITextureRegion texture = textureFactory.getIextureRegion(card.getAvatar());
         sprite = new Sprite(pX, pY, width, height, texture, vbom);
 
         return sprite;

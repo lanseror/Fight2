@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.andengine.entity.IEntity;
 import org.andengine.entity.primitive.Rectangle;
@@ -16,6 +15,7 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.util.algorithm.collision.EntityCollisionChecker;
+import org.andengine.util.debug.Debug;
 
 import android.util.SparseArray;
 import android.widget.Toast;
@@ -28,6 +28,7 @@ import com.fight2.entity.F2ButtonSprite;
 import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.GameUserSession;
 import com.fight2.util.CardUtils;
+import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
 
 public class PartyScene extends BaseScene {
@@ -35,7 +36,6 @@ public class PartyScene extends BaseScene {
     private final List<Float> gridYList = new ArrayList<Float>();
     private final List<Rectangle> gridCollisionList = new ArrayList<Rectangle>();
     private final Card[][] cardParties = GameUserSession.getInstance().getParties();
-    private final Map<SceneEnum, BaseScene> scenes = this.activity.getScenes();
     private final float topbarY = cameraHeight - TextureEnum.PARTY_TOPBAR.getHeight();
     private final float frameY = topbarY - TextureEnum.PARTY_FRAME.getHeight();
 
@@ -50,33 +50,43 @@ public class PartyScene extends BaseScene {
         final Background background = new SpriteBackground(bgSprite);
         this.setBackground(background);
 
-        final Sprite topbarSprite = createRealScreenImageSprite(TextureEnum.PARTY_TOPBAR, 0, topbarY);
+        final Sprite topbarSprite = createALBImageSprite(TextureEnum.PARTY_TOPBAR, this.simulatedLeftX, topbarY);
         this.attachChild(topbarSprite);
 
-        final Sprite frameSprite = createRealScreenImageSprite(TextureEnum.PARTY_FRAME, 0, frameY);
+        final Sprite rechargeSprite = createALBF2ButtonSprite(TextureEnum.PARTY_RECHARGE, TextureEnum.PARTY_RECHARGE_PRESSED, this.simulatedRightX
+                - TextureEnum.PARTY_RECHARGE.getWidth(), topbarY);
+        this.attachChild(rechargeSprite);
+        this.registerTouchArea(rechargeSprite);
+
+        final Sprite frameSprite = createALBImageSprite(TextureEnum.PARTY_FRAME, this.simulatedLeftX, frameY);
         this.attachChild(frameSprite);
 
         updateScene();
 
-        final Sprite editSprite = createEditSprite(TextureEnum.PARTY_EDIT_BUTTON, 850, frameY + 340, 1);
+        final F2ButtonSprite editSprite = createALBF2ButtonSprite(TextureEnum.PARTY_EDIT_BUTTON, TextureEnum.PARTY_EDIT_BUTTON_PRESSED,
+                this.simulatedRightX - 140, 220);
+        editSprite.setOnClickListener(new F2OnClickListener() {
+            @Override
+            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                try {
+                    final Scene editScene = new PartyEditScene(activity, 1);
+                    activity.getEngine().setScene(editScene);
+                } catch (final IOException e) {
+                    Debug.e(e);
+                }
+            }
+        });
         this.attachChild(editSprite);
         this.registerTouchArea(editSprite);
-        final Sprite editSprite2 = createEditSprite(TextureEnum.PARTY_EDIT_BUTTON, 850, frameY + 197, 2);
-        this.attachChild(editSprite2);
-        this.registerTouchArea(editSprite2);
-        final Sprite editSprite3 = createEditSprite(TextureEnum.PARTY_EDIT_BUTTON, 850, frameY + 53, 3);
-        this.attachChild(editSprite3);
-        this.registerTouchArea(editSprite3);
 
-        final F2ButtonSprite backButton = createRealScreenF2ButtonSprite(TextureEnum.COMMON_BACK_BUTTON_NORMAL, this.simulatedWidth - 100, 20);
+        final F2ButtonSprite backButton = createALBF2ButtonSprite(TextureEnum.COMMON_BACK_BUTTON_NORMAL, TextureEnum.COMMON_BACK_BUTTON_PRESSED,
+                this.simulatedRightX - 140, 50);
         backButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 final boolean isSaveOk = CardUtils.saveParties();
                 if (isSaveOk) {
-                    final BaseScene intentScene = scenes.get(SceneEnum.Main);
-                    intentScene.updateScene();
-                    activity.getEngine().setScene(intentScene);
+                    ResourceManager.getInstance().setCurrentScene(SceneEnum.Main);
                 } else {
                     activity.runOnUiThread(new Runnable() {
                         @Override
@@ -97,33 +107,6 @@ public class PartyScene extends BaseScene {
     private Rectangle createGridCollisionArea(final IEntity sprite) {
         final Rectangle area = new Rectangle(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight() * 0.65f, vbom);
         return area;
-    }
-
-    private Sprite createEditSprite(final TextureEnum textureEnum, final float x, final float y, final int partyNumber) {
-        final TextureFactory textureFactory = TextureFactory.getInstance();
-        final ITextureRegion texture = textureFactory.getIextureRegion(textureEnum);
-        final float width = textureEnum.getWidth();
-        final float height = textureEnum.getHeight();
-        final BigDecimal factor = BigDecimal.valueOf(this.cameraHeight).divide(BigDecimal.valueOf(deviceHeight), 2, RoundingMode.HALF_DOWN);
-        final float fakeWidth = BigDecimal.valueOf(this.deviceWidth).multiply(factor).floatValue();
-        final float pX = (this.cameraWidth - fakeWidth) / 2 + x + width * 0.5f;
-        final float pY = y + height * 0.5f;
-        final Sprite sprite = new Sprite(pX, pY, width, height, texture, vbom) {
-            @Override
-            public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                if (pSceneTouchEvent.isActionDown()) {
-                    try {
-                        final Scene editScene = new PartyEditScene(activity, partyNumber);
-                        activity.getEngine().setScene(editScene);
-                    } catch (final IOException e) {
-                        e.printStackTrace();
-                    }
-                    return true;
-                }
-                return false;
-            }
-        };
-        return sprite;
     }
 
     private IEntity createGridEntity(final TextureEnum textureEnum, final float x, final float y) {
@@ -208,7 +191,7 @@ public class PartyScene extends BaseScene {
             for (int cardIndex = 0; cardIndex < cards.length; cardIndex++) {
                 final Card card = cards[cardIndex];
                 if (card != null) {
-                    final ITextureRegion cardTextureRegion = TextureFactory.getInstance().getIextureRegion(card.getImage());
+                    final ITextureRegion cardTextureRegion = TextureFactory.getInstance().getIextureRegion(card.getAvatar());
                     final Sprite cardSprite = new Sprite(83f + (gap + cardWidth) * cardIndex, cardY, cardWidth, cardHeight, cardTextureRegion, vbom);
                     gridEntity.attachChild(cardSprite);
                 }

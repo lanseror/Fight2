@@ -3,10 +3,8 @@ package com.fight2;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.andengine.engine.Engine;
 import org.andengine.engine.camera.Camera;
@@ -36,15 +34,10 @@ import com.fight2.constant.SceneEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.ProgressBar;
-import com.fight2.scene.BaseScene;
-import com.fight2.scene.MainScene;
-import com.fight2.scene.PartyScene;
-import com.fight2.scene.SummonScene;
 import com.fight2.util.AccountUtils;
 import com.fight2.util.ConfigHelper;
 import com.fight2.util.ImageOpenHelper;
-import com.fight2.util.TextureFactory;
-import com.fight2.util.TiledTextureFactory;
+import com.fight2.util.ResourceManager;
 
 public class GameActivity extends BaseGameActivity {
     private static final int CAMERA_WIDTH = 1136;
@@ -57,7 +50,6 @@ public class GameActivity extends BaseGameActivity {
     private ITexture splashTexture;
     private ITextureRegion splashTextureRegion;
     private Sprite splash;
-    private final Map<SceneEnum, BaseScene> scenes = new HashMap<SceneEnum, BaseScene>();
 
     private Scene splashScene;
     private ProgressBar progressBar;
@@ -85,10 +77,11 @@ public class GameActivity extends BaseGameActivity {
         configHelper.setConfig(ConfigEnum.X_DPI, displayMetrics.xdpi);
         final BigDecimal factor = BigDecimal.valueOf(CAMERA_HEIGHT).divide(BigDecimal.valueOf(deviceHeight), 2, RoundingMode.HALF_DOWN);
         final int simulatedWidth = BigDecimal.valueOf(deviceWidth).multiply(factor).intValue();
+        configHelper.setConfig(ConfigEnum.SimulatedLeftX, CAMERA_CENTER_X - simulatedWidth * 0.5f);
+        configHelper.setConfig(ConfigEnum.SimulatedRightX, CAMERA_CENTER_X + simulatedWidth * 0.5f);
         configHelper.setConfig(ConfigEnum.SimulatedWidth, simulatedWidth);
         configHelper.setConfig(ConfigEnum.SimulatedHeight, CAMERA_HEIGHT);
         camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
-        camera.setZClippingPlanes(-240, 240);
         return new EngineOptions(true, ScreenOrientation.LANDSCAPE_SENSOR, new CropResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera);
     }
 
@@ -113,11 +106,10 @@ public class GameActivity extends BaseGameActivity {
     public void onCreateScene(final OnCreateSceneCallback pOnCreateSceneCallback) throws IOException {
         this.mEngine.registerUpdateHandler(new FPSLogger());
         final VertexBufferObjectManager vbom = this.getVertexBufferObjectManager();
-
         initProgressBar(vbom);
         initSplashScene(vbom);
-
         pOnCreateSceneCallback.onCreateSceneFinished(splashScene);
+
     }
 
     /**
@@ -173,10 +165,9 @@ public class GameActivity extends BaseGameActivity {
             @Override
             public void run() {
                 loadResources1();
-                loadScenes();
                 splashScene.detachChildren();
                 splashScene.detachSelf();
-                mEngine.setScene(scenes.get(SceneEnum.Main));
+                ResourceManager.getInstance().setCurrentScene(SceneEnum.Main);
                 camera.setHUD(null);
             }
 
@@ -189,34 +180,11 @@ public class GameActivity extends BaseGameActivity {
         loadAdditionResources();
     }
 
-    protected void loadScenes() {
-        try {
-            final BaseScene mainScene = new MainScene(this);
-            scenes.put(SceneEnum.Main, mainScene);
-            final BaseScene partyScene = new PartyScene(this);
-            scenes.put(SceneEnum.Party, partyScene);
-            final BaseScene summonScene = new SummonScene(this);
-            scenes.put(SceneEnum.Summon, summonScene);
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
-
     private void loadResources1() {
         try {
-            TiledTextureFactory.getInstance().loadResource(getTextureManager(), getAssets());
-            final TextureFactory textureFactory = TextureFactory.getInstance();
-            textureFactory.initImageData(this);
-            progressBar.increase(10);
-            final String installUUID = AccountUtils.readInstallUUID(this);
-            AccountUtils.login(installUUID, this);
-            progressBar.increase(50);
-            textureFactory.loadResource(getTextureManager(), getAssets(), progressBar);
-            // progressBar.increase(90);
+            final ResourceManager resourceManager = ResourceManager.getInstance();
+            resourceManager.loadGameResources(this, progressBar);
 
-            
-            progressBar.increase(100);
         } catch (final IOException e) {
             Debug.e(e);
         }
@@ -241,10 +209,6 @@ public class GameActivity extends BaseGameActivity {
             }
 
         }
-    }
-
-    public Map<SceneEnum, BaseScene> getScenes() {
-        return scenes;
     }
 
     public ImageOpenHelper getDbHelper() {

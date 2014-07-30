@@ -19,10 +19,10 @@ import com.fight2.GameActivity;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
+import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
 
 public class SummonFinishScene extends BaseScene {
-    final Map<SceneEnum, BaseScene> scenes = this.activity.getScenes();
 
     private final Sprite cardSprite;
 
@@ -44,7 +44,7 @@ public class SummonFinishScene extends BaseScene {
             @Override
             public boolean onSceneTouchEvent(final Scene pScene, final TouchEvent pSceneTouchEvent) {
                 if (pSceneTouchEvent.isActionDown()) {
-                    activity.getEngine().setScene(scenes.get(SceneEnum.Summon));
+                    ResourceManager.getInstance().setCurrentScene(SceneEnum.Summon);
                 }
                 return false;
             }
