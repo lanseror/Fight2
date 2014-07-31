@@ -28,7 +28,7 @@ public class SummonFinishScene extends BaseScene {
     public SummonFinishScene(final Card card, final GameActivity activity) throws IOException {
         super(activity);
         final TextureFactory textureFactory = TextureFactory.getInstance();
-        final ITextureRegion texture = textureFactory.getIextureRegion(card.getImage());
+        final ITextureRegion texture = textureFactory.getTextureRegion(card.getImage());
         cardSprite = new Sprite(cameraCenterX, cameraCenterY, 100, 150, texture, vbom);
         init();
     }

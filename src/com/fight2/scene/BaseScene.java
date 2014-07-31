@@ -69,7 +69,7 @@ public abstract class BaseScene extends Scene {
      */
     protected Sprite createALBImageSprite(final TextureEnum textureEnum, final float x, final float y) {
         final TextureFactory textureFactory = TextureFactory.getInstance();
-        final ITextureRegion texture = textureFactory.getIextureRegion(textureEnum);
+        final ITextureRegion texture = textureFactory.getAssetTextureRegion(textureEnum);
         final float width = textureEnum.getWidth();
         final float height = textureEnum.getHeight();
         final float pX = x + width * 0.5f;
@@ -80,8 +80,8 @@ public abstract class BaseScene extends Scene {
 
     protected F2ButtonSprite createALBF2ButtonSprite(final TextureEnum normalTextureEnum, final TextureEnum pressedTextureEnum, final float x, final float y) {
         final TextureFactory textureFactory = TextureFactory.getInstance();
-        final ITextureRegion normalTexture = textureFactory.getIextureRegion(normalTextureEnum);
-        final ITextureRegion pressedTexture = textureFactory.getIextureRegion(pressedTextureEnum);
+        final ITextureRegion normalTexture = textureFactory.getAssetTextureRegion(normalTextureEnum);
+        final ITextureRegion pressedTexture = textureFactory.getAssetTextureRegion(pressedTextureEnum);
         final float width = normalTextureEnum.getWidth();
         final float height = normalTextureEnum.getHeight();
         final float pX = x + width * 0.5f;
@@ -92,7 +92,7 @@ public abstract class BaseScene extends Scene {
 
     protected Sprite createCameraImageSprite(final TextureEnum textureEnum, final float x, final float y) {
         final TextureFactory textureFactory = TextureFactory.getInstance();
-        final ITextureRegion texture = textureFactory.getIextureRegion(textureEnum);
+        final ITextureRegion texture = textureFactory.getAssetTextureRegion(textureEnum);
         final float width = textureEnum.getWidth();
         final float height = textureEnum.getHeight();
         final float pX = x + width * 0.5f;

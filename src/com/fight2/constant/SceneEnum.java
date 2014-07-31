@@ -4,5 +4,6 @@ public enum SceneEnum {
     Splash,
     Main,
     Party,
-    Summon;
+    Summon,
+    Arena;
 }

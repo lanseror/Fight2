@@ -1,6 +1,7 @@
 package com.fight2.scene;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
@@ -8,28 +9,26 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
 
-import android.widget.Toast;
-
 import com.fight2.GameActivity;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
-import com.fight2.entity.Card;
 import com.fight2.entity.F2ButtonSprite;
 import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
-import com.fight2.util.CardUtils;
+import com.fight2.entity.Player;
+import com.fight2.util.ArenaUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
 
-public class SummonScene extends BaseScene {
+public class ArenaScene extends BaseScene {
 
-    public SummonScene(final GameActivity activity) throws IOException {
+    public ArenaScene(final GameActivity activity) throws IOException {
         super(activity);
         init();
     }
 
     @Override
     protected void init() throws IOException {
-        final Sprite bgSprite = createCameraImageSprite(TextureEnum.SUMMON_BG, 0, 0);
+        final Sprite bgSprite = createCameraImageSprite(TextureEnum.ARENA_BG, 0, 0);
         final Background background = new SpriteBackground(bgSprite);
         this.setBackground(background);
 
@@ -44,15 +43,17 @@ public class SummonScene extends BaseScene {
         this.attachChild(backButton);
         this.registerTouchArea(backButton);
 
-        final Sprite summonButton = createSummonSprite(TextureEnum.SUMMON_SUMMON_BUTTON, 885, 85);
-        this.attachChild(summonButton);
-        this.registerTouchArea(summonButton);
+        final Sprite battleButton = createBattleSprite(TextureEnum.ARENA_BATTLE, 633, 50);
+        this.attachChild(battleButton);
+        this.registerTouchArea(battleButton);
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
+
+        updateScene();
     }
 
-    private Sprite createSummonSprite(final TextureEnum textureEnum, final float x, final float y) {
+    private Sprite createBattleSprite(final TextureEnum textureEnum, final float x, final float y) {
         final TextureFactory textureFactory = TextureFactory.getInstance();
         final ITextureRegion texture = textureFactory.getAssetTextureRegion(textureEnum);
         final float width = textureEnum.getWidth();
@@ -61,23 +62,6 @@ public class SummonScene extends BaseScene {
             @Override
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 if (pSceneTouchEvent.isActionDown()) {
-                    final Card card = CardUtils.summon(activity);
-                    if (card != null) {
-                        try {
-                            final BaseScene summonFInishScene = new SummonFinishScene(card, activity);
-                            activity.getEngine().setScene(summonFInishScene);
-                            summonFInishScene.updateScene();
-                        } catch (final IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    } else {
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(activity, "可能服务器出错或者你召唤的卡片已经超过100张！", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
 
                     return true;
                 }
@@ -89,7 +73,28 @@ public class SummonScene extends BaseScene {
 
     @Override
     public void updateScene() {
+        final List<Player> competitors = ArenaUtils.getCompetitors(activity);
+        final TextureFactory textureFactory = TextureFactory.getInstance();
+        if (competitors.size() > 0) {
+            final Player competitor = competitors.get(0);
+            final String avatarStr = competitor.getAvatar();
+
+            final ITextureRegion defaultAvatar = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_DEFAULT_AVATAR);
+            ITextureRegion avatar = null;
+            if (TextureEnum.COMMON_DEFAULT_AVATAR.name().equals(avatarStr)) {
+                avatar = defaultAvatar;
+            } else {
+                try {
+                    textureFactory.addCardResource(activity, competitor.getAvatar());
+                } catch (final IOException e) {
+                    throw new RuntimeException(e);
+                }
+                avatar = textureFactory.getTextureRegion(competitor.getAvatar());
+            }
+
+            final Sprite competitorSprite = new Sprite(633, 245, avatar, vbom);
+            this.attachChild(competitorSprite);
+        }
 
     }
-
 }

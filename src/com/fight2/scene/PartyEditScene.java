@@ -343,7 +343,7 @@ public class PartyEditScene extends BaseScene {
     private Sprite createSwitchButton(final float x, final float y) {
         final TextureEnum textureEnum = TextureEnum.PARTY_EDIT_SWITCH_BUTTON;
         final TextureFactory textureFactory = TextureFactory.getInstance();
-        final ITextureRegion texture = textureFactory.getIextureRegion(textureEnum);
+        final ITextureRegion texture = textureFactory.getAssetTextureRegion(textureEnum);
         final float width = textureEnum.getWidth();
         final float height = textureEnum.getHeight();
         final BigDecimal factor = BigDecimal.valueOf(this.cameraHeight).divide(BigDecimal.valueOf(deviceHeight), 2, RoundingMode.HALF_DOWN);
@@ -452,7 +452,7 @@ public class PartyEditScene extends BaseScene {
         final float pY = y + height * 0.5f;
         Sprite sprite = null;
         final TextureFactory textureFactory = TextureFactory.getInstance();
-        final ITextureRegion texture = textureFactory.getIextureRegion(card.getImage());
+        final ITextureRegion texture = textureFactory.getTextureRegion(card.getImage());
         sprite = new Sprite(pX, pY, width, height, texture, vbom);
 
         return sprite;
@@ -467,7 +467,7 @@ public class PartyEditScene extends BaseScene {
         final float pY = y + height * 0.5f;
         Sprite sprite = null;
         final TextureFactory textureFactory = TextureFactory.getInstance();
-        final ITextureRegion texture = textureFactory.getIextureRegion(card.getAvatar());
+        final ITextureRegion texture = textureFactory.getTextureRegion(card.getAvatar());
         sprite = new Sprite(pX, pY, width, height, texture, vbom);
 
         return sprite;

@@ -11,6 +11,7 @@ import android.content.res.AssetManager;
 import com.fight2.GameActivity;
 import com.fight2.constant.SceneEnum;
 import com.fight2.entity.ProgressBar;
+import com.fight2.scene.ArenaScene;
 import com.fight2.scene.BaseScene;
 import com.fight2.scene.MainScene;
 import com.fight2.scene.PartyScene;
@@ -80,6 +81,9 @@ public class ResourceManager {
             scenes.put(SceneEnum.Party, partyScene);
             final BaseScene summonScene = new SummonScene(activity);
             scenes.put(SceneEnum.Summon, summonScene);
+            final BaseScene arenaScene = new ArenaScene(activity);
+            scenes.put(SceneEnum.Arena, arenaScene);
+
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }

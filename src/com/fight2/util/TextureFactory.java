@@ -95,11 +95,11 @@ public class TextureFactory {
         }
     }
 
-    public ITextureRegion getIextureRegion(final TextureEnum textureEnum) {
+    public ITextureRegion getAssetTextureRegion(final TextureEnum textureEnum) {
         return this.datas.get(textureEnum);
     }
 
-    public ITextureRegion getIextureRegion(final String imageString) {
+    public ITextureRegion getTextureRegion(final String imageString) {
         return this.cardDatas.get(imageString);
     }
 

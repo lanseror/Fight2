@@ -201,7 +201,7 @@ public class PartyScene extends BaseScene {
 
     private Sprite createGridSprite(final TextureEnum textureEnum, final float x, final float y) {
         final TextureFactory textureFactory = TextureFactory.getInstance();
-        final ITextureRegion texture = textureFactory.getIextureRegion(textureEnum);
+        final ITextureRegion texture = textureFactory.getAssetTextureRegion(textureEnum);
         final float width = textureEnum.getWidth();
         final float height = textureEnum.getHeight();
         final Sprite sprite = new Sprite(x, y, width, height, texture, vbom);
@@ -239,7 +239,7 @@ public class PartyScene extends BaseScene {
             for (int cardIndex = 0; cardIndex < cards.length; cardIndex++) {
                 final Card card = cards[cardIndex];
                 if (card != null) {
-                    final ITextureRegion cardTextureRegion = TextureFactory.getInstance().getIextureRegion(card.getAvatar());
+                    final ITextureRegion cardTextureRegion = TextureFactory.getInstance().getTextureRegion(card.getAvatar());
                     final Sprite cardSprite = new Sprite(83f + (gap + cardWidth) * cardIndex, cardY, cardWidth, cardHeight, cardTextureRegion, vbom);
                     gridEntity.attachChild(cardSprite);
                 }

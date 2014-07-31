@@ -7,6 +7,7 @@ public enum TextureEnum {
     // Common images.
     COMMON_BACK_BUTTON_NORMAL("images/common_back_button.png", 130, 133),
     COMMON_BACK_BUTTON_PRESSED("images/common_back_button_fcs.png", 130, 133),
+    COMMON_DEFAULT_AVATAR("images/common_default_avatar.png", 135, 135),
 
     // Main scene images.
     MAIN_BG("images/main_backgroud.png", 1136, 640),
@@ -54,6 +55,7 @@ public enum TextureEnum {
 
     // Arena scene images.
     ARENA_BG("images/arena_backgroud.png", 1136, 640),
+    ARENA_BATTLE("images/arena_battle_button.jpg", 215, 68),
 
     TEST_CARD1("card/card1.jpg", 100, 100),
     TEST_CARD2("card/card2.jpg", 100, 100),
