@@ -22,7 +22,8 @@ public class CardUtils {
         final GameUserSession session = GameUserSession.getInstance();
         final PartyInfo partyInfo = session.getPartyInfo();
         final JSONArray partyJson = new JSONArray();
-        for (final Party party : partyInfo.getParties()) {
+        final Party[] parties = partyInfo.getParties();
+        for (final Party party : parties) {
             final JSONArray cardJson = new JSONArray();
             for (final Card card : party.getCards()) {
                 if (card != null) {
@@ -35,10 +36,23 @@ public class CardUtils {
         }
 
         try {
-            return HttpUtils.postJSONString(url, partyJson.toString());
+
+            final String responseJsonStr = HttpUtils.postJSONString(url, partyJson.toString());
+            final JSONObject responseJson = new JSONObject(responseJsonStr);
+            partyInfo.setAtk(responseJson.getInt("atk"));
+            partyInfo.setHp(responseJson.getInt("hp"));
+            final JSONArray responsePartyJsonArray = responseJson.getJSONArray("parties");
+            for (int partyIndex = 0; partyIndex < responsePartyJsonArray.length(); partyIndex++) {
+                final JSONObject responsePartyJson = responsePartyJsonArray.getJSONObject(partyIndex);
+                final Party party = parties[partyIndex];
+                party.setAtk(responsePartyJson.getInt("atk"));
+                party.setHp(responsePartyJson.getInt("hp"));
+            }
+            return true;
+
         } catch (final ClientProtocolException e) {
             Debug.e(e);
-        } catch (final IOException e) {
+        } catch (final Exception e) {
             Debug.e(e);
         }
         return false;

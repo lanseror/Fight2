@@ -12,11 +12,16 @@ import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
+import org.andengine.opengl.font.Font;
+import org.andengine.opengl.font.FontFactory;
 import org.andengine.opengl.texture.region.ITextureRegion;
+import org.andengine.util.adt.color.Color;
 import org.andengine.util.algorithm.collision.EntityCollisionChecker;
 import org.andengine.util.debug.Debug;
 
+import android.graphics.Typeface;
 import android.util.SparseArray;
 import android.widget.Toast;
 
@@ -41,9 +46,32 @@ public class PartyScene extends BaseScene {
     private final Party[] parties = partyInfo.getParties();
     private final float topbarY = cameraHeight - TextureEnum.PARTY_TOPBAR.getHeight();
     private final float frameY = topbarY - TextureEnum.PARTY_FRAME.getHeight();
+    private final float frameTop = frameY + TextureEnum.PARTY_FRAME.getHeight();
+    private final float gridHeight = TextureEnum.PARTY_FRAME_GRID.getHeight();
+    private final Font mFont;
+    private final Text hpText;
+    private final Text atkText;
+
+    private final Text[] partyHps = new Text[3];;
+    private final Text[] partyAtks = new Text[3];
 
     public PartyScene(final GameActivity activity) throws IOException {
         super(activity);
+        this.mFont = FontFactory.create(activity.getFontManager(), activity.getTextureManager(), 256, 256, Typeface.create(Typeface.DEFAULT, Typeface.NORMAL),
+                24, Color.WHITE_ARGB_PACKED_INT);
+        this.mFont.load();
+        hpText = new Text(this.simulatedLeftX + 360, topbarY + 48, mFont, "0123456789", vbom);
+        atkText = new Text(this.simulatedLeftX + 600, topbarY + 48, mFont, "0123456789", vbom);
+        final float partyTextTop = frameTop - 82;
+        final float partyTextGap = gridHeight + 15;
+        for (int partyIndex = 0; partyIndex < 3; partyIndex++) {
+
+            final Text partyHp = new Text(this.simulatedLeftX + 110, partyTextTop - partyTextGap * partyIndex, mFont, "0123456789", vbom);
+            final Text partyAtk = new Text(this.simulatedLeftX + 110, partyTextTop - 43 - partyTextGap * partyIndex, mFont, "0123456789", vbom);
+            partyHps[partyIndex] = partyHp;
+            partyAtks[partyIndex] = partyAtk;
+        }
+
         init();
     }
 
@@ -63,6 +91,13 @@ public class PartyScene extends BaseScene {
 
         final Sprite frameSprite = createALBImageSprite(TextureEnum.PARTY_FRAME, this.simulatedLeftX, frameY);
         this.attachChild(frameSprite);
+
+        this.attachChild(hpText);
+        this.attachChild(atkText);
+        for (int partyIndex = 0; partyIndex < 3; partyIndex++) {
+            this.attachChild(partyHps[partyIndex]);
+            this.attachChild(partyAtks[partyIndex]);
+        }
 
         updateScene();
 
@@ -141,6 +176,13 @@ public class PartyScene extends BaseScene {
                             final Party tempParty = parties[thisOrder];
                             parties[thisOrder] = parties[collisionIndex];
                             parties[collisionIndex] = tempParty;
+
+                            for (int partyIndex = 0; partyIndex < parties.length; partyIndex++) {
+                                final Party party = parties[partyIndex];
+                                partyHps[partyIndex].setText(String.valueOf(party.getHp()));
+                                partyAtks[partyIndex].setText(String.valueOf(party.getAtk()));
+                            }
+
                         }
                     }
                 }
@@ -168,7 +210,9 @@ public class PartyScene extends BaseScene {
 
     @Override
     public void updateScene() {
-        final float gridHeight = TextureEnum.PARTY_FRAME_GRID.getHeight();
+        hpText.setText(String.valueOf(partyInfo.getHp()));
+        atkText.setText(String.valueOf(partyInfo.getAtk()));
+
         final int cardWidth = 135;
         final int cardHeight = 135;
         final float cardY = gridHeight * 0.5f;
@@ -201,7 +245,8 @@ public class PartyScene extends BaseScene {
                 }
 
             }
-
+            partyHps[partyIndex].setText(String.valueOf(party.getHp()));
+            partyAtks[partyIndex].setText(String.valueOf(party.getAtk()));
             gridEntity.attachChild(gridSprite);
         }
 

@@ -4,6 +4,10 @@ public enum TextureEnum {
     // Splash scene images.
     SPLASH_BG("images/common_splash_screen.png", 1136, 640),
 
+    // Common images.
+    COMMON_BACK_BUTTON_NORMAL("images/common_back_button.png", 130, 133),
+    COMMON_BACK_BUTTON_PRESSED("images/common_back_button_fcs.png", 130, 133),
+
     // Main scene images.
     MAIN_BG("images/main_backgroud.png", 1136, 640),
     MAIN_ARENA("images/main_arena.png", 422, 252),
@@ -48,9 +52,8 @@ public enum TextureEnum {
     SUMMON_BG("images/summon_backgroud.jpg", 1136, 640),
     SUMMON_SUMMON_BUTTON("images/summon_summon_button.jpg", 300, 90),
 
-    // Common images.
-    COMMON_BACK_BUTTON_NORMAL("images/common_back_button.png", 130, 133),
-    COMMON_BACK_BUTTON_PRESSED("images/common_back_button_fcs.png", 130, 133),
+    // Arena scene images.
+    ARENA_BG("images/arena_backgroud.png", 1136, 640),
 
     TEST_CARD1("card/card1.jpg", 100, 100),
     TEST_CARD2("card/card2.jpg", 100, 100),

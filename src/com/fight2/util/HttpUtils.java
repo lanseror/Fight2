@@ -25,7 +25,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class HttpUtils {
-    public static final String HOST_URL = "http://192.168.1.178:8080/Fight2Server";
+    public static final String HOST_URL = "http://112.124.37.194:8888/";
     private static final HttpClient HTTP_CLIENT = new DefaultHttpClient();
 
     public static JSONObject getJSONFromUrl(final String url) throws ClientProtocolException, IOException, JSONException {
@@ -54,8 +54,8 @@ public class HttpUtils {
         return jsonString.toString();
     }
 
-    public static boolean postJSONString(final String url, final String json) throws ClientProtocolException, IOException {
-        boolean isOk = false;
+    public static String postJSONString(final String url, final String json) throws ClientProtocolException, IOException {
+        final StringBuilder jsonString = new StringBuilder();
         try {
             final HttpPost httpPost = new HttpPost(url);
             final List<NameValuePair> params = new ArrayList<NameValuePair>();
@@ -67,15 +67,22 @@ public class HttpUtils {
             final int statusCode = httpResponse.getStatusLine().getStatusCode();
 
             if (statusCode == HttpStatus.SC_OK) {
-                isOk = true;
+                final HttpEntity httpEntity = httpResponse.getEntity();
+                final InputStream inputStream = httpEntity.getContent();
+                final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+                String line = null;
+                while ((line = reader.readLine()) != null) {
+                    jsonString.append(line);
+                }
+                inputStream.close();
             } else {
                 Debug.e("Post status ==> :" + String.valueOf(statusCode));
-                isOk = false;
             }
+
         } catch (final ConnectTimeoutException e) {
             throw new RuntimeException(e);
         }
-        return isOk;
+        return jsonString.toString();
     }
 
     public static JSONArray getJSONArrayFromUrl(final String url) throws ClientProtocolException, IOException, JSONException {
