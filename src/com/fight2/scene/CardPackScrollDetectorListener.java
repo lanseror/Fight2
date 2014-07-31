@@ -114,14 +114,14 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                     final Card[] partyCards = GameUserSession.getInstance().getParties()[this.partyEditScene.partyNumber - 1];
                     boolean collidedWithGrid = false;
                     boolean isReplace = false;
-                    IEntity replaceCardSprite = null;
+                    IEntity beReplacedCardSprite = null;
                     Rectangle cardGrid = null;
                     int cardGridIndex = 0;
                     for (; cardGridIndex < this.partyEditScene.cardFrames.length; cardGridIndex++) {
                         if (this.partyEditScene.cardFrames[cardGridIndex].contains(copyCard.getX(), copyCard.getY())) {
                             collidedWithGrid = true;
-                            replaceCardSprite = partyEditScene.addedCards[cardGridIndex];
-                            isReplace = (replaceCardSprite == null ? false : true);
+                            beReplacedCardSprite = partyEditScene.addedCards[cardGridIndex];
+                            isReplace = (beReplacedCardSprite == null ? false : true);
                             break;
                         }
                     }
@@ -143,14 +143,14 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                         // Debug.e("Add card");
                         final Card cardEntry = (Card) focusedCard.getUserData();
                         partyCards[cardGridIndex] = cardEntry;
-                        final IEntity avatar = partyEditScene.createCardAvatarSprite(cardEntry, 10, 20);
-                       
-                        this.partyEditScene.addedCards[cardGridIndex] = avatar;
                         cardGrid = this.partyEditScene.cardFrames[cardGridIndex];
-                        avatar.setPosition(cardGrid);
+                        final IEntity toReplaceCardAvatar = partyEditScene.createCardAvatarSprite(cardEntry, 10, 20);
+                        toReplaceCardAvatar.setPosition(cardGrid);
+                        toReplaceCardAvatar.setUserData(copyCard.getUserData());
+                        this.partyEditScene.addedCards[cardGridIndex] = toReplaceCardAvatar;
 
                         final IEntityModifierListener modifierListener = isReplace ? new ReplacePartyCardModifierListener(focusedCard, cardEntry,
-                                replaceCardSprite) : new AddPartyCardModifierListener(focusedCard, cardEntry, avatar);
+                                beReplacedCardSprite, toReplaceCardAvatar) : new AddPartyCardModifierListener(focusedCard, cardEntry, toReplaceCardAvatar);
                         final MoveModifier modifier = new MoveModifier(0.1f, copyCard.getX(), copyCard.getY(), cardGrid.getX(), cardGrid.getY(),
                                 modifierListener);
                         partyEditScene.getActivity().runOnUpdateThread(new Runnable() {
@@ -296,12 +296,15 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
     protected class ReplacePartyCardModifierListener implements IEntityModifierListener {
         private final IEntity focusedCard;
         private final Card cardEntry;
-        private final IEntity replaceCardSprite;
+        private final IEntity beReplacedCardSprite;
+        private final IEntity toReplaceCardAvatar;
 
-        protected ReplacePartyCardModifierListener(final IEntity focusedCard, final Card cardEntry, final IEntity replaceCardSprite) {
+        protected ReplacePartyCardModifierListener(final IEntity focusedCard, final Card cardEntry, final IEntity beReplacedCardSprite,
+                final IEntity toReplaceCardAvatar) {
             this.focusedCard = focusedCard;
             this.cardEntry = cardEntry;
-            this.replaceCardSprite = replaceCardSprite;
+            this.beReplacedCardSprite = beReplacedCardSprite;
+            this.toReplaceCardAvatar = toReplaceCardAvatar;
         }
 
         @Override
@@ -325,7 +328,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                             previousCard.getY());
                     if (cardPackIndex == focusedCardIndex - 1) {
                         cardZoom.setUserData(currentCard);
-                        cardEditModifier.addModifierListener(new ReplacePartyCardFinishedModifierListener(replaceCardSprite));
+                        cardEditModifier.addModifierListener(new ReplacePartyCardFinishedModifierListener(beReplacedCardSprite));
                     }
                     partyEditScene.getActivity().runOnUpdateThread(new Runnable() {
                         @Override
@@ -346,7 +349,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                             previousCard.getY());
                     if (cardPackIndex == focusedCardIndex + 1) {
                         cardZoom.setUserData(currentCard);
-                        cardEditModifier.addModifierListener(new ReplacePartyCardFinishedModifierListener(replaceCardSprite));
+                        cardEditModifier.addModifierListener(new ReplacePartyCardFinishedModifierListener(beReplacedCardSprite));
                     }
 
                     partyEditScene.getActivity().runOnUpdateThread(new Runnable() {
@@ -366,9 +369,11 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                     CardPackScrollDetectorListener.this.partyEditScene.removedCards.put(cardEntry, focusedCard);
                     GameUserSession.getInstance().getCards().remove(cardEntry);
                     if (cardPack.getChildCount() == 0) {
-                        partyEditScene.revertCardToCardPack(replaceCardSprite);
-                        replaceCardSprite.detachSelf();
+                        partyEditScene.revertCardToCardPack(beReplacedCardSprite);
+                        beReplacedCardSprite.detachSelf();
                     }
+                    pItem.detachSelf();
+                    partyEditScene.attachChild(toReplaceCardAvatar);
                     scrollable = true;
                 }
             });
