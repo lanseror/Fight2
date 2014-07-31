@@ -27,6 +27,8 @@ import com.fight2.entity.Card;
 import com.fight2.entity.F2ButtonSprite;
 import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.GameUserSession;
+import com.fight2.entity.Party;
+import com.fight2.entity.PartyInfo;
 import com.fight2.util.CardUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
@@ -35,7 +37,8 @@ public class PartyScene extends BaseScene {
     private final SparseArray<IEntity> gridOrders = new SparseArray<IEntity>();
     private final List<Float> gridYList = new ArrayList<Float>();
     private final List<Rectangle> gridCollisionList = new ArrayList<Rectangle>();
-    private final Card[][] cardParties = GameUserSession.getInstance().getParties();
+    private final PartyInfo partyInfo = GameUserSession.getInstance().getPartyInfo();
+    private final Party[] parties = partyInfo.getParties();
     private final float topbarY = cameraHeight - TextureEnum.PARTY_TOPBAR.getHeight();
     private final float frameY = topbarY - TextureEnum.PARTY_FRAME.getHeight();
 
@@ -135,9 +138,9 @@ public class PartyScene extends BaseScene {
                             gridOrders.put(thisOrder, collissionSprite);
                             gridOrders.put(collisionIndex, this);
                             collissionSprite.setPosition(pX, gridYList.get(thisOrder));
-                            final Card[] tempParty = cardParties[thisOrder];
-                            cardParties[thisOrder] = cardParties[collisionIndex];
-                            cardParties[collisionIndex] = tempParty;
+                            final Party tempParty = parties[thisOrder];
+                            parties[thisOrder] = parties[collisionIndex];
+                            parties[collisionIndex] = tempParty;
                         }
                     }
                 }
@@ -174,7 +177,7 @@ public class PartyScene extends BaseScene {
         gridOrders.clear();
         gridYList.clear();
         gridCollisionList.clear();
-        for (int partyIndex = 0; partyIndex < cardParties.length; partyIndex++) {
+        for (int partyIndex = 0; partyIndex < parties.length; partyIndex++) {
             final IEntity gridEntity = createGridEntity(TextureEnum.PARTY_FRAME_GRID, 153, frameY + 337 - partyIndex * (gridHeight + gridGap));
             final Sprite gridSprite = createGridSprite(TextureEnum.PARTY_FRAME_GRID, gridEntity.getWidth() * 0.5f, gridEntity.getHeight() * 0.5f);
             gridEntity.setTag(888 + partyIndex);
@@ -187,7 +190,8 @@ public class PartyScene extends BaseScene {
             this.attachChild(gridEntity);
             this.registerTouchArea(gridEntity);
 
-            final Card[] cards = cardParties[partyIndex];
+            final Party party = parties[partyIndex];
+            final Card[] cards = party.getCards();
             for (int cardIndex = 0; cardIndex < cards.length; cardIndex++) {
                 final Card card = cards[cardIndex];
                 if (card != null) {

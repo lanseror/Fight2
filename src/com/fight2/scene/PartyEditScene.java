@@ -39,9 +39,10 @@ import com.fight2.entity.Card;
 import com.fight2.entity.F2ButtonSprite;
 import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.GameUserSession;
+import com.fight2.entity.Party;
 import com.fight2.input.touch.detector.F2ScrollDetector;
-import com.fight2.util.ConfigHelper;
 import com.fight2.util.CardUtils;
+import com.fight2.util.ConfigHelper;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.SpriteUtils;
 import com.fight2.util.TextureFactory;
@@ -87,7 +88,8 @@ public class PartyEditScene extends BaseScene {
 
     @Override
     public void updateScene() {
-        final Card[] partyCards = GameUserSession.getInstance().getParties()[partyNumber - 1];
+        final Party[] parties = GameUserSession.getInstance().getPartyInfo().getParties();
+        final Card[] partyCards = parties[partyNumber - 1].getCards();
         for (int i = 0; i < partyCards.length; i++) {
             final Card cardEntry = partyCards[i];
             if (cardEntry != null) {
@@ -177,7 +179,8 @@ public class PartyEditScene extends BaseScene {
                             if (movingCard == null) {
                                 break;
                             }
-                            final Card[] partyCards = GameUserSession.getInstance().getParties()[partyNumber - 1];
+                            final Party[] parties = GameUserSession.getInstance().getPartyInfo().getParties();
+                            final Card[] partyCards = parties[partyNumber - 1].getCards();
                             boolean collidedWithOthers = false;
                             for (int i = 0; i < cardFrames.length; i++) {
                                 final IEntity cardFrame = cardFrames[i];

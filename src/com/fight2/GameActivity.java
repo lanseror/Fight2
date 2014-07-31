@@ -3,8 +3,6 @@ package com.fight2;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Iterator;
-import java.util.List;
 
 import org.andengine.engine.Engine;
 import org.andengine.engine.camera.Camera;
@@ -31,8 +29,6 @@ import android.util.DisplayMetrics;
 
 import com.fight2.constant.ConfigEnum;
 import com.fight2.constant.SceneEnum;
-import com.fight2.entity.Card;
-import com.fight2.entity.GameUserSession;
 import com.fight2.entity.ProgressBar;
 import com.fight2.util.AccountUtils;
 import com.fight2.util.ConfigHelper;
@@ -189,26 +185,6 @@ public class GameActivity extends BaseGameActivity {
             Debug.e(e);
         }
 
-        final GameUserSession session = GameUserSession.getInstance();
-        final List<Card> cards = session.getCards();
-
-        // Clear parties;
-        final Card[][] parties = session.getParties();
-        for (final Card[] party : parties) {
-            for (int i = 0; i < party.length; i++) {
-                final Card partyCard = party[i];
-                if (partyCard != null) {
-                    final Iterator<Card> it = cards.iterator();
-                    while (it.hasNext()) {
-                        final Card card = it.next();
-                        if (card.getId() == partyCard.getId()) {
-                            it.remove();
-                        }
-                    }
-                }
-            }
-
-        }
     }
 
     public ImageOpenHelper getDbHelper() {

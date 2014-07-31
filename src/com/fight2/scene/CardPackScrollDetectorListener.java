@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
+import com.fight2.entity.Party;
 import com.fight2.input.touch.detector.F2ScrollDetector;
 import com.fight2.util.SpriteUtils;
 
@@ -111,7 +112,8 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                     // Debug.e("Y < focusedCard will revert");
                     revertCard(focusedCard);
                 } else {
-                    final Card[] partyCards = GameUserSession.getInstance().getParties()[this.partyEditScene.partyNumber - 1];
+                    final Party[] parties = GameUserSession.getInstance().getPartyInfo().getParties();
+                    final Card[] partyCards = parties[this.partyEditScene.partyNumber - 1].getCards();
                     boolean collidedWithGrid = false;
                     boolean isReplace = false;
                     IEntity beReplacedCardSprite = null;

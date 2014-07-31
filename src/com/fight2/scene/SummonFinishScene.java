@@ -1,7 +1,6 @@
 package com.fight2.scene;
 
 import java.io.IOException;
-import java.util.Map;
 
 import org.andengine.entity.modifier.IEntityModifier;
 import org.andengine.entity.modifier.ParallelEntityModifier;

@@ -12,17 +12,19 @@ import org.json.JSONObject;
 import com.fight2.GameActivity;
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
+import com.fight2.entity.Party;
+import com.fight2.entity.PartyInfo;
 
 public class CardUtils {
 
     public static boolean saveParties() {
         final String url = HttpUtils.HOST_URL + "/party/edit";
         final GameUserSession session = GameUserSession.getInstance();
-        final Card[][] parties = session.getParties();
+        final PartyInfo partyInfo = session.getPartyInfo();
         final JSONArray partyJson = new JSONArray();
-        for (final Card[] party : parties) {
+        for (final Party party : partyInfo.getParties()) {
             final JSONArray cardJson = new JSONArray();
-            for (final Card card : party) {
+            for (final Card card : party.getCards()) {
                 if (card != null) {
                     cardJson.put(card.getId());
                 } else {

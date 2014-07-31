@@ -18,6 +18,8 @@ import android.content.Context;
 import com.fight2.GameActivity;
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
+import com.fight2.entity.Party;
+import com.fight2.entity.PartyInfo;
 
 public class AccountUtils {
     private static final String INSTALLATION = "INSTALLATION";
@@ -97,22 +99,38 @@ public class AccountUtils {
             }
             TextureFactory.getInstance().loadCardsResource(activity);
 
-            final Card[][] parties = session.getParties();
-            final JSONArray partyJsonArray = HttpUtils.getJSONArrayFromUrl(partyUrl);
+            final JSONObject partyInfoJson = HttpUtils.getJSONFromUrl(partyUrl);
+            final PartyInfo partyInfo = new PartyInfo();
+            partyInfo.setId(partyInfoJson.getInt("id"));
+            partyInfo.setAtk(partyInfoJson.getInt("atk"));
+            partyInfo.setHp(partyInfoJson.getInt("hp"));
+            final JSONArray partyJsonArray = partyInfoJson.getJSONArray("parties");
+            final Party[] parties = new Party[partyJsonArray.length()];
+            partyInfo.setParties(parties);
+            session.setPartyInfo(partyInfo);
             for (int partyIndex = 0; partyIndex < partyJsonArray.length(); partyIndex++) {
-                final Card[] party = parties[partyIndex];
-                final JSONArray partyCardJsonArray = partyJsonArray.getJSONArray(partyIndex);
+                final JSONObject partyJson = partyJsonArray.getJSONObject(partyIndex);
+                final Party party = new Party();
+                party.setId(partyJson.getInt("id"));
+                party.setAtk(partyJson.getInt("atk"));
+                party.setHp(partyJson.getInt("hp"));
+                party.setPartyNumber(partyJson.getInt("partyNumber"));
+                parties[partyIndex] = party;
+
+                final JSONArray partyCardJsonArray = partyJson.getJSONArray("cards");
+                final Card[] partyCards = new Card[partyCardJsonArray.length()];
+                party.setCards(partyCards);
                 for (int partyCardIndex = 0; partyCardIndex < partyCardJsonArray.length(); partyCardIndex++) {
                     final int partyCardId = partyCardJsonArray.getInt(partyCardIndex);
                     if (partyCardId == -1) {
-                        party[partyCardIndex] = null;
+                        partyCards[partyCardIndex] = null;
                     } else {
                         final Iterator<Card> it = cards.iterator();
                         while (it.hasNext()) {
                             final Card card = it.next();
                             if (partyCardId == card.getId()) {
                                 it.remove();
-                                party[partyCardIndex] = card;
+                                partyCards[partyCardIndex] = card;
                             }
                         }
                     }
