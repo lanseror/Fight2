@@ -68,6 +68,8 @@ public class PartyEditScene extends BaseScene {
 
     final Rectangle cardZoom;
     final Rectangle cardPack;
+    private final float topbarY = cameraHeight - TextureEnum.PARTY_TOPBAR.getHeight();
+    private final float frameY = topbarY - TextureEnum.PARTY_EDIT_FRAME.getHeight() + 5;
 
     public PartyEditScene(final GameActivity activity, final int partyNumber) throws IOException {
         super(activity);
@@ -115,33 +117,21 @@ public class PartyEditScene extends BaseScene {
 
     @Override
     protected void init() throws IOException {
-        final Sprite bgSprite = createCameraImageSprite(TextureEnum.PARTY_EDIT_BG, 0, 0);
+        final Sprite bgSprite = createCameraImageSprite(TextureEnum.PARTY_BG, 0, 0);
         final Background background = new SpriteBackground(bgSprite);
         this.setBackground(background);
 
-        final F2ButtonSprite backButton = createALBF2ButtonSprite(TextureEnum.COMMON_BACK_BUTTON_NORMAL, TextureEnum.COMMON_BACK_BUTTON_PRESSED,
-                this.simulatedWidth - 100, 250);
-        backButton.setOnClickListener(new F2OnClickListener() {
-            @Override
-            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                final boolean isSaveOk = CardUtils.saveParties();
-                if (isSaveOk) {
-                    ResourceManager.getInstance().setCurrentScene(SceneEnum.Party);
-                } else {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(activity, "队伍保存失败！", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
+        final Sprite topbarSprite = createALBImageSprite(TextureEnum.PARTY_TOPBAR, this.simulatedLeftX, topbarY);
+        this.attachChild(topbarSprite);
 
-            }
-        });
+        final Sprite rechargeSprite = createALBF2ButtonSprite(TextureEnum.PARTY_RECHARGE, TextureEnum.PARTY_RECHARGE_PRESSED, this.simulatedRightX
+                - TextureEnum.PARTY_RECHARGE.getWidth(), topbarY);
+        this.attachChild(rechargeSprite);
+        this.registerTouchArea(rechargeSprite);
 
-        final Sprite switchButton = createSwitchButton(this.simulatedWidth - 100, 380);
-        this.attachChild(switchButton);
-        this.registerTouchArea(switchButton);
+        final Sprite frameSprite = createALBImageSprite(TextureEnum.PARTY_EDIT_FRAME, this.simulatedLeftX, frameY);
+        this.attachChild(frameSprite);
+
         partyNumberText = new Text(110, 450, mFont, String.valueOf(partyNumber), vbom);
         this.attachChild(partyNumberText);
 
@@ -287,7 +277,7 @@ public class PartyEditScene extends BaseScene {
         };
         this.registerUpdateHandler(mPhysicsHandler);
 
-        final Rectangle touchArea = new Rectangle(1136 * 0.5f, 160, 1136, 320, vbom) {
+        final Rectangle touchArea = new Rectangle(1136 * 0.5f, 160, 900, 280, vbom) {
             private VelocityTracker velocityTracker;
 
             @Override
@@ -329,44 +319,82 @@ public class PartyEditScene extends BaseScene {
         };
         touchArea.setColor(Color.BLACK);
 
-        this.registerTouchArea(backButton);
         this.registerTouchArea(touchArea);
 
         this.attachChild(touchArea);
         this.attachChild(cardPack);
         this.attachChild(cardZoom);
+
+        final F2ButtonSprite backButton = createBackButton();
         this.attachChild(backButton);
+        this.registerTouchArea(backButton);
+
+        final F2ButtonSprite enhanceButton = createEnhanceButton();
+        this.attachChild(enhanceButton);
+        this.registerTouchArea(enhanceButton);
+
+        final F2ButtonSprite switchButton = createSwitchButton();
+        this.attachChild(switchButton);
+        this.registerTouchArea(switchButton);
+
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
     }
 
-    private Sprite createSwitchButton(final float x, final float y) {
-        final TextureEnum textureEnum = TextureEnum.PARTY_EDIT_SWITCH_BUTTON;
-        final TextureFactory textureFactory = TextureFactory.getInstance();
-        final ITextureRegion texture = textureFactory.getAssetTextureRegion(textureEnum);
-        final float width = textureEnum.getWidth();
-        final float height = textureEnum.getHeight();
-        final BigDecimal factor = BigDecimal.valueOf(this.cameraHeight).divide(BigDecimal.valueOf(deviceHeight), 2, RoundingMode.HALF_DOWN);
-        final float fakeWidth = BigDecimal.valueOf(this.deviceWidth).multiply(factor).floatValue();
-        final float pX = (this.cameraWidth - fakeWidth) / 2 + x + width * 0.5f;
-        final float pY = y + height * 0.5f;
-        final Sprite sprite = new Sprite(pX, pY, width, height, texture, vbom) {
+    private F2ButtonSprite createBackButton() {
+        final F2ButtonSprite backButton = createALBF2ButtonSprite(TextureEnum.COMMON_BACK_BUTTON_NORMAL, TextureEnum.COMMON_BACK_BUTTON_PRESSED,
+                this.simulatedRightX - 140, 50);
+        backButton.setOnClickListener(new F2OnClickListener() {
             @Override
-            public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                if (pSceneTouchEvent.isActionDown()) {
-                    try {
-                        final Scene editScene = new PartyEditScene(activity, partyNumber++ % 3 + 1);
-                        activity.getEngine().setScene(editScene);
-                    } catch (final IOException e) {
-                        Debug.e(e);
-                    }
-
-                    return true;
+            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                final boolean isSaveOk = CardUtils.saveParties();
+                if (isSaveOk) {
+                    ResourceManager.getInstance().setCurrentScene(SceneEnum.Party);
+                } else {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(activity, "队伍保存失败！", Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
-                return false;
             }
-        };
-        return sprite;
+        });
+        return backButton;
+    }
+
+    private F2ButtonSprite createEnhanceButton() {
+        final F2ButtonSprite enhanceButton = createALBF2ButtonSprite(TextureEnum.PARTY_ENHANCE_BUTTON, TextureEnum.PARTY_ENHANCE_BUTTON_PRESSED,
+                this.simulatedRightX - 140, 220);
+        enhanceButton.setOnClickListener(new F2OnClickListener() {
+            @Override
+            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(activity, "你点击了强化！", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+        return enhanceButton;
+    }
+
+    private F2ButtonSprite createSwitchButton() {
+        final F2ButtonSprite switchButton = createALBF2ButtonSprite(TextureEnum.PARTY_EDIT_SWITCH_BUTTON, TextureEnum.PARTY_EDIT_SWITCH_BUTTON_PRESSED,
+                this.simulatedRightX - 140, 390);
+        switchButton.setOnClickListener(new F2OnClickListener() {
+            @Override
+            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                try {
+                    final Scene editScene = new PartyEditScene(activity, partyNumber++ % 3 + 1);
+                    activity.getEngine().setScene(editScene);
+                } catch (final IOException e) {
+                    Debug.e(e);
+                }
+            }
+        });
+        return switchButton;
     }
 
     class MoveFinishedListener {

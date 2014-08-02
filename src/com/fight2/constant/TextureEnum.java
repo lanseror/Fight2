@@ -45,7 +45,11 @@ public enum TextureEnum {
     PARTY_EDIT_BUTTON("images/party_edit_button.png", 130, 132),
     PARTY_EDIT_BUTTON_PRESSED("images/party_edit_button_fcs.png", 130, 132),
     PARTY_EDIT_BG("images/party_edit_backgroud.png", 1136, 640),
-    PARTY_EDIT_SWITCH_BUTTON("images/party_edit_switch_button.jpg", 100, 100),
+    PARTY_EDIT_FRAME("images/party_edit_frame.png", 732, 247),
+    PARTY_EDIT_SWITCH_BUTTON("images/party_edit_switch_button.png", 131, 133),
+    PARTY_EDIT_SWITCH_BUTTON_PRESSED("images/party_edit_switch_button_fcs.png", 131, 133),
+    PARTY_ENHANCE_BUTTON("images/party_enhance_button.png", 132, 132),
+    PARTY_ENHANCE_BUTTON_PRESSED("images/party_enhance_button_fcs.png", 132, 132),
     PARTY_RECHARGE("images/party_recharge.png", 224, 77),
     PARTY_RECHARGE_PRESSED("images/party_recharge_fcs.png", 224, 77),
 
