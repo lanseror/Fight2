@@ -8,12 +8,12 @@ import org.andengine.engine.Engine;
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.handler.timer.ITimerCallback;
 import org.andengine.engine.handler.timer.TimerHandler;
+import org.andengine.engine.options.AudioOptions;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.CropResolutionPolicy;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
-import org.andengine.entity.util.FPSLogger;
 import org.andengine.opengl.texture.ITexture;
 import org.andengine.opengl.texture.TextureManager;
 import org.andengine.opengl.texture.bitmap.AssetBitmapTexture;
@@ -28,10 +28,12 @@ import android.content.res.AssetManager;
 import android.util.DisplayMetrics;
 
 import com.fight2.constant.ConfigEnum;
+import com.fight2.constant.MusicEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.entity.ProgressBar;
 import com.fight2.util.AccountUtils;
 import com.fight2.util.ConfigHelper;
+import com.fight2.util.F2MusicManager;
 import com.fight2.util.ImageOpenHelper;
 import com.fight2.util.ResourceManager;
 
@@ -78,7 +80,11 @@ public class GameActivity extends BaseGameActivity {
         configHelper.setConfig(ConfigEnum.SimulatedWidth, simulatedWidth);
         configHelper.setConfig(ConfigEnum.SimulatedHeight, CAMERA_HEIGHT);
         camera = new Camera(0, 0, CAMERA_WIDTH, CAMERA_HEIGHT);
-        return new EngineOptions(true, ScreenOrientation.LANDSCAPE_SENSOR, new CropResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT), camera);
+        final EngineOptions engineOptions = new EngineOptions(true, ScreenOrientation.LANDSCAPE_SENSOR, new CropResolutionPolicy(CAMERA_WIDTH, CAMERA_HEIGHT),
+                camera);
+        final AudioOptions audioOptions = engineOptions.getAudioOptions().setNeedsSound(true);
+        audioOptions.getMusicOptions().setNeedsMusic(true);
+        return engineOptions;
     }
 
     @Override
@@ -89,6 +95,7 @@ public class GameActivity extends BaseGameActivity {
         this.splashTexture = new AssetBitmapTexture(textureManager, assetManager, "images/common_splash_screen.png");
         this.splashTextureRegion = TextureRegionFactory.extractFromTexture(this.splashTexture);
         this.splashTexture.load();
+        F2MusicManager.getInstance().prepare(this);
         pOnCreateResourcesCallback.onCreateResourcesFinished();
     }
 
@@ -100,12 +107,12 @@ public class GameActivity extends BaseGameActivity {
 
     @Override
     public void onCreateScene(final OnCreateSceneCallback pOnCreateSceneCallback) throws IOException {
-        this.mEngine.registerUpdateHandler(new FPSLogger());
+        // this.mEngine.registerUpdateHandler(new FPSLogger());
         final VertexBufferObjectManager vbom = this.getVertexBufferObjectManager();
         initProgressBar(vbom);
         initSplashScene(vbom);
         pOnCreateSceneCallback.onCreateSceneFinished(splashScene);
-
+        // F2MusicManager.getInstance().playMusic(MusicEnum.COMMON_LOADING, true);
     }
 
     /**
@@ -165,6 +172,7 @@ public class GameActivity extends BaseGameActivity {
                 splashScene.detachSelf();
                 ResourceManager.getInstance().setCurrentScene(SceneEnum.Main);
                 camera.setHUD(null);
+                F2MusicManager.getInstance().playMusic(MusicEnum.MAIN_BG);
             }
 
         }).start();

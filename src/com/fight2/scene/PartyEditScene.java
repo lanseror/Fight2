@@ -17,7 +17,6 @@ import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
-import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.font.FontFactory;
@@ -58,8 +57,8 @@ public class PartyEditScene extends BaseScene {
     private final int factor;
     private F2ScrollDetector scrollDetector;
     int partyNumber;
-    private Text partyNumberText;
-    final Rectangle[] cardFrames = new Rectangle[4];
+    private final TextureEnum[] partyNumberTexts = { TextureEnum.PARTY_NUMBER_1, TextureEnum.PARTY_NUMBER_2, TextureEnum.PARTY_NUMBER_3 };
+    final Sprite[] cardGrids = new Sprite[4];
 
     private PhysicsHandler mPhysicsHandler;
     private final Font mFont;
@@ -96,7 +95,7 @@ public class PartyEditScene extends BaseScene {
             final Card cardEntry = partyCards[i];
             if (cardEntry != null) {
                 final IEntity card = createCardAvatarSprite(cardEntry, 10, 20);
-                card.setPosition(cardFrames[i]);
+                card.setPosition(cardGrids[i]);
                 card.setUserData(cardEntry);
                 this.attachChild(card);
                 addedCards[i] = card;
@@ -112,6 +111,7 @@ public class PartyEditScene extends BaseScene {
             }
 
         }
+        this.sortChildren();
 
     }
 
@@ -132,17 +132,26 @@ public class PartyEditScene extends BaseScene {
         final Sprite frameSprite = createALBImageSprite(TextureEnum.PARTY_EDIT_FRAME, this.simulatedLeftX, frameY);
         this.attachChild(frameSprite);
 
-        partyNumberText = new Text(110, 450, mFont, String.valueOf(partyNumber), vbom);
-        this.attachChild(partyNumberText);
-
+        final TextureEnum partyNumberText = partyNumberTexts[partyNumber - 1];
+        final Sprite partyNumberSprite = createALBImageSprite(partyNumberText, 25, 140);
+        frameSprite.attachChild(partyNumberSprite);
         cardPack.setColor(Color.TRANSPARENT);
 
         cardZoom.setColor(Color.TRANSPARENT);
         this.scrollDetector = new F2ScrollDetector(new CardPackScrollDetectorListener(this, cardPack, cardZoom));
 
-        for (int i = 0; i < 4; i++) {
-            final int frameIndex = i;
-            cardFrames[i] = new Rectangle(230 + 135 * i, 480, 120, 120, vbom) {
+        final TextureEnum gridEnum = TextureEnum.PARTY_EDIT_FRAME_GRID;
+        final float gridGap = 153;
+        final float gridStartX = 148;
+        final float frameLeft = frameSprite.getX() - frameSprite.getWidth() * 0.5f;
+        final float frameBottom = frameSprite.getY() - frameSprite.getHeight() * 0.5f;
+        final TextureFactory textureFactory = TextureFactory.getInstance();
+        final ITextureRegion gridTexture = textureFactory.getAssetTextureRegion(gridEnum);
+        final float gridWidth = gridEnum.getWidth();
+        final float gridHeight = gridEnum.getHeight();
+        for (int gridIndex = 0; gridIndex < 4; gridIndex++) {
+            final int frameIndex = gridIndex;
+            cardGrids[gridIndex] = new Sprite(frameLeft + gridStartX + gridGap * gridIndex, frameBottom + 161, gridWidth, gridHeight, gridTexture, vbom) {
                 private IEntity movingCard = null;
 
                 @Override
@@ -172,8 +181,8 @@ public class PartyEditScene extends BaseScene {
                             final Party[] parties = GameUserSession.getInstance().getPartyInfo().getParties();
                             final Card[] partyCards = parties[partyNumber - 1].getCards();
                             boolean collidedWithOthers = false;
-                            for (int i = 0; i < cardFrames.length; i++) {
-                                final IEntity cardFrame = cardFrames[i];
+                            for (int i = 0; i < cardGrids.length; i++) {
+                                final IEntity cardFrame = cardGrids[i];
                                 if (i != frameIndex && cardFrame.contains(touchX, touchY)) {
                                     collidedWithOthers = true;
                                     movingCard.setPosition(cardFrame);
@@ -208,6 +217,7 @@ public class PartyEditScene extends BaseScene {
                                 }
                             }
                             movingCard.setZIndex(IEntity.ZINDEX_DEFAULT);
+                            PartyEditScene.this.sortChildren();
                             movingCard = null;
                             break;
 
@@ -215,8 +225,9 @@ public class PartyEditScene extends BaseScene {
                     return true;
                 }
             };
-            this.attachChild(cardFrames[i]);
-            this.registerTouchArea(cardFrames[i]);
+            this.attachChild(cardGrids[gridIndex]);
+            this.registerTouchArea(cardGrids[gridIndex]);
+            cardGrids[gridIndex].setZIndex(10);
         }
 
         final float initCardX = cardZoom.getX() - (cardPack.getX() - 0.5f * cardPack.getWidth());
@@ -277,7 +288,9 @@ public class PartyEditScene extends BaseScene {
         };
         this.registerUpdateHandler(mPhysicsHandler);
 
-        final Rectangle touchArea = new Rectangle(1136 * 0.5f, 160, 900, 280, vbom) {
+        final float touchAreaWidth = this.simulatedWidth - TextureEnum.COMMON_BACK_BUTTON_NORMAL.getWidth() - 80;
+        final float touchAreaX = this.simulatedLeftX + touchAreaWidth * 0.5f;
+        final Rectangle touchArea = new Rectangle(touchAreaX, 160, touchAreaWidth, 280, vbom) {
             private VelocityTracker velocityTracker;
 
             @Override

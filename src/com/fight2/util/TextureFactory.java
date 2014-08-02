@@ -56,13 +56,15 @@ public class TextureFactory {
         final ImageOpenHelper dbHelper = activity.getDbHelper();
         final String selectQuery = "SELECT * FROM " + ImageOpenHelper.TABLE_NAME;
 
-        final SQLiteDatabase db = dbHelper.getWritableDatabase();
+        final SQLiteDatabase db = dbHelper.getReadableDatabase();
         final Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
             do {
                 imageDatas.put(cursor.getString(0), cursor.getString(1));
             } while (cursor.moveToNext());
         }
+        cursor.close();
+        db.close();
     }
 
     public Map<String, String> getImageDatas() {

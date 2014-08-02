@@ -3,7 +3,6 @@ package com.fight2.scene;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.IEntityModifier.IEntityModifierListener;
 import org.andengine.entity.modifier.MoveModifier;
-import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.input.touch.detector.ScrollDetector;
@@ -117,10 +116,10 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                     boolean collidedWithGrid = false;
                     boolean isReplace = false;
                     IEntity beReplacedCardSprite = null;
-                    Rectangle cardGrid = null;
+                    Sprite cardGrid = null;
                     int cardGridIndex = 0;
-                    for (; cardGridIndex < this.partyEditScene.cardFrames.length; cardGridIndex++) {
-                        if (this.partyEditScene.cardFrames[cardGridIndex].contains(copyCard.getX(), copyCard.getY())) {
+                    for (; cardGridIndex < this.partyEditScene.cardGrids.length; cardGridIndex++) {
+                        if (this.partyEditScene.cardGrids[cardGridIndex].contains(copyCard.getX(), copyCard.getY())) {
                             collidedWithGrid = true;
                             beReplacedCardSprite = partyEditScene.addedCards[cardGridIndex];
                             isReplace = (beReplacedCardSprite == null ? false : true);
@@ -145,7 +144,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                         // Debug.e("Add card");
                         final Card cardEntry = (Card) focusedCard.getUserData();
                         partyCards[cardGridIndex] = cardEntry;
-                        cardGrid = this.partyEditScene.cardFrames[cardGridIndex];
+                        cardGrid = this.partyEditScene.cardGrids[cardGridIndex];
                         final IEntity toReplaceCardAvatar = partyEditScene.createCardAvatarSprite(cardEntry, 10, 20);
                         toReplaceCardAvatar.setPosition(cardGrid);
                         toReplaceCardAvatar.setUserData(copyCard.getUserData());
@@ -287,6 +286,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                     GameUserSession.getInstance().getCards().remove(cardEntry);
                     partyEditScene.attachChild(avatar);
                     pItem.detachSelf();
+                    partyEditScene.sortChildren();
 
                 }
             });
@@ -316,6 +316,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
 
         @Override
         public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
+            partyEditScene.sortChildren();
             focusedCard.setAlpha(0);
             final int focusedCardIndex = focusedCard.getTag();
             final boolean isFocusedCardRightMost = (focusedCardIndex == cardPack.getChildCount() - 1);
@@ -376,6 +377,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                     }
                     pItem.detachSelf();
                     partyEditScene.attachChild(toReplaceCardAvatar);
+                    partyEditScene.sortChildren();
                     scrollable = true;
                 }
             });

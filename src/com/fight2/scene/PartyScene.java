@@ -47,7 +47,7 @@ public class PartyScene extends BaseScene {
     private final float topbarY = cameraHeight - TextureEnum.PARTY_TOPBAR.getHeight();
     private final float frameY = topbarY - TextureEnum.PARTY_FRAME.getHeight();
     private final float frameTop = frameY + TextureEnum.PARTY_FRAME.getHeight();
-    private final float gridHeight = TextureEnum.PARTY_FRAME_GRID.getHeight();
+    private final float gridHeight = TextureEnum.PARTY_FRAME_GRIDS.getHeight();
     private final Font mFont;
     private final Text hpText;
     private final Text atkText;
@@ -147,7 +147,7 @@ public class PartyScene extends BaseScene {
         return area;
     }
 
-    private IEntity createGridEntity(final TextureEnum textureEnum, final float x, final float y) {
+    private IEntity createGridsTouchArea(final TextureEnum textureEnum, final float x, final float y) {
         final float width = textureEnum.getWidth();
         final float height = textureEnum.getHeight();
         final BigDecimal factor = BigDecimal.valueOf(this.cameraHeight).divide(BigDecimal.valueOf(deviceHeight), 2, RoundingMode.HALF_DOWN);
@@ -222,17 +222,17 @@ public class PartyScene extends BaseScene {
         gridYList.clear();
         gridCollisionList.clear();
         for (int partyIndex = 0; partyIndex < parties.length; partyIndex++) {
-            final IEntity gridEntity = createGridEntity(TextureEnum.PARTY_FRAME_GRID, 153, frameY + 337 - partyIndex * (gridHeight + gridGap));
-            final Sprite gridSprite = createGridSprite(TextureEnum.PARTY_FRAME_GRID, gridEntity.getWidth() * 0.5f, gridEntity.getHeight() * 0.5f);
-            gridEntity.setTag(888 + partyIndex);
-            gridOrders.put(partyIndex, gridEntity);
-            gridYList.add(gridEntity.getY());
-            gridCollisionList.add(this.createGridCollisionArea(gridEntity));
+            final IEntity gridTouchArea = createGridsTouchArea(TextureEnum.PARTY_FRAME_GRIDS, 153, frameY + 337 - partyIndex * (gridHeight + gridGap));
+            final Sprite gridSprite = createGridSprite(TextureEnum.PARTY_FRAME_GRIDS, gridTouchArea.getWidth() * 0.5f, gridTouchArea.getHeight() * 0.5f);
+            gridTouchArea.setTag(888 + partyIndex);
+            gridOrders.put(partyIndex, gridTouchArea);
+            gridYList.add(gridTouchArea.getY());
+            gridCollisionList.add(this.createGridCollisionArea(gridTouchArea));
             final IEntity oldGridSprite = this.getChildByTag(888 + partyIndex);
             this.unregisterTouchArea(oldGridSprite);
             this.detachChild(oldGridSprite);
-            this.attachChild(gridEntity);
-            this.registerTouchArea(gridEntity);
+            this.attachChild(gridTouchArea);
+            this.registerTouchArea(gridTouchArea);
 
             final Party party = parties[partyIndex];
             final Card[] cards = party.getCards();
@@ -241,13 +241,13 @@ public class PartyScene extends BaseScene {
                 if (card != null) {
                     final ITextureRegion cardTextureRegion = TextureFactory.getInstance().getTextureRegion(card.getAvatar());
                     final Sprite cardSprite = new Sprite(83f + (gap + cardWidth) * cardIndex, cardY, cardWidth, cardHeight, cardTextureRegion, vbom);
-                    gridEntity.attachChild(cardSprite);
+                    gridTouchArea.attachChild(cardSprite);
                 }
 
             }
             partyHps[partyIndex].setText(String.valueOf(party.getHp()));
             partyAtks[partyIndex].setText(String.valueOf(party.getAtk()));
-            gridEntity.attachChild(gridSprite);
+            gridTouchArea.attachChild(gridSprite);
         }
 
     }

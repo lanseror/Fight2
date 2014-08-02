@@ -15,9 +15,11 @@ import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
 
 import com.fight2.GameActivity;
+import com.fight2.constant.MusicEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
+import com.fight2.util.F2MusicManager;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
 
@@ -57,7 +59,9 @@ public class SummonFinishScene extends BaseScene {
 
     @Override
     public void updateScene() {
-        final IEntityModifier modifier = new ParallelEntityModifier(new ScaleModifier(1f, 1f, 4), new RotationByModifier(1f, 360 * 3));
+        F2MusicManager.getInstance().playMusic(MusicEnum.SUMMON);
+        cardSprite.setRotation(90);
+        final IEntityModifier modifier = new ParallelEntityModifier(new ScaleModifier(0.3f, 1f, 3), new RotationByModifier(0.3f, 270));
         cardSprite.registerEntityModifier(modifier);
     }
 
