@@ -10,16 +10,20 @@ import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
 
 import com.fight2.GameActivity;
+import com.fight2.constant.MusicEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.F2ButtonSprite;
 import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.Player;
 import com.fight2.util.ArenaUtils;
+import com.fight2.util.F2MusicManager;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
 
 public class ArenaScene extends BaseScene {
+
+    private final Player[] players = new Player[3];
 
     public ArenaScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -62,7 +66,8 @@ public class ArenaScene extends BaseScene {
             @Override
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 if (pSceneTouchEvent.isActionDown()) {
-
+                    F2MusicManager.getInstance().playMusic(MusicEnum.ARENA_ATTACK);
+                    ArenaUtils.attack(players[0].getId());
                     return true;
                 }
                 return false;
@@ -78,7 +83,7 @@ public class ArenaScene extends BaseScene {
         if (competitors.size() > 0) {
             final Player competitor = competitors.get(0);
             final String avatarStr = competitor.getAvatar();
-
+            players[0] = competitor;
             final ITextureRegion defaultAvatar = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_DEFAULT_AVATAR);
             ITextureRegion avatar = null;
             if (TextureEnum.COMMON_DEFAULT_AVATAR.name().equals(avatarStr)) {

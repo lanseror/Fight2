@@ -3,7 +3,8 @@ package com.fight2.constant;
 public enum MusicEnum {
     COMMON_LOADING("CstleTown.mp3"),
     SUMMON("GOODLUCK.mp3"),
-    MAIN_BG("Campaign-Haven.mp3");
+    MAIN_BG("Campaign-Haven.mp3"),
+    ARENA_ATTACK("Sword-Draw.mp3");
 
     private final String url;
 

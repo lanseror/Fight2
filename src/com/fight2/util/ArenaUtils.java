@@ -41,18 +41,9 @@ public class ArenaUtils {
 
     public static void attack(final int id) {
         final String url = HttpUtils.HOST_URL + "/arena/attack.action?id=" + id;
-        final List<Player> competitors = new ArrayList<Player>();
         try {
             final JSONArray responseJson = HttpUtils.getJSONArrayFromUrl(url);
 
-            for (int i = 0; i < responseJson.length(); i++) {
-                final JSONObject jsonObject = responseJson.getJSONObject(i);
-                final Player player = new Player();
-                player.setId(jsonObject.getInt("id"));
-                player.setAvatar(jsonObject.optString("avatar", TextureEnum.COMMON_DEFAULT_AVATAR.name()));
-                player.setName(jsonObject.getString("name"));
-                competitors.add(player);
-            }
         } catch (final ClientProtocolException e) {
             throw new RuntimeException(e);
         } catch (final IOException e) {
