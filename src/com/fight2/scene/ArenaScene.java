@@ -67,7 +67,8 @@ public class ArenaScene extends BaseScene {
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 if (pSceneTouchEvent.isActionDown()) {
                     F2MusicManager.getInstance().playMusic(MusicEnum.ARENA_ATTACK);
-                    ArenaUtils.attack(players[0].getId());
+                    ResourceManager.getInstance().setCurrentScene(SceneEnum.Battle);
+                    // ArenaUtils.attack(players[0].getId());
                     return true;
                 }
                 return false;

@@ -8,6 +8,12 @@ public enum TextureEnum {
     COMMON_BACK_BUTTON_NORMAL("images/common_back_button.png", 130, 133),
     COMMON_BACK_BUTTON_PRESSED("images/common_back_button_fcs.png", 130, 133),
     COMMON_DEFAULT_AVATAR("images/common_default_avatar.png", 135, 135),
+    COMMON_HP_LEFT_RED("images/common_hp_left_red.png", 9, 30),
+    COMMON_HP_CENTER_RED("images/common_hp_center_red.png", 1, 30),
+    COMMON_HP_RIGHT_RED("images/common_hp_right_red.png", 9, 30),
+    COMMON_HP_LEFT_GREEN("images/common_hp_left_green.png", 9, 30),
+    COMMON_HP_CENTER_GREEN("images/common_hp_center_green.png", 1, 30),
+    COMMON_HP_RIGHT_GREEN("images/common_hp_right_green.png", 9, 30),
 
     // Main scene images.
     MAIN_BG("images/main_backgroud.png", 1136, 640),
@@ -64,6 +70,10 @@ public enum TextureEnum {
     // Arena scene images.
     ARENA_BG("images/arena_backgroud.png", 1136, 640),
     ARENA_BATTLE("images/arena_battle_button.jpg", 215, 68),
+
+    // Battle scene images.
+    BATTLE_PARTY_BOTTOM("images/battle_party_bottom.png", 312, 83),
+    BATTLE_PARTY_TOP("images/battle_party_top.png", 312, 81),
 
     TEST_CARD1("card/card1.jpg", 100, 100),
     TEST_CARD2("card/card2.jpg", 100, 100),

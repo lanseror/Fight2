@@ -13,6 +13,7 @@ import com.fight2.constant.SceneEnum;
 import com.fight2.entity.ProgressBar;
 import com.fight2.scene.ArenaScene;
 import com.fight2.scene.BaseScene;
+import com.fight2.scene.BattleScene;
 import com.fight2.scene.MainScene;
 import com.fight2.scene.PartyScene;
 import com.fight2.scene.SummonScene;
@@ -83,6 +84,8 @@ public class ResourceManager {
             scenes.put(SceneEnum.Summon, summonScene);
             final BaseScene arenaScene = new ArenaScene(activity);
             scenes.put(SceneEnum.Arena, arenaScene);
+            final BaseScene battleScene = new BattleScene(activity);
+            scenes.put(SceneEnum.Battle, battleScene);
 
         } catch (final IOException e) {
             throw new RuntimeException(e);

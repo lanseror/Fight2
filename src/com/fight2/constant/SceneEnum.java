@@ -5,5 +5,6 @@ public enum SceneEnum {
     Main,
     Party,
     Summon,
-    Arena;
+    Arena,
+    Battle;
 }
