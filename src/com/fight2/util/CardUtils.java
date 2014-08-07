@@ -93,4 +93,58 @@ public class CardUtils {
             throw new RuntimeException(e);
         }
     }
+
+    public static PartyInfo getPartyByUserId(final GameActivity activity, final int userId) {
+        final String partyUrl = HttpUtils.HOST_URL + "/party/user-parties.action?id=" + userId;
+        try {
+            final JSONObject partyInfoJson = HttpUtils.getJSONFromUrl(partyUrl);
+            final PartyInfo partyInfo = new PartyInfo();
+            partyInfo.setId(partyInfoJson.getInt("id"));
+            partyInfo.setAtk(partyInfoJson.getInt("atk"));
+            partyInfo.setHp(partyInfoJson.getInt("hp"));
+            final JSONArray partyJsonArray = partyInfoJson.getJSONArray("parties");
+            final Party[] parties = new Party[partyJsonArray.length()];
+            partyInfo.setParties(parties);
+            for (int partyIndex = 0; partyIndex < partyJsonArray.length(); partyIndex++) {
+                final JSONObject partyJson = partyJsonArray.getJSONObject(partyIndex);
+                final Party party = new Party();
+                party.setId(partyJson.getInt("id"));
+                party.setAtk(partyJson.getInt("atk"));
+                party.setHp(partyJson.getInt("hp"));
+                party.setPartyNumber(partyJson.getInt("partyNumber"));
+                parties[partyIndex] = party;
+                final JSONArray partyGridJsonArray = partyJson.getJSONArray("partyGrids");
+                final Card[] partyCards = new Card[partyGridJsonArray.length()];
+                party.setCards(partyCards);
+                for (int partyCardIndex = 0; partyCardIndex < partyGridJsonArray.length(); partyCardIndex++) {
+                    final JSONObject partyGridJson = partyGridJsonArray.getJSONObject(partyCardIndex);
+                    final JSONObject cardJson = partyGridJson.optJSONObject("card");
+                    if (cardJson != null) {
+                        final Card card = new Card();
+                        card.setId(cardJson.getInt("id"));
+                        card.setAtk(cardJson.getInt("atk"));
+                        card.setHp(cardJson.getInt("hp"));
+                        card.setStar(cardJson.getInt("star"));
+                        card.setTier(cardJson.getInt("tier"));
+                        card.setLevel(cardJson.getInt("level"));
+                        final String avatar = cardJson.optString("avatar");
+                        if (avatar != null && !"".equals(avatar)) {
+                            final String localAvatar = ImageUtils.getLocalString(avatar, activity);
+                            card.setAvatar(localAvatar);
+                            TextureFactory.getInstance().addCardResource(activity, localAvatar);
+                        }
+                        partyCards[partyCardIndex] = card;
+                    }
+                }
+            }
+            return partyInfo;
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 }
