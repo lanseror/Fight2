@@ -3,11 +3,13 @@ package com.fight2.scene;
 import java.io.IOException;
 import java.util.List;
 
+import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
+import org.andengine.util.debug.Debug;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.MusicEnum;
@@ -67,7 +69,12 @@ public class ArenaScene extends BaseScene {
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 if (pSceneTouchEvent.isActionDown()) {
                     F2MusicManager.getInstance().playMusic(MusicEnum.ARENA_ATTACK);
-                    ResourceManager.getInstance().setCurrentScene(SceneEnum.Battle);
+                    try {
+                        final Scene battleScene = new BattleScene(activity, players[0].getId());
+                        activity.getEngine().setScene(battleScene);
+                    } catch (final IOException e) {
+                        Debug.e(e);
+                    }
                     // ArenaUtils.attack(players[0].getId());
                     return true;
                 }

@@ -9,6 +9,8 @@ import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.opengl.texture.region.ITextureRegion;
 
+import android.util.SparseArray;
+
 import com.fight2.GameActivity;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
@@ -17,18 +19,24 @@ import com.fight2.entity.Card;
 import com.fight2.entity.F2ButtonSprite;
 import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.GameUserSession;
+import com.fight2.entity.HpBar;
 import com.fight2.entity.Party;
+import com.fight2.util.CardUtils;
 import com.fight2.util.ResourceManager;
+import com.fight2.util.StringUtils;
 import com.fight2.util.TextureFactory;
 
 public class BattleScene extends BaseScene {
     private final float TOP_PARTY_FRAME_Y = this.cameraHeight - TextureEnum.BATTLE_PARTY_TOP.getHeight();
     public final static int CARD_WIDTH = 100;
     public final static int CARD_HEIGHT = 150;
-    private final Party[] parties = GameUserSession.getInstance().getPartyInfo().getParties();
+    private final Party[] myParties = GameUserSession.getInstance().getPartyInfo().getParties();
+    private final Party[] opponentParties;
+    private final SparseArray<HpBar> hpBars = new SparseArray<HpBar>();
 
-    public BattleScene(final GameActivity activity) throws IOException {
+    public BattleScene(final GameActivity activity, final int attackPlayerId) throws IOException {
         super(activity);
+        opponentParties = CardUtils.getPartyByUserId(activity, attackPlayerId).getParties();
         init();
     }
 
@@ -49,9 +57,21 @@ public class BattleScene extends BaseScene {
         this.attachChild(backButton);
         this.registerTouchArea(backButton);
 
+        final F2ButtonSprite tButton = createALBF2ButtonSprite(TextureEnum.COMMON_BACK_BUTTON_NORMAL, TextureEnum.COMMON_BACK_BUTTON_PRESSED,
+                this.simulatedRightX - 140, 150);
+        tButton.setOnClickListener(new F2OnClickListener() {
+            @Override
+            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                final HpBar ppBar = hpBars.get(myParties[0].getId());
+                ppBar.setCurrentPoint(2000);
+            }
+        });
+        this.attachChild(tButton);
+        this.registerTouchArea(tButton);
+
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
-
+        updateScene();
     }
 
     @Override
@@ -60,14 +80,14 @@ public class BattleScene extends BaseScene {
         final float frameStartX = 90;
         final float partyGap = 10;
 
-        for (int i = 0; i < parties.length; i++) {
-            final Party party = parties[i];
+        for (int i = 0; i < myParties.length; i++) {
+            final Party party = myParties[i];
             final IEntity partyContainer = createPartyContainer(party, frameStartX + (width + partyGap) * i, 0, true);
             this.attachChild(partyContainer);
         }
 
-        for (int i = 0; i < parties.length; i++) {
-            final Party party = parties[i];
+        for (int i = 0; i < opponentParties.length; i++) {
+            final Party party = opponentParties[i];
             final IEntity partyContainer = createOpponentPartyContainer(party, frameStartX + (width + partyGap) * i, TOP_PARTY_FRAME_Y - 67, false);
             this.attachChild(partyContainer);
         }
@@ -97,7 +117,9 @@ public class BattleScene extends BaseScene {
         }
 
         final BattlePartyFrame battlePartyFrame = createPartyFrame(textureEnum, 0, 0, isBottom);
-        battlePartyFrame.setFullPoint(party.getHp());
+        final HpBar hpBar = new HpBar(158, 61, vbom, party.getHp(), true);
+        battlePartyFrame.attachChild(hpBar);
+        hpBars.put(party.getId(), hpBar);
         partyContainer.attachChild(battlePartyFrame);
 
         return partyContainer;
@@ -124,14 +146,17 @@ public class BattleScene extends BaseScene {
             if (card == null) {
                 continue;
             }
-
-            final ITextureRegion texture = textureFactory.getTextureRegion(card.getAvatar());
+            final String avatar = card.getAvatar();
+            final ITextureRegion texture = StringUtils.isEmpty(avatar) ? textureFactory.getAssetTextureRegion(TextureEnum.COMMON_DEFAULT_AVATAR)
+                    : textureFactory.getTextureRegion(avatar);
             final Sprite cardSprite = new Sprite(startX + (avatarWidth + avatarGap) * i, avatarHeight * 0.5f, avatarWidth, avatarHeight, texture, vbom);
             partyContainer.attachChild(cardSprite);
         }
 
         final BattlePartyFrame battlePartyFrame = createPartyFrame(textureEnum, 0, avatarHeight - 5, isBottom);
-        battlePartyFrame.setFullPoint(party.getHp());
+        final HpBar hpBar = new HpBar(156, 22, vbom, party.getHp());
+        battlePartyFrame.attachChild(hpBar);
+        hpBars.put(party.getId(), hpBar);
         partyContainer.attachChild(battlePartyFrame);
 
         return partyContainer;

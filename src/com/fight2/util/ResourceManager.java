@@ -84,8 +84,6 @@ public class ResourceManager {
             scenes.put(SceneEnum.Summon, summonScene);
             final BaseScene arenaScene = new ArenaScene(activity);
             scenes.put(SceneEnum.Arena, arenaScene);
-            final BaseScene battleScene = new BattleScene(activity);
-            scenes.put(SceneEnum.Battle, battleScene);
 
         } catch (final IOException e) {
             throw new RuntimeException(e);

@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import org.andengine.engine.Engine;
+import org.andengine.engine.FixedStepEngine;
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.handler.timer.ITimerCallback;
 import org.andengine.engine.handler.timer.TimerHandler;
@@ -14,6 +15,7 @@ import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.CropResolutionPolicy;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.entity.util.FPSLogger;
 import org.andengine.opengl.texture.ITexture;
 import org.andengine.opengl.texture.TextureManager;
 import org.andengine.opengl.texture.bitmap.AssetBitmapTexture;
@@ -56,7 +58,7 @@ public class GameActivity extends BaseGameActivity {
     @Override
     public Engine onCreateEngine(final EngineOptions pEngineOptions) {
         dbHelper = new ImageOpenHelper(this);
-        return super.onCreateEngine(pEngineOptions);
+        return new FixedStepEngine(pEngineOptions, 30);
     }
 
     @Override
@@ -107,7 +109,7 @@ public class GameActivity extends BaseGameActivity {
 
     @Override
     public void onCreateScene(final OnCreateSceneCallback pOnCreateSceneCallback) throws IOException {
-        // this.mEngine.registerUpdateHandler(new FPSLogger());
+        this.mEngine.registerUpdateHandler(new FPSLogger());
         final VertexBufferObjectManager vbom = this.getVertexBufferObjectManager();
         initProgressBar(vbom);
         initSplashScene(vbom);
