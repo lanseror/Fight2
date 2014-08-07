@@ -26,6 +26,7 @@ public class HpBar extends Rectangle {
     private final int fullHp;
     private final BigDecimal bigFullPoint;
     private int currentPoint;
+    private final Sprite[] centerHpSprites = new Sprite[CENTER_WIDTH];
 
     public HpBar(final float pX, final float pY, final VertexBufferObjectManager pVertexBufferObjectManager, final int fullHp) {
         this(pX, pY, pVertexBufferObjectManager, fullHp, false);
@@ -57,6 +58,7 @@ public class HpBar extends Rectangle {
         int i = 0;
         for (; i < CENTER_WIDTH; i++) {
             final Sprite hpCenter = createHpCenter(CENTER_X + i, 0);
+            centerHpSprites[i] = hpCenter;
             this.attachChild(hpCenter);
         }
         final Sprite hpRight = createHpEdge(hpRightTextureEnum, hpRightTextureEnum.getWidth(), CENTER_X + i, 0, false);
@@ -72,11 +74,13 @@ public class HpBar extends Rectangle {
     }
 
     public void setCurrentPoint(final int currentPoint) {
+        final int toPoint = currentPoint > fullHp ? fullHp : currentPoint;
         final int fromHp = this.currentPoint;
-        final HpBarModifier modifier = new HpBarModifier(0.2f, fromHp, currentPoint);
+        final float duration = fromHp > toPoint ? 0.2f : 1f;
+        final HpBarModifier modifier = new HpBarModifier(duration, fromHp, toPoint);
         this.clearEntityModifiers();
         this.registerEntityModifier(modifier);
-        this.currentPoint = currentPoint;
+        this.currentPoint = toPoint;
     }
 
     private void changeHp(final float currentPoint) {
@@ -95,8 +99,8 @@ public class HpBar extends Rectangle {
             final Sprite hpLeft = createHpEdge(hpLeftTextureEnum, hpLeftTextureEnum.getWidth(), 0, 0, true);
             this.attachChild(hpLeft);
             int i = 0;
-            for (; i < currentWidth - EDGE_WIDTH; i++) {
-                final Sprite hpCenter = createHpCenter(CENTER_X + i, 0);
+            for (; i < currentWidth - EDGE_WIDTH && i < centerHpSprites.length; i++) {
+                final Sprite hpCenter = centerHpSprites[i];
                 this.attachChild(hpCenter);
             }
             final Sprite hpRight = createHpEdge(hpRightTextureEnum, hpRightTextureEnum.getWidth(), CENTER_X + i, 0, false);

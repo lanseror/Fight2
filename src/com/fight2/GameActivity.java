@@ -5,7 +5,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import org.andengine.engine.Engine;
-import org.andengine.engine.FixedStepEngine;
 import org.andengine.engine.camera.Camera;
 import org.andengine.engine.handler.timer.ITimerCallback;
 import org.andengine.engine.handler.timer.TimerHandler;
@@ -58,7 +57,7 @@ public class GameActivity extends BaseGameActivity {
     @Override
     public Engine onCreateEngine(final EngineOptions pEngineOptions) {
         dbHelper = new ImageOpenHelper(this);
-        return new FixedStepEngine(pEngineOptions, 30);
+        return super.onCreateEngine(pEngineOptions);
     }
 
     @Override
