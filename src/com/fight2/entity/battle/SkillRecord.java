@@ -3,17 +3,17 @@ package com.fight2.entity.battle;
 import java.util.List;
 
 public class SkillRecord {
-    private int cardId;
+    private int cardIndex;
     private String name;
     private String effect;
     private List<SkillOperation> operations;
 
-    public int getCardId() {
-        return cardId;
+    public int getCardIndex() {
+        return cardIndex;
     }
 
-    public void setCardId(final int cardId) {
-        this.cardId = cardId;
+    public void setCardIndex(final int cardIndex) {
+        this.cardIndex = cardIndex;
     }
 
     public String getName() {

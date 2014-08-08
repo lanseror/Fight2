@@ -1,7 +1,6 @@
 package com.fight2.entity.battle;
 
 public class BattleRecord {
-
     private String actionPlayer;
     private int atkParty;
     private int defenceParty;
