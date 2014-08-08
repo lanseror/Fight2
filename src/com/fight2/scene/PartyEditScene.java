@@ -125,7 +125,7 @@ public class PartyEditScene extends BaseScene {
         this.attachChild(topbarSprite);
 
         final Sprite rechargeSprite = createALBF2ButtonSprite(TextureEnum.PARTY_RECHARGE, TextureEnum.PARTY_RECHARGE_PRESSED, this.simulatedRightX
-                - TextureEnum.PARTY_RECHARGE.getWidth(), topbarY);
+                - TextureEnum.PARTY_RECHARGE.getWidth() + 20, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight());
         this.attachChild(rechargeSprite);
         this.registerTouchArea(rechargeSprite);
 

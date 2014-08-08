@@ -1,11 +1,22 @@
 package com.fight2.entity;
 
+import org.andengine.entity.IEntity;
+import org.andengine.entity.modifier.DelayModifier;
+import org.andengine.entity.modifier.IEntityModifier;
+import org.andengine.entity.modifier.MoveModifier;
+import org.andengine.entity.modifier.SequenceEntityModifier;
+import org.andengine.entity.modifier.SingleValueSpanEntityModifier;
+import org.andengine.entity.modifier.IEntityModifier.IEntityModifierListener;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.entity.text.Text;
+import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
+import com.fight2.constant.FontEnum;
 import com.fight2.constant.TextureEnum;
+import com.fight2.util.ResourceManager;
 import com.fight2.util.StringUtils;
 import com.fight2.util.TextureFactory;
 
@@ -20,25 +31,35 @@ public class BattlePartyFrame extends Rectangle {
     private final float initY;
     private final VertexBufferObjectManager vbom;
     private HpBar hpBar;
+    private final Font font = ResourceManager.getInstance().getFont(FontEnum.MAIN);
+    private final Text atkText;
+    private final int currentAtk;
+    private final Party party;
+    private final Sprite[] cardSprites = new Sprite[4];
 
     public BattlePartyFrame(final float pX, final float pY, final Party party, final VertexBufferObjectManager pVertexBufferObjectManager,
             final boolean isBottom) {
         super(pX + WIDTH * 0.5f, pY + HEIGHT * 0.5f, WIDTH, HEIGHT, pVertexBufferObjectManager);
         super.setAlpha(0);
         this.vbom = pVertexBufferObjectManager;
+        this.party = party;
         if (isBottom) {
             this.createBottomCard(party);
             this.createBottomFrame(party);
+            atkText = new Text(91, 26, font, "0123456789", vbom);
         } else {
             final float height = 81 + AVATAR_HEIGHT - 5;
             this.setHeight(height);
             this.setY(pY + height * 0.5f);
             this.createTopCard(party);
             this.createTopFrame(party);
+            atkText = new Text(91, 125, font, "0123456789", vbom);
         }
         this.initX = this.getX();
         this.initY = this.getY();
-
+        atkText.setText(String.valueOf(party.getAtk()));
+        this.attachChild(atkText);
+        currentAtk = party.getAtk();
     }
 
     private void createBottomCard(final Party party) {
@@ -52,7 +73,8 @@ public class BattlePartyFrame extends Rectangle {
             }
 
             final ITextureRegion texture = textureFactory.getTextureRegion(card.getImage());
-            final Sprite cardSprite = new Sprite(startX + 65 * i, 90, CARD_WIDTH, CARD_HEIGHT, texture, vbom);
+            final Sprite cardSprite = new Sprite(startX + 65 * i, 80, CARD_WIDTH, CARD_HEIGHT, texture, vbom);
+            cardSprites[i] = cardSprite;
             this.attachChild(cardSprite);
         }
     }
@@ -72,6 +94,7 @@ public class BattlePartyFrame extends Rectangle {
             final ITextureRegion texture = StringUtils.isEmpty(avatar) ? textureFactory.getAssetTextureRegion(TextureEnum.COMMON_DEFAULT_AVATAR)
                     : textureFactory.getTextureRegion(avatar);
             final Sprite cardSprite = new Sprite(startX + (AVATAR_WIDTH + avatarGap) * i, AVATAR_HEIGHT * 0.5f, AVATAR_WIDTH, AVATAR_HEIGHT, texture, vbom);
+            cardSprites[i] = cardSprite;
             this.attachChild(cardSprite);
         }
 
@@ -79,15 +102,15 @@ public class BattlePartyFrame extends Rectangle {
 
     private void createTopFrame(final Party party) {
         final Sprite battlePartyFrame = createPartyFrame(TextureEnum.BATTLE_PARTY_TOP, 0, AVATAR_HEIGHT - 5, false);
-        // hpBar = new HpBar(156, 22, vbom, party.getHp(), false);
-        // battlePartyFrame.attachChild(hpBar);
+        hpBar = new HpBar(156, 22, vbom, party.getHp(), false);
+        battlePartyFrame.attachChild(hpBar);
         this.attachChild(battlePartyFrame);
     }
 
     private void createBottomFrame(final Party party) {
         final Sprite battlePartyFrame = createPartyFrame(TextureEnum.BATTLE_PARTY_BOTTOM, 0, 0, true);
-        // hpBar = new HpBar(158, 61, vbom, party.getHp(), true);
-        // battlePartyFrame.attachChild(hpBar);
+        hpBar = new HpBar(158, 61, vbom, party.getHp(), true);
+        battlePartyFrame.attachChild(hpBar);
         this.attachChild(battlePartyFrame);
     }
 
@@ -100,6 +123,56 @@ public class BattlePartyFrame extends Rectangle {
         final float pY = y + height * 0.5f;
         final Sprite partyFrame = new Sprite(pX, pY, texture, vbom);
         return partyFrame;
+    }
+
+    public void useSkill(final int cardIndex, final IEntityModifierListener finishListener) {
+        final Sprite cardSprite = cardSprites[cardIndex];
+        final float x = cardSprite.getX();
+        final float fromY = cardSprite.getY();
+        final float toY = fromY + 40;
+
+        final IEntityModifier upModifier = new MoveModifier(0.2f, x, fromY, x, toY);
+        final IEntityModifier downModifier = new MoveModifier(0.2f, x, toY, x, fromY);
+        final IEntityModifier cardModifier = new SequenceEntityModifier(finishListener, upModifier, new DelayModifier(0.2f), downModifier, new DelayModifier(1f));
+        cardSprite.clearEntityModifiers();
+        cardSprite.registerEntityModifier(cardModifier);
+    }
+
+    public void setAtk(final int atk) {
+        final AtkModifier modifier = new AtkModifier(0.5f, this.currentAtk, atk);
+        atkText.clearEntityModifiers();
+        atkText.registerEntityModifier(modifier);
+    }
+
+    private class AtkModifier extends SingleValueSpanEntityModifier {
+
+        public AtkModifier(final float pDuration, final float pFromValue, final float pToValue) {
+            super(pDuration, pFromValue, pToValue);
+        }
+
+        @Override
+        protected void onSetInitialValue(final IEntity pItem, final float pValue) {
+            final int atk = (int) pValue;
+            final Text atkText = (Text) pItem;
+            atkText.setText(String.valueOf(atk));
+        }
+
+        @Override
+        protected void onSetValue(final IEntity pItem, final float pPercentageDone, final float pValue) {
+            final int atk = (int) pValue;
+            final Text atkText = (Text) pItem;
+            atkText.setText(String.valueOf(atk));
+        }
+
+        protected AtkModifier(final AtkModifier modifier) {
+            super(modifier);
+        }
+
+        @Override
+        public AtkModifier deepCopy() throws org.andengine.util.modifier.IModifier.DeepCopyNotSupportedException {
+            return new AtkModifier(this);
+        }
+
     }
 
     public HpBar getHpBar() {

@@ -4,16 +4,20 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.andengine.opengl.font.Font;
+import org.andengine.opengl.font.FontFactory;
 import org.andengine.opengl.texture.TextureManager;
+import org.andengine.util.adt.color.Color;
 
 import android.content.res.AssetManager;
+import android.graphics.Typeface;
 
 import com.fight2.GameActivity;
+import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.entity.ProgressBar;
 import com.fight2.scene.ArenaScene;
 import com.fight2.scene.BaseScene;
-import com.fight2.scene.BattleScene;
 import com.fight2.scene.MainScene;
 import com.fight2.scene.PartyScene;
 import com.fight2.scene.SummonScene;
@@ -27,6 +31,7 @@ public class ResourceManager {
     private BaseScene currentScene;
 
     private final Map<SceneEnum, BaseScene> scenes = new HashMap<SceneEnum, BaseScene>();
+    private final Map<FontEnum, Font> fonts = new HashMap<FontEnum, Font>();
 
     private ResourceManager() {
         // Private the constructor;
@@ -40,7 +45,7 @@ public class ResourceManager {
         this.activity = activity;
         this.textureManager = activity.getTextureManager();
         this.assetManager = activity.getAssets();
-
+        loadFonts();
         // Start load resources
         TiledTextureFactory.getInstance().loadResource(textureManager, assetManager);
         final TextureFactory textureFactory = TextureFactory.getInstance();
@@ -72,6 +77,17 @@ public class ResourceManager {
         activity.getEngine().setScene(scene);
         scene.updateScene();
         this.currentScene = scene;
+    }
+
+    private void loadFonts() {
+        final Font mainFont = FontFactory.create(activity.getFontManager(), activity.getTextureManager(), 256, 256,
+                Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), 20, Color.WHITE_ARGB_PACKED_INT);
+        mainFont.load();
+        fonts.put(FontEnum.MAIN, mainFont);
+    }
+
+    public Font getFont(final FontEnum fontEnum) {
+        return fonts.get(fontEnum);
     }
 
     private void loadScenes() {

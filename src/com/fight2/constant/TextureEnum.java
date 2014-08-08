@@ -8,12 +8,10 @@ public enum TextureEnum {
     COMMON_BACK_BUTTON_NORMAL("images/common_back_button.png", 130, 133),
     COMMON_BACK_BUTTON_PRESSED("images/common_back_button_fcs.png", 130, 133),
     COMMON_DEFAULT_AVATAR("images/common_default_avatar.png", 135, 135),
-    COMMON_HP_LEFT_RED("images/common_hp_left_red.png", 9, 30),
-    COMMON_HP_CENTER_RED("images/common_hp_center_red.png", 1, 30),
-    COMMON_HP_RIGHT_RED("images/common_hp_right_red.png", 9, 30),
-    COMMON_HP_LEFT_GREEN("images/common_hp_left_green.png", 9, 30),
-    COMMON_HP_CENTER_GREEN("images/common_hp_center_green.png", 1, 30),
-    COMMON_HP_RIGHT_GREEN("images/common_hp_right_green.png", 9, 30),
+    COMMON_HP_RED("images/common_hp_red.png", 285, 23),
+    COMMON_HP_RIGHT_RED("images/common_hp_right_red.png", 10, 23),
+    COMMON_HP_RIGHT_GREEN("images/common_hp_right_green.png", 10, 23),
+    COMMON_HP_GREEN("images/common_hp_green.png", 285, 23),
 
     // Main scene images.
     MAIN_BG("images/main_backgroud.png", 1136, 640),

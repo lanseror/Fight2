@@ -66,12 +66,25 @@ public class BattleScene extends BaseScene {
         tButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                iAttack(2, 0);
-                // hpBar.setCurrentPoint(5000);
+                iPrepareAttack(2, 0);
+                // myPartyFrames[0].setAtk(503);
+                // opponentPartyFrames[0].setAtk(3544);
             }
         });
         this.attachChild(tButton);
         this.registerTouchArea(tButton);
+
+        final F2ButtonSprite tButton2 = createALBF2ButtonSprite(TextureEnum.COMMON_BACK_BUTTON_NORMAL, TextureEnum.COMMON_BACK_BUTTON_PRESSED,
+                this.simulatedRightX - 140, 350);
+        tButton2.setOnClickListener(new F2OnClickListener() {
+            @Override
+            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                myPartyFrames[0].getHpBar().setCurrentPoint(5000);
+                opponentPartyFrames[0].getHpBar().setCurrentPoint(5000);
+            }
+        });
+        this.attachChild(tButton2);
+        this.registerTouchArea(tButton2);
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
@@ -103,7 +116,7 @@ public class BattleScene extends BaseScene {
         }
     }
 
-    public void iAttack(final int actionPartyFrameIndex, final int defencePartyFrameIndex) {
+    public void iPrepareAttack(final int actionPartyFrameIndex, final int defencePartyFrameIndex) {
         final float frameHeight = myPartyFrames[actionPartyFrameIndex].getHeight();
         final float zoomInscale = 1.3f;
         final float zoomOutScale = (3 - zoomInscale) / 2;
@@ -120,9 +133,6 @@ public class BattleScene extends BaseScene {
         } else {
             actionX = (zoomOutWidth + PARTY_GAP) * 2 + zoomInWidth * 0.5f;
         }
-
-        final BattlePartyFrame actionPartyFrame = myPartyFrames[actionPartyFrameIndex];
-        final BattlePartyFrame defencePartyFrame = opponentPartyFrames[defencePartyFrameIndex];
 
         for (int i = 0; i < 3; i++) {
             final BattlePartyFrame partyFrame = myPartyFrames[i];
@@ -146,25 +156,12 @@ public class BattleScene extends BaseScene {
                 chaneScale = zoomOutScale;
             }
             final float duration = 0.2f;
-            final float attackDuration = 0.05f;
-            final float backDuration = 0.5f;
 
             final IEntityModifier scaleModifier = new ScaleModifier(duration, 1, chaneScale);
             final IEntityModifier moveModifier = new MoveModifier(duration, partyFrame.getInitX(), partyFrame.getInitY(), FRAME_START_X + changeX, changeY);
             final IEntityModifier modifier = new ParallelEntityModifier(scaleModifier, moveModifier);
             partyFrame.clearEntityModifiers();
             if (i == actionPartyFrameIndex) {
-                partyFrame.setZIndex(10);
-                this.sortChildren();
-                final IEntityModifier attackScaleModifier = new ScaleModifier(attackDuration, chaneScale, 1);
-                final IEntityModifier attackMoveModifier = new MoveModifier(attackDuration, FRAME_START_X + changeX, changeY, defencePartyFrame.getX(),
-                        defencePartyFrame.getY() - 150);
-                final IEntityModifier attackModifier = new ParallelEntityModifier(attackScaleModifier, attackMoveModifier);
-
-                final IEntityModifier backScaleModifier = new ScaleModifier(backDuration, 1, chaneScale);
-                final IEntityModifier backMoveModifier = new MoveModifier(backDuration, defencePartyFrame.getX(), defencePartyFrame.getY() - 150, FRAME_START_X
-                        + changeX, changeY);
-                final IEntityModifier backModifier = new ParallelEntityModifier(backScaleModifier, backMoveModifier);
                 final IEntityModifierListener finishListener = new IEntityModifierListener() {
                     @Override
                     public void onModifierStarted(final IModifier<IEntity> pModifier, final IEntity pItem) {
@@ -173,14 +170,23 @@ public class BattleScene extends BaseScene {
 
                     @Override
                     public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
-                        revertParties();
-                        pItem.setZIndex(IEntity.ZINDEX_DEFAULT);
-                        BattleScene.this.sortChildren();
+                        final IEntityModifierListener finishSkillListener = new IEntityModifierListener() {
+                            @Override
+                            public void onModifierStarted(final IModifier<IEntity> pModifier, final IEntity pItem) {
+
+                            }
+
+                            @Override
+                            public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
+                                BattleScene.this.iAttack(actionPartyFrameIndex, defencePartyFrameIndex);
+                            }
+
+                        };
+                        partyFrame.useSkill(actionPartyFrameIndex, finishSkillListener);
                     }
 
                 };
-                final IEntityModifier actionModifier = new SequenceEntityModifier(finishListener, modifier, new DelayModifier(0.3f), attackModifier,
-                        new DelayModifier(0.1f), backModifier);
+                final IEntityModifier actionModifier = new SequenceEntityModifier(finishListener, modifier);
                 partyFrame.registerEntityModifier(actionModifier);
             } else {
                 partyFrame.registerEntityModifier(modifier);
@@ -188,6 +194,46 @@ public class BattleScene extends BaseScene {
 
         }
 
+    }
+
+    private void iAttack(final int actionPartyFrameIndex, final int defencePartyFrameIndex) {
+        final BattlePartyFrame actionPartyFrame = myPartyFrames[actionPartyFrameIndex];
+        final BattlePartyFrame defencePartyFrame = opponentPartyFrames[defencePartyFrameIndex];
+
+        final float initScale = actionPartyFrame.getScaleX();
+        final float initX = actionPartyFrame.getX();
+        final float initY = actionPartyFrame.getY();
+        final float attackDuration = 0.05f;
+        final float backDuration = 0.5f;
+
+        actionPartyFrame.setZIndex(10);
+        this.sortChildren();
+
+        final IEntityModifier attackScaleModifier = new ScaleModifier(attackDuration, initScale, 1);
+        final IEntityModifier attackMoveModifier = new MoveModifier(attackDuration, initX, initY, defencePartyFrame.getX(), defencePartyFrame.getY() - 150);
+        final IEntityModifier attackModifier = new ParallelEntityModifier(attackScaleModifier, attackMoveModifier);
+
+        final IEntityModifier backScaleModifier = new ScaleModifier(backDuration, 1, initScale);
+        final IEntityModifier backMoveModifier = new MoveModifier(backDuration, defencePartyFrame.getX(), defencePartyFrame.getY() - 150, initX, initY);
+        final IEntityModifier backModifier = new ParallelEntityModifier(backScaleModifier, backMoveModifier);
+        final IEntityModifierListener finishListener = new IEntityModifierListener() {
+            @Override
+            public void onModifierStarted(final IModifier<IEntity> pModifier, final IEntity pItem) {
+
+            }
+
+            @Override
+            public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
+                revertParties();
+                pItem.setZIndex(IEntity.ZINDEX_DEFAULT);
+                BattleScene.this.sortChildren();
+            }
+
+        };
+        final IEntityModifier actionModifier = new SequenceEntityModifier(finishListener, new DelayModifier(0.3f), attackModifier, new DelayModifier(0.1f),
+                backModifier);
+        actionPartyFrame.clearEntityModifiers();
+        actionPartyFrame.registerEntityModifier(actionModifier);
     }
 
     private void revertParties() {

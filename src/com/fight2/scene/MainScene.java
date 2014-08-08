@@ -142,6 +142,11 @@ public class MainScene extends BaseScene {
         summonStoneEffect.animate(125);
         this.attachChild(summonStoneEffect);
 
+        final Sprite rechargeSprite = createALBF2ButtonSprite(TextureEnum.PARTY_RECHARGE, TextureEnum.PARTY_RECHARGE_PRESSED, this.simulatedRightX
+                - TextureEnum.PARTY_RECHARGE.getWidth() + 20, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight());
+        this.attachChild(rechargeSprite);
+        this.registerTouchArea(rechargeSprite);
+
         this.setOnSceneTouchListener(new IOnSceneTouchListener() {
             @Override
             public boolean onSceneTouchEvent(final Scene pScene, final TouchEvent pSceneTouchEvent) {
