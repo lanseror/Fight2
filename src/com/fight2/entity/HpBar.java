@@ -13,6 +13,7 @@ import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
+import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.util.ResourceManager;
@@ -22,6 +23,7 @@ public class HpBar extends Rectangle {
     private static final float WIDTH = TextureEnum.COMMON_HP_GREEN.getWidth();
     private static final float HEIGHT = TextureEnum.COMMON_HP_GREEN.getHeight();
     private static final float EDGE_WIDTH = 10;
+    private final GameActivity activity;
     private final VertexBufferObjectManager vbom;
     private final TextureEnum mainTextureEnum;
     private final TextureEnum hpRightTextureEnum;
@@ -31,21 +33,22 @@ public class HpBar extends Rectangle {
     private ClipEntity mainClipEntity;
     private ClipEntity rightClipEntity;
     private Sprite rightHpSprite;
-    private final Font font = ResourceManager.getInstance().getFont(FontEnum.MAIN);
+    private final Font font = ResourceManager.getInstance().getFont(FontEnum.Main);
     private final Text hpText;
 
-    public HpBar(final float pX, final float pY, final VertexBufferObjectManager pVertexBufferObjectManager, final int fullHp) {
-        this(pX, pY, pVertexBufferObjectManager, fullHp, false);
+    public HpBar(final float pX, final float pY, final GameActivity activity, final int fullHp) {
+        this(pX, pY, activity, fullHp, false);
     }
 
-    public HpBar(final float pX, final float pY, final VertexBufferObjectManager pVertexBufferObjectManager, final int fullHp, final boolean isGreenHp) {
-        super(pX, pY, WIDTH, HEIGHT, pVertexBufferObjectManager);
+    public HpBar(final float pX, final float pY, final GameActivity activity, final int fullHp, final boolean isGreenHp) {
+        super(pX, pY, WIDTH, HEIGHT, activity.getVertexBufferObjectManager());
         super.setAlpha(0);
-        this.vbom = pVertexBufferObjectManager;
+        this.activity = activity;
+        this.vbom = activity.getVertexBufferObjectManager();
         this.fullHp = fullHp;
         this.currentPoint = fullHp;
         this.bigFullPoint = BigDecimal.valueOf(fullHp);
-        hpText = new Text(WIDTH * 0.5f, HEIGHT * 0.5f+1, font, "0123456789", vbom);
+        hpText = new Text(WIDTH * 0.5f, HEIGHT * 0.5f + 1, font, "0123456789", vbom);
         hpText.setText(String.valueOf(fullHp));
 
         if (isGreenHp) {
@@ -84,8 +87,14 @@ public class HpBar extends Rectangle {
         final int fromHp = this.currentPoint;
         final float duration = fromHp > toPoint ? 0.2f : 1f;
         final HpBarModifier modifier = new HpBarModifier(duration, fromHp, toPoint);
-        this.clearEntityModifiers();
-        this.registerEntityModifier(modifier);
+        activity.runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                HpBar.this.clearEntityModifiers();
+                HpBar.this.registerEntityModifier(modifier);
+            }
+        });
+
         this.currentPoint = toPoint;
     }
 

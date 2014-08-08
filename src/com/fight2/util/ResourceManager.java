@@ -83,7 +83,11 @@ public class ResourceManager {
         final Font mainFont = FontFactory.create(activity.getFontManager(), activity.getTextureManager(), 256, 256,
                 Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), 20, Color.WHITE_ARGB_PACKED_INT);
         mainFont.load();
-        fonts.put(FontEnum.MAIN, mainFont);
+        fonts.put(FontEnum.Main, mainFont);
+        final Font battleFont = FontFactory.create(activity.getFontManager(), activity.getTextureManager(), 256, 256,
+                Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), 36, Color.WHITE_ARGB_PACKED_INT);
+        battleFont.load();
+        fonts.put(FontEnum.Battle, battleFont);
     }
 
     public Font getFont(final FontEnum fontEnum) {

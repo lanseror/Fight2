@@ -6,7 +6,6 @@ import org.andengine.entity.modifier.IEntityModifier;
 import org.andengine.entity.modifier.MoveModifier;
 import org.andengine.entity.modifier.SequenceEntityModifier;
 import org.andengine.entity.modifier.SingleValueSpanEntityModifier;
-import org.andengine.entity.modifier.IEntityModifier.IEntityModifierListener;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
@@ -14,8 +13,11 @@ import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
+import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.TextureEnum;
+import com.fight2.scene.BattleScene.ModifierFinishedListener;
+import com.fight2.scene.BattleScene.OnFinishedCallback;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.StringUtils;
 import com.fight2.util.TextureFactory;
@@ -31,18 +33,22 @@ public class BattlePartyFrame extends Rectangle {
     private final float initY;
     private final VertexBufferObjectManager vbom;
     private HpBar hpBar;
-    private final Font font = ResourceManager.getInstance().getFont(FontEnum.MAIN);
+    private final Font font = ResourceManager.getInstance().getFont(FontEnum.Main);
     private final Text atkText;
-    private final int currentAtk;
+    private int atk;
+    private int defence;
     private final Party party;
     private final Sprite[] cardSprites = new Sprite[4];
+    private final boolean isBottom;
+    private final GameActivity activity;
 
-    public BattlePartyFrame(final float pX, final float pY, final Party party, final VertexBufferObjectManager pVertexBufferObjectManager,
-            final boolean isBottom) {
-        super(pX + WIDTH * 0.5f, pY + HEIGHT * 0.5f, WIDTH, HEIGHT, pVertexBufferObjectManager);
+    public BattlePartyFrame(final float pX, final float pY, final Party party, final GameActivity activity, final boolean isBottom) {
+        super(pX + WIDTH * 0.5f, pY + HEIGHT * 0.5f, WIDTH, HEIGHT, activity.getVertexBufferObjectManager());
         super.setAlpha(0);
-        this.vbom = pVertexBufferObjectManager;
+        this.activity = activity;
+        this.vbom = activity.getVertexBufferObjectManager();
         this.party = party;
+        this.isBottom = isBottom;
         if (isBottom) {
             this.createBottomCard(party);
             this.createBottomFrame(party);
@@ -59,7 +65,7 @@ public class BattlePartyFrame extends Rectangle {
         this.initY = this.getY();
         atkText.setText(String.valueOf(party.getAtk()));
         this.attachChild(atkText);
-        currentAtk = party.getAtk();
+        atk = party.getAtk();
     }
 
     private void createBottomCard(final Party party) {
@@ -102,14 +108,14 @@ public class BattlePartyFrame extends Rectangle {
 
     private void createTopFrame(final Party party) {
         final Sprite battlePartyFrame = createPartyFrame(TextureEnum.BATTLE_PARTY_TOP, 0, AVATAR_HEIGHT - 5, false);
-        hpBar = new HpBar(156, 22, vbom, party.getHp(), false);
+        hpBar = new HpBar(156, 22, activity, party.getHp(), false);
         battlePartyFrame.attachChild(hpBar);
         this.attachChild(battlePartyFrame);
     }
 
     private void createBottomFrame(final Party party) {
         final Sprite battlePartyFrame = createPartyFrame(TextureEnum.BATTLE_PARTY_BOTTOM, 0, 0, true);
-        hpBar = new HpBar(158, 61, vbom, party.getHp(), true);
+        hpBar = new HpBar(158, 61, activity, party.getHp(), true);
         battlePartyFrame.attachChild(hpBar);
         this.attachChild(battlePartyFrame);
     }
@@ -125,23 +131,50 @@ public class BattlePartyFrame extends Rectangle {
         return partyFrame;
     }
 
-    public void useSkill(final int cardIndex, final IEntityModifierListener finishListener) {
+    public void useSkill(final int cardIndex, final OnFinishedCallback onFirstStepFinishedCallback, final OnFinishedCallback onFinishedCallback) {
         final Sprite cardSprite = cardSprites[cardIndex];
         final float x = cardSprite.getX();
         final float fromY = cardSprite.getY();
-        final float toY = fromY + 40;
+        final float toY = (isBottom ? fromY + 40 : fromY - 30);
 
-        final IEntityModifier upModifier = new MoveModifier(0.2f, x, fromY, x, toY);
-        final IEntityModifier downModifier = new MoveModifier(0.2f, x, toY, x, fromY);
-        final IEntityModifier cardModifier = new SequenceEntityModifier(finishListener, upModifier, new DelayModifier(0.2f), downModifier, new DelayModifier(1f));
-        cardSprite.clearEntityModifiers();
-        cardSprite.registerEntityModifier(cardModifier);
+        final IEntityModifier firstStepModifier = new MoveModifier(0.2f, x, fromY, x, toY);
+        final IEntityModifier secondStepModifier = new MoveModifier(0.2f, x, toY, x, fromY);
+        firstStepModifier.addModifierListener(new ModifierFinishedListener(onFirstStepFinishedCallback));
+        secondStepModifier.addModifierListener(new ModifierFinishedListener(onFinishedCallback));
+
+        final IEntityModifier cardModifier = new SequenceEntityModifier(firstStepModifier, new DelayModifier(0.2f), secondStepModifier, new DelayModifier(1f));
+        activity.runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                cardSprite.clearEntityModifiers();
+                cardSprite.registerEntityModifier(cardModifier);
+            }
+        });
+
+    }
+
+    public int getAtk() {
+        return atk;
     }
 
     public void setAtk(final int atk) {
-        final AtkModifier modifier = new AtkModifier(0.5f, this.currentAtk, atk);
-        atkText.clearEntityModifiers();
-        atkText.registerEntityModifier(modifier);
+        final AtkModifier modifier = new AtkModifier(0.5f, this.atk, atk);
+        this.atk = atk;
+        activity.runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                atkText.clearEntityModifiers();
+                atkText.registerEntityModifier(modifier);
+            }
+        });
+    }
+
+    public int getDefence() {
+        return defence;
+    }
+
+    public void setDefence(final int defence) {
+        this.defence = defence;
     }
 
     private class AtkModifier extends SingleValueSpanEntityModifier {
@@ -183,12 +216,24 @@ public class BattlePartyFrame extends Rectangle {
         this.hpBar = hpBar;
     }
 
+    public int getHp() {
+        return hpBar.getCurrentPoint();
+    }
+
+    public void setHp(final int hp) {
+        this.hpBar.setCurrentPoint(hp);
+    }
+
     public float getInitX() {
         return initX;
     }
 
     public float getInitY() {
         return initY;
+    }
+
+    public boolean isBottom() {
+        return isBottom;
     }
 
 }

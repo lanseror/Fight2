@@ -8,8 +8,6 @@ public class SkillOperation {
 
     private SkillType skillType;
 
-    private SkillPointAttribute skillPointAttribute;
-
     private SkillApplyParty skillApplyParty;
 
     public int getSign() {
@@ -34,14 +32,6 @@ public class SkillOperation {
 
     public void setSkillType(final SkillType skillType) {
         this.skillType = skillType;
-    }
-
-    public SkillPointAttribute getSkillPointAttribute() {
-        return skillPointAttribute;
-    }
-
-    public void setSkillPointAttribute(final SkillPointAttribute skillPointAttribute) {
-        this.skillPointAttribute = skillPointAttribute;
     }
 
     public SkillApplyParty getSkillApplyParty() {
