@@ -7,14 +7,12 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.fight2.GameActivity;
-import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Player;
 import com.fight2.entity.battle.BattleRecord;
 import com.fight2.entity.battle.SkillApplyParty;
@@ -34,7 +32,12 @@ public class ArenaUtils {
                 final JSONObject jsonObject = responseJson.getJSONObject(i);
                 final Player player = new Player();
                 player.setId(jsonObject.getInt("id"));
-                player.setAvatar(jsonObject.optString("avatar", TextureEnum.COMMON_DEFAULT_AVATAR.name()));
+                final String avatar = jsonObject.optString("avatar");
+                if (avatar != null && !"".equals(avatar)) {
+                    final String localAvatar = ImageUtils.getLocalString(avatar, activity);
+                    player.setAvatar(localAvatar);
+                    TextureFactory.getInstance().addCardResource(activity, localAvatar);
+                }
                 player.setName(jsonObject.getString("name"));
                 competitors.add(player);
             }

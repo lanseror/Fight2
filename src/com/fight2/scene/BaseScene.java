@@ -30,6 +30,7 @@ public abstract class BaseScene extends Scene {
     protected final int simulatedHeight;
     protected final float simulatedLeftX;
     protected final float simulatedRightX;
+    private boolean isStarted = false;
 
     public BaseScene(final GameActivity activity) throws IOException {
         super();
@@ -103,6 +104,18 @@ public abstract class BaseScene extends Scene {
 
     public GameActivity getActivity() {
         return activity;
+    }
+
+    protected void onStarted() {
+    }
+
+    @Override
+    protected void onManagedUpdate(final float pSecondsElapsed) {
+        if (!isStarted) {
+            isStarted = true;
+            onStarted();
+        }
+        super.onManagedUpdate(pSecondsElapsed);
     }
 
 }

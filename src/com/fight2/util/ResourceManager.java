@@ -31,7 +31,6 @@ public class ResourceManager {
     private BaseScene currentScene;
 
     private final Map<SceneEnum, BaseScene> scenes = new HashMap<SceneEnum, BaseScene>();
-    private final Map<FontEnum, Font> fonts = new HashMap<FontEnum, Font>();
 
     private ResourceManager() {
         // Private the constructor;
@@ -45,7 +44,6 @@ public class ResourceManager {
         this.activity = activity;
         this.textureManager = activity.getTextureManager();
         this.assetManager = activity.getAssets();
-        loadFonts();
         // Start load resources
         TiledTextureFactory.getInstance().loadResource(textureManager, assetManager);
         final TextureFactory textureFactory = TextureFactory.getInstance();
@@ -79,19 +77,25 @@ public class ResourceManager {
         this.currentScene = scene;
     }
 
-    private void loadFonts() {
-        final Font mainFont = FontFactory.create(activity.getFontManager(), activity.getTextureManager(), 256, 256,
-                Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), 20, Color.WHITE_ARGB_PACKED_INT);
-        mainFont.load();
-        fonts.put(FontEnum.Main, mainFont);
-        final Font battleFont = FontFactory.create(activity.getFontManager(), activity.getTextureManager(), 256, 256,
-                Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), 36, Color.WHITE_ARGB_PACKED_INT);
-        battleFont.load();
-        fonts.put(FontEnum.Battle, battleFont);
-    }
-
     public Font getFont(final FontEnum fontEnum) {
-        return fonts.get(fontEnum);
+        switch (fontEnum) {
+            case Main:
+                final Font mainFont = FontFactory.create(activity.getFontManager(), activity.getTextureManager(), 256, 256,
+                        Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), 20, Color.WHITE_ARGB_PACKED_INT);
+                mainFont.load();
+                return mainFont;
+            case Battle:
+                final Font battleFont = FontFactory.create(activity.getFontManager(), activity.getTextureManager(), 512, 512,
+                        Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), 36, Color.WHITE_ARGB_PACKED_INT);
+                battleFont.load();
+                return battleFont;
+            default:
+                final Font defaultFont = FontFactory.create(activity.getFontManager(), activity.getTextureManager(), 256, 256,
+                        Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), 20, Color.WHITE_ARGB_PACKED_INT);
+                defaultFont.load();
+                return defaultFont;
+        }
+
     }
 
     private void loadScenes() {

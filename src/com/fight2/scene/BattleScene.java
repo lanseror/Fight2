@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.AlphaModifier;
 import org.andengine.entity.modifier.DelayModifier;
@@ -62,7 +63,7 @@ public class BattleScene extends BaseScene {
     public BattleScene(final GameActivity activity, final int attackPlayerId) throws IOException {
         super(activity);
         this.skillText = new Text(this.cameraCenterX, this.cameraCenterY + 30, font, "技能：", 30, vbom);
-        this.skillEffectText = new Text(this.cameraCenterX, this.cameraCenterY - 10, font, "效果：", 30, vbom);
+        this.skillEffectText = new Text(this.cameraCenterX, this.cameraCenterY - 10, font, "效果：", 100, vbom);
         skillText.setAlpha(0);
         skillEffectText.setAlpha(0);
         this.attachChild(skillText);
@@ -93,66 +94,29 @@ public class BattleScene extends BaseScene {
         this.attachChild(backButton);
         this.registerTouchArea(backButton);
 
-        final F2ButtonSprite tButton = createALBF2ButtonSprite(TextureEnum.COMMON_BACK_BUTTON_NORMAL, TextureEnum.COMMON_BACK_BUTTON_PRESSED,
-                this.simulatedRightX - 140, 150);
-        tButton.setOnClickListener(new F2OnClickListener() {
-            @Override
-            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                // final BattleRecord battleRecord1 = new BattleRecord();
-                // battleRecord1.setActionPlayer("Player1");
-                // battleRecord1.setAtk(200);
-                // battleRecord1.setAtkParty(0);
-                // battleRecord1.setDefenceParty(0);
-                // final SkillRecord skill = new SkillRecord();
-                // skill.setCardIndex(0);
-                // skill.setName("一击必杀");
-                // skill.setEffect("对敌方团队（全体）造成伤害。");
-                // battleRecord1.setSkill(skill);
-                // final SkillOperation operationRecord = new SkillOperation();
-                // operationRecord.setSign(-1);
-                // operationRecord.setPoint(350);
-                // operationRecord.setSkillApplyParty(SkillApplyParty.OpponentAll);
-                // operationRecord.setSkillType(SkillType.HP);
-                // final List<SkillOperation> operations = new ArrayList<SkillOperation>();
-                // operations.add(operationRecord);
-                // skill.setOperations(operations);
-                //
-                // final BattleRecord battleRecord2 = new BattleRecord();
-                // battleRecord2.setActionPlayer("Player2");
-                // battleRecord2.setAtk(355);
-                // battleRecord2.setAtkParty(1);
-                // battleRecord2.setDefenceParty(0);
-                //
-                // final OnFinishedCallback battleFinishedCallback1 = new OnFinishedCallback() {
-                //
-                // @Override
-                // public void onFinished(final IEntity pItem) {
-                // // TODO Auto-generated method stub
-                //
-                // }
-                //
-                // };
-                //
-                // final OnFinishedCallback battleFinishedCallback2 = new OnFinishedCallback() {
-                //
-                // @Override
-                // public void onFinished(final IEntity pItem) {
-                // handleBattleRecord(battleRecord2, battleFinishedCallback1);
-                // }
-                //
-                // };
-                // handleBattleRecord(battleRecord1, battleFinishedCallback2);
-                if (!battleRecordQueue.isEmpty()) {
-                    handleBattleRecord(battleRecordQueue.poll(), battleFinishedCallbackQueue.poll());
-                }
-            }
-        });
-        this.attachChild(tButton);
-        this.registerTouchArea(tButton);
-
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
         updateScene();
+        registerUpdateHandler(new IUpdateHandler() {
+
+            private int updates = 0;
+
+            @Override
+            public void reset() {
+            }
+
+            @Override
+            public void onUpdate(final float pSecondsElapsed) {
+                ++updates;
+                if (updates > 10) {
+                    unregisterUpdateHandler(this);
+
+                    if (!battleRecordQueue.isEmpty()) {
+                        handleBattleRecord(battleRecordQueue.poll(), battleFinishedCallbackQueue.poll());
+                    }
+                }
+            }
+        });
     }
 
     private class BattleFinishedCallback implements OnFinishedCallback {
@@ -308,7 +272,10 @@ public class BattleScene extends BaseScene {
                 break;
             case Opponent:
                 for (final BattlePartyFrame party : opponentParties) {
-                    if (party.getHpBar().getCurrentPoint() > 0) {
+                    if (party == null) {
+                        continue;
+                    }
+                    if (party.getHp() > 0) {
                         applyParties.add(party);
                         break;
                     }
@@ -328,14 +295,20 @@ public class BattleScene extends BaseScene {
                 break;
             case SelfAll:
                 for (final BattlePartyFrame party : selfParties) {
-                    if (party.getHpBar().getCurrentPoint() > 0) {
+                    if (party == null) {
+                        continue;
+                    }
+                    if (party.getHp() > 0) {
                         applyParties.add(party);
                     }
                 }
                 break;
             case OpponentAll:
                 for (final BattlePartyFrame party : opponentParties) {
-                    if (party.getHpBar().getCurrentPoint() > 0) {
+                    if (party == null) {
+                        continue;
+                    }
+                    if (party.getHp() > 0) {
                         applyParties.add(party);
                     }
                 }

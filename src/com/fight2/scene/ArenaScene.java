@@ -21,6 +21,7 @@ import com.fight2.entity.Player;
 import com.fight2.util.ArenaUtils;
 import com.fight2.util.F2MusicManager;
 import com.fight2.util.ResourceManager;
+import com.fight2.util.StringUtils;
 import com.fight2.util.TextureFactory;
 
 public class ArenaScene extends BaseScene {
@@ -48,18 +49,14 @@ public class ArenaScene extends BaseScene {
         });
         this.attachChild(backButton);
         this.registerTouchArea(backButton);
-
-        final Sprite battleButton = createBattleSprite(TextureEnum.ARENA_BATTLE, 633, 50);
-        this.attachChild(battleButton);
-        this.registerTouchArea(battleButton);
+        updateScene();
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
 
-        updateScene();
     }
 
-    private Sprite createBattleSprite(final TextureEnum textureEnum, final float x, final float y) {
+    private Sprite createBattleSprite(final TextureEnum textureEnum, final float x, final float y, final int index) {
         final TextureFactory textureFactory = TextureFactory.getInstance();
         final ITextureRegion texture = textureFactory.getAssetTextureRegion(textureEnum);
         final float width = textureEnum.getWidth();
@@ -70,7 +67,7 @@ public class ArenaScene extends BaseScene {
                 if (pSceneTouchEvent.isActionDown()) {
                     F2MusicManager.getInstance().playMusic(MusicEnum.ARENA_ATTACK);
                     try {
-                        final Scene battleScene = new BattleScene(activity, players[0].getId());
+                        final Scene battleScene = new BattleScene(activity, players[index].getId());
                         activity.getEngine().setScene(battleScene);
                     } catch (final IOException e) {
                         Debug.e(e);
@@ -88,26 +85,23 @@ public class ArenaScene extends BaseScene {
     public void updateScene() {
         final List<Player> competitors = ArenaUtils.getCompetitors(activity);
         final TextureFactory textureFactory = TextureFactory.getInstance();
-        if (competitors.size() > 0) {
-            final Player competitor = competitors.get(0);
-            final String avatarStr = competitor.getAvatar();
-            players[0] = competitor;
-            final ITextureRegion defaultAvatar = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_DEFAULT_AVATAR);
-            ITextureRegion avatar = null;
-            if (TextureEnum.COMMON_DEFAULT_AVATAR.name().equals(avatarStr)) {
-                avatar = defaultAvatar;
-            } else {
-                try {
-                    textureFactory.addCardResource(activity, competitor.getAvatar());
-                } catch (final IOException e) {
-                    throw new RuntimeException(e);
-                }
-                avatar = textureFactory.getTextureRegion(competitor.getAvatar());
-            }
-
-            final Sprite competitorSprite = new Sprite(633, 245, avatar, vbom);
+        for (int i = 0; i < 3 && i < competitors.size(); i++) {
+            final Player competitor = competitors.get(i);
+            players[i] = competitor;
+            final String avatar = competitor.getAvatar();
+            final ITextureRegion avatarTexture = StringUtils.isEmpty(avatar) ? textureFactory.getAssetTextureRegion(TextureEnum.COMMON_DEFAULT_AVATAR)
+                    : textureFactory.getTextureRegion(avatar);
+            final Sprite competitorSprite = new Sprite(633 - 250 * i, 245, avatarTexture, vbom);
             this.attachChild(competitorSprite);
         }
-
+        for (int i = 0; i < players.length; i++) {
+            final Player player = players[i];
+            if (player == null) {
+                continue;
+            }
+            final Sprite battleButton = createBattleSprite(TextureEnum.ARENA_BATTLE, 633 - 250 * i, 50, i);
+            this.attachChild(battleButton);
+            this.registerTouchArea(battleButton);
+        }
     }
 }

@@ -108,7 +108,7 @@ public class GameActivity extends BaseGameActivity {
 
     @Override
     public void onCreateScene(final OnCreateSceneCallback pOnCreateSceneCallback) throws IOException {
-        this.mEngine.registerUpdateHandler(new FPSLogger());
+//        this.mEngine.registerUpdateHandler(new FPSLogger());
         final VertexBufferObjectManager vbom = this.getVertexBufferObjectManager();
         initProgressBar(vbom);
         initSplashScene(vbom);
