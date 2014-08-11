@@ -15,17 +15,15 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
-import org.andengine.opengl.font.FontFactory;
 import org.andengine.opengl.texture.region.ITextureRegion;
-import org.andengine.util.adt.color.Color;
 import org.andengine.util.algorithm.collision.EntityCollisionChecker;
 import org.andengine.util.debug.Debug;
 
-import android.graphics.Typeface;
 import android.util.SparseArray;
 import android.widget.Toast;
 
 import com.fight2.GameActivity;
+import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
@@ -57,9 +55,7 @@ public class PartyScene extends BaseScene {
 
     public PartyScene(final GameActivity activity) throws IOException {
         super(activity);
-        this.mFont = FontFactory.create(activity.getFontManager(), activity.getTextureManager(), 256, 256, Typeface.create(Typeface.DEFAULT, Typeface.NORMAL),
-                24, Color.WHITE_ARGB_PACKED_INT);
-        this.mFont.load();
+        this.mFont = ResourceManager.getInstance().getFont(FontEnum.Main);
         hpText = new Text(this.simulatedLeftX + 360, topbarY + 48, mFont, "0123456789", vbom);
         atkText = new Text(this.simulatedLeftX + 600, topbarY + 48, mFont, "0123456789", vbom);
         final float partyTextTop = frameTop - 82;
@@ -83,6 +79,8 @@ public class PartyScene extends BaseScene {
 
         final Sprite topbarSprite = createALBImageSprite(TextureEnum.PARTY_TOPBAR, this.simulatedLeftX, topbarY);
         this.attachChild(topbarSprite);
+        this.attachChild(hpText);
+        this.attachChild(atkText);
 
         final Sprite rechargeSprite = createALBF2ButtonSprite(TextureEnum.PARTY_RECHARGE, TextureEnum.PARTY_RECHARGE_PRESSED, this.simulatedRightX
                 - TextureEnum.PARTY_RECHARGE.getWidth() + 20, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight());
@@ -92,8 +90,6 @@ public class PartyScene extends BaseScene {
         final Sprite frameSprite = createALBImageSprite(TextureEnum.PARTY_FRAME, this.simulatedLeftX, frameY);
         this.attachChild(frameSprite);
 
-        this.attachChild(hpText);
-        this.attachChild(atkText);
         for (int partyIndex = 0; partyIndex < 3; partyIndex++) {
             this.attachChild(partyHps[partyIndex]);
             this.attachChild(partyAtks[partyIndex]);

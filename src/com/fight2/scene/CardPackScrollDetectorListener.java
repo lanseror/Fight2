@@ -103,7 +103,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
         final TouchEvent touchEvent = scrollDetector.getSceneTouchEvent();
         final float finishedY = touchEvent.getY();
         final IEntity focusedCard = (IEntity) cardZoom.getUserData();
-        if (focusedCard.getScaleX() > 1.8) {
+        if (focusedCard.getScaleX() > 1.8 * CardUpdateHandler.SCALE_FACTOR) {
             // Debug.e("focusedCard.getScaleX() > 1.8");
             if (pPointerID == initPointerID && copyCard != null && focusedCard.contains(initX, initY) && Math.abs(initDistanceY) > Math.abs(initDistanceX)) {
 
@@ -144,6 +144,8 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                         // Debug.e("Add card");
                         final Card cardEntry = (Card) focusedCard.getUserData();
                         partyCards[cardGridIndex] = cardEntry;
+                        partyEditScene.calculatePartyHpAtk();
+                        partyEditScene.updatePartyHpAtk();
                         cardGrid = this.partyEditScene.cardGrids[cardGridIndex];
                         final IEntity toReplaceCardAvatar = partyEditScene.createCardAvatarSprite(cardEntry, 10, 20);
                         toReplaceCardAvatar.setPosition(cardGrid);
@@ -282,12 +284,11 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                 @Override
                 public void run() {
                     focusedCard.detachSelf();
-                    CardPackScrollDetectorListener.this.partyEditScene.removedCards.put(cardEntry, focusedCard);
+                    partyEditScene.removedCards.put(cardEntry, focusedCard);
                     GameUserSession.getInstance().getCards().remove(cardEntry);
                     partyEditScene.attachChild(avatar);
                     pItem.detachSelf();
                     partyEditScene.sortChildren();
-
                 }
             });
 

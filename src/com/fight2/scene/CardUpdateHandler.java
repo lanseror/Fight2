@@ -7,6 +7,7 @@ import org.andengine.engine.handler.BaseEntityUpdateHandler;
 import org.andengine.entity.IEntity;
 
 public class CardUpdateHandler extends BaseEntityUpdateHandler {
+    public static float SCALE_FACTOR = 0.8f;
     /**
      * 
      */
@@ -31,7 +32,7 @@ public class CardUpdateHandler extends BaseEntityUpdateHandler {
         if (diff < distance) {
             final BigDecimal bdDiff = BigDecimal.valueOf(distance - diff);
             final BigDecimal bdDistance = BigDecimal.valueOf(distance);
-            final float scale = 1 + bdDiff.divide(bdDistance, 4, RoundingMode.HALF_UP).floatValue();
+            final float scale = 1 + bdDiff.divide(bdDistance, 4, RoundingMode.HALF_UP).floatValue() * SCALE_FACTOR;
             currentCard.setScale(scale);
 
             final int currentCardIndex = currentCard.getTag();

@@ -1,7 +1,9 @@
 package com.fight2.scene;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.andengine.entity.scene.IOnSceneTouchListener;
@@ -10,11 +12,14 @@ import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
+import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.util.algorithm.collision.BaseCollisionChecker;
 
 import com.fight2.GameActivity;
+import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.constant.TiledTextureEnum;
@@ -34,8 +39,21 @@ public class MainScene extends BaseScene {
 
     private final Map<Sprite, Sprite> buttonSprites = new HashMap<Sprite, Sprite>();
 
+    private final Font mFont;
+    private final Text summonText;
+    private final Text arenaText;
+    private final Text campText;
+    private final List<Text> tipTexts = new ArrayList<Text>();
+
     public MainScene(final GameActivity activity) throws IOException {
         super(activity);
+        this.mFont = ResourceManager.getInstance().getFont(FontEnum.Main);
+        summonText = new Text(this.simulatedLeftX + 570, 25, mFont, "召唤石", vbom);
+        arenaText = new Text(this.simulatedLeftX + 670, 345, mFont, "竞技场", vbom);
+        campText = new Text(this.simulatedLeftX + 720, 200, mFont, "训练营", vbom);
+        tipTexts.add(summonText);
+        tipTexts.add(arenaText);
+        tipTexts.add(campText);
         init();
     }
 
@@ -147,6 +165,11 @@ public class MainScene extends BaseScene {
         this.attachChild(rechargeSprite);
         this.registerTouchArea(rechargeSprite);
 
+        for (final Text tipText : tipTexts) {
+            tipText.setVisible(false);
+            this.attachChild(tipText);
+        }
+
         this.setOnSceneTouchListener(new IOnSceneTouchListener() {
             @Override
             public boolean onSceneTouchEvent(final Scene pScene, final TouchEvent pSceneTouchEvent) {
@@ -154,6 +177,9 @@ public class MainScene extends BaseScene {
                 final float y = pSceneTouchEvent.getY();
                 resetButtons();
                 if (pSceneTouchEvent.isActionDown() || pSceneTouchEvent.isActionMove()) {
+                    for (final Text tipText : tipTexts) {
+                        tipText.setVisible(true);
+                    }
                     if (checkContains(MAIL_VERTICES, x, y)) {
                         focusSprite(mailBoxSprite);
                     } else if (checkContains(SUMMON_VERTICES, x, y)) {
@@ -174,6 +200,10 @@ public class MainScene extends BaseScene {
                         focusSprite(gateSprite);
                     }
                 } else if (pSceneTouchEvent.isActionUp()) {
+                    for (final Text tipText : tipTexts) {
+                        tipText.setVisible(false);
+                    }
+
                     if (checkContains(MAIL_VERTICES, x, y)) {
                         unfocusSprite(mailBoxSprite);
                     } else if (checkContains(SUMMON_VERTICES, x, y)) {

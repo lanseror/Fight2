@@ -5,7 +5,7 @@ public enum MusicEnum {
     MAIN_BG("Campaign-Haven.mp3"),
     ARENA_ATTACK("Sword-Draw.mp3"),
     // BATTLE_BG("Battle-Haven.mp3"),
-    BATTLE_HIT("Hit.mp3"),
+    BATTLE_HIT("HeadHunterMissileHit2.wav"),
     BATTLE_WIN("Win Battle.mp3"),
     BATTLE_LOSE("LoseCastle.mp3");
     private final String url;

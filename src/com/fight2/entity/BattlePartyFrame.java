@@ -81,6 +81,10 @@ public class BattlePartyFrame extends Rectangle {
             final ITextureRegion texture = textureFactory.getTextureRegion(card.getImage());
             final Sprite cardSprite = new Sprite(startX + 65 * i, 80, CARD_WIDTH, CARD_HEIGHT, texture, vbom);
             cardSprites[i] = cardSprite;
+            final ITextureRegion textureFcs = textureFactory.getAssetTextureRegion(TextureEnum.BATTLE_CARD_SKILL_FCS);
+            final Sprite cardSpriteFcs = new Sprite(CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f, textureFcs, vbom);
+            cardSpriteFcs.setVisible(false);
+            cardSprite.attachChild(cardSpriteFcs);
             this.attachChild(cardSprite);
         }
     }
@@ -101,6 +105,10 @@ public class BattlePartyFrame extends Rectangle {
                     : textureFactory.getTextureRegion(avatar);
             final Sprite cardSprite = new Sprite(startX + (AVATAR_WIDTH + avatarGap) * i, AVATAR_HEIGHT * 0.5f, AVATAR_WIDTH, AVATAR_HEIGHT, texture, vbom);
             cardSprites[i] = cardSprite;
+            final ITextureRegion textureFcs = textureFactory.getAssetTextureRegion(TextureEnum.BATTLE_AVATAR_SKILL_FCS);
+            final Sprite cardSpriteFcs = new Sprite(AVATAR_WIDTH * 0.5f, AVATAR_HEIGHT * 0.5f, textureFcs, vbom);
+            cardSpriteFcs.setVisible(false);
+            cardSprite.attachChild(cardSpriteFcs);
             this.attachChild(cardSprite);
         }
 
@@ -137,10 +145,19 @@ public class BattlePartyFrame extends Rectangle {
         final float fromY = cardSprite.getY();
         final float toY = (isBottom ? fromY + 40 : fromY - 30);
 
+        final IEntity cardSpriteFcs = cardSprite.getChildByIndex(0);
+        cardSpriteFcs.setVisible(true);
+
         final IEntityModifier firstStepModifier = new MoveModifier(0.2f, x, fromY, x, toY);
         final IEntityModifier secondStepModifier = new MoveModifier(0.2f, x, toY, x, fromY);
         firstStepModifier.addModifierListener(new ModifierFinishedListener(onFirstStepFinishedCallback));
-        secondStepModifier.addModifierListener(new ModifierFinishedListener(onFinishedCallback));
+        secondStepModifier.addModifierListener(new ModifierFinishedListener(new OnFinishedCallback() {
+            @Override
+            public void onFinished(final IEntity pItem) {
+                cardSpriteFcs.setVisible(false);
+                onFinishedCallback.onFinished(pItem);
+            }
+        }));
 
         final IEntityModifier cardModifier = new SequenceEntityModifier(firstStepModifier, new DelayModifier(0.2f), secondStepModifier, new DelayModifier(1f));
         activity.runOnUpdateThread(new Runnable() {

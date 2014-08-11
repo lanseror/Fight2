@@ -146,7 +146,7 @@ public class BattleScene extends BaseScene {
 
         final IEntityModifier showModifier = new AlphaModifier(2, 0, 1);
         final IEntityModifier hideModifier = new AlphaModifier(2, 1, 0, hideFinishListener);
-        final IEntityModifier battleResultModifier = new SequenceEntityModifier(showModifier, new DelayModifier(1.5f), hideModifier, new DelayModifier(0.5f));
+        final IEntityModifier battleResultModifier = new SequenceEntityModifier(showModifier, new DelayModifier(1.5f), hideModifier);
         activity.runOnUpdateThread(new Runnable() {
             @Override
             public void run() {
