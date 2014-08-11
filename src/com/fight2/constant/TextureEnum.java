@@ -73,6 +73,9 @@ public enum TextureEnum {
     BATTLE_BG("images/battle_backgroud.jpg", 1136, 640),
     BATTLE_PARTY_BOTTOM("images/battle_party_bottom.png", 312, 83),
     BATTLE_PARTY_TOP("images/battle_party_top.png", 312, 81),
+    BATTLE_WIN("images/battle_win.png", 791, 254),
+    BATTLE_LOSE("images/battle_lose.png", 791, 251),
+    BATTLE_SKIP("images/battle_skip.png", 142, 101),
 
     TEST_CARD1("card/card1.jpg", 100, 100),
     TEST_CARD2("card/card2.jpg", 100, 100),

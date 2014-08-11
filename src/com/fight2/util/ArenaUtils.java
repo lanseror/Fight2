@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import com.fight2.GameActivity;
 import com.fight2.entity.Player;
 import com.fight2.entity.battle.BattleRecord;
+import com.fight2.entity.battle.BattleResult;
 import com.fight2.entity.battle.SkillApplyParty;
 import com.fight2.entity.battle.SkillOperation;
 import com.fight2.entity.battle.SkillRecord;
@@ -51,13 +52,17 @@ public class ArenaUtils {
         }
     }
 
-    public static List<BattleRecord> attack(final int id, final GameActivity activity) {
+    public static BattleResult attack(final int id, final GameActivity activity) {
         final String url = HttpUtils.HOST_URL + "/arena/attack.action?id=" + id;
+        final BattleResult battleResult = new BattleResult();
         final List<BattleRecord> battleRecords = new ArrayList<BattleRecord>();
+        battleResult.setBattleRecord(battleRecords);
         try {
-            final JSONArray responseJson = HttpUtils.getJSONArrayFromUrl(url);
-            for (int i = 0; i < responseJson.length(); i++) {
-                final JSONObject battleRecordJson = responseJson.getJSONObject(i);
+            final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
+            battleResult.setWinner(responseJson.getBoolean("isWinner"));
+            final JSONArray battleRecordJsonArray = responseJson.getJSONArray("battleRecord");
+            for (int i = 0; i < battleRecordJsonArray.length(); i++) {
+                final JSONObject battleRecordJson = battleRecordJsonArray.getJSONObject(i);
                 final BattleRecord battleRecord = new BattleRecord();
                 battleRecord.setActionPlayer(battleRecordJson.getString("actionPlayer"));
                 battleRecord.setAtk(battleRecordJson.getInt("atk"));
@@ -93,7 +98,7 @@ public class ArenaUtils {
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
-        return battleRecords;
+        return battleResult;
     }
 
     public static String getTestString(final GameActivity activity) {

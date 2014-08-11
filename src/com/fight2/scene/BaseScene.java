@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.ITexture;
 import org.andengine.opengl.texture.bitmap.AssetBitmapTexture;
 import org.andengine.opengl.texture.region.ITextureRegion;
@@ -14,6 +15,7 @@ import com.fight2.GameActivity;
 import com.fight2.constant.ConfigEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.F2ButtonSprite;
+import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.ConfigHelper;
 import com.fight2.util.TextureFactory;
 
@@ -60,6 +62,18 @@ public abstract class BaseScene extends Scene {
         return textureRegion;
     }
 
+    protected F2ButtonSprite createALBF2ButtonSprite(final TextureEnum normalTextureEnum, final TextureEnum pressedTextureEnum, final float x, final float y) {
+        final TextureFactory textureFactory = TextureFactory.getInstance();
+        final ITextureRegion normalTexture = textureFactory.getAssetTextureRegion(normalTextureEnum);
+        final ITextureRegion pressedTexture = textureFactory.getAssetTextureRegion(pressedTextureEnum);
+        final float width = normalTextureEnum.getWidth();
+        final float height = normalTextureEnum.getHeight();
+        final float pX = x + width * 0.5f;
+        final float pY = y + height * 0.5f;
+        final F2ButtonSprite sprite = new F2ButtonSprite(pX, pY, normalTexture, pressedTexture, vbom);
+        return sprite;
+    }
+
     /**
      * Anchor left bottom sprite
      * 
@@ -79,26 +93,48 @@ public abstract class BaseScene extends Scene {
         return sprite;
     }
 
-    protected F2ButtonSprite createALBF2ButtonSprite(final TextureEnum normalTextureEnum, final TextureEnum pressedTextureEnum, final float x, final float y) {
-        final TextureFactory textureFactory = TextureFactory.getInstance();
-        final ITextureRegion normalTexture = textureFactory.getAssetTextureRegion(normalTextureEnum);
-        final ITextureRegion pressedTexture = textureFactory.getAssetTextureRegion(pressedTextureEnum);
-        final float width = normalTextureEnum.getWidth();
-        final float height = normalTextureEnum.getHeight();
-        final float pX = x + width * 0.5f;
-        final float pY = y + height * 0.5f;
-        final F2ButtonSprite sprite = new F2ButtonSprite(pX, pY, normalTexture, pressedTexture, vbom);
-        return sprite;
-    }
-
-    protected Sprite createCameraImageSprite(final TextureEnum textureEnum, final float x, final float y) {
+    /**
+     * Anchor left bottom sprite
+     * 
+     * @param textureEnum
+     * @param x
+     * @param y
+     * @return
+     */
+    protected Sprite createALBImageSprite(final TextureEnum textureEnum, final float x, final float y, final F2OnClickListener onClickListener) {
         final TextureFactory textureFactory = TextureFactory.getInstance();
         final ITextureRegion texture = textureFactory.getAssetTextureRegion(textureEnum);
         final float width = textureEnum.getWidth();
         final float height = textureEnum.getHeight();
         final float pX = x + width * 0.5f;
         final float pY = y + height * 0.5f;
-        final Sprite sprite = new Sprite(pX, pY, width, height, texture, vbom);
+        final Sprite sprite = new Sprite(pX, pY, width, height, texture, vbom) {
+            @Override
+            public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                if (pSceneTouchEvent.isActionDown()) {
+                    onClickListener.onClick(this, pTouchAreaLocalX, pTouchAreaLocalY);
+                    return true;
+                }
+                return false;
+            }
+        };
+        return sprite;
+    }
+
+    /**
+     * Anchor center sprite
+     * 
+     * @param textureEnum
+     * @param x
+     * @param y
+     * @return
+     */
+    protected Sprite createACImageSprite(final TextureEnum textureEnum, final float x, final float y) {
+        final TextureFactory textureFactory = TextureFactory.getInstance();
+        final ITextureRegion texture = textureFactory.getAssetTextureRegion(textureEnum);
+        final float width = textureEnum.getWidth();
+        final float height = textureEnum.getHeight();
+        final Sprite sprite = new Sprite(x, y, width, height, texture, vbom);
         return sprite;
     }
 

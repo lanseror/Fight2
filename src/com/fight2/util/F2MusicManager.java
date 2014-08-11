@@ -38,6 +38,14 @@ public class F2MusicManager {
         playMusic(musicEnum, false);
     }
 
+    public void stopMusic() {
+        final Music oldMusic = currentMusic;
+        if (oldMusic != null && !oldMusic.isReleased()) {
+            oldMusic.pause();
+            oldMusic.seekTo(0);
+        }
+    }
+
     public void playMusic(final MusicEnum musicEnum, final boolean looping) {
         final Music oldMusic = currentMusic;
         currentMusic = datas.get(musicEnum);

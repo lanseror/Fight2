@@ -29,7 +29,7 @@ public class SummonScene extends BaseScene {
 
     @Override
     protected void init() throws IOException {
-        final Sprite bgSprite = createCameraImageSprite(TextureEnum.SUMMON_BG, 0, 0);
+        final Sprite bgSprite = createALBImageSprite(TextureEnum.SUMMON_BG, 0, 0);
         final Background background = new SpriteBackground(bgSprite);
         this.setBackground(background);
 

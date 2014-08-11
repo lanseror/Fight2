@@ -25,21 +25,23 @@ import org.andengine.util.modifier.IModifier;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
+import com.fight2.constant.MusicEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.BattlePartyFrame;
-import com.fight2.entity.F2ButtonSprite;
 import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.HpBar;
 import com.fight2.entity.Party;
 import com.fight2.entity.battle.BattleRecord;
+import com.fight2.entity.battle.BattleResult;
 import com.fight2.entity.battle.SkillApplyParty;
 import com.fight2.entity.battle.SkillOperation;
 import com.fight2.entity.battle.SkillRecord;
 import com.fight2.entity.battle.SkillType;
 import com.fight2.util.ArenaUtils;
 import com.fight2.util.CardUtils;
+import com.fight2.util.F2MusicManager;
 import com.fight2.util.ResourceManager;
 
 public class BattleScene extends BaseScene {
@@ -59,40 +61,52 @@ public class BattleScene extends BaseScene {
     private final Text skillEffectText;
     private final Queue<BattleRecord> battleRecordQueue = new LinkedList<BattleRecord>();
     private final Queue<OnFinishedCallback> battleFinishedCallbackQueue = new LinkedList<OnFinishedCallback>();
+    private final Sprite winImage;
+    private final Sprite loseImage;
+    private final boolean isWinner;
+    private final Sprite skipSprite;
 
     public BattleScene(final GameActivity activity, final int attackPlayerId) throws IOException {
         super(activity);
         this.skillText = new Text(this.cameraCenterX, this.cameraCenterY + 30, font, "技能：", 30, vbom);
         this.skillEffectText = new Text(this.cameraCenterX, this.cameraCenterY - 10, font, "效果：", 100, vbom);
+        winImage = this.createACImageSprite(TextureEnum.BATTLE_WIN, this.cameraCenterX, this.cameraCenterY);
+        loseImage = this.createACImageSprite(TextureEnum.BATTLE_LOSE, this.cameraCenterX, this.cameraCenterY);
         skillText.setAlpha(0);
         skillEffectText.setAlpha(0);
+        winImage.setAlpha(0);
+        loseImage.setAlpha(0);
         this.attachChild(skillText);
         this.attachChild(skillEffectText);
+        this.attachChild(winImage);
+        this.attachChild(loseImage);
         opponentParties = CardUtils.getPartyByUserId(activity, attackPlayerId).getParties();
-        final List<BattleRecord> battleRecords = ArenaUtils.attack(attackPlayerId, activity);
+        final BattleResult battleResult = ArenaUtils.attack(attackPlayerId, activity);
+        isWinner = battleResult.isWinner();
+        final List<BattleRecord> battleRecords = battleResult.getBattleRecord();
         for (final BattleRecord battleRecord : battleRecords) {
             battleRecordQueue.add(battleRecord);
             battleFinishedCallbackQueue.add(new BattleFinishedCallback());
         }
+
         init();
+
+        skipSprite = createALBImageSprite(TextureEnum.BATTLE_SKIP, this.simulatedRightX - 142, 250, new F2OnClickListener() {
+            @Override
+            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                skipSprite.setVisible(false);
+                battleRecordQueue.clear();
+            }
+        });
+        this.attachChild(skipSprite);
+        this.registerTouchArea(skipSprite);
     }
 
     @Override
     protected void init() throws IOException {
-        final Sprite bgSprite = createCameraImageSprite(TextureEnum.BATTLE_BG, 0, 0);
+        final Sprite bgSprite = createALBImageSprite(TextureEnum.BATTLE_BG, 0, 0);
         final Background background = new SpriteBackground(bgSprite);
         this.setBackground(background);
-
-        final F2ButtonSprite backButton = createALBF2ButtonSprite(TextureEnum.COMMON_BACK_BUTTON_NORMAL, TextureEnum.COMMON_BACK_BUTTON_PRESSED,
-                this.simulatedRightX - 140, 250);
-        backButton.setOnClickListener(new F2OnClickListener() {
-            @Override
-            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                ResourceManager.getInstance().setCurrentScene(SceneEnum.Arena);
-            }
-        });
-        this.attachChild(backButton);
-        this.registerTouchArea(backButton);
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
@@ -112,10 +126,37 @@ public class BattleScene extends BaseScene {
                     unregisterUpdateHandler(this);
 
                     if (!battleRecordQueue.isEmpty()) {
+                        // F2MusicManager.getInstance().playMusic(MusicEnum.BATTLE_BG);
                         handleBattleRecord(battleRecordQueue.poll(), battleFinishedCallbackQueue.poll());
                     }
                 }
             }
+        });
+    }
+
+    private void showBattleResult() {
+        skipSprite.setVisible(false);
+        F2MusicManager.getInstance().playMusic(isWinner ? MusicEnum.BATTLE_WIN : MusicEnum.BATTLE_LOSE);
+        final IEntityModifierListener hideFinishListener = new ModifierFinishedListener(new OnFinishedCallback() {
+            @Override
+            public void onFinished(final IEntity pItem) {
+                ResourceManager.getInstance().setCurrentScene(SceneEnum.Arena);
+            }
+        });
+
+        final IEntityModifier showModifier = new AlphaModifier(2, 0, 1);
+        final IEntityModifier hideModifier = new AlphaModifier(2, 1, 0, hideFinishListener);
+        final IEntityModifier battleResultModifier = new SequenceEntityModifier(showModifier, new DelayModifier(1.5f), hideModifier, new DelayModifier(0.5f));
+        activity.runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                if (isWinner) {
+                    winImage.registerEntityModifier(battleResultModifier);
+                } else {
+                    loseImage.registerEntityModifier(battleResultModifier);
+                }
+            }
+
         });
     }
 
@@ -126,9 +167,10 @@ public class BattleScene extends BaseScene {
             final BattleRecord battleRecord = battleRecordQueue.poll();
             if (battleRecord != null) {
                 handleBattleRecord(battleRecord, battleFinishedCallbackQueue.poll());
+            } else {
+                showBattleResult();
             }
         }
-
     }
 
     private void handleBattleRecord(final BattleRecord battleRecord, final OnFinishedCallback battleFinishedCallback) {
@@ -156,6 +198,7 @@ public class BattleScene extends BaseScene {
 
             @Override
             public void onFinished(final IEntity pItem) {
+                F2MusicManager.getInstance().playMusic(MusicEnum.BATTLE_HIT);
                 final HpBar hpBar = defencePartyFrame.getHpBar();
                 final int hp = hpBar.getCurrentPoint();
                 final int defence = defencePartyFrame.getDefence();
@@ -317,6 +360,16 @@ public class BattleScene extends BaseScene {
                 applyParties.add(selfParty);
         }
         return applyParties;
+    }
+
+    private int getPartiesRemainHp(final BattlePartyFrame[] parties) {
+        int hp = 0;
+        for (final BattlePartyFrame party : parties) {
+            if (party != null) {
+                hp += party.getHp();
+            }
+        }
+        return hp;
     }
 
     @Override
