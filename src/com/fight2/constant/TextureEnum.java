@@ -67,7 +67,16 @@ public enum TextureEnum {
 
     // Arena scene images.
     ARENA_BG("images/arena_backgroud.png", 1136, 640),
-    ARENA_BATTLE("images/arena_battle_button.jpg", 215, 68),
+    ARENA_BATTLE_FRAME("images/arena_battle_frame.png", 242, 311),
+    ARENA_BATTLE_BUTTON("images/arena_battle_button.png", 229, 75),
+    ARENA_BATTLE_BUTTON_FCS("images/arena_battle_button_fcs.png", 229, 75),
+    ARENA_BATTLE_INFO("images/arena_battle_info.png", 740, 181),
+    ARENA_BATTLE_REFRESH("images/arena_battle_refresh.png", 141, 145),
+    ARENA_BATTLE_REFRESH_FCS("images/arena_battle_refresh_fcs.png", 141, 145),
+    ARENA_BATTLE_RANKING("images/arena_battle_ranking.png", 141, 145),
+    ARENA_BATTLE_RANKING_FCS("images/arena_battle_ranking_fcs.png", 141, 145),
+    ARENA_BATTLE_REWARD("images/arena_battle_reward.png", 141, 145),
+    ARENA_BATTLE_REWARD_FCS("images/arena_battle_reward_fcs.png", 141, 145),
 
     // Battle scene images.
     BATTLE_BG("images/battle_backgroud.jpg", 1136, 640),
