@@ -2,20 +2,25 @@ package com.fight2.scene;
 
 import java.io.IOException;
 
+import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.IEntityModifier;
 import org.andengine.entity.modifier.ParallelEntityModifier;
 import org.andengine.entity.modifier.RotationByModifier;
 import org.andengine.entity.modifier.ScaleModifier;
+import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
+import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.util.debug.Debug;
 
 import com.fight2.GameActivity;
+import com.fight2.constant.FontEnum;
 import com.fight2.constant.MusicEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
@@ -28,14 +33,35 @@ import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
 
 public class SummonFinishScene extends BaseScene {
+    private final static int CARD_WIDTH = 100;
+    private final static int CARD_HEIGHT = 150;
     private final Sprite cardSprite;
-    final TextureFactory textureFactory = TextureFactory.getInstance();
+    private final IEntity cardFrame;
+    private final TextureFactory textureFactory = TextureFactory.getInstance();
+    private final Font mFont;
+    private final Text hpText;
+    private final Text atkText;
 
     public SummonFinishScene(final Card card, final GameActivity activity) throws IOException {
         super(activity);
-        loadImageFromServer(card);
+        this.mFont = ResourceManager.getInstance().getFont(FontEnum.Main, 10);
+        this.cardFrame = new Rectangle(cameraCenterX, cameraCenterY, CARD_WIDTH, CARD_HEIGHT, vbom);
+        this.attachChild(cardFrame);
         final ITextureRegion texture = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_CARD_COVER);
-        cardSprite = new Sprite(cameraCenterX, cameraCenterY, 100, 150, texture, vbom);
+        this.cardSprite = new Sprite(CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f, CARD_WIDTH, CARD_HEIGHT, texture, vbom);
+        cardFrame.attachChild(cardSprite);
+        loadImageFromServer(card);
+        hpText = new Text(30, 20, mFont, "0123456789", vbom);
+        atkText = new Text(30, 10, mFont, "0123456789", vbom);
+        hpText.setText(String.valueOf(card.getHp()));
+        atkText.setText(String.valueOf(card.getAtk()));
+        cardFrame.attachChild(hpText);
+        cardFrame.attachChild(atkText);
+        final ITextureRegion starTexture = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_STAR);
+        for (int i = 0; i < card.getStar(); i++) {
+            final Sprite star = new Sprite(15 + 6.5f * i, CARD_HEIGHT - 6, 6.5f, 8, starTexture, vbom);
+            cardFrame.attachChild(star);
+        }
         init();
     }
 
@@ -56,7 +82,6 @@ public class SummonFinishScene extends BaseScene {
 
         });
 
-        this.attachChild(cardSprite);
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
     }
@@ -69,9 +94,9 @@ public class SummonFinishScene extends BaseScene {
     @Override
     protected void playAnimation() {
         F2MusicManager.getInstance().playMusic(MusicEnum.SUMMON);
-        cardSprite.setRotation(90);
+        cardFrame.setRotation(90);
         final IEntityModifier modifier = new ParallelEntityModifier(new ScaleModifier(0.3f, 1f, 3), new RotationByModifier(0.3f, 270));
-        cardSprite.registerEntityModifier(modifier);
+        cardFrame.registerEntityModifier(modifier);
     }
 
     public void loadImageFromServer(final Card card) {
@@ -99,7 +124,7 @@ public class SummonFinishScene extends BaseScene {
 
                 if (image != null) {
                     final ITextureRegion texture = textureFactory.getTextureRegion(image);
-                    final Sprite imageSprite = new Sprite(50, 75, 100, 150, texture, vbom);
+                    final Sprite imageSprite = new Sprite(CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f, CARD_WIDTH, CARD_HEIGHT, texture, vbom);
                     cardSprite.attachChild(imageSprite);
                 }
 

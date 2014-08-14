@@ -13,6 +13,7 @@ public enum TextureEnum {
     COMMON_HP_RIGHT_GREEN("images/common_hp_right_green.png", 10, 23),
     COMMON_HP_GREEN("images/common_hp_green.png", 285, 23),
     COMMON_CARD_COVER("images/common_card_cover.png", 810, 540),
+    COMMON_STAR("images/common_star.png", 26, 32),
 
     // Main scene images.
     MAIN_BG("images/main_backgroud.png", 1136, 640),

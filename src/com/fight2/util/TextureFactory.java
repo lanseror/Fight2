@@ -102,7 +102,12 @@ public class TextureFactory {
     }
 
     public ITextureRegion getTextureRegion(final String imageString) {
-        return this.cardDatas.get(imageString);
+        if (cardDatas.containsKey(imageString)) {
+            return this.cardDatas.get(imageString);
+        } else {
+            return getAssetTextureRegion(TextureEnum.COMMON_CARD_COVER);
+        }
+
     }
 
     private ITextureRegion createIextureRegion(final GameActivity activity, final String image) throws IOException {
