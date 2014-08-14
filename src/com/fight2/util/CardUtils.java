@@ -67,17 +67,12 @@ public class CardUtils {
             final int status = responseJson.getInt("status");
             if (status == 0) {
                 final JSONObject cardJson = responseJson.getJSONObject("card");
-                final String avatar = ImageUtils.getLocalString(cardJson.getString("avatar"), activity);
-                final String image = ImageUtils.getLocalString(cardJson.getString("image"), activity);
-                final TextureFactory textureFactory = TextureFactory.getInstance();
-                textureFactory.addCardResource(activity, avatar);
-                textureFactory.addCardResource(activity, image);
                 final Card card = new Card();
                 card.setId(cardJson.getInt("id"));
                 card.setAtk(cardJson.getInt("atk"));
-                card.setAvatar(avatar);
+                card.setAvatar(cardJson.getString("avatar"));
                 card.setHp(cardJson.getInt("hp"));
-                card.setImage(image);
+                card.setImage(cardJson.getString("image"));
                 card.setName(cardJson.getString("name"));
                 card.setSkill(cardJson.optString("skill"));
                 cards.add(card);

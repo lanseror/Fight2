@@ -2,6 +2,7 @@ package com.fight2.scene;
 
 import java.io.IOException;
 
+import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
@@ -49,6 +50,33 @@ public abstract class BaseScene extends Scene {
         this.simulatedHeight = configHelper.getInt(ConfigEnum.SimulatedHeight);
         this.simulatedLeftX = configHelper.getFloat(ConfigEnum.SimulatedLeftX);
         this.simulatedRightX = configHelper.getFloat(ConfigEnum.SimulatedRightX);
+        this.registerUpdateHandler(new AnimationWorkarroundHandler(this));
+    }
+
+    private static class AnimationWorkarroundHandler implements IUpdateHandler {
+        private final BaseScene baseScene;
+        private int updates = 0;
+
+        public AnimationWorkarroundHandler(final BaseScene baseScene) {
+            this.baseScene = baseScene;
+        }
+
+        @Override
+        public void reset() {
+        }
+
+        @Override
+        public void onUpdate(final float pSecondsElapsed) {
+            ++updates;
+            if (updates > 10) {
+                baseScene.unregisterUpdateHandler(this);
+                baseScene.playAnimation();
+            }
+        }
+    }
+
+    protected void playAnimation() {
+
     }
 
     protected abstract void init() throws IOException;

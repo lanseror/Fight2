@@ -34,6 +34,7 @@ public class ImageUtils {
         return localString;
     }
 
+
     public static String downloadAndSave(final String webUrl, final Context context) throws IOException {
         final URL url = new URL(HttpUtils.HOST_URL + webUrl);
 
