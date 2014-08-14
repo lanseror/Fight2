@@ -98,7 +98,7 @@ public class PartyScene extends BaseScene {
         updateScene();
 
         final F2ButtonSprite editSprite = createALBF2ButtonSprite(TextureEnum.PARTY_EDIT_BUTTON, TextureEnum.PARTY_EDIT_BUTTON_PRESSED,
-                this.simulatedRightX - 140, 220);
+                this.simulatedRightX - 135, 220);
         editSprite.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
@@ -114,7 +114,7 @@ public class PartyScene extends BaseScene {
         this.registerTouchArea(editSprite);
 
         final F2ButtonSprite backButton = createALBF2ButtonSprite(TextureEnum.COMMON_BACK_BUTTON_NORMAL, TextureEnum.COMMON_BACK_BUTTON_PRESSED,
-                this.simulatedRightX - 140, 50);
+                this.simulatedRightX - 135, 50);
         backButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {

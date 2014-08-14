@@ -87,8 +87,8 @@ public class PartyEditScene extends BaseScene {
         max_velocity = BigDecimal.valueOf(Math.sqrt(2 * ACCELERATION * DISTANCE_15CARDS)).floatValue();
         this.mFont = ResourceManager.getInstance().getFont(FontEnum.Main);
 
-        cardZoom = new Rectangle(250 + CARD_WIDTH * 0.7f, 165, CARD_WIDTH * 1.4f, CARD_HEIGHT * 1.4f, vbom);
-        cardPack = new Rectangle(300, 165, 21000, 250, vbom);
+        cardZoom = new Rectangle(250 + CARD_WIDTH * 0.7f, 170, CARD_WIDTH * 1.4f, CARD_HEIGHT * 1.4f, vbom);
+        cardPack = new Rectangle(300, 170, 21000, 250, vbom);
         partyInfoHpText = new Text(this.simulatedLeftX + 360, topbarY + 48, mFont, "0123456789", vbom);
         partyInfoAtkText = new Text(this.simulatedLeftX + 600, topbarY + 48, mFont, "0123456789", vbom);
         partyHpText = new Text(this.simulatedLeftX + 165, frameY + 63, mFont, "0123456789", vbom);
@@ -355,6 +355,11 @@ public class PartyEditScene extends BaseScene {
         this.attachChild(cardPack);
         this.attachChild(cardZoom);
 
+        final Sprite leftCover = createALBImageSprite(TextureEnum.PARTY_EDIT_COVER_LEFT, 0, 80);
+        final Sprite rightCover = createALBImageSprite(TextureEnum.PARTY_EDIT_COVER_RIGHT, this.cameraWidth - TextureEnum.PARTY_EDIT_COVER_RIGHT.getWidth(), 80);
+        this.attachChild(leftCover);
+        this.attachChild(rightCover);
+
         final F2ButtonSprite backButton = createBackButton();
         this.attachChild(backButton);
         this.registerTouchArea(backButton);
@@ -373,7 +378,7 @@ public class PartyEditScene extends BaseScene {
 
     private F2ButtonSprite createBackButton() {
         final F2ButtonSprite backButton = createALBF2ButtonSprite(TextureEnum.COMMON_BACK_BUTTON_NORMAL, TextureEnum.COMMON_BACK_BUTTON_PRESSED,
-                this.simulatedRightX - 140, 50);
+                this.simulatedRightX - 135, 50);
         backButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
@@ -395,7 +400,7 @@ public class PartyEditScene extends BaseScene {
 
     private F2ButtonSprite createEnhanceButton() {
         final F2ButtonSprite enhanceButton = createALBF2ButtonSprite(TextureEnum.PARTY_ENHANCE_BUTTON, TextureEnum.PARTY_ENHANCE_BUTTON_PRESSED,
-                this.simulatedRightX - 140, 220);
+                this.simulatedRightX - 135, 220);
         enhanceButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
@@ -412,7 +417,7 @@ public class PartyEditScene extends BaseScene {
 
     private F2ButtonSprite createSwitchButton() {
         final F2ButtonSprite switchButton = createALBF2ButtonSprite(TextureEnum.PARTY_EDIT_SWITCH_BUTTON, TextureEnum.PARTY_EDIT_SWITCH_BUTTON_PRESSED,
-                this.simulatedRightX - 140, 390);
+                this.simulatedRightX - 135, 390);
         switchButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {

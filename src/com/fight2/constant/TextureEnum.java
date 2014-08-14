@@ -5,13 +5,14 @@ public enum TextureEnum {
     SPLASH_BG("images/common_splash_screen.png", 1136, 640),
 
     // Common images.
-    COMMON_BACK_BUTTON_NORMAL("images/common_back_button.png", 130, 133),
-    COMMON_BACK_BUTTON_PRESSED("images/common_back_button_fcs.png", 130, 133),
+    COMMON_BACK_BUTTON_NORMAL("images/common_back_button.png", 130, 132),
+    COMMON_BACK_BUTTON_PRESSED("images/common_back_button_fcs.png", 130, 132),
     COMMON_DEFAULT_AVATAR("images/common_default_avatar.png", 135, 135),
     COMMON_HP_RED("images/common_hp_red.png", 285, 23),
     COMMON_HP_RIGHT_RED("images/common_hp_right_red.png", 10, 23),
     COMMON_HP_RIGHT_GREEN("images/common_hp_right_green.png", 10, 23),
     COMMON_HP_GREEN("images/common_hp_green.png", 285, 23),
+    COMMON_CARD_COVER("images/common_card_cover.png", 810, 540),
 
     // Main scene images.
     MAIN_BG("images/main_backgroud.png", 1136, 640),
@@ -54,10 +55,12 @@ public enum TextureEnum {
     PARTY_EDIT_BG("images/party_edit_backgroud.png", 1136, 640),
     PARTY_EDIT_FRAME("images/party_edit_frame.png", 732, 247),
     PARTY_EDIT_FRAME_GRID("images/party_edit_frame_grid.png", 159, 148),
-    PARTY_EDIT_SWITCH_BUTTON("images/party_edit_switch_button.png", 131, 133),
-    PARTY_EDIT_SWITCH_BUTTON_PRESSED("images/party_edit_switch_button_fcs.png", 131, 133),
-    PARTY_ENHANCE_BUTTON("images/party_enhance_button.png", 132, 132),
-    PARTY_ENHANCE_BUTTON_PRESSED("images/party_enhance_button_fcs.png", 132, 132),
+    PARTY_EDIT_COVER_LEFT("images/party_edit_cover_left.png", 45, 178),
+    PARTY_EDIT_COVER_RIGHT("images/party_edit_cover_right.png", 442, 180),
+    PARTY_EDIT_SWITCH_BUTTON("images/party_edit_switch_button.png", 130, 132),
+    PARTY_EDIT_SWITCH_BUTTON_PRESSED("images/party_edit_switch_button_fcs.png", 130, 132),
+    PARTY_ENHANCE_BUTTON("images/party_enhance_button.png", 130, 132),
+    PARTY_ENHANCE_BUTTON_PRESSED("images/party_enhance_button_fcs.png", 130, 132),
     PARTY_RECHARGE("images/party_recharge.png", 224, 77),
     PARTY_RECHARGE_PRESSED("images/party_recharge_fcs.png", 224, 77),
 
@@ -71,12 +74,13 @@ public enum TextureEnum {
     ARENA_BATTLE_BUTTON("images/arena_battle_button.png", 229, 75),
     ARENA_BATTLE_BUTTON_FCS("images/arena_battle_button_fcs.png", 229, 75),
     ARENA_BATTLE_INFO("images/arena_battle_info.png", 740, 181),
-    ARENA_BATTLE_REFRESH("images/arena_battle_refresh.png", 141, 145),
-    ARENA_BATTLE_REFRESH_FCS("images/arena_battle_refresh_fcs.png", 141, 145),
-    ARENA_BATTLE_RANKING("images/arena_battle_ranking.png", 141, 145),
-    ARENA_BATTLE_RANKING_FCS("images/arena_battle_ranking_fcs.png", 141, 145),
-    ARENA_BATTLE_REWARD("images/arena_battle_reward.png", 141, 145),
-    ARENA_BATTLE_REWARD_FCS("images/arena_battle_reward_fcs.png", 141, 145),
+    ARENA_BATTLE_REFRESH("images/arena_battle_refresh.png", 130, 132),
+    ARENA_BATTLE_REFRESH_FCS("images/arena_battle_refresh_fcs.png", 130, 132),
+    ARENA_BATTLE_RANKING("images/arena_battle_ranking.png", 130, 132),
+    ARENA_BATTLE_RANKING_FCS("images/arena_battle_ranking_fcs.png", 130, 132),
+    ARENA_BATTLE_REWARD("images/arena_battle_reward.png", 130, 132),
+    ARENA_BATTLE_REWARD_FCS("images/arena_battle_reward_fcs.png", 130, 132),
+    ARENA_BATTLE_CONTINIOUS_WIN("images/arena_battle_continious_win.png", 121, 118),
 
     // Battle scene images.
     BATTLE_BG("images/battle_backgroud.jpg", 1136, 640),

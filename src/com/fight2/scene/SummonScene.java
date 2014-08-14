@@ -64,9 +64,9 @@ public class SummonScene extends BaseScene {
                     final Card card = CardUtils.summon(activity);
                     if (card != null) {
                         try {
-                            final BaseScene summonFInishScene = new SummonFinishScene(card, activity);
-                            activity.getEngine().setScene(summonFInishScene);
-                            summonFInishScene.updateScene();
+                            final BaseScene summonFinishScene = new SummonFinishScene(card, activity);
+                            activity.getEngine().setScene(summonFinishScene);
+                            summonFinishScene.updateScene();
                         } catch (final IOException e) {
                             throw new RuntimeException(e);
                         }

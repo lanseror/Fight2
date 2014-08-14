@@ -6,10 +6,12 @@ import java.util.Map;
 
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.font.FontFactory;
+import org.andengine.opengl.font.FontManager;
 import org.andengine.opengl.texture.TextureManager;
-import org.andengine.util.adt.color.Color;
+import org.andengine.opengl.texture.TextureOptions;
 
 import android.content.res.AssetManager;
+import android.graphics.Color;
 import android.graphics.Typeface;
 
 import com.fight2.GameActivity;
@@ -28,6 +30,7 @@ public class ResourceManager {
     private GameActivity activity;
     private TextureManager textureManager;
     private AssetManager assetManager;
+    private FontManager fontManager;
     private BaseScene currentScene;
 
     private final Map<SceneEnum, BaseScene> scenes = new HashMap<SceneEnum, BaseScene>();
@@ -44,6 +47,8 @@ public class ResourceManager {
         this.activity = activity;
         this.textureManager = activity.getTextureManager();
         this.assetManager = activity.getAssets();
+        this.fontManager = activity.getFontManager();
+        FontFactory.setAssetBasePath("font/");
         // Start load resources
         TiledTextureFactory.getInstance().loadResource(textureManager, assetManager);
         final TextureFactory textureFactory = TextureFactory.getInstance();
@@ -78,20 +83,41 @@ public class ResourceManager {
     }
 
     public Font getFont(final FontEnum fontEnum) {
+
         switch (fontEnum) {
             case Main:
-                final Font mainFont = FontFactory.create(activity.getFontManager(), activity.getTextureManager(), 256, 256,
-                        Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), 20, Color.WHITE_ARGB_PACKED_INT);
+                return getFont(fontEnum, 20);
+            case Battle:
+                return getFont(fontEnum, 36);
+            case BoldFace:
+                return getFont(fontEnum, 30);
+            default:
+                return getFont(fontEnum, 30);
+        }
+
+    }
+
+    public Font getFont(final FontEnum fontEnum, final int size) {
+
+        switch (fontEnum) {
+            case Main:
+                final Font mainFont = FontFactory.create(fontManager, textureManager, 256, 256, Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), size,
+                        Color.WHITE);
                 mainFont.load();
                 return mainFont;
             case Battle:
                 final Font battleFont = FontFactory.create(activity.getFontManager(), activity.getTextureManager(), 512, 512,
-                        Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), 36, Color.WHITE_ARGB_PACKED_INT);
+                        Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), size, Color.WHITE);
                 battleFont.load();
                 return battleFont;
+            case BoldFace:
+                final Font boldFace = FontFactory.createFromAsset(fontManager, textureManager, 256, 256, TextureOptions.BILINEAR, assetManager,
+                        FontEnum.BoldFace.getFontUrl(), size, true, Color.WHITE);
+                boldFace.load();
+                return boldFace;
             default:
-                final Font defaultFont = FontFactory.create(activity.getFontManager(), activity.getTextureManager(), 256, 256,
-                        Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), 20, Color.WHITE_ARGB_PACKED_INT);
+                final Font defaultFont = FontFactory.createFromAsset(fontManager, textureManager, 256, 256, TextureOptions.BILINEAR, assetManager,
+                        FontEnum.BoldFace.getFontUrl(), size, true, Color.WHITE);
                 defaultFont.load();
                 return defaultFont;
         }
