@@ -48,8 +48,8 @@ public class ArenaScene extends BaseScene {
     public ArenaScene(final GameActivity activity) throws IOException {
         super(activity);
         this.mFont = ResourceManager.getInstance().getFont(FontEnum.Main);
-        this.boldFaceFont = ResourceManager.getInstance().getFont(FontEnum.BoldFace);
-        this.difficultyFont = ResourceManager.getInstance().getFont(FontEnum.BoldFace, 21);
+        this.boldFaceFont = ResourceManager.getInstance().getFont(FontEnum.Default);
+        this.difficultyFont = ResourceManager.getInstance().getFont(FontEnum.Default, 21);
         hpText = new Text(this.simulatedLeftX + 360, topbarY + 48, mFont, "0123456789", vbom);
         atkText = new Text(this.simulatedLeftX + 600, topbarY + 48, mFont, "0123456789", vbom);
         strengthTexts[0] = new Text(140, 90, boldFaceFont, "+10", vbom);

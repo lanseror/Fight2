@@ -89,7 +89,7 @@ public class ResourceManager {
                 return getFont(fontEnum, 20);
             case Battle:
                 return getFont(fontEnum, 36);
-            case BoldFace:
+            case Default:
                 return getFont(fontEnum, 30);
             default:
                 return getFont(fontEnum, 30);
@@ -101,23 +101,22 @@ public class ResourceManager {
 
         switch (fontEnum) {
             case Main:
-                final Font mainFont = FontFactory.create(fontManager, textureManager, 256, 256, Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), size,
-                        Color.WHITE);
+                final Font mainFont = FontFactory.create(fontManager, textureManager, 256, 256, Typeface.DEFAULT, size, Color.WHITE);
                 mainFont.load();
                 return mainFont;
             case Battle:
-                final Font battleFont = FontFactory.create(activity.getFontManager(), activity.getTextureManager(), 512, 512,
-                        Typeface.create(Typeface.DEFAULT, Typeface.NORMAL), size, Color.WHITE);
+                final Font battleFont = FontFactory.create(activity.getFontManager(), activity.getTextureManager(), 512, 512, Typeface.DEFAULT, size,
+                        Color.WHITE);
                 battleFont.load();
                 return battleFont;
-            case BoldFace:
-                final Font boldFace = FontFactory.createFromAsset(fontManager, textureManager, 256, 256, TextureOptions.BILINEAR, assetManager,
-                        FontEnum.BoldFace.getFontUrl(), size, true, Color.WHITE);
+            case Default:
+                final Font boldFace = FontFactory.create(fontManager, textureManager, 256, 256, TextureOptions.BILINEAR, Typeface.DEFAULT, size, true,
+                        Color.WHITE);
                 boldFace.load();
                 return boldFace;
             default:
-                final Font defaultFont = FontFactory.createFromAsset(fontManager, textureManager, 256, 256, TextureOptions.BILINEAR, assetManager,
-                        FontEnum.BoldFace.getFontUrl(), size, true, Color.WHITE);
+                final Font defaultFont = FontFactory.create(fontManager, textureManager, 256, 256, TextureOptions.BILINEAR, Typeface.DEFAULT, size, true,
+                        Color.WHITE);
                 defaultFont.load();
                 return defaultFont;
         }

@@ -46,6 +46,7 @@ public class SummonFinishScene extends BaseScene {
         super(activity);
         this.mFont = ResourceManager.getInstance().getFont(FontEnum.Main, 10);
         this.cardFrame = new Rectangle(cameraCenterX, cameraCenterY, CARD_WIDTH, CARD_HEIGHT, vbom);
+        cardFrame.setRotation(90);
         this.attachChild(cardFrame);
         final ITextureRegion texture = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_CARD_COVER);
         this.cardSprite = new Sprite(CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f, CARD_WIDTH, CARD_HEIGHT, texture, vbom);
@@ -94,7 +95,6 @@ public class SummonFinishScene extends BaseScene {
     @Override
     protected void playAnimation() {
         F2MusicManager.getInstance().playMusic(MusicEnum.SUMMON);
-        cardFrame.setRotation(90);
         final IEntityModifier modifier = new ParallelEntityModifier(new ScaleModifier(0.3f, 1f, 3), new RotationByModifier(0.3f, 270));
         cardFrame.registerEntityModifier(modifier);
     }
