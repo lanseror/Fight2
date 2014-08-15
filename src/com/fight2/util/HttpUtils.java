@@ -55,6 +55,31 @@ public class HttpUtils {
         return jsonString.toString();
     }
 
+    /**
+     * 
+     * Return true if success, false otherwise.
+     * 
+     * @param url
+     * @return
+     * @throws ClientProtocolException
+     * @throws IOException
+     */
+    public static boolean doGet(final String url) throws ClientProtocolException, IOException {
+        try {
+            final HttpGet httpGet = new HttpGet(url);
+            final HttpResponse httpResponse = HTTP_CLIENT.execute(httpGet);
+            final int statusCode = httpResponse.getStatusLine().getStatusCode();
+            if (statusCode == HttpStatus.SC_OK) {
+                return true;
+            } else {
+                Debug.e("Http status ==> :" + String.valueOf(statusCode));
+            }
+        } catch (final ConnectTimeoutException e) {
+            throw new RuntimeException(e);
+        }
+        return false;
+    }
+
     public static String postJSONString(final String url, final String json) throws ClientProtocolException, IOException {
         final StringBuilder jsonString = new StringBuilder();
         try {
