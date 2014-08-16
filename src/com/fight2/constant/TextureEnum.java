@@ -15,6 +15,11 @@ public enum TextureEnum {
     COMMON_CARD_COVER("images/common_card_cover.png", 810, 540),
     COMMON_STAR("images/common_star.png", 26, 32),
 
+    // Chat room images.
+    CHAT_INPUT_BG("images/chat_input_backgroud.png", 755, 75),
+    CHAT_INPUT_OPEN("images/chat_input_open.png", 93, 75),
+    CHAT_INPUT_SEND("images/chat_input_send.png", 145, 52),
+
     // Main scene images.
     MAIN_BG("images/main_backgroud.png", 1136, 640),
     MAIN_ARENA("images/main_arena.png", 422, 252),

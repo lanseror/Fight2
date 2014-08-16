@@ -1,16 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:android1="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
 
-    <ProgressBar
-        android:id="@+id/progressBar1"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="188dp"
-        android:background="@drawable/splash_screen" />
+    <org.andengine.opengl.view.RenderSurfaceView
+        android:id="@+id/game_rendersurfaceview"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="bottom" />
 
-</RelativeLayout>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="75pt"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal" >
+
+        <EditText
+            android:id="@+id/chat_input_text"
+            android:layout_width="0dp"
+            android:layout_height="75pt"
+            android:layout_weight="1"
+            android:gravity="bottom"
+            android:hint="@string/chat_text_default"
+            android:singleLine="true"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+</LinearLayout>

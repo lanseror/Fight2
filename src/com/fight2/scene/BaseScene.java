@@ -102,6 +102,14 @@ public abstract class BaseScene extends Scene {
         return sprite;
     }
 
+    protected F2ButtonSprite createACF2ButtonSprite(final TextureEnum normalTextureEnum, final TextureEnum pressedTextureEnum, final float x, final float y) {
+        final TextureFactory textureFactory = TextureFactory.getInstance();
+        final ITextureRegion normalTexture = textureFactory.getAssetTextureRegion(normalTextureEnum);
+        final ITextureRegion pressedTexture = textureFactory.getAssetTextureRegion(pressedTextureEnum);
+        final F2ButtonSprite sprite = new F2ButtonSprite(x, y, normalTexture, pressedTexture, vbom);
+        return sprite;
+    }
+
     /**
      * Anchor left bottom sprite
      * 

@@ -2,10 +2,15 @@ package com.fight2.scene;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
+import org.andengine.entity.IEntity;
+import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
@@ -17,12 +22,17 @@ import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.util.algorithm.collision.BaseCollisionChecker;
+import org.andengine.util.debug.Debug;
+
+import android.graphics.Color;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.constant.TiledTextureEnum;
+import com.fight2.entity.F2ButtonSprite;
+import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TiledTextureFactory;
 
@@ -39,6 +49,15 @@ public class MainScene extends BaseScene {
 
     private final Map<Sprite, Sprite> buttonSprites = new HashMap<Sprite, Sprite>();
 
+    private final Font chatFont;
+    private final Text chatText;
+    private final static int CHAT_SIZE = 500;
+    private final static String SAMPLE_CHAT_STRING = "ABCDE: FGHIJKLMNOPWRSTUVWXYZ!abcdefghijklm.  21:45"
+            + "\nABCDE: FGHIJKLMNOPWRSTUVWXYZ!abcdefghijklm.  21:45";
+    private final StringBuilder chatString = new StringBuilder();
+
+    private final IEntity chatBox;
+
     private final Font mFont;
     private final Text summonText;
     private final Text arenaText;
@@ -54,7 +73,59 @@ public class MainScene extends BaseScene {
         tipTexts.add(summonText);
         tipTexts.add(arenaText);
         tipTexts.add(campText);
+
+        chatBox = new Rectangle(this.simulatedLeftX + 755 * 0.5f, 640 * 0.5f, 755, 640, vbom);
+        chatBox.setColor(Color.BLACK);
+        chatBox.setAlpha(0.5f);
+        chatFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
+        chatText = new Text(470, 75 * 0.5f, chatFont, SAMPLE_CHAT_STRING, CHAT_SIZE, vbom);
+        chatText.setColor(0XFFE8BD80);
         init();
+        createChatRoom();
+        createChatInput();
+    }
+
+    private void createChatRoom() {
+        final IEntity smallChatRoom = new Rectangle(this.simulatedLeftX + 860 * 0.5f, 75 * 0.5f, 860, 75, vbom);
+        smallChatRoom.setColor(Color.BLACK);
+        smallChatRoom.setAlpha(0.3f);
+        this.attachChild(smallChatRoom);
+
+        final F2ButtonSprite openButton = createALBF2ButtonSprite(TextureEnum.CHAT_INPUT_OPEN, TextureEnum.CHAT_INPUT_OPEN, 0, 0);
+        openButton.setOnClickListener(new F2OnClickListener() {
+            @Override
+            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+            }
+        });
+        smallChatRoom.attachChild(openButton);
+        this.registerTouchArea(openButton);
+        smallChatRoom.attachChild(chatText);
+    }
+
+    private void createChatInput() {
+        final IEntity checkInputBox = createALBImageSprite(TextureEnum.CHAT_INPUT_BG, this.simulatedLeftX, 0);
+
+        activity.runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                // editText.setVisibility(View.INVISIBLE);
+            }
+
+        });
+
+        final float bgWidth = TextureEnum.CHAT_INPUT_BG.getWidth();
+        final float bgHeight = TextureEnum.CHAT_INPUT_BG.getHeight();
+        final F2ButtonSprite sendButton = createACF2ButtonSprite(TextureEnum.CHAT_INPUT_SEND, TextureEnum.CHAT_INPUT_SEND, bgWidth - 90, bgHeight * 0.5f - 2);
+        sendButton.setOnClickListener(new F2OnClickListener() {
+            @Override
+            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+            }
+        });
+
+        checkInputBox.attachChild(sendButton);
+        this.attachChild(checkInputBox);
+
     }
 
     @Override
@@ -169,6 +240,7 @@ public class MainScene extends BaseScene {
             tipText.setVisible(false);
             this.attachChild(tipText);
         }
+        // updateDisplay();
 
         this.setOnSceneTouchListener(new IOnSceneTouchListener() {
             @Override
@@ -242,6 +314,27 @@ public class MainScene extends BaseScene {
                 unfocusSprite(gateSprite);
             }
         });
+    }
+
+    private void updateDisplay() {
+        final Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+
+            @Override
+            public void run() {
+                final Calendar c = Calendar.getInstance();
+                final int mHour = c.get(Calendar.HOUR_OF_DAY);
+                final int mMinute = c.get(Calendar.MINUTE);
+                chatString.append("\n").append(SAMPLE_CHAT_STRING).append(" ").append(mHour).append(":").append(mMinute).append(":");
+                if (chatString.length() > CHAT_SIZE) {
+                    chatString.delete(0, CHAT_SIZE);
+                }
+                Debug.w("ChatLength:" + chatString.length());
+                chatText.setText(chatString);
+
+            }
+        }, 0, 1000);// Update text every second
+
     }
 
     private void focusSprite(final Sprite sprite) {
