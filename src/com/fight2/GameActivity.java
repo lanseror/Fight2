@@ -14,7 +14,6 @@ import org.andengine.engine.options.ScreenOrientation;
 import org.andengine.engine.options.resolutionpolicy.CropResolutionPolicy;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
-import org.andengine.entity.util.FPSLogger;
 import org.andengine.opengl.texture.ITexture;
 import org.andengine.opengl.texture.TextureManager;
 import org.andengine.opengl.texture.bitmap.AssetBitmapTexture;
@@ -22,11 +21,13 @@ import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.texture.region.TextureRegionFactory;
 import org.andengine.opengl.util.GLState;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
-import org.andengine.ui.activity.BaseGameActivity;
+import org.andengine.ui.activity.LayoutGameActivity;
 import org.andengine.util.debug.Debug;
 
 import android.content.res.AssetManager;
 import android.util.DisplayMetrics;
+import android.view.View;
+import android.widget.EditText;
 
 import com.fight2.constant.ConfigEnum;
 import com.fight2.constant.MusicEnum;
@@ -38,9 +39,9 @@ import com.fight2.util.F2MusicManager;
 import com.fight2.util.ImageOpenHelper;
 import com.fight2.util.ResourceManager;
 
-public class GameActivity extends BaseGameActivity {
-    private static final int CAMERA_WIDTH = 1136;
-    private static final int CAMERA_HEIGHT = 640;
+public class GameActivity extends LayoutGameActivity {
+    public static final int CAMERA_WIDTH = 1136;
+    public static final int CAMERA_HEIGHT = 640;
     private static final float CAMERA_CENTER_X = CAMERA_WIDTH * 0.5f;
     private static final float CAMERA_CENTER_Y = CAMERA_HEIGHT * 0.5f;
 
@@ -53,6 +54,24 @@ public class GameActivity extends BaseGameActivity {
     private Scene splashScene;
     private ProgressBar progressBar;
     private ImageOpenHelper dbHelper;
+    private EditText chatText;
+
+    @Override
+    protected int getLayoutID() {
+        return R.layout.game;
+    }
+
+    @Override
+    protected int getRenderSurfaceViewID() {
+        return R.id.game_rendersurfaceview;
+    }
+
+    @Override
+    protected void onSetContentView() {
+        super.onSetContentView();
+        chatText = (EditText) this.findViewById(R.id.chat_text);
+        chatText.setVisibility(View.INVISIBLE);
+    }
 
     @Override
     public Engine onCreateEngine(final EngineOptions pEngineOptions) {
@@ -108,7 +127,7 @@ public class GameActivity extends BaseGameActivity {
 
     @Override
     public void onCreateScene(final OnCreateSceneCallback pOnCreateSceneCallback) throws IOException {
-//        this.mEngine.registerUpdateHandler(new FPSLogger());
+        // this.mEngine.registerUpdateHandler(new FPSLogger());
         final VertexBufferObjectManager vbom = this.getVertexBufferObjectManager();
         initProgressBar(vbom);
         initSplashScene(vbom);
@@ -198,6 +217,10 @@ public class GameActivity extends BaseGameActivity {
 
     public ImageOpenHelper getDbHelper() {
         return dbHelper;
+    }
+
+    public EditText getChatText() {
+        return chatText;
     }
 
 }

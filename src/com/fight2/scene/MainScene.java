@@ -25,6 +25,7 @@ import org.andengine.util.algorithm.collision.BaseCollisionChecker;
 import org.andengine.util.debug.Debug;
 
 import android.graphics.Color;
+import android.view.View;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
@@ -82,7 +83,7 @@ public class MainScene extends BaseScene {
         chatText.setColor(0XFFE8BD80);
         init();
         createChatRoom();
-        createChatInput();
+        // createChatInput();
     }
 
     private void createChatRoom() {
@@ -95,6 +96,15 @@ public class MainScene extends BaseScene {
         openButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                ResourceManager.getInstance().setCurrentScene(SceneEnum.Chat);
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        activity.getChatText().setVisibility(View.VISIBLE);
+                    }
+
+                });
+
             }
         });
         smallChatRoom.attachChild(openButton);
@@ -104,15 +114,6 @@ public class MainScene extends BaseScene {
 
     private void createChatInput() {
         final IEntity checkInputBox = createALBImageSprite(TextureEnum.CHAT_INPUT_BG, this.simulatedLeftX, 0);
-
-        activity.runOnUiThread(new Runnable() {
-
-            @Override
-            public void run() {
-                // editText.setVisibility(View.INVISIBLE);
-            }
-
-        });
 
         final float bgWidth = TextureEnum.CHAT_INPUT_BG.getWidth();
         final float bgHeight = TextureEnum.CHAT_INPUT_BG.getHeight();

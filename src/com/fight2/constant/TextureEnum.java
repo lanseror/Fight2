@@ -17,7 +17,9 @@ public enum TextureEnum {
 
     // Chat room images.
     CHAT_INPUT_BG("images/chat_input_backgroud.png", 755, 75),
+    CHAT_INPUT_TEXT_BG("images/chat_input_text_bg.png", 487, 44),
     CHAT_INPUT_OPEN("images/chat_input_open.png", 93, 75),
+    CHAT_INPUT_CLOSE("images/chat_input_close.png", 40, 40),
     CHAT_INPUT_SEND("images/chat_input_send.png", 145, 52),
 
     // Main scene images.
