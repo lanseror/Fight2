@@ -2,6 +2,7 @@ package com.fight2.util;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -16,16 +17,20 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.SparseArray;
+
 import com.fight2.GameActivity;
 import com.fight2.entity.ChatMessage;
 
 public class ChatUtils {
     public static int msgIndex = -1;
-    private static List<ChatMessage> CHAT_MESSAGES = new ArrayList<ChatMessage>();
+    private static int containMsgSize = 0;
+    private static int displayedMsg = 0;
+    private static SparseArray<ChatMessage> CHAT_MESSAGES = new SparseArray<ChatMessage>();
 
     public static boolean send(final String msg) {
         try {
-            final String url = HttpUtils.HOST_URL + "/chat/send.action?msg=" + URLEncoder.encode(msg, "UTF-8");
+            final String url = HttpUtils.HOST_URL + "/chat/send.action?msg=" + URLEncoder.encode(URLEncoder.encode(msg, "UTF-8"), "UTF-8");
             return HttpUtils.doGet(url);
 
         } catch (final UnsupportedEncodingException e) {
@@ -50,9 +55,10 @@ public class ChatUtils {
                 final JSONObject messageJson = messageJsonArray.getJSONObject(i);
                 final ChatMessage message = new ChatMessage();
                 message.setSender(messageJson.getString("sender"));
-                message.setContent(messageJson.getString("content"));
+                message.setContent(URLDecoder.decode(messageJson.getString("content"), "UTF-8"));
                 message.setDate(messageJson.getString("date"));
                 messages.add(message);
+                CHAT_MESSAGES.put(++containMsgSize, message);
             }
         } catch (final ClientProtocolException e) {
             throw new RuntimeException(e);
@@ -67,26 +73,22 @@ public class ChatUtils {
 
     public static List<ChatMessage> testGet(final GameActivity activity) {
         final List<ChatMessage> messages = new ArrayList<ChatMessage>();
-        final DateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.CHINA);
-        for (int i = 0; i < 2; i++) {
-            final ChatMessage message = new ChatMessage();
-            message.setSender("Chesley");
-            message.setContent("有人在吗？有人在吗？有人在吗？有人在吗？");
-            message.setDate(dateFormat.format(new Date()));
-            messages.add(message);
-        }
-
-        return messages;
-    }
-
-    public static ChatMessage getDisplayMessage() {
         final DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss", Locale.CHINA);
         final ChatMessage message = new ChatMessage();
         message.setSender("Chesley");
-        message.setContent("有人在吗？有人在吗？有人在吗？有人在吗有人在吗？有人在吗？");
+        message.setContent("有人在吗？有人在吗？有人在吗？有人在吗？");
         message.setDate(dateFormat.format(new Date()));
-
-        return message;
+        messages.add(message);
+        CHAT_MESSAGES.put(++containMsgSize, message);
+        return messages;
     }
 
+    public static synchronized ChatMessage getDisplayMessage() {
+        final int tempDisplayedMsg = displayedMsg + 1;
+        final ChatMessage message = CHAT_MESSAGES.get(tempDisplayedMsg);
+        if (message != null) {
+            displayedMsg = tempDisplayedMsg;
+        }
+        return message;
+    }
 }

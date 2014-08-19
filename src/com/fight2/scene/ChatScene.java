@@ -12,6 +12,7 @@ import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.util.adt.color.Color;
 
 import android.content.Context;
+import android.text.Editable;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -20,11 +21,15 @@ import com.fight2.GameActivity;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.ChatBoxCloseButton;
+import com.fight2.entity.F2ButtonSprite;
+import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
+import com.fight2.util.ChatUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
 
 public class ChatScene extends BaseScene {
     private final ChatBoxCloseButton closeButton;
+    private final EditText editText = activity.getChatText();
 
     public ChatScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -51,7 +56,6 @@ public class ChatScene extends BaseScene {
     }
 
     private void goBack() {
-        final EditText editText = activity.getChatText();
         final InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
         ResourceManager.getInstance().setCurrentScene(SceneEnum.Main);
@@ -91,6 +95,30 @@ public class ChatScene extends BaseScene {
 
         final Sprite chatInputSprite = createALBImageSprite(TextureEnum.CHAT_INPUT_BG, this.simulatedLeftX, 0);
         this.attachChild(chatInputSprite);
+        final TextureEnum sendTextureEnum = TextureEnum.CHAT_INPUT_SEND;
+        final F2ButtonSprite sendSprite = createALBF2ButtonSprite(sendTextureEnum, sendTextureEnum, chatInputSprite.getWidth() - sendTextureEnum.getWidth()
+                - 20, 10);
+        chatInputSprite.attachChild(sendSprite);
+        this.registerTouchArea(sendSprite);
+        sendSprite.setOnClickListener(new F2OnClickListener() {
+            @Override
+            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                final Editable inputEditable = editText.getText();
+                final String inputText = inputEditable.toString();
+                if (inputText != null && !inputText.equals("")) {
+                    ChatUtils.send(inputText);
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            inputEditable.clear();
+                        }
+                    });
+
+                }
+            }
+
+        });
+
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -126,7 +154,7 @@ public class ChatScene extends BaseScene {
     @Override
     public void leaveScene() {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

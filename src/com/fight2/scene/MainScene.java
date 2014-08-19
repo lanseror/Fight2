@@ -309,6 +309,8 @@ public class MainScene extends BaseScene {
                 unfocusSprite(gateSprite);
             }
         });
+
+        scheduleGetChatMessage();
     }
 
     private void adjustChatTextPosition() {
@@ -340,6 +342,16 @@ public class MainScene extends BaseScene {
                 chatText.setText(chatString);
                 chatTimeText.setText(chatTimeString);
                 adjustChatTextPosition();
+            }
+        }, 0, 1000);// Update text every second
+    }
+
+    private void scheduleGetChatMessage() {
+        final Timer getChatTimer = new Timer();
+        getChatTimer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                ChatUtils.get(activity);
             }
         }, 0, 1000);// Update text every second
     }
