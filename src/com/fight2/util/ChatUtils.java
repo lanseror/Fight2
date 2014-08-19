@@ -3,8 +3,12 @@ package com.fight2.util;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.andengine.util.debug.Debug;
 import org.apache.http.client.ClientProtocolException;
@@ -17,6 +21,7 @@ import com.fight2.entity.ChatMessage;
 
 public class ChatUtils {
     public static int msgIndex = -1;
+    private static List<ChatMessage> CHAT_MESSAGES = new ArrayList<ChatMessage>();
 
     public static boolean send(final String msg) {
         try {
@@ -58,6 +63,30 @@ public class ChatUtils {
         }
 
         return messages;
+    }
+
+    public static List<ChatMessage> testGet(final GameActivity activity) {
+        final List<ChatMessage> messages = new ArrayList<ChatMessage>();
+        final DateFormat dateFormat = new SimpleDateFormat("HH:mm", Locale.CHINA);
+        for (int i = 0; i < 2; i++) {
+            final ChatMessage message = new ChatMessage();
+            message.setSender("Chesley");
+            message.setContent("有人在吗？有人在吗？有人在吗？有人在吗？");
+            message.setDate(dateFormat.format(new Date()));
+            messages.add(message);
+        }
+
+        return messages;
+    }
+
+    public static ChatMessage getDisplayMessage() {
+        final DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss", Locale.CHINA);
+        final ChatMessage message = new ChatMessage();
+        message.setSender("Chesley");
+        message.setContent("有人在吗？有人在吗？有人在吗？有人在吗有人在吗？有人在吗？");
+        message.setDate(dateFormat.format(new Date()));
+
+        return message;
     }
 
 }

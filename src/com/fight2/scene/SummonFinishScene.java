@@ -141,4 +141,10 @@ public class SummonFinishScene extends BaseScene {
 
     }
 
+    @Override
+    public void leaveScene() {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

@@ -192,4 +192,10 @@ public class ArenaScene extends BaseScene {
             this.registerTouchArea(battleButton);
         }
     }
+
+    @Override
+    public void leaveScene() {
+        // TODO Auto-generated method stub
+        
+    }
 }

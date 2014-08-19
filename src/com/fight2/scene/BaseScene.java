@@ -82,6 +82,8 @@ public abstract class BaseScene extends Scene {
     protected abstract void init() throws IOException;
 
     public abstract void updateScene();
+    
+    public abstract void leaveScene();
 
     protected ITextureRegion createCardTexture(final String imageUrl) throws IOException {
         final ITexture texture = new AssetBitmapTexture(activity.getTextureManager(), activity.getAssets(), imageUrl);

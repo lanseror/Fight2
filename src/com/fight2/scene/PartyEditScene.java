@@ -631,4 +631,10 @@ public class PartyEditScene extends BaseScene {
 
     }
 
+    @Override
+    public void leaveScene() {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

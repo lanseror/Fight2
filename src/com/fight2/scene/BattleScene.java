@@ -554,4 +554,10 @@ public class BattleScene extends BaseScene {
         public void onFinished(final IEntity pItem);
     }
 
+    @Override
+    public void leaveScene() {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

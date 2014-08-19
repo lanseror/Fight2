@@ -248,4 +248,10 @@ public class PartyScene extends BaseScene {
 
     }
 
+    @Override
+    public void leaveScene() {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

@@ -123,4 +123,10 @@ public class ChatScene extends BaseScene {
         return sprite;
     }
 
+    @Override
+    public void leaveScene() {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

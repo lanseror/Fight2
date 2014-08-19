@@ -77,10 +77,13 @@ public class ResourceManager {
     }
 
     public void setCurrentScene(final SceneEnum sceneEnum) {
+        if (currentScene != null) {
+            currentScene.leaveScene();
+        }
         final BaseScene scene = scenes.get(sceneEnum);
         activity.getEngine().setScene(scene);
         scene.updateScene();
-        this.currentScene = scene;
+        currentScene = scene;
     }
 
     public Font getFont(final FontEnum fontEnum) {
@@ -116,7 +119,7 @@ public class ResourceManager {
                 boldFace.load();
                 return boldFace;
             default:
-                final Font defaultFont = FontFactory.create(fontManager, textureManager, 256, 256, TextureOptions.BILINEAR, Typeface.DEFAULT, size, true,
+                final Font defaultFont = FontFactory.create(fontManager, textureManager, 256, 256, TextureOptions.BILINEAR, Typeface.MONOSPACE, size, true,
                         Color.WHITE);
                 defaultFont.load();
                 return defaultFont;
