@@ -25,7 +25,8 @@ import com.fight2.entity.ChatMessage;
 public class ChatUtils {
     public static int msgIndex = -1;
     private static int containMsgSize = 0;
-    private static int displayedMsg = 0;
+    private static int displayedMiniMsg = 0;
+    private static int displayedFullMsg = 0;
     private static SparseArray<ChatMessage> CHAT_MESSAGES = new SparseArray<ChatMessage>();
 
     public static boolean send(final String msg) {
@@ -83,12 +84,25 @@ public class ChatUtils {
         return messages;
     }
 
-    public static synchronized ChatMessage getDisplayMessage() {
+    public static synchronized ChatMessage getDisplayMessage(final DisplayChannel displayChannel) {
+        final int displayedMsg = (displayChannel == DisplayChannel.MiniChatRoom ? displayedMiniMsg : displayedFullMsg);
         final int tempDisplayedMsg = displayedMsg + 1;
         final ChatMessage message = CHAT_MESSAGES.get(tempDisplayedMsg);
         if (message != null) {
-            displayedMsg = tempDisplayedMsg;
+            switch (displayChannel) {
+                case MiniChatRoom:
+                    displayedMiniMsg = tempDisplayedMsg;
+                    break;
+                case FullChatRoom:
+                    displayedFullMsg = tempDisplayedMsg;
+                    break;
+            }
         }
         return message;
+    }
+
+    public enum DisplayChannel {
+        MiniChatRoom,
+        FullChatRoom;
     }
 }

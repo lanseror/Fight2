@@ -35,6 +35,7 @@ import com.fight2.entity.F2ButtonSprite;
 import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.ChatTextHandler;
 import com.fight2.util.ChatUtils;
+import com.fight2.util.ChatUtils.DisplayChannel;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TiledTextureFactory;
 
@@ -51,7 +52,7 @@ public class MainScene extends BaseScene {
 
     private final Map<Sprite, Sprite> buttonSprites = new HashMap<Sprite, Sprite>();
 
-    private Timer displayChatTimer;
+    private final Timer displayChatTimer = new Timer();
     private final Font chatFont;
     private final Text chatText;
     private final Text chatTimeText;
@@ -311,6 +312,7 @@ public class MainScene extends BaseScene {
         });
 
         scheduleGetChatMessage();
+        scheduleDisplayChat();
     }
 
     private void adjustChatTextPosition() {
@@ -321,11 +323,10 @@ public class MainScene extends BaseScene {
     }
 
     private void scheduleDisplayChat() {
-        displayChatTimer = new Timer();
         displayChatTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                final ChatMessage chatMessage = ChatUtils.getDisplayMessage();
+                final ChatMessage chatMessage = ChatUtils.getDisplayMessage(DisplayChannel.MiniChatRoom);
                 if (chatMessage != null) {
                     final int deleteIndex = chatString.indexOf("\n");
                     chatString.delete(0, deleteIndex + 1);
@@ -374,12 +375,9 @@ public class MainScene extends BaseScene {
 
     @Override
     public void updateScene() {
-        scheduleDisplayChat();
     }
 
     @Override
     public void leaveScene() {
-        this.displayChatTimer.cancel();
-        this.displayChatTimer.purge();
     }
 }

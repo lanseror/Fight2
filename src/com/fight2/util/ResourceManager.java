@@ -33,6 +33,7 @@ public class ResourceManager {
     private AssetManager assetManager;
     private FontManager fontManager;
     private BaseScene currentScene;
+    private SceneEnum currentSceneEnum;
 
     private final Map<SceneEnum, BaseScene> scenes = new HashMap<SceneEnum, BaseScene>();
 
@@ -84,6 +85,11 @@ public class ResourceManager {
         activity.getEngine().setScene(scene);
         scene.updateScene();
         currentScene = scene;
+        currentSceneEnum = sceneEnum;
+    }
+
+    public SceneEnum getCurrentSceneEnum() {
+        return currentSceneEnum;
     }
 
     public Font getFont(final FontEnum fontEnum) {
@@ -94,6 +100,8 @@ public class ResourceManager {
             case Battle:
                 return getFont(fontEnum, 36);
             case Default:
+                return getFont(fontEnum, 30);
+            case Bold:
                 return getFont(fontEnum, 30);
             default:
                 return getFont(fontEnum, 30);
@@ -114,16 +122,17 @@ public class ResourceManager {
                 battleFont.load();
                 return battleFont;
             case Default:
-                final Font boldFace = FontFactory.create(fontManager, textureManager, 256, 256, TextureOptions.BILINEAR, Typeface.DEFAULT, size, true,
-                        Color.WHITE);
-                boldFace.load();
-                return boldFace;
-            default:
-                final Font defaultFont = FontFactory.create(fontManager, textureManager, 256, 256, TextureOptions.BILINEAR, Typeface.MONOSPACE, size, true,
+                final Font defaultFont = FontFactory.create(fontManager, textureManager, 256, 256, TextureOptions.BILINEAR, Typeface.DEFAULT, size, true,
                         Color.WHITE);
                 defaultFont.load();
                 return defaultFont;
+            case Bold:
+                final Font boldFace = FontFactory.create(fontManager, textureManager, 256, 256, TextureOptions.BILINEAR, Typeface.DEFAULT_BOLD, size, true,
+                        Color.WHITE);
+                boldFace.load();
+                return boldFace;
         }
+        return null;
 
     }
 

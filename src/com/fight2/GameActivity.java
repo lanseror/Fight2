@@ -24,9 +24,17 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.LayoutGameActivity;
 import org.andengine.util.debug.Debug;
 
+import android.content.Intent;
 import android.content.res.AssetManager;
+import android.net.Uri;
+import android.os.Build;
+import android.text.Selection;
+import android.text.method.TextKeyListener;
 import android.util.DisplayMetrics;
+import android.view.KeyEvent;
+import android.view.Menu;
 import android.view.View;
+import android.view.Window;
 import android.widget.EditText;
 
 import com.fight2.constant.ConfigEnum;
@@ -221,6 +229,18 @@ public class GameActivity extends LayoutGameActivity {
 
     public EditText getChatText() {
         return chatText;
+    }
+
+    @Override
+    public boolean onKeyDown(final int keyCode, final KeyEvent event) {
+        final ResourceManager resourceManager = ResourceManager.getInstance();
+        if (keyCode == KeyEvent.KEYCODE_BACK && resourceManager.getCurrentSceneEnum() != SceneEnum.Main) {
+            resourceManager.setCurrentScene(SceneEnum.Main);
+            return true;
+        } else {
+            return super.onKeyDown(keyCode, event);
+        }
+
     }
 
 }
