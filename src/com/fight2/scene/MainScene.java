@@ -61,10 +61,8 @@ public class MainScene extends BaseScene {
     private final static String SAMPLE_CHAT_STRING = "\n";
     private final static String SAMPLE_CHAT_TIME_STRING = "\n";
     private final static String TEST_CHAT_TIME_STRING = "16:30\n16:30";
-    private final StringBuilder chatString = new StringBuilder(SAMPLE_CHAT_STRING);
-    private final StringBuilder chatTimeString = new StringBuilder(SAMPLE_CHAT_TIME_STRING);
-
-    private final IEntity chatBox;
+    private final StringBuffer chatStringBuffer = new StringBuffer(SAMPLE_CHAT_STRING);
+    private final StringBuffer chatTimeString = new StringBuffer(SAMPLE_CHAT_TIME_STRING);
 
     private final Font mFont;
     private final Text summonText;
@@ -82,9 +80,6 @@ public class MainScene extends BaseScene {
         tipTexts.add(arenaText);
         tipTexts.add(campText);
 
-        chatBox = new Rectangle(this.simulatedLeftX + 755 * 0.5f, 640 * 0.5f, 755, 640, vbom);
-        chatBox.setColor(Color.BLACK);
-        chatBox.setAlpha(0.5f);
         final Font chatFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
         chatText = new Text(0, 0, chatFont, SAMPLE_CHAT_STRING, CHAT_SIZE, vbom);
         chatText.setColor(0XFFE8BD80);
@@ -94,7 +89,7 @@ public class MainScene extends BaseScene {
 
         chatTextHandler = new ChatTextHandler(CHAT_SIZE, vbom);
         init();
-        createChatRoom();
+        // createChatRoom();
     }
 
     private void createChatRoom() {
@@ -108,14 +103,6 @@ public class MainScene extends BaseScene {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 ResourceManager.getInstance().setCurrentScene(SceneEnum.Chat);
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        activity.getChatText().setVisibility(View.VISIBLE);
-                    }
-
-                });
-
             }
         });
         smallChatRoom.attachChild(openButton);
@@ -318,7 +305,7 @@ public class MainScene extends BaseScene {
         });
 
         scheduleGetChatMessage();
-        scheduleDisplayChat();
+        // scheduleDisplayChat();
     }
 
     private void adjustChatTextPosition() {
@@ -334,11 +321,11 @@ public class MainScene extends BaseScene {
             public void run() {
                 final ChatMessage chatMessage = ChatUtils.getDisplayMessage(DisplayChannel.MiniChatRoom);
                 if (chatMessage != null) {
-                    final int deleteIndex = chatString.indexOf("\n");
-                    chatString.delete(0, deleteIndex + 1);
+                    final int deleteIndex = chatStringBuffer.indexOf("\n");
+                    chatStringBuffer.delete(0, deleteIndex + 1);
                     final String sender = chatMessage.getSender();
                     final String content = chatMessage.getContent();
-                    chatString.append(chatTextHandler.handle(sender, content));
+                    // chatStringBuffer.append(chatTextHandler.handle(sender, content));
 
                     final String date = chatMessage.getDate();
                     final int deleteChatTimeIndex = chatTimeString.indexOf("\n");
@@ -347,11 +334,12 @@ public class MainScene extends BaseScene {
                     chatTimeString.append(date);
                     chatTimeText.setText(chatTimeString);
 
+                    final String chatString = chatStringBuffer.toString();
                     activity.runOnUpdateThread(new Runnable() {
                         @Override
                         public void run() {
                             chatText.detachSelf();
-                            final Font chatFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
+                            final Font chatFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28, 256);
                             chatText = new Text(0, 0, chatFont, chatString, vbom);
                             chatText.setColor(0XFFE8BD80);
                             smallChatRoom.attachChild(chatText);
@@ -360,9 +348,8 @@ public class MainScene extends BaseScene {
                     });
 
                 }
-
             }
-        }, 0, 1000);// Update text every second
+        }, 0, 300);// Update text every 0.3 second
     }
 
     private void scheduleGetChatMessage() {
@@ -393,6 +380,7 @@ public class MainScene extends BaseScene {
 
     @Override
     public void updateScene() {
+        activity.getGameHub().needSmallChatRoom(true);
     }
 
     @Override

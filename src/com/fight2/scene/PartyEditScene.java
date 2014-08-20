@@ -99,6 +99,7 @@ public class PartyEditScene extends BaseScene {
 
     @Override
     public void updateScene() {
+        activity.getGameHub().needSmallChatRoom(false);
         final Party[] parties = GameUserSession.getInstance().getPartyInfo().getParties();
         final Card[] partyCards = parties[partyNumber - 1].getCards();
         for (int i = 0; i < partyCards.length; i++) {

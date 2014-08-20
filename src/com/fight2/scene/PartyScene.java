@@ -95,8 +95,6 @@ public class PartyScene extends BaseScene {
             this.attachChild(partyAtks[partyIndex]);
         }
 
-        updateScene();
-
         final F2ButtonSprite editSprite = createALBF2ButtonSprite(TextureEnum.PARTY_EDIT_BUTTON, TextureEnum.PARTY_EDIT_BUTTON_PRESSED,
                 this.simulatedRightX - 135, 220);
         editSprite.setOnClickListener(new F2OnClickListener() {
@@ -206,6 +204,7 @@ public class PartyScene extends BaseScene {
 
     @Override
     public void updateScene() {
+        activity.getGameHub().needSmallChatRoom(false);
         hpText.setText(String.valueOf(partyInfo.getHp()));
         atkText.setText(String.valueOf(partyInfo.getAtk()));
 
@@ -251,7 +250,7 @@ public class PartyScene extends BaseScene {
     @Override
     public void leaveScene() {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

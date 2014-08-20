@@ -89,7 +89,7 @@ public class SummonScene extends BaseScene {
 
     @Override
     public void updateScene() {
-
+        activity.getGameHub().needSmallChatRoom(false);
     }
 
     @Override

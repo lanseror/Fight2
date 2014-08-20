@@ -4,12 +4,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import org.andengine.util.debug.Debug;
 import org.apache.http.client.ClientProtocolException;
@@ -25,8 +21,8 @@ import com.fight2.entity.ChatMessage;
 public class ChatUtils {
     public static int msgIndex = -1;
     private static int containMsgSize = 0;
-    private static int displayedMiniMsg = 0;
-    private static int displayedFullMsg = 0;
+    public static int displayedMiniMsg = 0;
+    public static int displayedFullMsg = 0;
     private static SparseArray<ChatMessage> CHAT_MESSAGES = new SparseArray<ChatMessage>();
 
     public static boolean send(final String msg) {
@@ -72,19 +68,7 @@ public class ChatUtils {
         return messages;
     }
 
-    public static List<ChatMessage> testGet(final GameActivity activity) {
-        final List<ChatMessage> messages = new ArrayList<ChatMessage>();
-        final DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss", Locale.CHINA);
-        final ChatMessage message = new ChatMessage();
-        message.setSender("Chesley");
-        message.setContent("有人在吗？有人在吗？有人在吗？有人在吗？");
-        message.setDate(dateFormat.format(new Date()));
-        messages.add(message);
-        CHAT_MESSAGES.put(++containMsgSize, message);
-        return messages;
-    }
-
-    public static synchronized ChatMessage getDisplayMessage(final DisplayChannel displayChannel) {
+    public static ChatMessage getDisplayMessage(final DisplayChannel displayChannel) {
         final int displayedMsg = (displayChannel == DisplayChannel.MiniChatRoom ? displayedMiniMsg : displayedFullMsg);
         final int tempDisplayedMsg = displayedMsg + 1;
         final ChatMessage message = CHAT_MESSAGES.get(tempDisplayedMsg);
@@ -92,9 +76,15 @@ public class ChatUtils {
             switch (displayChannel) {
                 case MiniChatRoom:
                     displayedMiniMsg = tempDisplayedMsg;
+                    if (displayedMiniMsg - displayedFullMsg > 15) {
+                        displayedFullMsg = displayedMiniMsg - 15;
+                    }
                     break;
                 case FullChatRoom:
                     displayedFullMsg = tempDisplayedMsg;
+                    if (displayedFullMsg > 1 && displayedFullMsg - displayedMiniMsg > 2) {
+                        displayedMiniMsg = displayedFullMsg - 2;
+                    }
                     break;
             }
         }

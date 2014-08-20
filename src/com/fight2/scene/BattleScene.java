@@ -374,6 +374,7 @@ public class BattleScene extends BaseScene {
 
     @Override
     public void updateScene() {
+        activity.getGameHub().needSmallChatRoom(false);
         final float width = TextureEnum.BATTLE_PARTY_BOTTOM.getWidth();
 
         for (int i = 0; i < myParties.length; i++) {

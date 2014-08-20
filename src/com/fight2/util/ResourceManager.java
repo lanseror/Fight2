@@ -77,6 +77,10 @@ public class ResourceManager {
         return currentScene;
     }
 
+    public BaseScene getScene(final SceneEnum sceneEnum) {
+        return scenes.get(sceneEnum);
+    }
+
     public void setCurrentScene(final SceneEnum sceneEnum) {
         if (currentScene != null) {
             currentScene.leaveScene();
@@ -113,22 +117,37 @@ public class ResourceManager {
 
         switch (fontEnum) {
             case Main:
-                final Font mainFont = FontFactory.create(fontManager, textureManager, 256, 256, Typeface.DEFAULT, size, Color.WHITE);
+                return getFont(fontEnum, size, 256);
+            case Battle:
+                return getFont(fontEnum, size, 512);
+            case Default:
+                return getFont(fontEnum, size, 256);
+            case Bold:
+                return getFont(fontEnum, size, 256);
+        }
+        return null;
+
+    }
+
+    public Font getFont(final FontEnum fontEnum, final int size, final int textureSize) {
+        switch (fontEnum) {
+            case Main:
+                final Font mainFont = FontFactory.create(fontManager, textureManager, textureSize, textureSize, Typeface.DEFAULT, size, Color.WHITE);
                 mainFont.load();
                 return mainFont;
             case Battle:
-                final Font battleFont = FontFactory.create(activity.getFontManager(), activity.getTextureManager(), 512, 512, Typeface.DEFAULT, size,
-                        Color.WHITE);
+                final Font battleFont = FontFactory.create(activity.getFontManager(), activity.getTextureManager(), textureSize, textureSize, Typeface.DEFAULT,
+                        size, Color.WHITE);
                 battleFont.load();
                 return battleFont;
             case Default:
-                final Font defaultFont = FontFactory.create(fontManager, textureManager, 256, 256, TextureOptions.BILINEAR, Typeface.DEFAULT, size, true,
-                        Color.WHITE);
+                final Font defaultFont = FontFactory.create(fontManager, textureManager, textureSize, textureSize, TextureOptions.BILINEAR, Typeface.DEFAULT,
+                        size, true, Color.WHITE);
                 defaultFont.load();
                 return defaultFont;
             case Bold:
-                final Font boldFace = FontFactory.create(fontManager, textureManager, 256, 256, TextureOptions.BILINEAR, Typeface.DEFAULT_BOLD, size, true,
-                        Color.WHITE);
+                final Font boldFace = FontFactory.create(fontManager, textureManager, textureSize, textureSize, TextureOptions.BILINEAR, Typeface.DEFAULT_BOLD,
+                        size, true, Color.WHITE);
                 boldFace.load();
                 return boldFace;
         }
@@ -138,6 +157,8 @@ public class ResourceManager {
 
     private void loadScenes() {
         try {
+            final BaseScene chatScene = new ChatScene(activity);
+            scenes.put(SceneEnum.Chat, chatScene);
             final BaseScene mainScene = new MainScene(activity);
             scenes.put(SceneEnum.Main, mainScene);
             final BaseScene partyScene = new PartyScene(activity);
@@ -146,8 +167,6 @@ public class ResourceManager {
             scenes.put(SceneEnum.Summon, summonScene);
             final BaseScene arenaScene = new ArenaScene(activity);
             scenes.put(SceneEnum.Arena, arenaScene);
-            final BaseScene chatScene = new ChatScene(activity);
-            scenes.put(SceneEnum.Chat, chatScene);
 
         } catch (final IOException e) {
             throw new RuntimeException(e);

@@ -1,6 +1,8 @@
 package com.fight2.scene;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -21,6 +23,7 @@ import org.andengine.input.touch.detector.SurfaceScrollDetector;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.util.adt.color.Color;
+import org.andengine.util.debug.Debug;
 
 import android.content.Context;
 import android.text.Editable;
@@ -171,18 +174,26 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
             }
 
         });
+        // scheduleDisplayChat();
     }
 
     @Override
     public void updateScene() {
-        activity.runOnUpdateThread(new Runnable() {
+        activity.getGameHub().needSmallChatRoom(false);
+        scheduleDisplayChat();
+        activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 closeButton.toggle();
+                final int diff = ChatUtils.displayedMiniMsg - ChatUtils.displayedFullMsg;
+                final int count = (diff < 15 ? 15 : diff);
+                for (int i = 0; i < count; i++) {
+                    displayChat(false);
+                }
+                activity.getChatText().setVisibility(View.VISIBLE);
             }
 
         });
-        scheduleDisplayChat();
     }
 
     private void scheduleDisplayChat() {
@@ -190,17 +201,40 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
         displayChatTimer.schedule(new TimerTask() {
             @Override
             public void run() {
-                final ChatMessage chatMessage = ChatUtils.getDisplayMessage(DisplayChannel.FullChatRoom);
-                if (chatMessage != null) {
-                    createChatMessageBox(chatMessage);
-                }
+                displayChat(true);
             }
-        }, 0, 300);// Update text every 0.3 second
+        }, 2000, 800);// Update text every 0.8 second
     }
 
-    private void createChatMessageBox(final ChatMessage chatMessage) {
+    private void displayChat(final boolean isDelay) {
+        final ChatMessage chatMessage = ChatUtils.getDisplayMessage(DisplayChannel.FullChatRoom);
+        if (chatMessage != null) {
+            createChatMessageBox(chatMessage, isDelay);
+        }
+    }
+
+    private void createChatMessageBox(final ChatMessage chatMessage, final boolean isDelay) {
+        final int childCount = chatContainer.getChildCount();
+        // Debug.e("Child:" + childCount);
+
+        if (childCount == 75) {
+            activity.runOnUpdateThread(new Runnable() {
+                @Override
+                public void run() {
+                    final List<IEntity> children = new ArrayList<IEntity>(25);
+                    for (int i = 0; i < 25; i++) {
+                        final IEntity child = chatContainer.getChildByIndex(i);
+                        children.add(child);
+                    }
+                    for (final IEntity child : children) {
+                        chatContainer.detachChild(child);
+                    }
+                }
+            });
+        }
+
         final String name = chatMessage.getSender();
-        final Font nameFont = ResourceManager.getInstance().getFont(FontEnum.Bold, 28);
+        final Font nameFont = ResourceManager.getInstance().getFont(FontEnum.Bold, 28, 128);
         final Text nameText = new Text(0, 0, nameFont, name, vbom);
         nameText.setColor(0XFFCF9030);
         final float nameWidth = nameText.getWidth();
@@ -225,7 +259,6 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
                 messageBoxHeight, vbom);
         messageBox.setColor(0XFF34251F);
         chatContainer.attachChild(messageBox);
-
         // Attache texts to messageBox.
 
         nameText.setPosition(nameWidth * 0.5f, messageBoxHeight - nameHeight * 0.5f);
@@ -237,8 +270,13 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
 
         final float x = chatContainer.getX();
         final float y = chatContainer.getY();
-        final IEntityModifier moveModifier = new MoveModifier(0.1f, x, y, x, y + messageBoxHeight + messageBoxGap);
-        chatContainer.registerEntityModifier(moveModifier);
+        final float toY = y + messageBoxHeight + messageBoxGap;
+        if (isDelay) {
+            final IEntityModifier moveModifier = new MoveModifier(0.1f, x, y, x, toY);
+            chatContainer.registerEntityModifier(moveModifier);
+        } else {
+            chatContainer.setY(toY);
+        }
         allMessageBoxY -= messageBoxHeight + messageBoxGap;
     }
 
@@ -257,6 +295,14 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
     public void leaveScene() {
         displayChatTimer.cancel();
         displayChatTimer.purge();
+        activity.runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                chatContainer.detachChildren();
+                allMessageBoxY = 0;
+                chatContainer.setY(chatContainerInitY);
+            }
+        });
     }
 
     @Override
@@ -267,10 +313,18 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
     private void handleScroll(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
         final float checkY = chatContainerInitY - allMessageBoxY;
         final float toY = chatContainer.getY() - pDistanceY;
+        float limitY = 0;
+        if (chatContainer.getChildCount() > 50) {
+            final IEntity child25th = chatContainer.getChildByIndex(24);
+            limitY = child25th.getY() - child25th.getHeight() * 0.5f;
+        } else if (chatContainer.getChildCount() > 0) {
+            final IEntity fistChild = chatContainer.getChildByIndex(0);
+            limitY = fistChild.getY() - fistChild.getHeight() * 0.5f;
+        }
         if (toY > checkY) {
             chatContainer.setY(checkY);
-        } else if (toY < chatContainerInitY + 80) {
-            chatContainer.setY(chatContainerInitY + 80);
+        } else if (toY < chatContainerInitY - limitY) {
+            chatContainer.setY(chatContainerInitY - limitY);
         } else {
             chatContainer.setY(toY);
         }

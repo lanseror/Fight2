@@ -90,6 +90,7 @@ public class SummonFinishScene extends BaseScene {
     @Override
     public void updateScene() {
         // playAnimation();
+        activity.getGameHub().needSmallChatRoom(false);
     }
 
     @Override

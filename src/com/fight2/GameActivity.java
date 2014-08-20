@@ -24,25 +24,20 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.LayoutGameActivity;
 import org.andengine.util.debug.Debug;
 
-import android.content.Intent;
 import android.content.res.AssetManager;
-import android.net.Uri;
-import android.os.Build;
-import android.text.Selection;
-import android.text.method.TextKeyListener;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.View;
-import android.view.Window;
 import android.widget.EditText;
 
 import com.fight2.constant.ConfigEnum;
 import com.fight2.constant.MusicEnum;
 import com.fight2.constant.SceneEnum;
+import com.fight2.entity.GameHud;
 import com.fight2.entity.ProgressBar;
 import com.fight2.util.AccountUtils;
 import com.fight2.util.ConfigHelper;
+import com.fight2.util.EntryFactory;
 import com.fight2.util.F2MusicManager;
 import com.fight2.util.ImageOpenHelper;
 import com.fight2.util.ResourceManager;
@@ -50,8 +45,8 @@ import com.fight2.util.ResourceManager;
 public class GameActivity extends LayoutGameActivity {
     public static final int CAMERA_WIDTH = 1136;
     public static final int CAMERA_HEIGHT = 640;
-    private static final float CAMERA_CENTER_X = CAMERA_WIDTH * 0.5f;
-    private static final float CAMERA_CENTER_Y = CAMERA_HEIGHT * 0.5f;
+    public static final float CAMERA_CENTER_X = CAMERA_WIDTH * 0.5f;
+    public static final float CAMERA_CENTER_Y = CAMERA_HEIGHT * 0.5f;
 
     private Camera camera;
 
@@ -198,12 +193,17 @@ public class GameActivity extends LayoutGameActivity {
                 loadResources1();
                 splashScene.detachChildren();
                 splashScene.detachSelf();
+                final GameHud gameHud = new GameHud(GameActivity.this);
+                camera.setHUD(gameHud);
                 ResourceManager.getInstance().setCurrentScene(SceneEnum.Main);
-                camera.setHUD(null);
                 F2MusicManager.getInstance().playMusic(MusicEnum.MAIN_BG);
             }
 
         }).start();
+    }
+
+    public GameHud getGameHub() {
+        return (GameHud) camera.getHUD();
     }
 
     @Override
@@ -214,6 +214,7 @@ public class GameActivity extends LayoutGameActivity {
 
     private void loadResources1() {
         try {
+            EntryFactory.getInstance().init(this.getVertexBufferObjectManager());
             final ResourceManager resourceManager = ResourceManager.getInstance();
             resourceManager.loadGameResources(this, progressBar);
 
