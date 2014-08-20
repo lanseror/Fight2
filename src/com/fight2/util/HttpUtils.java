@@ -35,7 +35,7 @@ public class HttpUtils {
         return jsonObj;
     }
 
-    private static String getJSONString(final String url) throws ClientProtocolException, IOException {
+    private static synchronized String getJSONString(final String url) throws ClientProtocolException, IOException {
         // Making HTTP request
         final StringBuilder jsonString = new StringBuilder();
         try {
@@ -64,7 +64,7 @@ public class HttpUtils {
      * @throws ClientProtocolException
      * @throws IOException
      */
-    public static boolean doGet(final String url) throws ClientProtocolException, IOException {
+    public static synchronized boolean doGet(final String url) throws ClientProtocolException, IOException {
         try {
             final HttpGet httpGet = new HttpGet(url);
             final HttpResponse httpResponse = HTTP_CLIENT.execute(httpGet);
@@ -80,7 +80,7 @@ public class HttpUtils {
         return false;
     }
 
-    public static String postJSONString(final String url, final String json) throws ClientProtocolException, IOException {
+    public static synchronized String postJSONString(final String url, final String json) throws ClientProtocolException, IOException {
         final StringBuilder jsonString = new StringBuilder();
         try {
             final HttpPost httpPost = new HttpPost(url);

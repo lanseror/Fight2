@@ -15,6 +15,9 @@ import org.andengine.entity.text.AutoWrap;
 import org.andengine.entity.text.Text;
 import org.andengine.entity.text.TextOptions;
 import org.andengine.input.touch.TouchEvent;
+import org.andengine.input.touch.detector.ScrollDetector;
+import org.andengine.input.touch.detector.ScrollDetector.IScrollDetectorListener;
+import org.andengine.input.touch.detector.SurfaceScrollDetector;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.util.adt.color.Color;
@@ -34,16 +37,19 @@ import com.fight2.entity.ChatMessage;
 import com.fight2.entity.F2ButtonSprite;
 import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.ChatUtils;
+import com.fight2.util.ChatUtils.DisplayChannel;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
-import com.fight2.util.ChatUtils.DisplayChannel;
 
-public class ChatScene extends BaseScene {
+public class ChatScene extends BaseScene implements IScrollDetectorListener {
     private final ChatBoxCloseButton closeButton;
     private final EditText editText = activity.getChatText();
-    private IEntity chatContainer;
-    private int messageSize = 0;
+    private final IEntity chatContainer;
+    private final float chatContainerInitY;
+    private final IEntity chatScrollArea;
+    private float allMessageBoxY = 0;
     private Timer displayChatTimer;
+    private final SurfaceScrollDetector scrollDetector;
 
     public ChatScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -51,10 +57,25 @@ public class ChatScene extends BaseScene {
         // Chat message box container.
         final float chatContainerWidth = simulatedWidth;
         final float chatContainerHeight = 10;
-        chatContainer = new Rectangle(cameraCenterX, TextureEnum.CHAT_INPUT_BG.getHeight() + chatContainerHeight * 0.5f + 10, chatContainerWidth,
-                chatContainerHeight, vbom);
+        chatContainerInitY = TextureEnum.CHAT_INPUT_BG.getHeight() + chatContainerHeight * 0.5f + 10;
+        chatContainer = new Rectangle(cameraCenterX, chatContainerInitY, chatContainerWidth, chatContainerHeight, vbom);
         chatContainer.setColor(Color.TRANSPARENT);
         this.attachChild(chatContainer);
+        // chat scroll touch area
+        scrollDetector = new SurfaceScrollDetector(this);
+        final float chatScrollAreaWidth = 850;
+        final float chatScrollAreaHeight = simulatedHeight - TextureEnum.CHAT_INPUT_BG.getHeight() - 10;
+        chatScrollArea = new Rectangle(chatScrollAreaWidth * 0.5f, simulatedHeight - chatScrollAreaHeight * 0.5f, chatScrollAreaWidth, chatScrollAreaHeight,
+                vbom) {
+            @Override
+            public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                scrollDetector.onTouchEvent(pSceneTouchEvent);
+                return true;
+            }
+        };
+        chatScrollArea.setColor(Color.TRANSPARENT);
+        this.attachChild(chatScrollArea);
+        this.registerTouchArea(chatScrollArea);
         // Right-top close button.
         closeButton = createCloseButton(TextureEnum.CHAT_INPUT_CLOSE, this.simulatedRightX - 50, this.cameraHeight - 50);
         final IEntity closeTouchArea = new Rectangle(this.simulatedRightX - 75, this.cameraHeight - 75, 150, 150, vbom) {
@@ -130,6 +151,7 @@ public class ChatScene extends BaseScene {
                 final String inputText = inputEditable.toString();
                 if (inputText != null && !inputText.equals("")) {
                     ChatUtils.send(inputText);
+                    chatContainer.setY(chatContainerInitY - allMessageBoxY);
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -191,7 +213,7 @@ public class ChatScene extends BaseScene {
         final float timeWidth = timeText.getWidth();
 
         final String content = chatMessage.getContent();
-        final TextOptions textOptions = new TextOptions(AutoWrap.WORDS, 800);
+        final TextOptions textOptions = new TextOptions(AutoWrap.LETTERS, 800);
         final Text contentText = new Text(0, 0, font, content, textOptions, vbom);
         final float contentWidth = contentText.getWidth();
         final float contentHeight = contentText.getHeight();
@@ -199,8 +221,8 @@ public class ChatScene extends BaseScene {
         final float messageBoxGap = 10;
         final float messageBoxWidth = 850;
         final float messageBoxHeight = nameHeight + contentHeight + 5;
-        final IEntity messageBox = new Rectangle(messageBoxWidth * 0.5f + 15, -(messageBoxHeight + messageBoxGap) * messageSize - 0.5f * messageBoxHeight
-                - messageBoxGap, messageBoxWidth, messageBoxHeight, vbom);
+        final IEntity messageBox = new Rectangle(messageBoxWidth * 0.5f + 15, allMessageBoxY - 0.5f * messageBoxHeight - messageBoxGap, messageBoxWidth,
+                messageBoxHeight, vbom);
         messageBox.setColor(0XFF34251F);
         chatContainer.attachChild(messageBox);
 
@@ -217,7 +239,7 @@ public class ChatScene extends BaseScene {
         final float y = chatContainer.getY();
         final IEntityModifier moveModifier = new MoveModifier(0.1f, x, y, x, y + messageBoxHeight + messageBoxGap);
         chatContainer.registerEntityModifier(moveModifier);
-        messageSize++;
+        allMessageBoxY -= messageBoxHeight + messageBoxGap;
     }
 
     private ChatBoxCloseButton createCloseButton(final TextureEnum normalTextureEnum, final float x, final float y) {
@@ -235,6 +257,33 @@ public class ChatScene extends BaseScene {
     public void leaveScene() {
         displayChatTimer.cancel();
         displayChatTimer.purge();
+    }
+
+    @Override
+    public void onScrollStarted(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
+        handleScroll(pScollDetector, pPointerID, pDistanceX, pDistanceY);
+    }
+
+    private void handleScroll(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
+        final float checkY = chatContainerInitY - allMessageBoxY;
+        final float toY = chatContainer.getY() - pDistanceY;
+        if (toY > checkY) {
+            chatContainer.setY(checkY);
+        } else if (toY < chatContainerInitY + 80) {
+            chatContainer.setY(chatContainerInitY + 80);
+        } else {
+            chatContainer.setY(toY);
+        }
+    }
+
+    @Override
+    public void onScroll(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
+        handleScroll(pScollDetector, pPointerID, pDistanceX, pDistanceY);
+    }
+
+    @Override
+    public void onScrollFinished(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
+        handleScroll(pScollDetector, pPointerID, pDistanceX, pDistanceY);
     }
 
 }

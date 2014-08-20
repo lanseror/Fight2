@@ -52,14 +52,15 @@ public class MainScene extends BaseScene {
 
     private final Map<Sprite, Sprite> buttonSprites = new HashMap<Sprite, Sprite>();
 
+    private IEntity smallChatRoom;
     private final Timer displayChatTimer = new Timer();
-    private final Font chatFont;
-    private final Text chatText;
+    private Text chatText;
     private final Text chatTimeText;
     private final ChatTextHandler chatTextHandler;
     private final static int CHAT_SIZE = 500;
-    private final static String SAMPLE_CHAT_STRING = "ABCDE: FGHIJKLMNOPWRSTUVWXYZ!abcdefghijklm.  " + "\nABCDE: FGHIJKLMNOPWRSTUVWXYZ!abcdefghijklm.  ";
-    private final static String SAMPLE_CHAT_TIME_STRING = "21:45\n21:45";
+    private final static String SAMPLE_CHAT_STRING = "\n";
+    private final static String SAMPLE_CHAT_TIME_STRING = "\n";
+    private final static String TEST_CHAT_TIME_STRING = "16:30\n16:30";
     private final StringBuilder chatString = new StringBuilder(SAMPLE_CHAT_STRING);
     private final StringBuilder chatTimeString = new StringBuilder(SAMPLE_CHAT_TIME_STRING);
 
@@ -84,18 +85,20 @@ public class MainScene extends BaseScene {
         chatBox = new Rectangle(this.simulatedLeftX + 755 * 0.5f, 640 * 0.5f, 755, 640, vbom);
         chatBox.setColor(Color.BLACK);
         chatBox.setAlpha(0.5f);
-        chatFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
+        final Font chatFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
         chatText = new Text(0, 0, chatFont, SAMPLE_CHAT_STRING, CHAT_SIZE, vbom);
         chatText.setColor(0XFFE8BD80);
-        chatTimeText = new Text(0, 0, chatFont, SAMPLE_CHAT_TIME_STRING, CHAT_SIZE, vbom);
+        final Font chatTimeFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
+        chatTimeText = new Text(0, 0, chatTimeFont, SAMPLE_CHAT_TIME_STRING, CHAT_SIZE, vbom);
         chatTimeText.setColor(0XFFE8BD80);
-        chatTextHandler = new ChatTextHandler(chatText, vbom);
+
+        chatTextHandler = new ChatTextHandler(CHAT_SIZE, vbom);
         init();
         createChatRoom();
     }
 
     private void createChatRoom() {
-        final IEntity smallChatRoom = new Rectangle(this.simulatedLeftX + 900 * 0.5f, 75 * 0.5f, 900, 75, vbom);
+        smallChatRoom = new Rectangle(this.simulatedLeftX + 900 * 0.5f, 75 * 0.5f, 900, 75, vbom);
         smallChatRoom.setColor(Color.BLACK);
         smallChatRoom.setAlpha(0.3f);
         this.attachChild(smallChatRoom);
@@ -118,8 +121,11 @@ public class MainScene extends BaseScene {
         smallChatRoom.attachChild(openButton);
         adjustChatTextPosition();
         smallChatRoom.attachChild(chatText);
-        final float chatTimeTextWidth = chatTimeText.getWidth();
-        final float chatTimeTextHeight = chatTimeText.getHeight();
+        final Font testChatFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
+        final Text testChatTimeText = new Text(0, 0, testChatFont, TEST_CHAT_TIME_STRING, CHAT_SIZE, vbom);
+        final float chatTimeTextWidth = testChatTimeText.getWidth();
+        final float chatTimeTextHeight = testChatTimeText.getHeight();
+
         chatTimeText.setPosition(smallChatRoom.getWidth() - chatTimeTextWidth * 0.5f - 10, chatTimeTextHeight * 0.5f + 5);
         smallChatRoom.attachChild(chatTimeText);
         this.registerTouchArea(openButton);
@@ -339,10 +345,22 @@ public class MainScene extends BaseScene {
                     chatTimeString.delete(0, deleteChatTimeIndex + 1);
                     chatTimeString.append("\n");
                     chatTimeString.append(date);
+                    chatTimeText.setText(chatTimeString);
+
+                    activity.runOnUpdateThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            chatText.detachSelf();
+                            final Font chatFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
+                            chatText = new Text(0, 0, chatFont, chatString, vbom);
+                            chatText.setColor(0XFFE8BD80);
+                            smallChatRoom.attachChild(chatText);
+                            adjustChatTextPosition();
+                        }
+                    });
+
                 }
-                chatText.setText(chatString);
-                chatTimeText.setText(chatTimeString);
-                adjustChatTextPosition();
+
             }
         }, 0, 1000);// Update text every second
     }
