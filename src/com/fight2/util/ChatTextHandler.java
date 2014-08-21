@@ -13,15 +13,11 @@ import com.fight2.constant.FontEnum;
 public class ChatTextHandler {
     private static String FORMAT = "\n%s: %s";
     private static String SAMPLE_TEXT = "ABCDE: FGHIJKLMNOPWRSTUVWXYZ!abcdefghijklm.  ";
-    private final VertexBufferObjectManager vbom;
-    private final int charactersMaximum;
     private final Text sampleText;
     private final Text text;
 
     public ChatTextHandler(final int charactersMaximum, final VertexBufferObjectManager vbom) {
         super();
-        this.vbom = vbom;
-        this.charactersMaximum = charactersMaximum;
         final Font chatHandlerFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
         sampleText = new Text(0, 0, chatHandlerFont, SAMPLE_TEXT, vbom);
         final TextOptions textOptions = new TextOptions(AutoWrap.LETTERS, sampleText.getWidth() - 5);
