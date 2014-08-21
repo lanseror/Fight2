@@ -186,8 +186,12 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
             public void run() {
                 closeButton.toggle();
                 final int diff = ChatUtils.displayedMiniMsg - ChatUtils.displayedFullMsg;
-                final int count = (diff < 15 ? 15 : diff);
-                for (int i = 0; i < count; i++) {
+                if (chatContainer.getChildCount() > 30 && diff > 15) {
+                    chatContainer.detachChildren();
+                    allMessageBoxY = 0;
+                    chatContainer.setY(chatContainerInitY);
+                }
+                for (int i = 0; i < diff; i++) {
                     displayChat(false);
                 }
                 activity.getChatText().setVisibility(View.VISIBLE);
@@ -295,14 +299,6 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
     public void leaveScene() {
         displayChatTimer.cancel();
         displayChatTimer.purge();
-        activity.runOnUpdateThread(new Runnable() {
-            @Override
-            public void run() {
-                chatContainer.detachChildren();
-                allMessageBoxY = 0;
-                chatContainer.setY(chatContainerInitY);
-            }
-        });
     }
 
     @Override

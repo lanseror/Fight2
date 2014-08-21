@@ -76,8 +76,8 @@ public class ChatUtils {
             switch (displayChannel) {
                 case MiniChatRoom:
                     displayedMiniMsg = tempDisplayedMsg;
-                    if (displayedMiniMsg - displayedFullMsg > 15) {
-                        displayedFullMsg = displayedMiniMsg - 15;
+                    if (displayedMiniMsg - displayedFullMsg > 25) {
+                        displayedFullMsg = displayedMiniMsg - 25;
                     }
                     break;
                 case FullChatRoom:
