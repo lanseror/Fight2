@@ -8,8 +8,6 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.andengine.entity.IEntity;
-import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
@@ -22,20 +20,12 @@ import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.util.algorithm.collision.BaseCollisionChecker;
 
-import android.graphics.Color;
-import android.view.View;
-
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.constant.TiledTextureEnum;
-import com.fight2.entity.ChatMessage;
-import com.fight2.entity.F2ButtonSprite;
-import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
-import com.fight2.util.ChatTextHandler;
 import com.fight2.util.ChatUtils;
-import com.fight2.util.ChatUtils.DisplayChannel;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TiledTextureFactory;
 
@@ -51,18 +41,6 @@ public class MainScene extends BaseScene {
     private static final float[] BILLBOARD_VERTICES = { 425, 91, 485, 258, 616, 238, 609, 94, 570, 132, 525, 89 };
 
     private final Map<Sprite, Sprite> buttonSprites = new HashMap<Sprite, Sprite>();
-
-    private IEntity smallChatRoom;
-    private final Timer displayChatTimer = new Timer();
-    private Text chatText;
-    private final Text chatTimeText;
-    private final ChatTextHandler chatTextHandler;
-    private final static int CHAT_SIZE = 500;
-    private final static String SAMPLE_CHAT_STRING = "\n";
-    private final static String SAMPLE_CHAT_TIME_STRING = "\n";
-    private final static String TEST_CHAT_TIME_STRING = "16:30\n16:30";
-    private final StringBuffer chatStringBuffer = new StringBuffer(SAMPLE_CHAT_STRING);
-    private final StringBuffer chatTimeString = new StringBuffer(SAMPLE_CHAT_TIME_STRING);
 
     private final Font mFont;
     private final Text summonText;
@@ -80,42 +58,7 @@ public class MainScene extends BaseScene {
         tipTexts.add(arenaText);
         tipTexts.add(campText);
 
-        final Font chatFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
-        chatText = new Text(0, 0, chatFont, SAMPLE_CHAT_STRING, CHAT_SIZE, vbom);
-        chatText.setColor(0XFFE8BD80);
-        final Font chatTimeFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
-        chatTimeText = new Text(0, 0, chatTimeFont, SAMPLE_CHAT_TIME_STRING, CHAT_SIZE, vbom);
-        chatTimeText.setColor(0XFFE8BD80);
-
-        chatTextHandler = new ChatTextHandler(CHAT_SIZE, vbom);
         init();
-        // createChatRoom();
-    }
-
-    private void createChatRoom() {
-        smallChatRoom = new Rectangle(this.simulatedLeftX + 900 * 0.5f, 75 * 0.5f, 900, 75, vbom);
-        smallChatRoom.setColor(Color.BLACK);
-        smallChatRoom.setAlpha(0.3f);
-        this.attachChild(smallChatRoom);
-
-        final F2ButtonSprite openButton = createALBF2ButtonSprite(TextureEnum.CHAT_INPUT_OPEN, TextureEnum.CHAT_INPUT_OPEN, 0, 0);
-        openButton.setOnClickListener(new F2OnClickListener() {
-            @Override
-            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                ResourceManager.getInstance().setCurrentScene(SceneEnum.Chat);
-            }
-        });
-        smallChatRoom.attachChild(openButton);
-        adjustChatTextPosition();
-        smallChatRoom.attachChild(chatText);
-        final Font testChatFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
-        final Text testChatTimeText = new Text(0, 0, testChatFont, TEST_CHAT_TIME_STRING, CHAT_SIZE, vbom);
-        final float chatTimeTextWidth = testChatTimeText.getWidth();
-        final float chatTimeTextHeight = testChatTimeText.getHeight();
-
-        chatTimeText.setPosition(smallChatRoom.getWidth() - chatTimeTextWidth * 0.5f - 10, chatTimeTextHeight * 0.5f + 5);
-        smallChatRoom.attachChild(chatTimeText);
-        this.registerTouchArea(openButton);
     }
 
     @Override
@@ -305,51 +248,6 @@ public class MainScene extends BaseScene {
         });
 
         scheduleGetChatMessage();
-        // scheduleDisplayChat();
-    }
-
-    private void adjustChatTextPosition() {
-        final float openButtonWidth = TextureEnum.CHAT_INPUT_OPEN.getWidth();
-        final float chatTextWidth = chatText.getWidth();
-        final float chatTextHeight = chatText.getHeight();
-        chatText.setPosition(openButtonWidth + chatTextWidth * 0.5f + 5, chatTextHeight * 0.5f + 5);
-    }
-
-    private void scheduleDisplayChat() {
-        displayChatTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                final ChatMessage chatMessage = ChatUtils.getDisplayMessage(DisplayChannel.MiniChatRoom);
-                if (chatMessage != null) {
-                    final int deleteIndex = chatStringBuffer.indexOf("\n");
-                    chatStringBuffer.delete(0, deleteIndex + 1);
-                    final String sender = chatMessage.getSender();
-                    final String content = chatMessage.getContent();
-                    // chatStringBuffer.append(chatTextHandler.handle(sender, content));
-
-                    final String date = chatMessage.getDate();
-                    final int deleteChatTimeIndex = chatTimeString.indexOf("\n");
-                    chatTimeString.delete(0, deleteChatTimeIndex + 1);
-                    chatTimeString.append("\n");
-                    chatTimeString.append(date);
-                    chatTimeText.setText(chatTimeString);
-
-                    final String chatString = chatStringBuffer.toString();
-                    activity.runOnUpdateThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            chatText.detachSelf();
-                            final Font chatFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28, 256);
-                            chatText = new Text(0, 0, chatFont, chatString, vbom);
-                            chatText.setColor(0XFFE8BD80);
-                            smallChatRoom.attachChild(chatText);
-                            adjustChatTextPosition();
-                        }
-                    });
-
-                }
-            }
-        }, 0, 300);// Update text every 0.3 second
     }
 
     private void scheduleGetChatMessage() {
