@@ -239,6 +239,7 @@ public class GameActivity extends LayoutGameActivity {
             resourceManager.setCurrentScene(SceneEnum.Main);
             return true;
         } else {
+            this.getGameHub().needSmallChatRoom(false);
             return super.onKeyDown(keyCode, event);
         }
 
