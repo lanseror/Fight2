@@ -93,6 +93,7 @@ public enum TextureEnum {
 
     // Arena list scene images.
     ARENA_LIST_FRAME("images/arena_list_frame.png", 790, 489),
+    ARENA_LIST_LINE("images/arena_list_line.png", 515, 1),
     ARENA_LIST_SELECTED("images/arena_list_selected.png", 527, 35),
     ARENA_LIST_ENTER("images/arena_list_enter.png", 178, 98),
     ARENA_LIST_ENTER_PRESSED("images/arena_list_enter_fcs.png", 178, 98),

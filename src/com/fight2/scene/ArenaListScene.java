@@ -36,8 +36,8 @@ public class ArenaListScene extends BaseScene {
     private final Text ticketText;
     private final Sprite listFrame;
     private final Sprite listSelectedBar;
-    private final float arenaStartY = listFrameHeight - 75;
-    private final List<Text> arenaTexts = new ArrayList<Text>();
+    private final float arenaStartY = listFrameHeight - 90;
+    private final List<IEntity> arenaEntities = new ArrayList<IEntity>();
     private int selectedArenaId = 0;
 
     public ArenaListScene(final GameActivity activity) throws IOException {
@@ -104,27 +104,31 @@ public class ArenaListScene extends BaseScene {
 
     @Override
     public void updateScene() {
-        for (final Text arenaText : arenaTexts) {
-            listFrame.detachChild(arenaText);
+        for (final IEntity arenaEntity : arenaEntities) {
+            listFrame.detachChild(arenaEntity);
         }
-        arenaTexts.clear();
+        arenaEntities.clear();
 
         final Font font = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
         final List<Arena> arenas = ArenaUtils.getArenas(activity);
 
         for (int i = 0; i < arenas.size(); i++) {
             final Arena arena = arenas.get(i);
-            final float arenaY = arenaStartY - i * 50;
+            final float arenaY = arenaStartY - i * 65;
             final Text nameText = new Text(100, arenaY, font, arena.getName(), vbom);
             nameText.setX(30 + nameText.getWidth() * 0.5f);
             final Text timeText = new Text(360, arenaY, font, arena.getRemainTime(), vbom);
             final Text onlineText = new Text(500, arenaY, font, String.valueOf(arena.getOnlineNumber()), vbom);
+            final Sprite line = createACImageSprite(TextureEnum.ARENA_LIST_LINE, 280, arenaY - 32);
             listFrame.attachChild(nameText);
             listFrame.attachChild(timeText);
             listFrame.attachChild(onlineText);
-            arenaTexts.add(nameText);
-            arenaTexts.add(timeText);
-            arenaTexts.add(onlineText);
+            listFrame.attachChild(line);
+            arenaEntities.add(nameText);
+            arenaEntities.add(timeText);
+            arenaEntities.add(onlineText);
+            arenaEntities.add(line);
+
             final int arenaId = arena.getId();
             if (selectedArenaId == arenaId) {
                 listSelectedBar.setY(arenaY);
@@ -143,7 +147,7 @@ public class ArenaListScene extends BaseScene {
     }
 
     private IEntity createListTouchArea(final int id, final float arenaY) {
-        final IEntity touchArea = new Rectangle(280, arenaY, 530, 45, vbom) {
+        final IEntity touchArea = new Rectangle(280, arenaY, 530, 55, vbom) {
             @Override
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 if (pSceneTouchEvent.isActionUp()) {
