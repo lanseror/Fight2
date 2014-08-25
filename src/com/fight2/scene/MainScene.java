@@ -224,7 +224,7 @@ public class MainScene extends BaseScene {
                         unfocusSprite(hotelSprite);
                     } else if (checkContains(ARENA_VERTICES, x, y)) {
                         unfocusSprite(arenaSprite);
-                        ResourceManager.getInstance().setCurrentScene(SceneEnum.Arena);
+                        ResourceManager.getInstance().setCurrentScene(SceneEnum.ArenaList);
                     } else if (checkContains(CONGRESS_VERTICES, x, y)) {
                         unfocusSprite(congressSprite);
                     } else if (checkContains(GATE_VERTICES, x, y)) {

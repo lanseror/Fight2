@@ -31,15 +31,16 @@ import com.fight2.util.TextureFactory;
 
 public class ArenaScene extends BaseScene {
     private final PartyInfo partyInfo = GameUserSession.getInstance().getPartyInfo();
-    private final float topbarY = cameraHeight - TextureEnum.PARTY_TOPBAR.getHeight();
+    private final float topbarY = cameraHeight - TextureEnum.ARENA_TOPBAR.getHeight();
     private final float infoFrameY = topbarY - TextureEnum.ARENA_BATTLE_INFO.getHeight() + 10;
     private final float battleFrameY = infoFrameY - TextureEnum.ARENA_BATTLE_FRAME.getHeight();
-    private final Font mFont;
+    private final Font topBarFont;
     private final Font boldFaceFont;
     private final Font difficultyFont;
     private final Text hpText;
     private final Text atkText;
-    private final Text[] strengthTexts = new Text[3];
+    private final Text ticketText;
+    private final Text[] mightTexts = new Text[3];
     private final Text[] difficultyTexts = new Text[3];
 
     private final Sprite[] battleFrames = new Sprite[3];
@@ -47,14 +48,15 @@ public class ArenaScene extends BaseScene {
 
     public ArenaScene(final GameActivity activity) throws IOException {
         super(activity);
-        this.mFont = ResourceManager.getInstance().getFont(FontEnum.Main);
+        this.topBarFont = ResourceManager.getInstance().getFont(FontEnum.Main);
         this.boldFaceFont = ResourceManager.getInstance().getFont(FontEnum.Default);
         this.difficultyFont = ResourceManager.getInstance().getFont(FontEnum.Default, 21);
-        hpText = new Text(this.simulatedLeftX + 360, topbarY + 48, mFont, "0123456789", vbom);
-        atkText = new Text(this.simulatedLeftX + 600, topbarY + 48, mFont, "0123456789", vbom);
-        strengthTexts[0] = new Text(140, 90, boldFaceFont, "+10", vbom);
-        strengthTexts[1] = new Text(140, 90, boldFaceFont, "+ 8", vbom);
-        strengthTexts[2] = new Text(140, 90, boldFaceFont, "+ 5", vbom);
+        hpText = new Text(280, 48, topBarFont, "0123456789", vbom);
+        atkText = new Text(480, 48, topBarFont, "0123456789", vbom);
+        ticketText = new Text(670, 48, topBarFont, "0123456789", vbom);
+        mightTexts[0] = new Text(140, 90, boldFaceFont, "+10", vbom);
+        mightTexts[1] = new Text(140, 90, boldFaceFont, "+ 8", vbom);
+        mightTexts[2] = new Text(140, 90, boldFaceFont, "+ 5", vbom);
         difficultyTexts[0] = new Text(117, 137, difficultyFont, "困难", vbom);
         difficultyTexts[0].setColor(0XFFED6F00);
         difficultyTexts[1] = new Text(117, 137, difficultyFont, "一般", vbom);
@@ -63,6 +65,7 @@ public class ArenaScene extends BaseScene {
         difficultyTexts[2].setColor(0XFFADCE00);
         hpText.setText(String.valueOf(partyInfo.getHp()));
         atkText.setText(String.valueOf(partyInfo.getAtk()));
+        ticketText.setText("0");
         init();
     }
 
@@ -72,10 +75,11 @@ public class ArenaScene extends BaseScene {
         final Background background = new SpriteBackground(bgSprite);
         this.setBackground(background);
 
-        final Sprite topbarSprite = createALBImageSprite(TextureEnum.PARTY_TOPBAR, this.simulatedLeftX, topbarY);
+        final Sprite topbarSprite = createALBImageSprite(TextureEnum.ARENA_TOPBAR, this.simulatedLeftX, topbarY);
         this.attachChild(topbarSprite);
-        this.attachChild(hpText);
-        this.attachChild(atkText);
+        topbarSprite.attachChild(hpText);
+        topbarSprite.attachChild(atkText);
+        topbarSprite.attachChild(ticketText);
 
         final Sprite rechargeSprite = createALBF2ButtonSprite(TextureEnum.PARTY_RECHARGE, TextureEnum.PARTY_RECHARGE_PRESSED, this.simulatedRightX
                 - TextureEnum.PARTY_RECHARGE.getWidth() + 20, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight());
@@ -92,7 +96,7 @@ public class ArenaScene extends BaseScene {
             final Sprite battleFrame = createALBImageSprite(TextureEnum.ARENA_BATTLE_FRAME, this.simulatedLeftX + 245 * i, battleFrameY);
             battleFrames[i] = battleFrame;
             this.attachChild(battleFrame);
-            battleFrame.attachChild(strengthTexts[i]);
+            battleFrame.attachChild(mightTexts[i]);
             battleFrame.attachChild(difficultyTexts[i]);
         }
 
@@ -101,7 +105,7 @@ public class ArenaScene extends BaseScene {
         backButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                ResourceManager.getInstance().setCurrentScene(SceneEnum.Main);
+                ResourceManager.getInstance().setCurrentScene(SceneEnum.ArenaList);
             }
         });
         this.attachChild(backButton);
@@ -196,6 +200,6 @@ public class ArenaScene extends BaseScene {
     @Override
     public void leaveScene() {
         // TODO Auto-generated method stub
-        
+
     }
 }

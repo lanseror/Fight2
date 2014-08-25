@@ -1,7 +1,6 @@
 package com.fight2.entity;
 
 import org.andengine.engine.camera.hud.HUD;
-import org.andengine.entity.primitive.Rectangle;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 import com.fight2.GameActivity;

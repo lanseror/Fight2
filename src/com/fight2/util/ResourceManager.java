@@ -18,6 +18,7 @@ import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.entity.ProgressBar;
+import com.fight2.scene.ArenaListScene;
 import com.fight2.scene.ArenaScene;
 import com.fight2.scene.BaseScene;
 import com.fight2.scene.ChatScene;
@@ -165,6 +166,9 @@ public class ResourceManager {
             scenes.put(SceneEnum.Party, partyScene);
             final BaseScene summonScene = new SummonScene(activity);
             scenes.put(SceneEnum.Summon, summonScene);
+            final BaseScene arenaListScene = new ArenaListScene(activity);
+            scenes.put(SceneEnum.ArenaList, arenaListScene);
+
             final BaseScene arenaScene = new ArenaScene(activity);
             scenes.put(SceneEnum.Arena, arenaScene);
 

@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.fight2.GameActivity;
+import com.fight2.entity.Arena;
 import com.fight2.entity.Player;
 import com.fight2.entity.battle.BattleRecord;
 import com.fight2.entity.battle.BattleResult;
@@ -43,6 +44,30 @@ public class ArenaUtils {
                 competitors.add(player);
             }
             return competitors;
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static List<Arena> getArenas(final GameActivity activity) {
+        final String url = HttpUtils.HOST_URL + "/arena/list-started";
+        final List<Arena> arenas = new ArrayList<Arena>();
+        try {
+            final JSONArray responseJson = HttpUtils.getJSONArrayFromUrl(url);
+            for (int i = 0; i < responseJson.length(); i++) {
+                final JSONObject jsonObject = responseJson.getJSONObject(i);
+                final Arena arena = new Arena();
+                arena.setId(jsonObject.getInt("id"));
+                arena.setName(jsonObject.getString("name"));
+                arena.setOnlineNumber(jsonObject.getInt("onlineNumber"));
+                arena.setRemainTime(jsonObject.getString("remainTime"));
+                arenas.add(arena);
+            }
+            return arenas;
         } catch (final ClientProtocolException e) {
             throw new RuntimeException(e);
         } catch (final IOException e) {
