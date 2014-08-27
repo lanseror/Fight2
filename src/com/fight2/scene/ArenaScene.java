@@ -27,6 +27,7 @@ import com.fight2.entity.UserArenaInfo;
 import com.fight2.entity.UserArenaRecord;
 import com.fight2.util.ArenaUtils;
 import com.fight2.util.BWShaderProgram;
+import com.fight2.util.DialogUtils;
 import com.fight2.util.F2MusicManager;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.StringUtils;
@@ -118,8 +119,18 @@ public class ArenaScene extends BaseScene {
         infoFrame.attachChild(loseText);
         infoFrame.attachChild(remainTimeText);
 
-        final Sprite continiousWinButton = createALBImageSprite(TextureEnum.ARENA_BATTLE_CONTINIOUS_WIN, 488, 15);
+        final F2ButtonSprite continiousWinButton = this.createALBF2ButtonSprite(TextureEnum.ARENA_BATTLE_CONTINIOUS_WIN,
+                TextureEnum.ARENA_BATTLE_CONTINIOUS_WIN, 488, 15);
         infoFrame.attachChild(continiousWinButton);
+        this.registerTouchArea(continiousWinButton);
+        continiousWinButton.setOnClickListener(new F2OnClickListener() {
+
+            @Override
+            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                DialogUtils.ConfirmDialog(activity, "连续胜利", "连胜可以让你的胜利获得额外的力量加成！");
+            }
+
+        });
 
         for (int i = 0; i < 3; i++) {
             final Sprite battleFrame = createALBImageSprite(TextureEnum.ARENA_BATTLE_FRAME, this.simulatedLeftX + 245 * i, battleFrameY);
@@ -147,7 +158,6 @@ public class ArenaScene extends BaseScene {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 ResourceManager.getInstance().setCurrentScene(SceneEnum.ArenaList);
-                ArenaUtils.exit();
             }
         });
         this.attachChild(backButton);
