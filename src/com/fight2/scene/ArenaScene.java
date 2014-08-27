@@ -22,8 +22,11 @@ import com.fight2.entity.F2ButtonSprite;
 import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.PartyInfo;
-import com.fight2.entity.Player;
+import com.fight2.entity.User;
+import com.fight2.entity.UserArenaInfo;
+import com.fight2.entity.UserArenaRecord;
 import com.fight2.util.ArenaUtils;
+import com.fight2.util.BWShaderProgram;
 import com.fight2.util.F2MusicManager;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.StringUtils;
@@ -35,25 +38,45 @@ public class ArenaScene extends BaseScene {
     private final float infoFrameY = topbarY - TextureEnum.ARENA_BATTLE_INFO.getHeight() + 10;
     private final float battleFrameY = infoFrameY - TextureEnum.ARENA_BATTLE_FRAME.getHeight();
     private final Font topBarFont;
+    private final Font infoFont;
+    private final Font remainTimeFont;
     private final Font boldFaceFont;
     private final Font difficultyFont;
     private final Text hpText;
     private final Text atkText;
     private final Text ticketText;
+    private final Text mightText;
+    private final Text winText;
+    private final Text rankText;
+    private final Text loseText;
+    private final Text remainTimeText;
     private final Text[] mightTexts = new Text[3];
     private final Text[] difficultyTexts = new Text[3];
 
     private final Sprite[] battleFrames = new Sprite[3];
-    private final Player[] players = new Player[3];
+    private final Sprite[] competitorSprites = new Sprite[3];
+    private final Sprite[] battleButtons = new Sprite[3];
+    private final Sprite[] winButtons = new Sprite[3];
+    private final Sprite[] loseButtons = new Sprite[3];
+    private final Text[] nameTexts = new Text[3];
+    private final User[] players = new User[3];
 
     public ArenaScene(final GameActivity activity) throws IOException {
         super(activity);
         this.topBarFont = ResourceManager.getInstance().getFont(FontEnum.Main);
-        this.boldFaceFont = ResourceManager.getInstance().getFont(FontEnum.Default);
+        this.infoFont = ResourceManager.getInstance().getFont(FontEnum.Default);
+        this.remainTimeFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
+        this.boldFaceFont = ResourceManager.getInstance().getFont(FontEnum.Bold);
         this.difficultyFont = ResourceManager.getInstance().getFont(FontEnum.Default, 21);
         hpText = new Text(280, 48, topBarFont, "0123456789", vbom);
         atkText = new Text(480, 48, topBarFont, "0123456789", vbom);
         ticketText = new Text(670, 48, topBarFont, "0123456789", vbom);
+        mightText = new Text(140, 105, infoFont, "0123456789", vbom);
+        winText = new Text(360, 105, infoFont, "0123456789", vbom);
+        rankText = new Text(140, 40, infoFont, "0123456789", vbom);
+        loseText = new Text(360, 40, infoFont, "0123456789", vbom);
+        remainTimeText = new Text(658, 160, remainTimeFont, "0123456789: 天", vbom);
+        remainTimeText.setColor(0XFFF8B451);
         mightTexts[0] = new Text(140, 90, boldFaceFont, "+10", vbom);
         mightTexts[1] = new Text(140, 90, boldFaceFont, "+ 8", vbom);
         mightTexts[2] = new Text(140, 90, boldFaceFont, "+ 5", vbom);
@@ -89,6 +112,12 @@ public class ArenaScene extends BaseScene {
         final Sprite infoFrame = createALBImageSprite(TextureEnum.ARENA_BATTLE_INFO, this.simulatedLeftX, infoFrameY);
         this.attachChild(infoFrame);
 
+        infoFrame.attachChild(mightText);
+        infoFrame.attachChild(winText);
+        infoFrame.attachChild(rankText);
+        infoFrame.attachChild(loseText);
+        infoFrame.attachChild(remainTimeText);
+
         final Sprite continiousWinButton = createALBImageSprite(TextureEnum.ARENA_BATTLE_CONTINIOUS_WIN, 488, 15);
         infoFrame.attachChild(continiousWinButton);
 
@@ -98,6 +127,18 @@ public class ArenaScene extends BaseScene {
             this.attachChild(battleFrame);
             battleFrame.attachChild(mightTexts[i]);
             battleFrame.attachChild(difficultyTexts[i]);
+            final Sprite battleButton = createBattleSprite(TextureEnum.ARENA_BATTLE_BUTTON, 122, 37, i);
+            battleButtons[i] = battleButton;
+            battleFrame.attachChild(battleButton);
+
+            final Sprite winButton = this.createACImageSprite(TextureEnum.ARENA_RESULT_WIN, 122, 37);
+            winButtons[i] = winButton;
+            winButton.setVisible(false);
+            battleFrame.attachChild(winButton);
+            final Sprite loseButton = this.createACImageSprite(TextureEnum.ARENA_RESULT_LOSE, 122, 37);
+            loseButtons[i] = loseButton;
+            loseButton.setVisible(false);
+            battleFrame.attachChild(loseButton);
         }
 
         final F2ButtonSprite backButton = createALBF2ButtonSprite(TextureEnum.COMMON_BACK_BUTTON_NORMAL, TextureEnum.COMMON_BACK_BUTTON_PRESSED,
@@ -106,6 +147,7 @@ public class ArenaScene extends BaseScene {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 ResourceManager.getInstance().setCurrentScene(SceneEnum.ArenaList);
+                ArenaUtils.exit();
             }
         });
         this.attachChild(backButton);
@@ -159,7 +201,8 @@ public class ArenaScene extends BaseScene {
                 if (pSceneTouchEvent.isActionDown()) {
                     F2MusicManager.getInstance().playMusic(MusicEnum.ARENA_ATTACK);
                     try {
-                        final Scene battleScene = new BattleScene(activity, players[index].getId());
+                        final User player = players[index];
+                        final Scene battleScene = new BattleScene(activity, index, player.getId());
                         activity.getEngine().setScene(battleScene);
                     } catch (final IOException e) {
                         Debug.e(e);
@@ -175,25 +218,55 @@ public class ArenaScene extends BaseScene {
 
     @Override
     public void updateScene() {
-        final List<Player> competitors = ArenaUtils.getCompetitors(activity);
+        final Font nameFont = ResourceManager.getInstance().getFont(FontEnum.Default, 20);
+        final UserArenaInfo userArenaInfo = ArenaUtils.enter(activity);
+        mightText.setText(String.valueOf(userArenaInfo.getMight()));
+        winText.setText(String.valueOf(userArenaInfo.getWin()));
+        rankText.setText(String.valueOf(userArenaInfo.getRankNumber()));
+        loseText.setText(String.valueOf(userArenaInfo.getLose()));
+        remainTimeText.setText(userArenaInfo.getRemainTime());
+        final List<UserArenaRecord> userArenaRecords = userArenaInfo.getArenaRecords();
         final TextureFactory textureFactory = TextureFactory.getInstance();
-        for (int i = 0; i < 3 && i < competitors.size(); i++) {
-            final Player competitor = competitors.get(i);
+        for (int i = 0; i < 3 && i < userArenaRecords.size(); i++) {
+            // clean up;
+            battleFrames[i].detachChild(competitorSprites[i]);
+            this.unregisterTouchArea(battleButtons[i]);
+            battleFrames[i].detachChild(nameTexts[i]);
+
+            final UserArenaRecord userArenaRecord = userArenaRecords.get(i);
+            final User competitor = userArenaRecord.getUser();
             players[i] = competitor;
+
+            final Text nameText = new Text(120, 288, nameFont, competitor.getName(), vbom);
+            nameText.setColor(0XFFFFD190);
+            battleFrames[i].attachChild(nameText);
+            nameTexts[i] = nameText;
             final String avatar = competitor.getAvatar();
             final ITextureRegion avatarTexture = StringUtils.isEmpty(avatar) ? textureFactory.getAssetTextureRegion(TextureEnum.COMMON_DEFAULT_AVATAR)
                     : textureFactory.getTextureRegion(avatar);
             final Sprite competitorSprite = new Sprite(117, 209, 100, 100, avatarTexture, vbom);
             battleFrames[i].attachChild(competitorSprite);
-        }
-        for (int i = 0; i < players.length; i++) {
-            final Player player = players[i];
-            if (player == null) {
-                continue;
+            competitorSprites[i] = competitorSprite;
+
+            switch (userArenaRecord.getStatus()) {
+                case NoAction:
+                    battleButtons[i].setVisible(true);
+                    winButtons[i].setVisible(false);
+                    loseButtons[i].setVisible(false);
+                    this.registerTouchArea(battleButtons[i]);
+                    break;
+                case Win:
+                    battleButtons[i].setVisible(false);
+                    winButtons[i].setVisible(true);
+                    loseButtons[i].setVisible(false);
+                    competitorSprite.setShaderProgram(BWShaderProgram.getInstance());
+                    break;
+                case Lose:
+                    battleButtons[i].setVisible(false);
+                    winButtons[i].setVisible(false);
+                    loseButtons[i].setVisible(true);
+                    break;
             }
-            final Sprite battleButton = createBattleSprite(TextureEnum.ARENA_BATTLE_BUTTON, 122, 37, i);
-            battleFrames[i].attachChild(battleButton);
-            this.registerTouchArea(battleButton);
         }
     }
 

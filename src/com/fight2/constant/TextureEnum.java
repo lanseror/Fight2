@@ -90,6 +90,8 @@ public enum TextureEnum {
     ARENA_BATTLE_REWARD("images/arena_battle_reward.png", 130, 132),
     ARENA_BATTLE_REWARD_FCS("images/arena_battle_reward_fcs.png", 130, 132),
     ARENA_BATTLE_CONTINIOUS_WIN("images/arena_battle_continious_win.png", 121, 118),
+    ARENA_RESULT_WIN("images/arena_result_win.png", 140, 35),
+    ARENA_RESULT_LOSE("images/arena_result_lose.png", 140, 35),
 
     // Arena list scene images.
     ARENA_LIST_FRAME("images/arena_list_frame.png", 790, 489),

@@ -78,6 +78,8 @@ public class PartyEditScene extends BaseScene {
     private final Text partyHpText;
     private final Text partyAtkText;
 
+    private final Party[] parties = GameUserSession.getInstance().getPartyInfo().getParties();
+
     public PartyEditScene(final GameActivity activity, final int partyNumber) throws IOException {
         super(activity);
         this.partyNumber = partyNumber;
@@ -383,16 +385,26 @@ public class PartyEditScene extends BaseScene {
         backButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                final boolean isSaveOk = CardUtils.saveParties();
-                if (isSaveOk) {
-                    ResourceManager.getInstance().setCurrentScene(SceneEnum.Party);
-                } else {
+                final Card[] cards = parties[0].getCards();
+                if (cards[0] == null) {
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(activity, "队伍保存失败！", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(activity, "你必须要有一个领军人物！", Toast.LENGTH_SHORT).show();
                         }
                     });
+                } else {
+                    final boolean isSaveOk = CardUtils.saveParties();
+                    if (isSaveOk) {
+                        ResourceManager.getInstance().setCurrentScene(SceneEnum.Party);
+                    } else {
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(activity, "队伍保存失败！", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
                 }
             }
         });
@@ -635,7 +647,7 @@ public class PartyEditScene extends BaseScene {
     @Override
     public void leaveScene() {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

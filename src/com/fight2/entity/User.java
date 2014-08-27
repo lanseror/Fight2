@@ -1,6 +1,6 @@
 package com.fight2.entity;
 
-public class Player {
+public class User {
     private int id;
     private String avatar;
     private String name;

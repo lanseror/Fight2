@@ -66,7 +66,7 @@ public class BattleScene extends BaseScene {
     private final boolean isWinner;
     private final Sprite skipSprite;
 
-    public BattleScene(final GameActivity activity, final int attackPlayerId) throws IOException {
+    public BattleScene(final GameActivity activity, final int attackPlayerIndex, final int attackPlayerId) throws IOException {
         super(activity);
         this.skillText = new Text(this.cameraCenterX, this.cameraCenterY + 30, font, "技能：", 30, vbom);
         this.skillEffectText = new Text(this.cameraCenterX, this.cameraCenterY - 10, font, "效果：", 100, vbom);
@@ -81,7 +81,7 @@ public class BattleScene extends BaseScene {
         this.attachChild(winImage);
         this.attachChild(loseImage);
         opponentParties = CardUtils.getPartyByUserId(activity, attackPlayerId).getParties();
-        final BattleResult battleResult = ArenaUtils.attack(attackPlayerId, activity);
+        final BattleResult battleResult = ArenaUtils.attack(attackPlayerIndex, activity);
         isWinner = battleResult.isWinner();
         final List<BattleRecord> battleRecords = battleResult.getBattleRecord();
         for (final BattleRecord battleRecord : battleRecords) {
@@ -558,7 +558,7 @@ public class BattleScene extends BaseScene {
     @Override
     public void leaveScene() {
         // TODO Auto-generated method stub
-        
+
     }
 
 }

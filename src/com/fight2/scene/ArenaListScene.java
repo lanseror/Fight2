@@ -38,7 +38,6 @@ public class ArenaListScene extends BaseScene {
     private final Sprite listSelectedBar;
     private final float arenaStartY = listFrameHeight - 90;
     private final List<IEntity> arenaEntities = new ArrayList<IEntity>();
-    private int selectedArenaId = 0;
 
     public ArenaListScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -130,7 +129,7 @@ public class ArenaListScene extends BaseScene {
             arenaEntities.add(line);
 
             final int arenaId = arena.getId();
-            if (selectedArenaId == arenaId) {
+            if (ArenaUtils.getSelectedArenaId() == arenaId) {
                 listSelectedBar.setY(arenaY);
                 listSelectedBar.setVisible(true);
             }
@@ -142,7 +141,7 @@ public class ArenaListScene extends BaseScene {
         if (!listSelectedBar.isVisible() && !arenas.isEmpty()) {
             listSelectedBar.setY(arenaStartY);
             listSelectedBar.setVisible(true);
-            selectedArenaId = arenas.get(0).getId();
+            ArenaUtils.setSelectedArenaId(arenas.get(0).getId());
         }
     }
 
@@ -152,7 +151,7 @@ public class ArenaListScene extends BaseScene {
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 if (pSceneTouchEvent.isActionUp()) {
                     listSelectedBar.setY(arenaY);
-                    selectedArenaId = id;
+                    ArenaUtils.setSelectedArenaId(id);
                 }
                 return true;
             }

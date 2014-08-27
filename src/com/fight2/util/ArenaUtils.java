@@ -14,7 +14,10 @@ import org.json.JSONObject;
 
 import com.fight2.GameActivity;
 import com.fight2.entity.Arena;
-import com.fight2.entity.Player;
+import com.fight2.entity.User;
+import com.fight2.entity.UserArenaInfo;
+import com.fight2.entity.UserArenaRecord;
+import com.fight2.entity.UserArenaRecord.UserArenaRecordStatus;
 import com.fight2.entity.battle.BattleRecord;
 import com.fight2.entity.battle.BattleResult;
 import com.fight2.entity.battle.SkillApplyParty;
@@ -23,32 +26,66 @@ import com.fight2.entity.battle.SkillRecord;
 import com.fight2.entity.battle.SkillType;
 
 public class ArenaUtils {
+    private static int selectedArenaId = 0;
 
-    public static List<Player> getCompetitors(final GameActivity activity) {
-        final String url = HttpUtils.HOST_URL + "/arena/competitors";
-        final List<Player> competitors = new ArrayList<Player>();
+    public static int getSelectedArenaId() {
+        return selectedArenaId;
+    }
+
+    public static void setSelectedArenaId(final int selectedArenaId) {
+        ArenaUtils.selectedArenaId = selectedArenaId;
+    }
+
+    public static UserArenaInfo enter(final GameActivity activity) {
+        final String url = HttpUtils.HOST_URL + "/arena/enter?id=" + selectedArenaId;
+        final UserArenaInfo userArenaInfo = new UserArenaInfo();
         try {
-            final JSONArray responseJson = HttpUtils.getJSONArrayFromUrl(url);
+            final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
 
-            for (int i = 0; i < responseJson.length(); i++) {
-                final JSONObject jsonObject = responseJson.getJSONObject(i);
-                final Player player = new Player();
-                player.setId(jsonObject.getInt("id"));
-                final String avatar = jsonObject.optString("avatar");
+            userArenaInfo.setLose(responseJson.getInt("lose"));
+            userArenaInfo.setMight(responseJson.getInt("might"));
+            userArenaInfo.setRankNumber(responseJson.getInt("rankNumber"));
+            userArenaInfo.setWin(responseJson.getInt("win"));
+            userArenaInfo.setRemainTime(responseJson.getString("remainTime"));
+            final List<UserArenaRecord> arenaRecords = new ArrayList<UserArenaRecord>();
+
+            final JSONArray arenaRecordsJsonArray = responseJson.getJSONArray("arenaRecords");
+            for (int i = 0; i < arenaRecordsJsonArray.length(); i++) {
+                final UserArenaRecord userArenaRecord = new UserArenaRecord();
+                final JSONObject arenaRecordsJson = arenaRecordsJsonArray.getJSONObject(i);
+                final String status = arenaRecordsJson.getString("status");
+                userArenaRecord.setStatus(UserArenaRecordStatus.valueOf(status));
+                final JSONObject arenaRecordsUserJson = arenaRecordsJson.getJSONObject("user");
+                final User player = new User();
+                player.setId(arenaRecordsUserJson.getInt("id"));
+                final String avatar = arenaRecordsUserJson.optString("avatar");
                 if (avatar != null && !"".equals(avatar)) {
                     final String localAvatar = ImageUtils.getLocalString(avatar, activity);
                     player.setAvatar(localAvatar);
                     TextureFactory.getInstance().addCardResource(activity, localAvatar);
                 }
-                player.setName(jsonObject.getString("name"));
-                competitors.add(player);
+                player.setName(arenaRecordsUserJson.getString("name"));
+                userArenaRecord.setUser(player);
+                arenaRecords.add(userArenaRecord);
             }
-            return competitors;
+            userArenaInfo.setArenaRecords(arenaRecords);
+            return userArenaInfo;
         } catch (final ClientProtocolException e) {
             throw new RuntimeException(e);
         } catch (final IOException e) {
             throw new RuntimeException(e);
         } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static void exit() {
+        final String url = HttpUtils.HOST_URL + "/arena/exit?id=" + selectedArenaId;
+        try {
+            HttpUtils.doGet(url);
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -77,8 +114,8 @@ public class ArenaUtils {
         }
     }
 
-    public static BattleResult attack(final int id, final GameActivity activity) {
-        final String url = HttpUtils.HOST_URL + "/arena/attack.action?id=" + id;
+    public static BattleResult attack(final int index, final GameActivity activity) {
+        final String url = HttpUtils.HOST_URL + "/arena/attack.action?id=" + selectedArenaId + "&index=" + index;
         final BattleResult battleResult = new BattleResult();
         final List<BattleRecord> battleRecords = new ArrayList<BattleRecord>();
         battleResult.setBattleRecord(battleRecords);
