@@ -13,6 +13,9 @@ import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.util.debug.Debug;
 
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
+
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.MusicEnum;
@@ -127,7 +130,13 @@ public class ArenaScene extends BaseScene {
 
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                DialogUtils.ConfirmDialog(activity, "连续胜利", "连胜可以让你的胜利获得额外的力量加成！");
+                DialogUtils.ConfirmDialog(activity, "连续胜利", "连胜可以让你获得额外的力量加成！", new OnClickListener() {
+                    @Override
+                    public void onClick(final DialogInterface dialog, final int whichButton) {
+                        final int seconds = ArenaUtils.addContinuousWin();
+                    }
+                });
+
             }
 
         });

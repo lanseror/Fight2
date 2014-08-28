@@ -90,13 +90,16 @@ public class ArenaUtils {
         }
     }
 
-    public static boolean addContinuousWin() {
+    public static int addContinuousWin() {
         final String url = HttpUtils.HOST_URL + "/arena/acw";
         try {
-            return HttpUtils.doGet(url);
+            final JSONArray responseJsonArray = HttpUtils.getJSONArrayFromUrl(url);
+            return responseJsonArray.getInt(0);
         } catch (final ClientProtocolException e) {
             throw new RuntimeException(e);
         } catch (final IOException e) {
+            throw new RuntimeException(e);
+        } catch (final JSONException e) {
             throw new RuntimeException(e);
         }
     }
