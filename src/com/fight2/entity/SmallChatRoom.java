@@ -153,7 +153,7 @@ public class SmallChatRoom extends Rectangle {
 
                 }
             }
-        }, 500, 800);// Update text every 0.5 second
+        }, 500, 800);// Update text every 0.8 second
     }
 
     public boolean isNeeded() {

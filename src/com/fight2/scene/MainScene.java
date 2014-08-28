@@ -257,7 +257,7 @@ public class MainScene extends BaseScene {
             public void run() {
                 ChatUtils.get(activity);
             }
-        }, 3000, 1000);// Update text every 1 second
+        }, 3000, 5000);// Update text every 5 second
     }
 
     private void focusSprite(final Sprite sprite) {

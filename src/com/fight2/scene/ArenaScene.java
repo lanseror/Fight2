@@ -119,11 +119,11 @@ public class ArenaScene extends BaseScene {
         infoFrame.attachChild(loseText);
         infoFrame.attachChild(remainTimeText);
 
-        final F2ButtonSprite continiousWinButton = this.createALBF2ButtonSprite(TextureEnum.ARENA_BATTLE_CONTINIOUS_WIN,
-                TextureEnum.ARENA_BATTLE_CONTINIOUS_WIN, 488, 15);
-        infoFrame.attachChild(continiousWinButton);
-        this.registerTouchArea(continiousWinButton);
-        continiousWinButton.setOnClickListener(new F2OnClickListener() {
+        final F2ButtonSprite continuousWinButton = this.createALBF2ButtonSprite(TextureEnum.ARENA_BATTLE_CONTINUOUS_WIN,
+                TextureEnum.ARENA_BATTLE_CONTINUOUS_WIN, 488, 15);
+        infoFrame.attachChild(continuousWinButton);
+        this.registerTouchArea(continuousWinButton);
+        continuousWinButton.setOnClickListener(new F2OnClickListener() {
 
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
@@ -168,6 +168,8 @@ public class ArenaScene extends BaseScene {
         refleshButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                ArenaUtils.refresh();
+                updateScene();
             }
         });
         this.attachChild(refleshButton);

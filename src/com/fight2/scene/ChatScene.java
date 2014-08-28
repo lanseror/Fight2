@@ -23,7 +23,6 @@ import org.andengine.input.touch.detector.SurfaceScrollDetector;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.util.adt.color.Color;
-import org.andengine.util.debug.Debug;
 
 import android.content.Context;
 import android.text.Editable;

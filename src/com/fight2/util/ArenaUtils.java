@@ -79,6 +79,28 @@ public class ArenaUtils {
         }
     }
 
+    public static boolean refresh() {
+        final String url = HttpUtils.HOST_URL + "/arena/refresh?id=" + selectedArenaId;
+        try {
+            return HttpUtils.doGet(url);
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean addContinuousWin() {
+        final String url = HttpUtils.HOST_URL + "/arena/acw";
+        try {
+            return HttpUtils.doGet(url);
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static List<Arena> getArenas(final GameActivity activity) {
         final String url = HttpUtils.HOST_URL + "/arena/list-started";
         final List<Arena> arenas = new ArrayList<Arena>();
