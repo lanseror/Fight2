@@ -111,13 +111,13 @@ public class ArenaScene extends BaseScene {
         ticketText.setText("0");
         init();
         continuousWin = ArenaUtils.getContinuousWin();
-        cwRateText.setText(String.format("+%s%%", continuousWin.getRate()));
         timerHandler = new TimerHandler(1.0f, new ITimerCallback() {
             @Override
             public void onTimePassed(final TimerHandler pTimerHandler) {
                 if (continuousWin.getTime() > 0) {
                     if (ResourceManager.getInstance().getCurrentSceneEnum() == SceneEnum.Arena) {
                         cwTimeText.setText(DateUtils.formatRemainTime(continuousWin.getTime()));
+                        cwRateText.setText(String.format("+%s%%", continuousWin.getRate()));
                         cwTimeText.setVisible(true);
                         cwRateText.setVisible(true);
                     }
@@ -268,7 +268,6 @@ public class ArenaScene extends BaseScene {
                     } catch (final IOException e) {
                         Debug.e(e);
                     }
-                    // ArenaUtils.attack(players[0].getId());
                     return true;
                 }
                 return false;
@@ -329,6 +328,11 @@ public class ArenaScene extends BaseScene {
                     break;
             }
         }
+        if (continuousWin != null && continuousWin.getTime() > 0) {
+            final ArenaContinuousWin continuousWinTmp = ArenaUtils.getContinuousWin();
+            continuousWin.setRate(continuousWinTmp.getRate());
+            continuousWin.setTime(continuousWinTmp.getTime());
+        }
     }
 
     @Override
@@ -336,4 +340,5 @@ public class ArenaScene extends BaseScene {
         // TODO Auto-generated method stub
 
     }
+
 }

@@ -16,17 +16,18 @@ import org.andengine.entity.modifier.MoveModifier;
 import org.andengine.entity.modifier.ParallelEntityModifier;
 import org.andengine.entity.modifier.ScaleModifier;
 import org.andengine.entity.modifier.SequenceEntityModifier;
+import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
 import org.andengine.opengl.font.Font;
+import org.andengine.util.debug.Debug;
 import org.andengine.util.modifier.IModifier;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.MusicEnum;
-import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.BattlePartyFrame;
 import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
@@ -65,6 +66,7 @@ public class BattleScene extends BaseScene {
     private final Sprite loseImage;
     private final boolean isWinner;
     private final Sprite skipSprite;
+    private final BattleResult battleResult;
 
     public BattleScene(final GameActivity activity, final int attackPlayerIndex, final int attackPlayerId) throws IOException {
         super(activity);
@@ -81,7 +83,7 @@ public class BattleScene extends BaseScene {
         this.attachChild(winImage);
         this.attachChild(loseImage);
         opponentParties = CardUtils.getPartyByUserId(activity, attackPlayerId).getParties();
-        final BattleResult battleResult = ArenaUtils.attack(attackPlayerIndex, activity);
+        battleResult = ArenaUtils.attack(attackPlayerIndex, activity);
         isWinner = battleResult.isWinner();
         final List<BattleRecord> battleRecords = battleResult.getBattleRecord();
         for (final BattleRecord battleRecord : battleRecords) {
@@ -140,7 +142,13 @@ public class BattleScene extends BaseScene {
         final IEntityModifierListener hideFinishListener = new ModifierFinishedListener(new OnFinishedCallback() {
             @Override
             public void onFinished(final IEntity pItem) {
-                ResourceManager.getInstance().setCurrentScene(SceneEnum.Arena);
+                try {
+                    final Scene battleResultScene = new BattleResultScene(battleResult, activity);
+                    activity.getEngine().setScene(battleResultScene);
+                } catch (final IOException e) {
+                    Debug.e(e);
+                }
+
             }
         });
 

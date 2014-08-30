@@ -7,6 +7,8 @@ public enum TextureEnum {
     // Common images.
     COMMON_BACK_BUTTON_NORMAL("images/common_back_button.png", 130, 132),
     COMMON_BACK_BUTTON_PRESSED("images/common_back_button_fcs.png", 130, 132),
+    COMMON_CONFIRM_BUTTON_NORMAL("images/common_confirm_button.png", 130, 132),
+    COMMON_CONFIRM_BUTTON_PRESSED("images/common_confirm_button_fcs.png", 130, 132),
     COMMON_DEFAULT_AVATAR("images/common_default_avatar.png", 135, 135),
     COMMON_HP_RED("images/common_hp_red.png", 285, 23),
     COMMON_HP_RIGHT_RED("images/common_hp_right_red.png", 10, 23),
@@ -109,6 +111,7 @@ public enum TextureEnum {
     BATTLE_SKIP("images/battle_skip.png", 142, 101),
     BATTLE_CARD_SKILL_FCS("images/battle_card_skill_fcs.png", 146, 202),
     BATTLE_AVATAR_SKILL_FCS("images/battle_avatar_skill_fcs.png", 74, 74),
+    BATTLE_RESULT("images/battle_result.png", 771, 553),
 
     TEST_CARD1("card/card1.jpg", 100, 100),
     TEST_CARD2("card/card2.jpg", 100, 100),

@@ -8,5 +8,6 @@ public enum SceneEnum {
     ArenaList,
     Arena,
     Battle,
+    BattleResult,
     Chat;
 }

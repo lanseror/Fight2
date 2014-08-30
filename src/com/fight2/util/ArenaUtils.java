@@ -154,6 +154,11 @@ public class ArenaUtils {
         try {
             final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
             battleResult.setWinner(responseJson.getBoolean("isWinner"));
+            battleResult.setBaseMight(responseJson.getInt("baseMight"));
+            battleResult.setAliveMight(responseJson.getInt("aliveMight"));
+            battleResult.setCwMight(responseJson.getInt("cwMight"));
+            battleResult.setTotalMight(responseJson.getInt("totalMight"));
+            battleResult.setCwRate(responseJson.getInt("cwRate"));
             final JSONArray battleRecordJsonArray = responseJson.getJSONArray("battleRecord");
             for (int i = 0; i < battleRecordJsonArray.length(); i++) {
                 final JSONObject battleRecordJson = battleRecordJsonArray.getJSONObject(i);
