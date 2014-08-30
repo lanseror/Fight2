@@ -6,6 +6,7 @@ import java.math.RoundingMode;
 
 import org.andengine.engine.Engine;
 import org.andengine.engine.camera.Camera;
+import org.andengine.engine.camera.hud.HUD;
 import org.andengine.engine.handler.timer.ITimerCallback;
 import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.engine.options.AudioOptions;
@@ -203,7 +204,12 @@ public class GameActivity extends LayoutGameActivity {
     }
 
     public GameHud getGameHub() {
-        return (GameHud) camera.getHUD();
+        final HUD hud = camera.getHUD();
+        if (hud instanceof GameHud) {
+            return (GameHud) hud;
+        } else {
+            return null;
+        }
     }
 
     @Override
