@@ -245,7 +245,11 @@ public class GameActivity extends LayoutGameActivity {
 
     @Override
     protected void onDestroy() {
-        this.getGameHub().needSmallChatRoom(false);
+        final GameHud gameHud = this.getGameHub();
+        if (gameHud != null) {
+            gameHud.needSmallChatRoom(false);
+        }
+
         super.onDestroy();
     }
 
