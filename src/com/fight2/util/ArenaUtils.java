@@ -14,6 +14,7 @@ import org.json.JSONObject;
 
 import com.fight2.GameActivity;
 import com.fight2.entity.Arena;
+import com.fight2.entity.ArenaContinuousWin;
 import com.fight2.entity.User;
 import com.fight2.entity.UserArenaInfo;
 import com.fight2.entity.UserArenaRecord;
@@ -88,6 +89,23 @@ public class ArenaUtils {
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static ArenaContinuousWin getContinuousWin() {
+        final ArenaContinuousWin arenaContinuousWin = new ArenaContinuousWin();
+        final String url = HttpUtils.HOST_URL + "/arena/gcw";
+        try {
+            final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
+            arenaContinuousWin.setTime(responseJson.getInt("time"));
+            arenaContinuousWin.setRate(responseJson.getInt("rate"));
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        }
+        return arenaContinuousWin;
     }
 
     public static int addContinuousWin() {

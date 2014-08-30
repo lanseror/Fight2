@@ -3,6 +3,8 @@ package com.fight2.scene;
 import java.io.IOException;
 import java.util.List;
 
+import org.andengine.engine.handler.timer.ITimerCallback;
+import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
@@ -21,6 +23,7 @@ import com.fight2.constant.FontEnum;
 import com.fight2.constant.MusicEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
+import com.fight2.entity.ArenaContinuousWin;
 import com.fight2.entity.F2ButtonSprite;
 import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.GameUserSession;
@@ -30,6 +33,7 @@ import com.fight2.entity.UserArenaInfo;
 import com.fight2.entity.UserArenaRecord;
 import com.fight2.util.ArenaUtils;
 import com.fight2.util.BWShaderProgram;
+import com.fight2.util.DateUtils;
 import com.fight2.util.DialogUtils;
 import com.fight2.util.F2MusicManager;
 import com.fight2.util.ResourceManager;
@@ -64,6 +68,10 @@ public class ArenaScene extends BaseScene {
     private final Sprite[] loseButtons = new Sprite[3];
     private final Text[] nameTexts = new Text[3];
     private final User[] players = new User[3];
+    private final ArenaContinuousWin continuousWin;
+    private final Text cwRateText;
+    private final Text cwTimeText;
+    private final TimerHandler timerHandler;
 
     public ArenaScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -72,6 +80,8 @@ public class ArenaScene extends BaseScene {
         this.remainTimeFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
         this.boldFaceFont = ResourceManager.getInstance().getFont(FontEnum.Bold);
         this.difficultyFont = ResourceManager.getInstance().getFont(FontEnum.Default, 21);
+        final Font cwTimeFont = ResourceManager.getInstance().getFont(FontEnum.Default, 20);
+        final Font cwRateFont = ResourceManager.getInstance().getFont(FontEnum.Default, 36);
         hpText = new Text(280, 48, topBarFont, "0123456789", vbom);
         atkText = new Text(480, 48, topBarFont, "0123456789", vbom);
         ticketText = new Text(670, 48, topBarFont, "0123456789", vbom);
@@ -81,6 +91,12 @@ public class ArenaScene extends BaseScene {
         loseText = new Text(360, 40, infoFont, "0123456789", vbom);
         remainTimeText = new Text(658, 160, remainTimeFont, "0123456789: 天", vbom);
         remainTimeText.setColor(0XFFF8B451);
+        cwTimeText = new Text(666, 35, cwTimeFont, "0123456789: 天", vbom);
+        cwTimeText.setColor(0XFF186AF3);
+        cwTimeText.setVisible(false);
+        cwRateText = new Text(666, 85, cwRateFont, "+0123456789%", vbom);
+        cwRateText.setColor(0XFFACCF01);
+        cwRateText.setVisible(false);
         mightTexts[0] = new Text(140, 90, boldFaceFont, "+10", vbom);
         mightTexts[1] = new Text(140, 90, boldFaceFont, "+ 8", vbom);
         mightTexts[2] = new Text(140, 90, boldFaceFont, "+ 5", vbom);
@@ -94,6 +110,26 @@ public class ArenaScene extends BaseScene {
         atkText.setText(String.valueOf(partyInfo.getAtk()));
         ticketText.setText("0");
         init();
+        continuousWin = ArenaUtils.getContinuousWin();
+        cwRateText.setText(String.format("+%s%%", continuousWin.getRate()));
+        timerHandler = new TimerHandler(1.0f, new ITimerCallback() {
+            @Override
+            public void onTimePassed(final TimerHandler pTimerHandler) {
+                if (continuousWin.getTime() > 0) {
+                    if (ResourceManager.getInstance().getCurrentSceneEnum() == SceneEnum.Arena) {
+                        cwTimeText.setText(DateUtils.formatRemainTime(continuousWin.getTime()));
+                        cwTimeText.setVisible(true);
+                        cwRateText.setVisible(true);
+                    }
+                    continuousWin.setTime(continuousWin.getTime() - 1);
+                    pTimerHandler.reset();
+                } else {
+                    cwTimeText.setVisible(false);
+                    cwRateText.setVisible(false);
+                }
+            }
+        });
+        activity.getEngine().registerUpdateHandler(timerHandler);
     }
 
     @Override
@@ -121,19 +157,23 @@ public class ArenaScene extends BaseScene {
         infoFrame.attachChild(rankText);
         infoFrame.attachChild(loseText);
         infoFrame.attachChild(remainTimeText);
+        infoFrame.attachChild(cwTimeText);
+        infoFrame.attachChild(cwRateText);
 
         final F2ButtonSprite continuousWinButton = this.createALBF2ButtonSprite(TextureEnum.ARENA_BATTLE_CONTINUOUS_WIN,
-                TextureEnum.ARENA_BATTLE_CONTINUOUS_WIN, 488, 15);
+                TextureEnum.ARENA_BATTLE_CONTINUOUS_WIN, 485, 15);
         infoFrame.attachChild(continuousWinButton);
         this.registerTouchArea(continuousWinButton);
         continuousWinButton.setOnClickListener(new F2OnClickListener() {
 
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                DialogUtils.ConfirmDialog(activity, "连续胜利", "连胜可以让你获得额外的力量加成！", new OnClickListener() {
+                DialogUtils.ConfirmDialog(activity, "连胜奖励（24小时）", "在竞技场每场战斗你都能获得10%的力量奖励，每连赢一场更可额外获得1%的奖励加成！", new OnClickListener() {
                     @Override
                     public void onClick(final DialogInterface dialog, final int whichButton) {
-                        final int seconds = ArenaUtils.addContinuousWin();
+                        final int cwRemainTime = ArenaUtils.addContinuousWin();
+                        continuousWin.setTime(cwRemainTime);
+                        timerHandler.reset();
                     }
                 });
 
