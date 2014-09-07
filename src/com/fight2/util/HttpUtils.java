@@ -50,7 +50,7 @@ public class HttpUtils {
             }
             inputStream.close();
         } catch (final ConnectTimeoutException e) {
-            throw new RuntimeException(e);
+            LogUtils.e(e);
         }
         return jsonString.toString();
     }
@@ -75,7 +75,7 @@ public class HttpUtils {
                 Debug.e("Http status ==> :" + String.valueOf(statusCode));
             }
         } catch (final ConnectTimeoutException e) {
-            throw new RuntimeException(e);
+            LogUtils.e(e);
         }
         return false;
     }
@@ -106,7 +106,7 @@ public class HttpUtils {
             }
 
         } catch (final ConnectTimeoutException e) {
-            throw new RuntimeException(e);
+            LogUtils.e(e);
         }
         return jsonString.toString();
     }

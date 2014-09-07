@@ -3,7 +3,6 @@ package com.fight2.util;
 import java.io.IOException;
 import java.util.List;
 
-import org.andengine.util.debug.Debug;
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,9 +50,9 @@ public class CardUtils {
             return true;
 
         } catch (final ClientProtocolException e) {
-            Debug.e(e);
+            LogUtils.e(e);
         } catch (final Exception e) {
-            Debug.e(e);
+            LogUtils.e(e);
         }
         return false;
     }

@@ -171,9 +171,16 @@ public class ArenaScene extends BaseScene {
                 DialogUtils.ConfirmDialog(activity, "连胜奖励（24小时）", "在竞技场每场战斗你都能获得10%的力量奖励，每连赢一场更可额外获得1%的奖励加成！", new OnClickListener() {
                     @Override
                     public void onClick(final DialogInterface dialog, final int whichButton) {
-                        final int cwRemainTime = ArenaUtils.addContinuousWin();
-                        continuousWin.setTime(cwRemainTime);
-                        timerHandler.reset();
+                        activity.runOnUpdateThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                final int cwRemainTime = ArenaUtils.addContinuousWin();
+                                continuousWin.setTime(cwRemainTime);
+                                timerHandler.reset();
+                            }
+
+                        });
+
                     }
                 });
 

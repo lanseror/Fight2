@@ -47,6 +47,7 @@ public class ResourceManager {
     }
 
     public void loadGameResources(final GameActivity activity, final ProgressBar progressBar) throws IOException {
+        LogUtils.init(activity);
         this.activity = activity;
         this.textureManager = activity.getTextureManager();
         this.assetManager = activity.getAssets();
@@ -173,7 +174,7 @@ public class ResourceManager {
             scenes.put(SceneEnum.Arena, arenaScene);
 
         } catch (final IOException e) {
-            throw new RuntimeException(e);
+            LogUtils.e(e);
         }
 
     }

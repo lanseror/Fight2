@@ -23,7 +23,6 @@ import org.andengine.opengl.texture.region.TextureRegionFactory;
 import org.andengine.opengl.util.GLState;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.LayoutGameActivity;
-import org.andengine.util.debug.Debug;
 
 import android.content.res.AssetManager;
 import android.util.DisplayMetrics;
@@ -41,6 +40,7 @@ import com.fight2.util.ConfigHelper;
 import com.fight2.util.EntryFactory;
 import com.fight2.util.F2MusicManager;
 import com.fight2.util.ImageOpenHelper;
+import com.fight2.util.LogUtils;
 import com.fight2.util.ResourceManager;
 
 public class GameActivity extends LayoutGameActivity {
@@ -225,7 +225,7 @@ public class GameActivity extends LayoutGameActivity {
             resourceManager.loadGameResources(this, progressBar);
 
         } catch (final IOException e) {
-            Debug.e(e);
+            LogUtils.e(e);
         }
 
     }

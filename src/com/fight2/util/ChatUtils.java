@@ -31,11 +31,11 @@ public class ChatUtils {
             return HttpUtils.doGet(url);
 
         } catch (final UnsupportedEncodingException e) {
-            Debug.e(e);
+            LogUtils.e(e);
         } catch (final ClientProtocolException e) {
-            Debug.e(e);
+            LogUtils.e(e);
         } catch (final IOException e) {
-            Debug.e(e);
+            LogUtils.e(e);
         }
         return false;
     }
@@ -58,11 +58,11 @@ public class ChatUtils {
                 CHAT_MESSAGES.put(++containMsgSize, message);
             }
         } catch (final ClientProtocolException e) {
-            throw new RuntimeException(e);
+            LogUtils.e(e);
         } catch (final IOException e) {
-            throw new RuntimeException(e);
+            LogUtils.e(e);
         } catch (final JSONException e) {
-            throw new RuntimeException(e);
+            LogUtils.e(e);
         }
 
         return messages;
