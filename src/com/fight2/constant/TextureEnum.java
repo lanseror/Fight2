@@ -105,6 +105,7 @@ public enum TextureEnum {
     // Arena reward scene images.
     ARENA_REWARD_BG("images/arena_reward_backgroud.png", 605, 555),
     ARENA_REWARD_MIGHT_BUTTON("images/arena_reward_might_button.png", 557, 60),
+    ARENA_REWARD_RANK_BUTTON("images/arena_reward_rank_button.png", 557, 60),
     ARENA_REWARD_DESC("images/arena_reward_desc.png", 582, 181),
     ARENA_REWARD_GRID("images/arena_reward_grid.png", 582, 344),
 

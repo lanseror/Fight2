@@ -10,12 +10,10 @@ import org.andengine.input.touch.TouchEvent;
 import org.andengine.input.touch.detector.ScrollDetector;
 import org.andengine.input.touch.detector.ScrollDetector.IScrollDetectorListener;
 import org.andengine.input.touch.detector.SurfaceScrollDetector;
-import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.util.adt.color.Color;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.TextureEnum;
-import com.fight2.util.TextureFactory;
 
 public class ArenaRewardScene extends BaseScene implements IScrollDetectorListener {
     private final static float CLIP_HEIGHT = 460;
@@ -28,7 +26,7 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
     private final IEntity mightContainer;
     private final IEntity rankContainer;
     private float scrollMightBottomY = 0;
-    private final float scrollRankBottomY = CLIP_HEIGHT * 0.5f;
+    private float scrollRankBottomY = 0;
 
     public ArenaRewardScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -52,7 +50,7 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
         final Sprite frameSprite = createACImageSprite(TextureEnum.ARENA_REWARD_BG, cameraCenterX, frameY);
         this.attachChild(frameSprite);
 
-        final IEntity closeTouchArea = new Rectangle(frameWidth - 75, frameHeight - 75, 150, 150, vbom) {
+        final IEntity closeTouchArea = new Rectangle(frameWidth - 10, frameHeight - 15, 130, 120, vbom) {
             @Override
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 if (pSceneTouchEvent.isActionUp()) {
@@ -68,30 +66,21 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
         frameSprite.attachChild(closeTouchArea);
         this.registerTouchArea(closeTouchArea);
 
-        final ClipEntity rewardListTouchArea = new ClipEntity(frameCenter, 250, frameWidth, CLIP_HEIGHT) {
-            @Override
-            public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                scrollDetector.onTouchEvent(pSceneTouchEvent);
-                return true;
-            }
-        };
-        frameSprite.attachChild(rewardListTouchArea);
-        this.registerTouchArea(rewardListTouchArea);
-
-        rewardListTouchArea.attachChild(mightContainer);
-        rewardListTouchArea.attachChild(rankContainer);
-
-        final IEntity mightButton = createMightButton();
-        mightContainer.attachChild(mightButton);
-        this.registerTouchArea(mightButton);
-        final TextureEnum mightDescEnum = TextureEnum.ARENA_REWARD_DESC;
-        final Sprite mightDesc = createACImageSprite(mightDescEnum, frameCenter, CLIP_HEIGHT - mightButton.getHeight() - mightDescEnum.getHeight() * 0.5f);
-        mightContainer.attachChild(mightDesc);
-
+        final TextureEnum descEnum = TextureEnum.ARENA_REWARD_DESC;
         final TextureEnum gridEnum = TextureEnum.ARENA_REWARD_GRID;
         final float gridHeight = gridEnum.getHeight();
-        final float gridInitY = CLIP_HEIGHT - mightButton.getHeight() - mightDescEnum.getHeight() - gridHeight * 0.5f + 2;
+        // Might elements
+        final TextureEnum mightButtonEnum = TextureEnum.ARENA_REWARD_MIGHT_BUTTON;
+        final IEntity mightButton = createACImageSprite(mightButtonEnum, frameCenter, CLIP_HEIGHT - mightButtonEnum.getHeight() * 0.5f);
+        mightContainer.attachChild(mightButton);
+        final IEntity mightTouchArea = createMightTouchArea();
+        mightButton.attachChild(mightTouchArea);
+        this.registerTouchArea(mightTouchArea);
 
+        final Sprite mightDesc = createACImageSprite(descEnum, frameCenter, CLIP_HEIGHT - mightButton.getHeight() - descEnum.getHeight() * 0.5f);
+        mightContainer.attachChild(mightDesc);
+
+        final float gridInitY = CLIP_HEIGHT - mightButton.getHeight() - descEnum.getHeight() - gridHeight * 0.5f + 2;
         float mightGridBottomY = 0;
         for (int i = 0; i < 3; i++) {
             mightGridBottomY = gridInitY - gridHeight * i;
@@ -99,30 +88,43 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
             mightContainer.attachChild(rewardGrid);
         }
         scrollMightBottomY = CONTAINER_INIT_Y - mightGridBottomY + gridHeight * 0.5f;
+        // Rank elements
+
+        final TextureEnum rankButtonEnum = TextureEnum.ARENA_REWARD_RANK_BUTTON;
+        final IEntity rankButton = createACImageSprite(rankButtonEnum, frameCenter, CLIP_HEIGHT - rankButtonEnum.getHeight() * 0.5f);
+        rankContainer.attachChild(rankButton);
+        final IEntity rankTouchArea = createRankTouchArea();
+        rankButton.attachChild(rankTouchArea);
+        this.registerTouchArea(rankTouchArea);
+        final Sprite rankDesc = createACImageSprite(descEnum, frameCenter, CLIP_HEIGHT - rankButton.getHeight() - descEnum.getHeight() * 0.5f);
+        rankContainer.attachChild(rankDesc);
+
+        float rankGridBottomY = 0;
+        for (int i = 0; i < 2; i++) {
+            rankGridBottomY = gridInitY - gridHeight * i;
+            final IEntity rewardGrid = createRewardGrid(frameCenter, rankGridBottomY);
+            rankContainer.attachChild(rewardGrid);
+        }
+        scrollRankBottomY = CONTAINER_INIT_Y - rankGridBottomY + gridHeight * 0.5f;
+
+        final ClipEntity rewardListTouchArea = new ClipEntity(frameCenter, 250, frameWidth, CLIP_HEIGHT) {
+            @Override
+            public boolean onAreaTouched(final TouchEvent touchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                if (mightButton.contains(touchEvent.getX(), touchEvent.getY())) {
+                    return false;
+                } else {
+                    scrollDetector.onTouchEvent(touchEvent);
+                    return true;
+                }
+            }
+        };
+        frameSprite.attachChild(rewardListTouchArea);
+        this.registerTouchArea(rewardListTouchArea);
+        rewardListTouchArea.attachChild(mightContainer);
+        rewardListTouchArea.attachChild(rankContainer);
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
-    }
-
-    private IEntity createMightButton() {
-        final TextureEnum textureEnum = TextureEnum.ARENA_REWARD_MIGHT_BUTTON;
-        final TextureFactory textureFactory = TextureFactory.getInstance();
-        final ITextureRegion texture = textureFactory.getAssetTextureRegion(textureEnum);
-        final float width = textureEnum.getWidth();
-        final float height = textureEnum.getHeight();
-        final Sprite sprite = new Sprite(frameWidth * 0.5f, CLIP_HEIGHT - height * 0.5f, width, height, texture, vbom) {
-            @Override
-            public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                if (pSceneTouchEvent.isActionUp()) {
-
-                    return true;
-                }
-                return false;
-
-            }
-        };
-        return sprite;
-
     }
 
     private IEntity createRewardGrid(final float x, final float y) {
@@ -130,6 +132,40 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
         final Sprite rewardGrid = createACImageSprite(textureEnum, x, y);
         return rewardGrid;
 
+    }
+
+    private IEntity createMightTouchArea() {
+        final IEntity touchArea = new Rectangle(140, 30, 250, 60, vbom) {
+            @Override
+            public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                if (pSceneTouchEvent.isActionUp()) {
+                    mightContainer.setVisible(true);
+                    rankContainer.setVisible(false);
+                    return true;
+                }
+                return false;
+
+            }
+        };
+        touchArea.setAlpha(0);
+        return touchArea;
+    }
+
+    private IEntity createRankTouchArea() {
+        final IEntity touchArea = new Rectangle(405, 30, 230, 60, vbom) {
+            @Override
+            public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                if (pSceneTouchEvent.isActionUp()) {
+                    mightContainer.setVisible(false);
+                    rankContainer.setVisible(true);
+                    return true;
+                }
+                return false;
+
+            }
+        };
+        touchArea.setAlpha(0);
+        return touchArea;
     }
 
     @Override
