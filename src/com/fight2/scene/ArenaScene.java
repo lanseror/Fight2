@@ -246,6 +246,7 @@ public class ArenaScene extends BaseScene {
         rewardButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                showArenaReward();
             }
         });
         this.attachChild(rewardButton);
@@ -256,6 +257,16 @@ public class ArenaScene extends BaseScene {
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
 
+    }
+
+    private void showArenaReward() {
+        try {
+            final BaseScene scene = new ArenaRewardScene(activity);
+            scene.updateScene();
+            this.setChildScene(scene, false, false, true);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Sprite createBattleSprite(final TextureEnum textureEnum, final float x, final float y, final int index) {

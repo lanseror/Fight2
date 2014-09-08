@@ -102,6 +102,12 @@ public enum TextureEnum {
     ARENA_LIST_ENTER("images/arena_list_enter.png", 178, 98),
     ARENA_LIST_ENTER_PRESSED("images/arena_list_enter_fcs.png", 178, 98),
 
+    // Arena reward scene images.
+    ARENA_REWARD_BG("images/arena_reward_backgroud.png", 605, 555),
+    ARENA_REWARD_MIGHT_BUTTON("images/arena_reward_might_button.png", 557, 60),
+    ARENA_REWARD_DESC("images/arena_reward_desc.png", 582, 181),
+    ARENA_REWARD_GRID("images/arena_reward_grid.png", 582, 344),
+
     // Battle scene images.
     BATTLE_BG("images/battle_backgroud.jpg", 1136, 640),
     BATTLE_PARTY_BOTTOM("images/battle_party_bottom.png", 312, 83),
