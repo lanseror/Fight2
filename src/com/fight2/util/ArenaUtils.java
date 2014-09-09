@@ -113,7 +113,7 @@ public class ArenaUtils {
         return arenaContinuousWin;
     }
 
-    public static List<ArenaReward> getArenaReward() {
+    public static List<ArenaReward> getArenaReward(final GameActivity activity) {
         final List<ArenaReward> arenaRewards = new ArrayList<ArenaReward>();
         final String url = HttpUtils.HOST_URL + "/arena-reward/list-json?arenaId=" + selectedArenaId;
         try {
@@ -141,7 +141,12 @@ public class ArenaUtils {
                         card.setAtk(cardJson.getInt("atk"));
                         card.setHp(cardJson.getInt("hp"));
                         card.setStar(cardJson.getInt("star"));
-                        card.setImage(cardJson.getString("image"));
+                        final String image = cardJson.getString("image");
+                        if (image != null && !"".equals(image)) {
+                            final String localImage = ImageUtils.getLocalString(image, activity);
+                            card.setImage(localImage);
+                            TextureFactory.getInstance().addCardResource(activity, localImage);
+                        }
                         arenaRewardItem.setCard(card);
                     }
                     rewardItems.add(arenaRewardItem);

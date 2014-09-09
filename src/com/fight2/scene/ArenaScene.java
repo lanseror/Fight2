@@ -261,7 +261,7 @@ public class ArenaScene extends BaseScene {
 
     private void showArenaReward() {
         try {
-            final BaseScene scene = new ArenaRewardScene(activity);
+            final BaseScene scene = new ArenaRewardScene(activity,rankText.getText());
             scene.updateScene();
             this.setChildScene(scene, false, false, true);
         } catch (final IOException e) {

@@ -16,6 +16,8 @@ public enum TextureEnum {
     COMMON_HP_GREEN("images/common_hp_green.png", 285, 23),
     COMMON_CARD_COVER("images/common_card_cover.png", 810, 540),
     COMMON_STAR("images/common_star.png", 26, 32),
+    COMMON_ARENA_TICKET("images/common_arena_ticket.png", 109, 76),
+    COMMON_STAMINA("images/common_stamina.png", 120, 138),
 
     // Chat room images.
     CHAT_INPUT_BG("images/chat_input_backgroud.png", 755, 75),
@@ -108,6 +110,8 @@ public enum TextureEnum {
     ARENA_REWARD_RANK_BUTTON("images/arena_reward_rank_button.png", 557, 60),
     ARENA_REWARD_DESC("images/arena_reward_desc.png", 582, 181),
     ARENA_REWARD_GRID("images/arena_reward_grid.png", 582, 344),
+    ARENA_REWARD_MIGHT_POINT("images/arena_reward_might_point.png", 88, 87),
+    ARENA_REWARD_ITEM_GRID("images/arena_reward_item_grid.png", 135, 138),
 
     // Battle scene images.
     BATTLE_BG("images/battle_backgroud.jpg", 1136, 640),
