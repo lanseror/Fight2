@@ -17,7 +17,7 @@ import android.graphics.Typeface;
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
-import com.fight2.entity.ProgressBar;
+import com.fight2.entity.engine.ProgressBar;
 import com.fight2.scene.ArenaListScene;
 import com.fight2.scene.ArenaScene;
 import com.fight2.scene.BaseScene;

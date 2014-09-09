@@ -1,4 +1,4 @@
-package com.fight2.entity;
+package com.fight2.entity.engine;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -14,7 +14,8 @@ import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
-import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
+import com.fight2.entity.ChatMessage;
+import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.ChatTextHandler;
 import com.fight2.util.ChatUtils;
 import com.fight2.util.EntryFactory;

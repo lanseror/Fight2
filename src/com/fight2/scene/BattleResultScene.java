@@ -12,9 +12,9 @@ import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
-import com.fight2.entity.F2ButtonSprite;
-import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.battle.BattleResult;
+import com.fight2.entity.engine.F2ButtonSprite;
+import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.ResourceManager;
 
 public class BattleResultScene extends BaseScene {

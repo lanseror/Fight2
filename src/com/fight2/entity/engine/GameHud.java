@@ -1,4 +1,4 @@
-package com.fight2.entity;
+package com.fight2.entity.engine;
 
 import org.andengine.engine.camera.hud.HUD;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;

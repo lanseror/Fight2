@@ -1,4 +1,4 @@
-package com.fight2.entity;
+package com.fight2.entity.engine;
 
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
@@ -16,7 +16,7 @@ import android.view.Gravity;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
+import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 
 public class InputText extends F2ButtonSprite implements F2OnClickListener {
 

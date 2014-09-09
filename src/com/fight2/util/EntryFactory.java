@@ -7,8 +7,8 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.TextureEnum;
-import com.fight2.entity.F2ButtonSprite;
-import com.fight2.entity.F2ButtonSprite.F2OnClickListener;
+import com.fight2.entity.engine.F2ButtonSprite;
+import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 
 public class EntryFactory {
     private static EntryFactory INSTANCE = new EntryFactory();

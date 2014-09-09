@@ -3,7 +3,7 @@ package com.fight2.entity.modifier;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.SingleValueSpanEntityModifier;
 
-import com.fight2.entity.HpBar;
+import com.fight2.entity.engine.HpBar;
 
 public class HpBarModifier extends SingleValueSpanEntityModifier {
 

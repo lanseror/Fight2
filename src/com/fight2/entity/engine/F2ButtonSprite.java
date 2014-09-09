@@ -1,4 +1,4 @@
-package com.fight2.entity;
+package com.fight2.entity.engine;
 
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;

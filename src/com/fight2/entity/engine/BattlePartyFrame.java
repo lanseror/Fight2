@@ -1,4 +1,4 @@
-package com.fight2.entity;
+package com.fight2.entity.engine;
 
 import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.DelayModifier;
@@ -16,6 +16,8 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.TextureEnum;
+import com.fight2.entity.Card;
+import com.fight2.entity.Party;
 import com.fight2.scene.BattleScene.ModifierFinishedListener;
 import com.fight2.scene.BattleScene.OnFinishedCallback;
 import com.fight2.util.ResourceManager;

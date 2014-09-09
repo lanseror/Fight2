@@ -22,7 +22,7 @@ import com.fight2.GameActivity;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
-import com.fight2.entity.ProgressBar;
+import com.fight2.entity.engine.ProgressBar;
 
 public class TextureFactory {
     private static TextureFactory INSTANCE = new TextureFactory();

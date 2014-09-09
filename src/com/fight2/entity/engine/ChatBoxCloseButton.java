@@ -1,4 +1,4 @@
-package com.fight2.entity;
+package com.fight2.entity.engine;
 
 import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.IEntity;

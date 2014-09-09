@@ -15,6 +15,11 @@ import org.json.JSONObject;
 import com.fight2.GameActivity;
 import com.fight2.entity.Arena;
 import com.fight2.entity.ArenaContinuousWin;
+import com.fight2.entity.ArenaReward;
+import com.fight2.entity.ArenaReward.ArenaRewardType;
+import com.fight2.entity.ArenaRewardItem;
+import com.fight2.entity.ArenaRewardItem.ArenaRewardItemType;
+import com.fight2.entity.Card;
 import com.fight2.entity.User;
 import com.fight2.entity.UserArenaInfo;
 import com.fight2.entity.UserArenaRecord;
@@ -106,6 +111,52 @@ public class ArenaUtils {
             throw new RuntimeException(e);
         }
         return arenaContinuousWin;
+    }
+
+    public static List<ArenaReward> getArenaReward() {
+        final List<ArenaReward> arenaRewards = new ArrayList<ArenaReward>();
+        final String url = HttpUtils.HOST_URL + "/arena-reward/list-json?arenaId=" + selectedArenaId;
+        try {
+            final JSONArray responseJsonArray = HttpUtils.getJSONArrayFromUrl(url);
+            for (int i = 0; i < responseJsonArray.length(); i++) {
+                final JSONObject responseJson = responseJsonArray.getJSONObject(i);
+                final ArenaReward arenaReward = new ArenaReward();
+                arenaReward.setId(responseJson.getInt("id"));
+                arenaReward.setMax(responseJson.getInt("max"));
+                arenaReward.setMin(responseJson.getInt("min"));
+                arenaReward.setType(ArenaRewardType.valueOf(responseJson.getString("type")));
+                final JSONArray rewardItemJsonArray = responseJson.getJSONArray("rewardItems");
+                final List<ArenaRewardItem> rewardItems = new ArrayList<ArenaRewardItem>();
+                for (int j = 0; j < rewardItemJsonArray.length(); j++) {
+                    final JSONObject rewardItemJson = rewardItemJsonArray.getJSONObject(j);
+                    final ArenaRewardItem arenaRewardItem = new ArenaRewardItem();
+                    arenaRewardItem.setId(rewardItemJson.getInt("id"));
+                    arenaRewardItem.setAmount(rewardItemJson.getInt("amount"));
+                    final ArenaRewardItemType rewardItemType = ArenaRewardItemType.valueOf(rewardItemJson.getString("type"));
+                    arenaRewardItem.setType(rewardItemType);
+                    if (rewardItemType == ArenaRewardItemType.Card) {
+                        final JSONObject cardJson = rewardItemJson.getJSONObject("card");
+                        final Card card = new Card();
+                        card.setName(cardJson.getString("name"));
+                        card.setAtk(cardJson.getInt("atk"));
+                        card.setHp(cardJson.getInt("hp"));
+                        card.setStar(cardJson.getInt("star"));
+                        card.setImage(cardJson.getString("image"));
+                        arenaRewardItem.setCard(card);
+                    }
+                    rewardItems.add(arenaRewardItem);
+                }
+                arenaReward.setRewardItems(rewardItems);
+                arenaRewards.add(arenaReward);
+            }
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        }
+        return arenaRewards;
     }
 
     public static int addContinuousWin() {

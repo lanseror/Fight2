@@ -1,4 +1,4 @@
-package com.fight2.entity;
+package com.fight2.entity.engine;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
