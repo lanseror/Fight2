@@ -66,9 +66,9 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
         this.rankFont = ResourceManager.getInstance().getFont(FontEnum.Bold, 30);
         this.amountFont = ResourceManager.getInstance().getFont(FontEnum.Default, 30);
         this.itemFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
-        this.mightDescTitleText = new Text(291, 150, descTitleFont, MIGHT_DESC_TITLE, vbom);
+        this.mightDescTitleText = new Text(291, 145, descTitleFont, MIGHT_DESC_TITLE, vbom);
         mightDescTitleText.setColor(0XFF683905);
-        this.rankDescTitleText = new Text(291, 150, descTitleFont, String.format(RANK_DESC_TITLE, rankString), vbom);
+        this.rankDescTitleText = new Text(291, 145, descTitleFont, String.format(RANK_DESC_TITLE, rankString), vbom);
         rankDescTitleText.setColor(0XFF683905);
         final TextOptions textOptions = new TextOptions(AutoWrap.LETTERS, 485);
         this.mightDescText = new Text(291, 80, descFont, MIGHT_DESC, textOptions, vbom);
@@ -239,7 +239,7 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
             final ArenaReward rankReward = rankRewards.get(i);
             rankGridBottomY = gridInitY - gridHeight * i;
             final IEntity rewardGrid = createRewardGrid(frameCenter, rankGridBottomY);
-            final Text rankText = new Text(gridWidth * 0.5f, gridHeight - 58, rankFont, String.format("排名: %s-%s", rankReward.getMin(), rankReward.getMax()),
+            final Text rankText = new Text(gridWidth * 0.5f, gridHeight - 55, rankFont, String.format("排名: %s-%s", rankReward.getMin(), rankReward.getMax()),
                     vbom);
             rankText.setColor(0XFFF9B552);
             rewardGrid.attachChild(rankText);

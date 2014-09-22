@@ -25,8 +25,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class HttpUtils {
-     public static final String HOST_URL = "http://192.168.1.106:8080/Fight2Server";
-//    public static final String HOST_URL = "http://112.124.37.194:8888";
+    // public static final String HOST_URL = "http://192.168.1.106:8080/Fight2Server";
+    public static final String HOST_URL = "http://112.124.37.194:8888";
     private static final HttpClient HTTP_CLIENT = new DefaultHttpClient();
 
     public static JSONObject getJSONFromUrl(final String url) throws ClientProtocolException, IOException, JSONException {

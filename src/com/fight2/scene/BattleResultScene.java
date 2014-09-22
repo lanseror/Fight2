@@ -36,15 +36,15 @@ public class BattleResultScene extends BaseScene {
         totoalMightFont = ResourceManager.getInstance().getFont(FontEnum.Default, 36);
         rateFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
         final String result = (battleResult.isWinner() ? "你击败了对手！" : "对手已将你击败！");
-        resultText = new Text(245, 380, mFont, result, vbom);
-        aliveText = new Text(280, 275, mFont, "队伍中所有团队均存活", vbom);
-        cwText = new Text(250, 170, mFont, "连续胜利奖励倍数", vbom);
-        baseMightText = new Text(600, 400, mFont, String.valueOf(battleResult.getBaseMight()), vbom);
-        aliveMightText = new Text(600, 290, mFont, String.valueOf(battleResult.getAliveMight()), vbom);
-        cwMightText = new Text(600, 190, mFont, String.valueOf(battleResult.getCwMight()), vbom);
-        cwRateText = new Text(670, 190, rateFont, String.format("(+%s%%)", battleResult.getCwRate()), vbom);
+        resultText = new Text(205, 380, mFont, result, vbom);
+        aliveText = new Text(240, 275, mFont, "队伍中所有团队均存活", vbom);
+        cwText = new Text(210, 170, mFont, "连续胜利奖励倍数", vbom);
+        baseMightText = new Text(560, 400, mFont, String.valueOf(battleResult.getBaseMight()), vbom);
+        aliveMightText = new Text(560, 290, mFont, String.valueOf(battleResult.getAliveMight()), vbom);
+        cwMightText = new Text(560, 190, mFont, String.valueOf(battleResult.getCwMight()), vbom);
+        cwRateText = new Text(630, 190, rateFont, String.format("(+%s%%)", battleResult.getCwRate()), vbom);
         cwRateText.setColor(0XFF00FF0C);
-        totoalMightText = new Text(610, 55, totoalMightFont, String.valueOf(battleResult.getTotalMight()), vbom);
+        totoalMightText = new Text(570, 55, totoalMightFont, String.valueOf(battleResult.getTotalMight()), vbom);
         totoalMightText.setColor(0XFF00FF0C);
 
         init();
