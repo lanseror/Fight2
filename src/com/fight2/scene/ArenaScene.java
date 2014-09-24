@@ -20,22 +20,20 @@ import android.content.DialogInterface.OnClickListener;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
-import com.fight2.constant.MusicEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.ArenaContinuousWin;
-import com.fight2.entity.engine.F2ButtonSprite;
-import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.PartyInfo;
 import com.fight2.entity.User;
 import com.fight2.entity.UserArenaInfo;
 import com.fight2.entity.UserArenaRecord;
+import com.fight2.entity.engine.F2ButtonSprite;
+import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.ArenaUtils;
 import com.fight2.util.BWShaderProgram;
 import com.fight2.util.DateUtils;
 import com.fight2.util.DialogUtils;
-import com.fight2.util.F2MusicManager;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.StringUtils;
 import com.fight2.util.TextureFactory;
@@ -252,8 +250,6 @@ public class ArenaScene extends BaseScene {
         this.attachChild(rewardButton);
         this.registerTouchArea(rewardButton);
 
-        updateScene();
-
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
 
@@ -261,7 +257,7 @@ public class ArenaScene extends BaseScene {
 
     private void showArenaReward() {
         try {
-            final BaseScene scene = new ArenaRewardScene(activity,rankText.getText());
+            final BaseScene scene = new ArenaRewardScene(activity, rankText.getText());
             scene.updateScene();
             this.setChildScene(scene, false, false, true);
         } catch (final IOException e) {
@@ -278,11 +274,10 @@ public class ArenaScene extends BaseScene {
             @Override
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 if (pSceneTouchEvent.isActionDown()) {
-                    F2MusicManager.getInstance().playMusic(MusicEnum.ARENA_ATTACK);
                     try {
                         final User player = players[index];
-                        final Scene battleScene = new BattleScene(activity, index, player.getId());
-                        activity.getEngine().setScene(battleScene);
+                        final Scene preBattleScene = new PreBattleScene(activity, index, player);
+                        activity.getEngine().setScene(preBattleScene);
                     } catch (final IOException e) {
                         Debug.e(e);
                     }
@@ -351,11 +346,11 @@ public class ArenaScene extends BaseScene {
             continuousWin.setRate(continuousWinTmp.getRate());
             continuousWin.setTime(continuousWinTmp.getTime());
         }
+        activity.getGameHub().needSmallChatRoom(true);
     }
 
     @Override
     public void leaveScene() {
-        // TODO Auto-generated method stub
 
     }
 

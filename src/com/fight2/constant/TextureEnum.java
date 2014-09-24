@@ -124,6 +124,18 @@ public enum TextureEnum {
     BATTLE_AVATAR_SKILL_FCS("images/battle_avatar_skill_fcs.png", 74, 74),
     BATTLE_RESULT("images/battle_result.png", 730, 551),
 
+    // PreBattle scene images.
+    PREBATTLE_RETREAT_BUTTON("images/prebattle_retreat_button.png", 130, 132),
+    PREBATTLE_RETREAT_BUTTON_FCS("images/prebattle_retreat_button_fcs.png", 130, 132),
+    PREBATTLE_BATTLE_BUTTON("images/prebattle_battle_button.png", 130, 132),
+    PREBATTLE_BATTLE_BUTTON_FCS("images/prebattle_battle_button_fcs.png", 130, 132),
+    PREBATTLE_VS_ICON("images/prebattle_vs_icon.png", 190, 176),
+    PREBATTLE_INFO_LEFT("images/prebattle_info_left.png", 283, 84),
+    PREBATTLE_INFO_RIGHT("images/prebattle_info_right.png", 283, 84),
+    PREBATTLE_NAME_BOX("images/prebattle_name_box.png", 378, 77),
+    PREBATTLE_COMBO_SKILL_LEFT("images/prebattle_combo_skill_left.png", 285, 122),
+    PREBATTLE_COMBO_SKILL_RIGHT("images/prebattle_combo_skill_right.png", 285, 122),
+
     TEST_CARD1("card/card1.jpg", 100, 100),
     TEST_CARD2("card/card2.jpg", 100, 100),
     TEST_CARD3("card/card3.jpg", 100, 100);

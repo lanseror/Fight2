@@ -18,11 +18,15 @@ import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.ResourceManager;
 
 public class BattleResultScene extends BaseScene {
-    private final Font mFont;
+    private final Font optionFont;
+    private final Font descFont;
     private final Font rateFont;
     private final Font totoalMightFont;
+    private final Text optionResultText;
     private final Text resultText;
+    private final Text optionAliveText;
     private final Text aliveText;
+    private final Text optionCwText;
     private final Text cwText;
     private final Text baseMightText;
     private final Text aliveMightText;
@@ -32,16 +36,30 @@ public class BattleResultScene extends BaseScene {
 
     public BattleResultScene(final BattleResult battleResult, final GameActivity activity) throws IOException {
         super(activity);
-        this.mFont = ResourceManager.getInstance().getFont(FontEnum.Default);
+        this.optionFont = ResourceManager.getInstance().getFont(FontEnum.Default);
+        this.descFont = ResourceManager.getInstance().getFont(FontEnum.Default);
         totoalMightFont = ResourceManager.getInstance().getFont(FontEnum.Default, 36);
         rateFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
+        final String optionResult = (battleResult.isWinner() ? "胜利" : "失败");
         final String result = (battleResult.isWinner() ? "你击败了对手！" : "对手已将你击败！");
-        resultText = new Text(205, 380, mFont, result, vbom);
-        aliveText = new Text(240, 275, mFont, "队伍中所有团队均存活", vbom);
-        cwText = new Text(210, 170, mFont, "连续胜利奖励倍数", vbom);
-        baseMightText = new Text(560, 400, mFont, String.valueOf(battleResult.getBaseMight()), vbom);
-        aliveMightText = new Text(560, 290, mFont, String.valueOf(battleResult.getAliveMight()), vbom);
-        cwMightText = new Text(560, 190, mFont, String.valueOf(battleResult.getCwMight()), vbom);
+        optionResultText = new Text(160, 415, optionFont, optionResult, vbom);
+        optionResultText.setColor(0XFFF6B453);
+        leftAlignText(optionResultText, 75);
+        resultText = new Text(200, 380, descFont, result, vbom);
+        leftAlignText(resultText, 75);
+        optionAliveText = new Text(220, 310, optionFont, "存活奖励", vbom);
+        optionAliveText.setColor(0XFFF6B453);
+        leftAlignText(optionAliveText, 75);
+        aliveText = new Text(240, 275, descFont, "队伍中所有团队均存活", vbom);
+        leftAlignText(aliveText, 75);
+        optionCwText = new Text(190, 205, optionFont, "连续胜利", vbom);
+        optionCwText.setColor(0XFFF6B453);
+        leftAlignText(optionCwText, 75);
+        cwText = new Text(210, 170, descFont, "连续胜利奖励倍数", vbom);
+        leftAlignText(cwText, 75);
+        baseMightText = new Text(560, 400, descFont, String.valueOf(battleResult.getBaseMight()), vbom);
+        aliveMightText = new Text(560, 290, descFont, String.valueOf(battleResult.getAliveMight()), vbom);
+        cwMightText = new Text(560, 190, descFont, String.valueOf(battleResult.getCwMight()), vbom);
         cwRateText = new Text(630, 190, rateFont, String.format("(+%s%%)", battleResult.getCwRate()), vbom);
         cwRateText.setColor(0XFF00FF0C);
         totoalMightText = new Text(570, 55, totoalMightFont, String.valueOf(battleResult.getTotalMight()), vbom);
@@ -60,8 +78,11 @@ public class BattleResultScene extends BaseScene {
         final Sprite frameSprite = createALBImageSprite(TextureEnum.BATTLE_RESULT, this.simulatedLeftX, frameY);
         this.attachChild(frameSprite);
 
+        frameSprite.attachChild(optionResultText);
         frameSprite.attachChild(resultText);
+        frameSprite.attachChild(optionAliveText);
         frameSprite.attachChild(aliveText);
+        frameSprite.attachChild(optionCwText);
         frameSprite.attachChild(cwText);
         frameSprite.attachChild(cwRateText);
         frameSprite.attachChild(baseMightText);
@@ -82,6 +103,10 @@ public class BattleResultScene extends BaseScene {
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
+    }
+
+    private void leftAlignText(final Text text, final float x) {
+        text.setX(x + text.getWidth() * 0.5f);
     }
 
     @Override

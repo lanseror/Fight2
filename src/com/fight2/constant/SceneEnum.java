@@ -9,5 +9,6 @@ public enum SceneEnum {
     Arena,
     Battle,
     BattleResult,
-    Chat;
+    Chat,
+    Quest;
 }

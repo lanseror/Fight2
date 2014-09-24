@@ -94,8 +94,6 @@ public class ArenaListScene extends BaseScene {
         listFrame.attachChild(enterButton);
         this.registerTouchArea(enterButton);
 
-        updateScene();
-
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
 
@@ -143,6 +141,7 @@ public class ArenaListScene extends BaseScene {
             listSelectedBar.setVisible(true);
             ArenaUtils.setSelectedArenaId(arenas.get(0).getId());
         }
+        activity.getGameHub().needSmallChatRoom(true);
     }
 
     private IEntity createListTouchArea(final int id, final float arenaY) {

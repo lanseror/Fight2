@@ -128,6 +128,7 @@ public class CardUtils {
                             card.setAvatar(localAvatar);
                             TextureFactory.getInstance().addCardResource(activity, localAvatar);
                         }
+                        card.setImage(cardJson.getString("image"));
                         partyCards[partyCardIndex] = card;
                     }
                 }

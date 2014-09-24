@@ -41,7 +41,6 @@ import com.fight2.entity.engine.BattlePartyFrame;
 import com.fight2.entity.engine.HpBar;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.ArenaUtils;
-import com.fight2.util.CardUtils;
 import com.fight2.util.F2MusicManager;
 import com.fight2.util.ResourceManager;
 
@@ -68,7 +67,7 @@ public class BattleScene extends BaseScene {
     private final Sprite skipSprite;
     private final BattleResult battleResult;
 
-    public BattleScene(final GameActivity activity, final int attackPlayerIndex, final int attackPlayerId) throws IOException {
+    public BattleScene(final GameActivity activity, final int attackPlayerIndex, final Party[] opponentParties) throws IOException {
         super(activity);
         this.skillText = new Text(this.cameraCenterX, this.cameraCenterY + 30, font, "技能：", 30, vbom);
         this.skillEffectText = new Text(this.cameraCenterX, this.cameraCenterY - 10, font, "效果：", 100, vbom);
@@ -82,7 +81,7 @@ public class BattleScene extends BaseScene {
         this.attachChild(skillEffectText);
         this.attachChild(winImage);
         this.attachChild(loseImage);
-        opponentParties = CardUtils.getPartyByUserId(activity, attackPlayerId).getParties();
+        this.opponentParties = opponentParties;
         battleResult = ArenaUtils.attack(attackPlayerIndex, activity);
         isWinner = battleResult.isWinner();
         final List<BattleRecord> battleRecords = battleResult.getBattleRecord();

@@ -229,6 +229,7 @@ public class MainScene extends BaseScene {
                         unfocusSprite(congressSprite);
                     } else if (checkContains(GATE_VERTICES, x, y)) {
                         unfocusSprite(gateSprite);
+                        ResourceManager.getInstance().setCurrentScene(SceneEnum.Quest);
                     }
                 }
                 return true;
