@@ -17,6 +17,7 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
+import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.util.algorithm.collision.BaseCollisionChecker;
 
@@ -25,11 +26,17 @@ import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.constant.TiledTextureEnum;
+import com.fight2.entity.Card;
+import com.fight2.entity.GameUserSession;
+import com.fight2.entity.Party;
+import com.fight2.entity.PartyInfo;
 import com.fight2.util.ChatUtils;
 import com.fight2.util.ResourceManager;
+import com.fight2.util.TextureFactory;
 import com.fight2.util.TiledTextureFactory;
 
 public class MainScene extends BaseScene {
+    private final TextureFactory textureFactory = TextureFactory.getInstance();
     private static final float[] GATE_VERTICES = { 20, 468, 548, 475, 506, 382, 451, 338, 60, 344 };
     private static final float[] CONGRESS_VERTICES = { 559, 416, 862, 633, 997, 496, 1003, 451, 930, 380 };
     private static final float[] ARENA_VERTICES = { 518, 392, 863, 386, 861, 283, 534, 270 };
@@ -47,6 +54,9 @@ public class MainScene extends BaseScene {
     private final Text arenaText;
     private final Text campText;
     private final List<Text> tipTexts = new ArrayList<Text>();
+
+    private final PartyInfo myPartyInfo = GameUserSession.getInstance().getPartyInfo();
+    private final Party[] myParties = myPartyInfo.getParties();
 
     public MainScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -168,6 +178,21 @@ public class MainScene extends BaseScene {
                 - TextureEnum.PARTY_RECHARGE.getWidth() + 20, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight());
         this.attachChild(rechargeSprite);
         this.registerTouchArea(rechargeSprite);
+
+        final TextureEnum playerInfoEnum = TextureEnum.MAIN_PLAYER_INFO;
+        final Card myLeader = myParties[0].getCards()[0];
+        final ITextureRegion myTexture = textureFactory.getTextureRegion(myLeader.getAvatar());
+        final float avatarSize = 90;
+        final float avatarHalfSize = avatarSize * 0.5f;
+        final Sprite myAvatarSprite = new Sprite(this.simulatedLeftX + avatarHalfSize + 18, this.simulatedHeight - avatarHalfSize - 20, avatarSize, avatarSize,
+                myTexture, vbom);
+        this.attachChild(myAvatarSprite);
+        final Sprite playerInfoSprite = createALBImageSprite(playerInfoEnum, this.simulatedLeftX, this.simulatedHeight - playerInfoEnum.getHeight());
+        this.attachChild(playerInfoSprite);
+        final Sprite playerInfoStaminaSprite = createALBImageSprite(TextureEnum.MAIN_PLAYER_INFO_STAMINA, 114, 86);
+        playerInfoSprite.attachChild(playerInfoStaminaSprite);
+        final Sprite playerInfoStaminaBoxSprite = createALBImageSprite(TextureEnum.MAIN_PLAYER_INFO_STAMINA_BOX, 100, 83);
+        playerInfoSprite.attachChild(playerInfoStaminaBoxSprite); 
 
         for (final Text tipText : tipTexts) {
             tipText.setVisible(false);

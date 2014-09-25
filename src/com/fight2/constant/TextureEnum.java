@@ -53,6 +53,9 @@ public enum TextureEnum {
     MAIN_TRAINING_CAMP("images/main_training_camp.png", 387, 219),
     MAIN_TRAINING_CAMP_FCS("images/main_training_camp_fcs.png", 387, 219),
     MAIN_TREE("images/main_tree.png", 1136, 640),
+    MAIN_PLAYER_INFO("images/main_player_info.png", 308, 138),
+    MAIN_PLAYER_INFO_STAMINA("images/main_player_info_stamina.png", 160, 26),
+    MAIN_PLAYER_INFO_STAMINA_BOX("images/main_player_info_stamina_box.png", 184, 35),
 
     // Party scene images.
     PARTY_BG("images/party_backgroud.png", 1136, 640),
