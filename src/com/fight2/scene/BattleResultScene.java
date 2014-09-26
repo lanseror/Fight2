@@ -105,10 +105,6 @@ public class BattleResultScene extends BaseScene {
         this.setTouchAreaBindingOnActionMoveEnabled(true);
     }
 
-    private void leftAlignText(final Text text, final float x) {
-        text.setX(x + text.getWidth() * 0.5f);
-    }
-
     @Override
     public void updateScene() {
         activity.getGameHub().needSmallChatRoom(false);

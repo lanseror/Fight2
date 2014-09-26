@@ -6,6 +6,7 @@ import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.andengine.engine.handler.physics.PhysicsHandler;
 import org.andengine.entity.IEntity;
@@ -35,11 +36,11 @@ import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
-import com.fight2.entity.engine.F2ButtonSprite;
-import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
+import com.fight2.entity.engine.F2ButtonSprite;
+import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.input.touch.detector.F2ScrollDetector;
 import com.fight2.util.CardUtils;
 import com.fight2.util.ConfigHelper;
@@ -79,6 +80,7 @@ public class PartyEditScene extends BaseScene {
     private final Text partyAtkText;
 
     private final Party[] parties = GameUserSession.getInstance().getPartyInfo().getParties();
+    private final Set<Integer> inPartyCards = GameUserSession.getInstance().getInPartyCards();
 
     public PartyEditScene(final GameActivity activity, final int partyNumber) throws IOException {
         super(activity);
@@ -218,6 +220,7 @@ public class PartyEditScene extends BaseScene {
                             }
                             if (!collidedWithOthers) {
                                 if (touchY < this.getY() - 50) {
+                                    inPartyCards.remove(partyCards[frameIndex].getTemplateId());
                                     revertCardToCardPack(movingCard);
                                     partyCards[frameIndex] = null;
                                     calculatePartyHpAtk();
@@ -228,6 +231,7 @@ public class PartyEditScene extends BaseScene {
                                         public void run() {
                                             addedCards[frameIndex].detachSelf();
                                             addedCards[frameIndex] = null;
+
                                         }
 
                                     });

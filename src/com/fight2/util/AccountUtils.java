@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.http.client.ClientProtocolException;
@@ -77,6 +78,7 @@ public class AccountUtils {
             final JSONObject loginJson = HttpUtils.getJSONFromUrl(loginUrl);
             final GameUserSession session = GameUserSession.getInstance();
             session.setName(loginJson.getString("name"));
+            final Set<Integer> inPartyCards = session.getInPartyCards();
 
             // Get cards.
             final List<Card> cards = session.getCards();
@@ -95,6 +97,8 @@ public class AccountUtils {
                 card.setImage(image);
                 card.setName(cardJson.getString("name"));
                 card.setSkill(cardJson.optString("skill"));
+                final JSONObject cardTemplateJson = cardJson.getJSONObject("cardTemplate");
+                card.setTemplateId(cardTemplateJson.getInt("id"));
                 cards.add(card);
             }
             TextureFactory.getInstance().loadCardsResource(activity);
@@ -131,6 +135,7 @@ public class AccountUtils {
                             if (partyCardId == card.getId()) {
                                 it.remove();
                                 partyCards[partyCardIndex] = card;
+                                inPartyCards.add(card.getTemplateId());
                             }
                         }
                     }

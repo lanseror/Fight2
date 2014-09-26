@@ -1,5 +1,7 @@
 package com.fight2.scene;
 
+import java.util.Set;
+
 import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.IEntityModifier.IEntityModifierListener;
 import org.andengine.entity.modifier.MoveModifier;
@@ -111,16 +113,22 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                     // Debug.e("Y < focusedCard will revert");
                     revertCard(focusedCard);
                 } else {
-                    final Party[] parties = GameUserSession.getInstance().getPartyInfo().getParties();
+                    final GameUserSession session = GameUserSession.getInstance();
+                    final Set<Integer> inPartyCards = session.getInPartyCards();
+                    final Party[] parties = session.getPartyInfo().getParties();
                     final Card[] partyCards = parties[this.partyEditScene.partyNumber - 1].getCards();
                     boolean collidedWithGrid = false;
                     boolean isReplace = false;
                     IEntity beReplacedCardSprite = null;
                     Sprite cardGrid = null;
                     int cardGridIndex = 0;
+                    int collidedCardTemplateId = -1;
                     for (; cardGridIndex < this.partyEditScene.cardGrids.length; cardGridIndex++) {
                         if (this.partyEditScene.cardGrids[cardGridIndex].contains(copyCard.getX(), copyCard.getY())) {
                             collidedWithGrid = true;
+                            if (partyCards[cardGridIndex] != null) {
+                                collidedCardTemplateId = partyCards[cardGridIndex].getTemplateId();
+                            }
                             beReplacedCardSprite = partyEditScene.addedCards[cardGridIndex];
                             isReplace = (beReplacedCardSprite == null ? false : true);
                             break;
@@ -139,10 +147,26 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                         }
                     }
 
-                    if (collidedWithGrid || hasPosition) {
+                    final Card cardEntry = (Card) focusedCard.getUserData();
+                    final int focusedCardTempalteId = cardEntry.getTemplateId();
+                    if ((collidedWithGrid || hasPosition) && inPartyCards.contains(focusedCardTempalteId) && collidedCardTemplateId != focusedCardTempalteId) {
+                        scrollable = false;
+                        // Debug.e("Already had the template id will revert");
+                        revertCard(focusedCard);
+                        partyEditScene.getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(partyEditScene.getActivity(), "该卡片已经在你的队伍中！", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } else if (collidedWithGrid || hasPosition) {
                         scrollable = false;
                         // Debug.e("Add card");
-                        final Card cardEntry = (Card) focusedCard.getUserData();
+
+                        if (collidedWithGrid) {
+                            inPartyCards.remove(collidedCardTemplateId);
+                        }
+                        inPartyCards.add(focusedCardTempalteId);
                         partyCards[cardGridIndex] = cardEntry;
                         partyEditScene.calculatePartyHpAtk();
                         partyEditScene.updatePartyHpAtk();

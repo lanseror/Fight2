@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import com.fight2.GameActivity;
 import com.fight2.entity.Arena;
 import com.fight2.entity.ArenaContinuousWin;
+import com.fight2.entity.ArenaRanking;
 import com.fight2.entity.ArenaReward;
 import com.fight2.entity.ArenaReward.ArenaRewardType;
 import com.fight2.entity.ArenaRewardItem;
@@ -111,6 +112,34 @@ public class ArenaUtils {
             throw new RuntimeException(e);
         }
         return arenaContinuousWin;
+    }
+
+    public static List<ArenaRanking> getArenaRanking(final GameActivity activity) {
+        final List<ArenaRanking> arenaRankings = new ArrayList<ArenaRanking>();
+        final String url = HttpUtils.HOST_URL + "/arena/get-ranking?id=" + selectedArenaId;
+        try {
+            final JSONArray responseJsonArray = HttpUtils.getJSONArrayFromUrl(url);
+            for (int i = 0; i < responseJsonArray.length(); i++) {
+                final JSONObject responseJson = responseJsonArray.getJSONObject(i);
+                final ArenaRanking arenaRanking = new ArenaRanking();
+                arenaRanking.setId(responseJson.getInt("id"));
+                arenaRanking.setMight(responseJson.getInt("might"));
+                arenaRanking.setRankNumber(responseJson.getInt("rankNumber"));
+                final JSONObject userJson = responseJson.getJSONObject("user");
+                final User user = new User();
+                user.setId(userJson.getInt("id"));
+                user.setName(userJson.getString("name"));
+                arenaRanking.setUser(user);
+                arenaRankings.add(arenaRanking);
+            }
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        }
+        return arenaRankings;
     }
 
     public static List<ArenaReward> getArenaReward(final GameActivity activity) {

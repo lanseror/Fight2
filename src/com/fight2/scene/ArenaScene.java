@@ -71,6 +71,8 @@ public class ArenaScene extends BaseScene {
     private final Text cwTimeText;
     private final TimerHandler timerHandler;
 
+    private UserArenaInfo userArenaInfo;
+
     public ArenaScene(final GameActivity activity) throws IOException {
         super(activity);
         this.topBarFont = ResourceManager.getInstance().getFont(FontEnum.Main);
@@ -234,6 +236,7 @@ public class ArenaScene extends BaseScene {
         rankButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                showArenaRanking();
             }
         });
         this.attachChild(rankButton);
@@ -258,6 +261,16 @@ public class ArenaScene extends BaseScene {
     private void showArenaReward() {
         try {
             final BaseScene scene = new ArenaRewardScene(activity, rankText.getText());
+            scene.updateScene();
+            this.setChildScene(scene, false, false, true);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void showArenaRanking() {
+        try {
+            final BaseScene scene = new ArenaRankingScene(activity, userArenaInfo);
             scene.updateScene();
             this.setChildScene(scene, false, false, true);
         } catch (final IOException e) {
@@ -292,7 +305,7 @@ public class ArenaScene extends BaseScene {
     @Override
     public void updateScene() {
         final Font nameFont = ResourceManager.getInstance().getFont(FontEnum.Default, 20);
-        final UserArenaInfo userArenaInfo = ArenaUtils.enter(activity);
+        userArenaInfo = ArenaUtils.enter(activity);
         mightText.setText(String.valueOf(userArenaInfo.getMight()));
         winText.setText(String.valueOf(userArenaInfo.getWin()));
         rankText.setText(String.valueOf(userArenaInfo.getRankNumber()));

@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.ITexture;
 import org.andengine.opengl.texture.bitmap.AssetBitmapTexture;
@@ -190,6 +191,10 @@ public abstract class BaseScene extends Scene {
             onStarted();
         }
         super.onManagedUpdate(pSecondsElapsed);
+    }
+    
+    protected void leftAlignText(final Text text, final float x) {
+        text.setX(x + text.getWidth() * 0.5f);
     }
 
 }

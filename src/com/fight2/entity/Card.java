@@ -12,6 +12,7 @@ public class Card {
     private int atk;// Attack value;
     private String skill;
     private int skillLevel;
+    private int templateId;
     private int version;
 
     public int getId() {
@@ -100,6 +101,14 @@ public class Card {
 
     public void setSkillLevel(final int skillLevel) {
         this.skillLevel = skillLevel;
+    }
+
+    public int getTemplateId() {
+        return templateId;
+    }
+
+    public void setTemplateId(final int templateId) {
+        this.templateId = templateId;
     }
 
     public int getVersion() {

@@ -75,6 +75,8 @@ public class CardUtils {
                 card.setImage(cardJson.getString("image"));
                 card.setName(cardJson.getString("name"));
                 card.setSkill(cardJson.optString("skill"));
+                final JSONObject cardTemplateJson = cardJson.getJSONObject("cardTemplate");
+                card.setTemplateId(cardTemplateJson.getInt("id"));
                 cards.add(card);
                 return card;
             } else {
