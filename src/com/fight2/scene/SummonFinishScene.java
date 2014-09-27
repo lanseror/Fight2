@@ -41,6 +41,7 @@ public class SummonFinishScene extends BaseScene {
     private final Font mFont;
     private final Text hpText;
     private final Text atkText;
+    private final Text nameText;
 
     public SummonFinishScene(final Card card, final GameActivity activity) throws IOException {
         super(activity);
@@ -56,8 +57,10 @@ public class SummonFinishScene extends BaseScene {
         atkText = new Text(30, 10, mFont, "0123456789", vbom);
         hpText.setText(String.valueOf(card.getHp()));
         atkText.setText(String.valueOf(card.getAtk()));
+        nameText = new Text(30, 50, mFont, card.getName(), vbom);
         cardFrame.attachChild(hpText);
         cardFrame.attachChild(atkText);
+        cardFrame.attachChild(nameText);
         final ITextureRegion starTexture = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_STAR);
         for (int i = 0; i < card.getStar(); i++) {
             final Sprite star = new Sprite(15 + 6.5f * i, CARD_HEIGHT - 6, 6.5f, 8, starTexture, vbom);

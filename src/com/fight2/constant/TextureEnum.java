@@ -19,6 +19,11 @@ public enum TextureEnum {
     COMMON_ARENA_TICKET("images/common_arena_ticket.png", 109, 76),
     COMMON_STAMINA("images/common_stamina.png", 120, 138),
     COMMON_MIGHT_ICON("images/common_might_icon.png", 44, 44),
+    COMMON_STAMINA_BOX("images/common_stamina_box.png", 262, 65),
+    COMMON_STAMINA_STICK("images/common_stamina_stick.png", 203, 37),
+    COMMON_EXPERIENCE_BOX("images/common_experience_box.png", 267, 67),
+    COMMON_EXPERIENCE_BOX_STAR("images/common_experience_box_star.png", 267, 67),
+    COMMON_EXPERIENCE_STICK("images/common_experience_stick.png", 205, 67),
 
     // Chat room images.
     CHAT_INPUT_BG("images/chat_input_backgroud.png", 755, 75),
@@ -83,6 +88,9 @@ public enum TextureEnum {
     // Summon scene images.
     SUMMON_BG("images/summon_backgroud.jpg", 1136, 640),
     SUMMON_SUMMON_BUTTON("images/summon_summon_button.jpg", 300, 90),
+
+    // PlayerInfo scene images.
+    PLAYERINFO_FRAME("images/playerinfo_frame.png", 491, 469),
 
     // Arena scene images.
     ARENA_BG("images/arena_backgroud.png", 1136, 640),

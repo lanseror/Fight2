@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.andengine.entity.IEntity;
+import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
@@ -30,6 +32,8 @@ import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
+import com.fight2.entity.engine.F2ButtonSprite;
+import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.ChatUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
@@ -57,6 +61,11 @@ public class MainScene extends BaseScene {
 
     private final PartyInfo myPartyInfo = GameUserSession.getInstance().getPartyInfo();
     private final Party[] myParties = myPartyInfo.getParties();
+    private IEntity avatarBox;
+    private Sprite avatarSprite;
+    private int avatarCardId = -1;
+    private final float avatarSize = 90;
+    private final float avatarHalfSize = avatarSize * 0.5f;
 
     public MainScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -180,19 +189,22 @@ public class MainScene extends BaseScene {
         this.registerTouchArea(rechargeSprite);
 
         final TextureEnum playerInfoEnum = TextureEnum.MAIN_PLAYER_INFO;
-        final Card myLeader = myParties[0].getCards()[0];
-        final ITextureRegion myTexture = textureFactory.getTextureRegion(myLeader.getAvatar());
-        final float avatarSize = 90;
-        final float avatarHalfSize = avatarSize * 0.5f;
-        final Sprite myAvatarSprite = new Sprite(this.simulatedLeftX + avatarHalfSize + 18, this.simulatedHeight - avatarHalfSize - 20, avatarSize, avatarSize,
-                myTexture, vbom);
-        this.attachChild(myAvatarSprite);
-        final Sprite playerInfoSprite = createALBImageSprite(playerInfoEnum, this.simulatedLeftX, this.simulatedHeight - playerInfoEnum.getHeight());
+        avatarBox = new Rectangle(this.simulatedLeftX + avatarHalfSize + 18, this.simulatedHeight - avatarHalfSize - 20, avatarSize, avatarSize, vbom);
+        this.attachChild(avatarBox);
+        final F2ButtonSprite playerInfoSprite = createALBF2ButtonSprite(playerInfoEnum, playerInfoEnum, this.simulatedLeftX, this.simulatedHeight
+                - playerInfoEnum.getHeight());
+        playerInfoSprite.setOnClickListener(new F2OnClickListener() {
+            @Override
+            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                ResourceManager.getInstance().setCurrentScene(SceneEnum.PlayerInfo);
+            }
+        });
+        this.registerTouchArea(playerInfoSprite);
         this.attachChild(playerInfoSprite);
         final Sprite playerInfoStaminaSprite = createALBImageSprite(TextureEnum.MAIN_PLAYER_INFO_STAMINA, 114, 86);
         playerInfoSprite.attachChild(playerInfoStaminaSprite);
         final Sprite playerInfoStaminaBoxSprite = createALBImageSprite(TextureEnum.MAIN_PLAYER_INFO_STAMINA_BOX, 100, 83);
-        playerInfoSprite.attachChild(playerInfoStaminaBoxSprite); 
+        playerInfoSprite.attachChild(playerInfoStaminaBoxSprite);
 
         for (final Text tipText : tipTexts) {
             tipText.setVisible(false);
@@ -305,6 +317,16 @@ public class MainScene extends BaseScene {
     @Override
     public void updateScene() {
         activity.getGameHub().needSmallChatRoom(true);
+        final Card myLeader = myParties[0].getCards()[0];
+        if (myLeader.getId() != this.avatarCardId) {
+            final ITextureRegion myTexture = textureFactory.getTextureRegion(myLeader.getAvatar());
+            if (avatarSprite != null) {
+                avatarSprite.detachSelf();
+            }
+            avatarSprite = new Sprite(avatarHalfSize, avatarHalfSize, avatarSize, avatarSize, myTexture, vbom);
+            avatarBox.attachChild(avatarSprite);
+            this.avatarCardId = myLeader.getId();
+        }
     }
 
     @Override

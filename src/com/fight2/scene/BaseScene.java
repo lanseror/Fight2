@@ -16,6 +16,7 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import com.fight2.GameActivity;
 import com.fight2.constant.ConfigEnum;
 import com.fight2.constant.TextureEnum;
+import com.fight2.entity.GameUserSession;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.ConfigHelper;
@@ -35,6 +36,7 @@ public abstract class BaseScene extends Scene {
     protected final float simulatedRightX;
     private boolean isStarted = false;
     protected VertexBufferObjectManager vbom;
+    protected GameUserSession session = GameUserSession.getInstance();
 
     public BaseScene(final GameActivity activity) throws IOException {
         super();
@@ -192,7 +194,7 @@ public abstract class BaseScene extends Scene {
         }
         super.onManagedUpdate(pSecondsElapsed);
     }
-    
+
     protected void leftAlignText(final Text text, final float x) {
         text.setX(x + text.getWidth() * 0.5f);
     }

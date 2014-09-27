@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -146,5 +148,30 @@ public class AccountUtils {
             throw new RuntimeException(e);
         }
 
+    }
+
+    public static boolean saveUserInfo() {
+        final String url = HttpUtils.HOST_URL + "/user/save-user-info";
+        final GameUserSession session = GameUserSession.getInstance();
+        final JSONObject infoJson = new JSONObject();
+        try {
+            infoJson.put("name", URLEncoder.encode(session.getName(), "UTF-8"));
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        } catch (final UnsupportedEncodingException e) {
+            throw new RuntimeException(e);
+        }
+
+        try {
+            final String responseJsonStr = HttpUtils.postJSONString(url, infoJson.toString());
+            final JSONObject responseJson = new JSONObject(responseJsonStr);
+            final int status = responseJson.getInt("status");
+            return status == 0;
+        } catch (final ClientProtocolException e) {
+            LogUtils.e(e);
+        } catch (final Exception e) {
+            LogUtils.e(e);
+        }
+        return false;
     }
 }
