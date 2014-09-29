@@ -22,6 +22,7 @@ import com.fight2.scene.ArenaListScene;
 import com.fight2.scene.ArenaScene;
 import com.fight2.scene.BaseScene;
 import com.fight2.scene.ChatScene;
+import com.fight2.scene.GuildScene;
 import com.fight2.scene.MainScene;
 import com.fight2.scene.PartyScene;
 import com.fight2.scene.PlayerInfoScene;
@@ -175,6 +176,8 @@ public class ResourceManager {
             scenes.put(SceneEnum.Quest, questScene);
             final BaseScene playerInfoScene = new PlayerInfoScene(activity);
             scenes.put(SceneEnum.PlayerInfo, playerInfoScene);
+            final BaseScene guildScene = new GuildScene(activity);
+            scenes.put(SceneEnum.Guild, guildScene);
 
             final BaseScene arenaScene = new ArenaScene(activity);
             scenes.put(SceneEnum.Arena, arenaScene);

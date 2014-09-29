@@ -11,5 +11,6 @@ public enum SceneEnum {
     BattleResult,
     Chat,
     Quest,
-    PlayerInfo;
+    PlayerInfo,
+    Guild;
 }

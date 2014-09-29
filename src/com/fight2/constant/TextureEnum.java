@@ -24,6 +24,8 @@ public enum TextureEnum {
     COMMON_EXPERIENCE_BOX("images/common_experience_box.png", 267, 67),
     COMMON_EXPERIENCE_BOX_STAR("images/common_experience_box_star.png", 267, 67),
     COMMON_EXPERIENCE_STICK("images/common_experience_stick.png", 205, 67),
+    COMMON_BUTTON("images/common_button.png", 129, 49),
+    COMMON_INPUT_ICON("images/common_input_icon.png", 54, 53),
 
     // Chat room images.
     CHAT_INPUT_BG("images/chat_input_backgroud.png", 755, 75),
@@ -91,6 +93,14 @@ public enum TextureEnum {
 
     // PlayerInfo scene images.
     PLAYERINFO_FRAME("images/playerinfo_frame.png", 491, 469),
+
+    // Guild scene images.
+    GUILD_FRAME("images/guild_frame.png", 851, 495),
+    GUILD_OPTION_BG("images/guild_option_backgroud.png", 781, 38),
+    GUILD_FRAME_SCROLLBAR("images/guild_frame_scrollbar.png", 23, 332),
+    GUILD_FRAME_SCROLLSTICK("images/guild_frame_scrollstick.png", 23, 332),
+    GUILD_FRAME_BUTTON_FCS("images/guild_frame_button_fcs.png", 116, 39),
+    GUILD_FRAME_BUTTON("images/guild_frame_button.png", 116, 39),
 
     // Arena scene images.
     ARENA_BG("images/arena_backgroud.png", 1136, 640),

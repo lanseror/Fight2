@@ -3,9 +3,9 @@ package com.fight2.scene;
 import java.io.IOException;
 
 import org.andengine.engine.handler.IUpdateHandler;
+import org.andengine.entity.IEntity;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
-import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.ITexture;
 import org.andengine.opengl.texture.bitmap.AssetBitmapTexture;
@@ -19,6 +19,7 @@ import com.fight2.constant.TextureEnum;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
+import com.fight2.entity.engine.F2CommonButton;
 import com.fight2.util.ConfigHelper;
 import com.fight2.util.TextureFactory;
 
@@ -115,6 +116,20 @@ public abstract class BaseScene extends Scene {
         return sprite;
     }
 
+    public F2CommonButton createALBF2CommonButton(final float x, final float y, final String text) {
+        final float width = TextureEnum.COMMON_BUTTON.getWidth();
+        final float height = TextureEnum.COMMON_BUTTON.getHeight();
+        final float pX = x + width * 0.5f;
+        final float pY = y + height * 0.5f;
+        final F2CommonButton sprite = new F2CommonButton(pX, pY, text, vbom);
+        return sprite;
+    }
+
+    public F2CommonButton createACF2CommonButton(final float x, final float y, final String text) {
+        final F2CommonButton sprite = new F2CommonButton(x, y, text, vbom);
+        return sprite;
+    }
+
     /**
      * Anchor left bottom sprite
      * 
@@ -183,6 +198,10 @@ public abstract class BaseScene extends Scene {
         return activity;
     }
 
+    public VertexBufferObjectManager getVbom() {
+        return vbom;
+    }
+
     protected void onStarted() {
     }
 
@@ -195,8 +214,19 @@ public abstract class BaseScene extends Scene {
         super.onManagedUpdate(pSecondsElapsed);
     }
 
-    protected void leftAlignText(final Text text, final float x) {
-        text.setX(x + text.getWidth() * 0.5f);
+    public void topAlignEntity(final IEntity entity, final float y) {
+        entity.setY(y - entity.getHeight() * 0.5f);
     }
 
+    public void bottomAlignEntity(final IEntity entity, final float y) {
+        entity.setY(y + entity.getHeight() * 0.5f);
+    }
+
+    public void leftAlignEntity(final IEntity entity, final float x) {
+        entity.setX(x + entity.getWidth() * 0.5f);
+    }
+
+    public void rightAlignEntity(final IEntity entity, final float x) {
+        entity.setX(x - entity.getWidth() * 0.5f);
+    }
 }

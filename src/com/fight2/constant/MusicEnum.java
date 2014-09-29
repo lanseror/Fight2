@@ -2,7 +2,7 @@ package com.fight2.constant;
 
 public enum MusicEnum {
     SUMMON("GOODLUCK.mp3"),
-    MAIN_BG("Campaign-Haven.mp3"),
+    MAIN_BG("Mainmenu.mp3"),
     ARENA_ATTACK("Sword-Draw.mp3"),
     // BATTLE_BG("Battle-Haven.mp3"),
     BATTLE_HIT("HeadHunterMissileHit2.wav"),

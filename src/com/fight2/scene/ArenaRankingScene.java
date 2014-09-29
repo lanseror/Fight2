@@ -91,13 +91,13 @@ public class ArenaRankingScene extends BaseScene implements IScrollDetectorListe
         final Text myNumText = new Text(initX, myRankY, numFont, String.valueOf(userArenaInfo.getRankNumber()), vbom);
         frameSprite.attachChild(myNumText);
         final Text nameText = new Text(100, myRankY, numFont, GameUserSession.getInstance().getName(), vbom);
-        this.leftAlignText(nameText, initX + 40);
+        this.leftAlignEntity(nameText, initX + 40);
         frameSprite.attachChild(nameText);
         final IEntity mightIcon = this.createACImageSprite(TextureEnum.COMMON_MIGHT_ICON, initX + 272, myRankY);
         frameSprite.attachChild(mightIcon);
         final Text mightText = new Text(380, myRankY, numFont, String.valueOf(userArenaInfo.getMight()), vbom);
         mightText.setColor(0XFFE5B978);
-        this.leftAlignText(mightText, initX + 302);
+        this.leftAlignEntity(mightText, initX + 302);
         frameSprite.attachChild(mightText);
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
@@ -134,14 +134,14 @@ public class ArenaRankingScene extends BaseScene implements IScrollDetectorListe
             }
 
             final Text nameText = new Text(75, GRID_HEIGHT * 0.5f, numFont, ranking.getUser().getName(), vbom);
-            this.leftAlignText(nameText, 68);
+            this.leftAlignEntity(nameText, 68);
             rankGrid.attachChild(nameText);
 
             final IEntity mightIcon = this.createACImageSprite(TextureEnum.COMMON_MIGHT_ICON, 300, GRID_HEIGHT * 0.5f);
             rankGrid.attachChild(mightIcon);
             final Text mightText = new Text(335, GRID_HEIGHT * 0.5f, numFont, String.valueOf(ranking.getMight()), vbom);
             mightText.setColor(0XFFE5B978);
-            this.leftAlignText(mightText, 330);
+            this.leftAlignEntity(mightText, 330);
             rankGrid.attachChild(mightText);
             rankContainer.attachChild(rankGrid);
         }

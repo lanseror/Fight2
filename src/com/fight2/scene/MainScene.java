@@ -254,6 +254,7 @@ public class MainScene extends BaseScene {
                         unfocusSprite(billboardSprite);
                     } else if (checkContains(GUILD_VERTICES, x, y)) {
                         unfocusSprite(guildSprite);
+                        ResourceManager.getInstance().setCurrentScene(SceneEnum.Guild);
                     } else if (checkContains(CAMP_VERTICES, x, y)) {
                         unfocusSprite(trainingCampSprite);
                         ResourceManager.getInstance().setCurrentScene(SceneEnum.Party);
