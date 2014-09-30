@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.andengine.entity.IEntity;
-import org.andengine.entity.clip.ClipEntity;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
@@ -24,6 +23,7 @@ import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Guild;
 import com.fight2.entity.ScrollZone;
+import com.fight2.entity.User;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.engine.InputText;
@@ -39,19 +39,24 @@ public class GuildScene extends BaseScene {
     private static int SCROLL_ZONE_WIDTH = 795;
     private static int SCROLL_ZONE_HEIGHT = 323;
     private static int TOUCH_AREA_WIDTH = 790;
-    private static int TOUCH_AREA_HEIGHT = 290;
+    private static int TOUCH_AREA_HEIGHT = 280;
     private final Sprite[] focusedButtons = new Sprite[7];
     private final Sprite[] unfocusedButtons = new Sprite[7];
     private final static String[] NOGUILD_STRINGS = { "公会列表", "创建公会" };
     private final static String[] INGUILD_STRINGS = { "公会信息", "公会排名", "成员列表", "公会仓库", "公会战", "炼金房", "投票" };
-    private final static String[] HEADBAR_GUILD_LIST = { "NO.", "公会名", "会长" };
+    private final static String[] HEADBAR_GUILD_LIST = { "NO.", "公会名", "" };
     private final static float[] HBW_GUILD_LIST = { 0.1f, 0.5f, 0.4f };
+    private final static String[] HEADBAR_GUILD_RANK = { "NO.", "公会名", "会长" };
+    private final static float[] HBW_GUILD_RANK = { 0.1f, 0.5f, 0.4f };
+    private final static String[] HEADBAR_GUILD_MEMBER = { "NO.", "名称", "头衔", "身价" };
+    private final static float[] HBW_GUILD_MEMBER = { 0.1f, 0.3f, 0.3f, 0.3f };
     private final List<IEntity> boards = new ArrayList<IEntity>();
     private final Sprite frame;
 
     private final Font buttonFont;
     private final Font infoFont;
     private final Font headBarFont;
+    private final Font rankingFont;
     private int focusedIndex = 0;
     private Guild guild;
     private boolean inGuild;
@@ -63,6 +68,7 @@ public class GuildScene extends BaseScene {
         buttonFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
         infoFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
         headBarFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
+        rankingFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
         frame = createALBImageSprite(TextureEnum.GUILD_FRAME, this.simulatedLeftX, FRAME_BOTTOM);
         this.attachChild(frame);
         // final Sprite optionBackgroud = createALBImageSprite(TextureEnum.GUILD_OPTION_BG, 23, 387);
@@ -222,15 +228,66 @@ public class GuildScene extends BaseScene {
 
     private IEntity createGuildRankingBoard() {
         final IEntity board = createBoardBox();
-        final Text guildNameTitle = new Text(257, 225, infoFont, "公会排名", vbom);
-        board.attachChild(guildNameTitle);
+        this.createHeadBar(HEADBAR_GUILD_RANK, HBW_GUILD_RANK, board);
+        final List<Guild> guilds = GuildUtils.getTopGuilds();
+        final ScrollZone scrollZone = new ScrollZone(board.getWidth() * 0.5f, 5 + SCROLL_ZONE_HEIGHT * 0.5f, SCROLL_ZONE_WIDTH, SCROLL_ZONE_HEIGHT, vbom);
+        final IEntity touchArea = scrollZone.createTouchArea(SCROLL_ZONE_WIDTH * 0.5f, SCROLL_ZONE_HEIGHT * 0.5f, TOUCH_AREA_WIDTH, TOUCH_AREA_HEIGHT);
+        board.attachChild(scrollZone);
+        this.registerTouchArea(touchArea);
+
+        for (int i = 0; i < guilds.size(); i++) {
+            final Guild guild = guilds.get(i);
+            final IEntity row = new Rectangle(0, 0, SCROLL_ZONE_WIDTH, 64, vbom);
+            row.setAlpha(0);
+            if (i < guilds.size() - 1) {
+                final Sprite line = this.createACImageSprite(TextureEnum.GUILD_SCROLL_ROW_SEPARATOR, SCROLL_ZONE_WIDTH * 0.5f, 1);
+                row.attachChild(line);
+            }
+            final float rowY = row.getHeight() * 0.5f;
+            final Text number = new Text(25, rowY, rankingFont, String.valueOf(i + 1), vbom);
+            row.attachChild(number);
+            final Text guildName = new Text(100, rowY, rankingFont, guild.getName(), vbom);
+            row.attachChild(guildName);
+            this.leftAlignEntity(guildName, (HBW_GUILD_RANK[0]) * SCROLL_ZONE_WIDTH + 25);
+            final Text presidentName = new Text(100, rowY, rankingFont, guild.getPresident().getName(), vbom);
+            row.attachChild(presidentName);
+            this.leftAlignEntity(presidentName, (HBW_GUILD_RANK[0] + HBW_GUILD_RANK[1]) * SCROLL_ZONE_WIDTH + 25);
+            scrollZone.attachRow(row);
+        }
         return board;
     }
 
     private IEntity createMemberListBoard() {
         final IEntity board = createBoardBox();
-        final Text guildNameTitle = new Text(257, 225, infoFont, "成员列表", vbom);
-        board.attachChild(guildNameTitle);
+        this.createHeadBar(HEADBAR_GUILD_MEMBER, HBW_GUILD_MEMBER, board);
+        final List<User> members = GuildUtils.getMembers(guild.getId());
+        final ScrollZone scrollZone = new ScrollZone(board.getWidth() * 0.5f, 5 + SCROLL_ZONE_HEIGHT * 0.5f, SCROLL_ZONE_WIDTH, SCROLL_ZONE_HEIGHT, vbom);
+        final IEntity touchArea = scrollZone.createTouchArea(SCROLL_ZONE_WIDTH * 0.5f, SCROLL_ZONE_HEIGHT * 0.5f, TOUCH_AREA_WIDTH, TOUCH_AREA_HEIGHT);
+        board.attachChild(scrollZone);
+        this.registerTouchArea(touchArea);
+
+        for (int i = 0; i < members.size(); i++) {
+            final User member = members.get(i);
+            final IEntity row = new Rectangle(0, 0, SCROLL_ZONE_WIDTH, 64, vbom);
+            row.setAlpha(0);
+            if (i < members.size() - 1) {
+                final Sprite line = this.createACImageSprite(TextureEnum.GUILD_SCROLL_ROW_SEPARATOR, SCROLL_ZONE_WIDTH * 0.5f, 1);
+                row.attachChild(line);
+            }
+            final float rowY = row.getHeight() * 0.5f;
+            final Text number = new Text(25, rowY, rankingFont, String.valueOf(i + 1), vbom);
+            row.attachChild(number);
+            final Text memberName = new Text(100, rowY, rankingFont, member.getName(), vbom);
+            row.attachChild(memberName);
+            this.leftAlignEntity(memberName, (HBW_GUILD_MEMBER[0]) * SCROLL_ZONE_WIDTH + 25);
+            final Text titleName = new Text(100, rowY, rankingFont, "天使长", vbom);
+            row.attachChild(titleName);
+            this.leftAlignEntity(titleName, (HBW_GUILD_MEMBER[0] + HBW_GUILD_MEMBER[1]) * SCROLL_ZONE_WIDTH + 25);
+            final Text salaryName = new Text(100, rowY, rankingFont, "100", vbom);
+            row.attachChild(salaryName);
+            this.leftAlignEntity(salaryName, (HBW_GUILD_MEMBER[0] + HBW_GUILD_MEMBER[1] + HBW_GUILD_MEMBER[2]) * SCROLL_ZONE_WIDTH + 25);
+            scrollZone.attachRow(row);
+        }
         return board;
     }
 
@@ -265,8 +322,7 @@ public class GuildScene extends BaseScene {
     private void createGuildBoards() {
         if (inGuild) {
             boards.add(createGuildInfoBoard());
-            boards.add(createGuildListBoard());
-            // boards.add(createGuildRankingBoard());
+            boards.add(createGuildRankingBoard());
             boards.add(createMemberListBoard());
             boards.add(createGuildWarehouseBoard());
             boards.add(createGuildBattleBoard());
@@ -302,38 +358,75 @@ public class GuildScene extends BaseScene {
 
     }
 
-    private IEntity createScrollZone(final IEntity parent) {
-        final ClipEntity scrollZone = new ClipEntity(parent.getWidth() * 0.5f, 5 + SCROLL_ZONE_HEIGHT * 0.5f, SCROLL_ZONE_WIDTH, SCROLL_ZONE_HEIGHT);
-        scrollZone.setAlpha(0);
-        parent.attachChild(scrollZone);
-        return scrollZone;
-    }
-
-    private IEntity createScrollContainer(final IEntity parent) {
-        final IEntity scrollContainer = new Rectangle(parent.getWidth() * 0.5f, SCROLL_ZONE_HEIGHT * 0.5f, SCROLL_ZONE_WIDTH, SCROLL_ZONE_HEIGHT, vbom);
-        scrollContainer.setAlpha(0);
-        parent.attachChild(scrollContainer);
-        return scrollContainer;
-    }
-
-    private IEntity createTouchArea(final IEntity board) {
-        final IEntity touchArea = new Rectangle(board.getWidth() * 0.5f, 25 + TOUCH_AREA_HEIGHT * 0.5f, TOUCH_AREA_WIDTH, TOUCH_AREA_HEIGHT, vbom);
-        board.attachChild(touchArea);
-        touchArea.setAlpha(0);
-        this.registerTouchArea(touchArea);
-        return touchArea;
-    }
-
     private IEntity createGuildListBoard() {
         final IEntity board = createBoardBox();
         this.createHeadBar(HEADBAR_GUILD_LIST, HBW_GUILD_LIST, board);
         final List<Guild> guilds = GuildUtils.getTopGuilds();
 
-        final Text guildNameTitle = new Text(257, 225, infoFont, "公会列表", vbom);
-        board.attachChild(guildNameTitle);
+        // final List<Guild> guilds = new ArrayList<Guild>();
+        // for (int i = 0; i < 20; i++) {
+        // final int seq = i + 1;
+        // final Guild guild = new Guild();
+        // guild.setId(seq);
+        // guild.setName("公会" + seq);
+        // final User president = new User();
+        // president.setId(seq);
+        // president.setName("会长" + seq);
+        // guild.setPresident(president);
+        // guilds.add(guild);
+        // }
+        final ScrollZone scrollZone = new ScrollZone(board.getWidth() * 0.5f, 5 + SCROLL_ZONE_HEIGHT * 0.5f, SCROLL_ZONE_WIDTH, SCROLL_ZONE_HEIGHT, vbom);
+        final IEntity touchArea = scrollZone.createTouchArea(SCROLL_ZONE_WIDTH * 0.5f, SCROLL_ZONE_HEIGHT * 0.5f, TOUCH_AREA_WIDTH, TOUCH_AREA_HEIGHT);
+        board.attachChild(scrollZone);
 
-        final ScrollZone scrollZGone = new ScrollZone(board.getWidth() * 0.5f, 5 + SCROLL_ZONE_HEIGHT * 0.5f, SCROLL_ZONE_WIDTH, SCROLL_ZONE_HEIGHT, vbom);
-        final IEntity touchArea = createTouchArea(board);
+        for (int i = 0; i < guilds.size(); i++) {
+            final Guild guild = guilds.get(i);
+            final IEntity row = new Rectangle(0, 0, SCROLL_ZONE_WIDTH, 64, vbom);
+            row.setAlpha(0);
+            if (i < guilds.size() - 1) {
+                final Sprite line = this.createACImageSprite(TextureEnum.GUILD_SCROLL_ROW_SEPARATOR, SCROLL_ZONE_WIDTH * 0.5f, 1);
+                row.attachChild(line);
+            }
+            final float rowY = row.getHeight() * 0.5f;
+            final Text number = new Text(25, rowY, rankingFont, String.valueOf(i + 1), vbom);
+            row.attachChild(number);
+            final Text guildName = new Text(100, rowY, rankingFont, guild.getName(), vbom);
+            row.attachChild(guildName);
+            this.leftAlignEntity(guildName, (HBW_GUILD_LIST[0]) * SCROLL_ZONE_WIDTH + 25);
+            final F2ButtonSprite joinGuildButton = createACF2CommonButton((HBW_GUILD_LIST[0] + HBW_GUILD_LIST[1] + HBW_GUILD_LIST[2] * 0.5f)
+                    * SCROLL_ZONE_WIDTH, rowY, "申请加入");
+            row.attachChild(joinGuildButton);
+            this.registerTouchArea(joinGuildButton);
+            joinGuildButton.setOnClickListener(new F2OnClickListener() {
+                @Override
+                public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                    if (GuildUtils.joinGuild(guild.getId())) {
+                        GuildScene.this.guild = GuildUtils.getUserGuild();
+                        inGuild = true;
+                        for (int i = 0; i < 7; i++) {
+                            final Sprite focusedButton = focusedButtons[i];
+                            if (focusedButton != null) {
+                                focusedButton.detachSelf();
+                            }
+                            final Sprite unfocusedButton = unfocusedButtons[i];
+                            if (unfocusedButton != null) {
+                                focusedButton.detachSelf();
+                            }
+                        }
+                        for (final IEntity board : boards) {
+                            board.detachSelf();
+                        }
+                        boards.clear();
+                        focusedIndex = 0;
+                        createButtons();
+                        createGuildBoards();
+                        focusButton(focusedIndex);
+                    }
+                }
+            });
+            scrollZone.attachRow(row);
+        }
+        this.registerTouchArea(touchArea);
         return board;
     }
 

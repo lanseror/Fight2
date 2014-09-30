@@ -38,6 +38,7 @@ public class ScrollZone extends ClipEntity implements IScrollDetectorListener {
             }
         };
         touchArea.setAlpha(0);
+        this.attachChild(touchArea);
         return touchArea;
     }
 

@@ -97,8 +97,9 @@ public enum TextureEnum {
     // Guild scene images.
     GUILD_FRAME("images/guild_frame.png", 851, 495),
     GUILD_TOPBAR("images/guild_topbar.png", 454, 69),
-    GUILD_OPTION_BG("images/guild_option_backgroud.png", 781, 38),
+    GUILD_OPTION_BG("images/guild_option_backgroud.png", 805, 37),
     GUILD_OPTION_LINE("images/guild_option_line.png", 2, 32),
+    GUILD_SCROLL_ROW_SEPARATOR("images/guild_scroll_row_separator.png", 748, 2),
     GUILD_FRAME_SCROLLBAR("images/guild_frame_scrollbar.png", 23, 332),
     GUILD_FRAME_SCROLLSTICK("images/guild_frame_scrollstick.png", 23, 332),
     GUILD_FRAME_BUTTON_FCS("images/guild_frame_button_fcs.png", 116, 39),

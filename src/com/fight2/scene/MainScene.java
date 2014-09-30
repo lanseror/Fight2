@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 
+import org.andengine.engine.handler.timer.ITimerCallback;
+import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.IOnSceneTouchListener;
@@ -290,13 +290,14 @@ public class MainScene extends BaseScene {
     }
 
     private void scheduleGetChatMessage() {
-        final Timer getChatTimer = new Timer();
-        getChatTimer.schedule(new TimerTask() {
+        final TimerHandler timerHandler = new TimerHandler(5.0f, new ITimerCallback() {
             @Override
-            public void run() {
+            public void onTimePassed(final TimerHandler pTimerHandler) {
                 ChatUtils.get(activity);
+                pTimerHandler.reset();
             }
-        }, 3000, 5000);// Update text every 5 second
+        });
+        activity.getEngine().registerUpdateHandler(timerHandler);
     }
 
     private void focusSprite(final Sprite sprite) {
@@ -319,7 +320,7 @@ public class MainScene extends BaseScene {
     public void updateScene() {
         activity.getGameHub().needSmallChatRoom(true);
         final Card myLeader = myParties[0].getCards()[0];
-        if (myLeader.getId() != this.avatarCardId) {
+        if (myLeader != null && myLeader.getId() != this.avatarCardId) {
             final ITextureRegion myTexture = textureFactory.getTextureRegion(myLeader.getAvatar());
             if (avatarSprite != null) {
                 avatarSprite.detachSelf();

@@ -70,6 +70,45 @@ public class GuildUtils {
 
     }
 
+    public static boolean joinGuild(final int id) {
+        final String url = HttpUtils.HOST_URL + "/guild/join?id=" + id;
+        try {
+            final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
+            final int status = responseJson.getInt("status");
+            return status == 0;
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public static List<User> getMembers(final int id) {
+        final String url = HttpUtils.HOST_URL + "/guild/members?id=" + id;
+        try {
+            final List<User> members = new ArrayList<User>();
+            final JSONArray memberJsonArray = HttpUtils.getJSONArrayFromUrl(url);
+            for (int i = 0; i < memberJsonArray.length(); i++) {
+                final JSONObject memberJson = memberJsonArray.getJSONObject(i);
+                final User member = new User();
+                member.setId(memberJson.getInt("id"));
+                member.setName(memberJson.getString("name"));
+                members.add(member);
+            }
+            return members;
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
     public static List<Guild> getTopGuilds() {
         final String url = HttpUtils.HOST_URL + "/guild/list-tops";
         try {
