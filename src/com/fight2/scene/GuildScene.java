@@ -57,6 +57,8 @@ public class GuildScene extends BaseScene {
     private final Font infoFont;
     private final Font headBarFont;
     private final Font rankingFont;
+    private final Font headTitleFont;
+    private final Text headTitleText;
     private int focusedIndex = 0;
     private Guild guild;
     private boolean inGuild;
@@ -69,14 +71,12 @@ public class GuildScene extends BaseScene {
         infoFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
         headBarFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
         rankingFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
+        headTitleFont = ResourceManager.getInstance().getFont(FontEnum.Default, 30);
         frame = createALBImageSprite(TextureEnum.GUILD_FRAME, this.simulatedLeftX, FRAME_BOTTOM);
         this.attachChild(frame);
-        // final Sprite optionBackgroud = createALBImageSprite(TextureEnum.GUILD_OPTION_BG, 23, 387);
-        // frame.attachChild(optionBackgroud);
-        // final Sprite scrollbar = createALBImageSprite(TextureEnum.GUILD_FRAME_SCROLLBAR, 802, 58);
-        // frame.attachChild(scrollbar);
-        // final Sprite scrollStick = createALBImageSprite(TextureEnum.GUILD_FRAME_SCROLLSTICK, 0, 0);
-        // scrollbar.attachChild(scrollStick);
+        headTitleText = new Text(frame.getWidth() * 0.5f, frame.getHeight() - 25, headTitleFont, "公会信息", 15, vbom);
+        headTitleText.setColor(0XFF390800);
+        frame.attachChild(headTitleText);
         init();
     }
 
@@ -120,6 +120,8 @@ public class GuildScene extends BaseScene {
         unfocusedBoard.detachSelf();
         unfocusedButtons[focusedIndex].setVisible(true);
         focusedButtons[i].setVisible(true);
+        final String[] buttonTextStrings = inGuild ? INGUILD_STRINGS : NOGUILD_STRINGS;
+        headTitleText.setText(buttonTextStrings[i]);
         final IEntity focusedBoard = boards.get(i);
         frame.attachChild(focusedBoard);
         unfocusedButtons[i].setVisible(false);
