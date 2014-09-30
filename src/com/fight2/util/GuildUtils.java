@@ -3,8 +3,11 @@ package com.fight2.util;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.client.ClientProtocolException;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -57,6 +60,34 @@ public class GuildUtils {
             president.setName(presidentJson.getString("name"));
             guild.setPresident(president);
             return guild;
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public static List<Guild> getTopGuilds() {
+        final String url = HttpUtils.HOST_URL + "/guild/list-tops";
+        try {
+            final List<Guild> guilds = new ArrayList<Guild>();
+            final JSONArray guildJsonArray = HttpUtils.getJSONArrayFromUrl(url);
+            for (int i = 0; i < guildJsonArray.length(); i++) {
+                final JSONObject guildJson = guildJsonArray.getJSONObject(i);
+                final Guild guild = new Guild();
+                guild.setId(guildJson.getInt("id"));
+                guild.setName(guildJson.getString("name"));
+                final User president = new User();
+                final JSONObject presidentJson = guildJson.getJSONObject("president");
+                president.setId(presidentJson.getInt("id"));
+                president.setName(presidentJson.getString("name"));
+                guild.setPresident(president);
+                guilds.add(guild);
+            }
+            return guilds;
         } catch (final ClientProtocolException e) {
             throw new RuntimeException(e);
         } catch (final IOException e) {

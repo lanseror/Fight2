@@ -20,6 +20,8 @@ import com.fight2.constant.FontEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.ArenaRanking;
 import com.fight2.entity.GameUserSession;
+import com.fight2.entity.Guild;
+import com.fight2.entity.User;
 import com.fight2.entity.UserArenaInfo;
 import com.fight2.util.ArenaUtils;
 import com.fight2.util.ResourceManager;
@@ -36,12 +38,14 @@ public class ArenaRankingScene extends BaseScene implements IScrollDetectorListe
     private final IEntity rankContainer;
     private float scrollRankBottomY = 0;
     private final Font numFont;
+    private final Font guildFont;
     private final UserArenaInfo userArenaInfo;
 
     public ArenaRankingScene(final GameActivity activity, final UserArenaInfo userArenaInfo) throws IOException {
         super(activity);
         this.userArenaInfo = userArenaInfo;
         this.numFont = ResourceManager.getInstance().getFont(FontEnum.Bold, 26);
+        this.guildFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
         scrollDetector = new SurfaceScrollDetector(this);
         rankContainer = new Rectangle(frameCenter, CONTAINER_INIT_Y, frameWidth, CLIP_HEIGHT, vbom);
         rankContainer.setAlpha(0);
@@ -132,8 +136,8 @@ public class ArenaRankingScene extends BaseScene implements IScrollDetectorListe
                 final Text numText = new Text(numberX, GRID_HEIGHT * 0.5f, numFont, String.valueOf(ranking.getRankNumber()), vbom);
                 rankGrid.attachChild(numText);
             }
-
-            final Text nameText = new Text(75, GRID_HEIGHT * 0.5f, numFont, ranking.getUser().getName(), vbom);
+            final User user = ranking.getUser();
+            final Text nameText = new Text(75, GRID_HEIGHT * 0.5f, numFont, user.getName(), vbom);
             this.leftAlignEntity(nameText, 68);
             rankGrid.attachChild(nameText);
 
@@ -143,6 +147,14 @@ public class ArenaRankingScene extends BaseScene implements IScrollDetectorListe
             mightText.setColor(0XFFE5B978);
             this.leftAlignEntity(mightText, 330);
             rankGrid.attachChild(mightText);
+
+            final Guild guild = user.getGuild();
+            if (guild != null) {
+                final Text guildText = new Text(450, GRID_HEIGHT * 0.5f, guildFont, guild.getName(), vbom);
+                guildText.setColor(0XFFED6F00);
+                this.leftAlignEntity(guildText, 420);
+                rankGrid.attachChild(guildText);
+            }
             rankContainer.attachChild(rankGrid);
         }
         scrollRankBottomY = rankings.size() * GRID_HEIGHT - CONTAINER_INIT_Y;

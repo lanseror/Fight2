@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.andengine.entity.IEntity;
+import org.andengine.entity.clip.ClipEntity;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
@@ -15,12 +16,14 @@ import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 
 import android.text.InputType;
+import android.widget.Toast;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Guild;
+import com.fight2.entity.ScrollZone;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.engine.InputText;
@@ -30,20 +33,27 @@ import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
 
 public class GuildScene extends BaseScene {
-    private final static int FRAME_BOTTOM = 80;
+    private final static int FRAME_BOTTOM = 90;
     private static int BOARD_WIDTH = 805;
     private static int BOARD_HEIGHT = 370;
+    private static int SCROLL_ZONE_WIDTH = 795;
+    private static int SCROLL_ZONE_HEIGHT = 323;
+    private static int TOUCH_AREA_WIDTH = 790;
+    private static int TOUCH_AREA_HEIGHT = 290;
     private final Sprite[] focusedButtons = new Sprite[7];
     private final Sprite[] unfocusedButtons = new Sprite[7];
-    private final String[] NOGUILD_STRINGS = { "公会列表", "创建公会" };
-    private final String[] INGUILD_STRINGS = { "公会信息", "公会排名", "成员列表", "公会仓库", "公会战", "炼金房", "投票" };
+    private final static String[] NOGUILD_STRINGS = { "公会列表", "创建公会" };
+    private final static String[] INGUILD_STRINGS = { "公会信息", "公会排名", "成员列表", "公会仓库", "公会战", "炼金房", "投票" };
+    private final static String[] HEADBAR_GUILD_LIST = { "NO.", "公会名", "会长" };
+    private final static float[] HBW_GUILD_LIST = { 0.1f, 0.5f, 0.4f };
     private final List<IEntity> boards = new ArrayList<IEntity>();
     private final Sprite frame;
 
     private final Font buttonFont;
     private final Font infoFont;
+    private final Font headBarFont;
     private int focusedIndex = 0;
-    private final Guild guild;
+    private Guild guild;
     private boolean inGuild;
 
     public GuildScene(final GameActivity activity) throws IOException {
@@ -52,6 +62,7 @@ public class GuildScene extends BaseScene {
         inGuild = (this.guild != null);
         buttonFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
         infoFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
+        headBarFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
         frame = createALBImageSprite(TextureEnum.GUILD_FRAME, this.simulatedLeftX, FRAME_BOTTOM);
         this.attachChild(frame);
         // final Sprite optionBackgroud = createALBImageSprite(TextureEnum.GUILD_OPTION_BG, 23, 387);
@@ -69,20 +80,8 @@ public class GuildScene extends BaseScene {
         final Background background = new SpriteBackground(bgSprite);
         this.setBackground(background);
 
-        final Sprite experienceBox = createALBImageSprite(TextureEnum.COMMON_EXPERIENCE_BOX, this.simulatedLeftX + 20, this.simulatedHeight
-                - TextureEnum.COMMON_EXPERIENCE_BOX.getHeight());
-        this.attachChild(experienceBox);
-        final Sprite experienceStick = createALBImageSprite(TextureEnum.COMMON_EXPERIENCE_STICK, 52, 0);
-        experienceBox.attachChild(experienceStick);
-        final Sprite experienceBoxStar = createALBImageSprite(TextureEnum.COMMON_EXPERIENCE_BOX_STAR, this.simulatedLeftX + 20, this.simulatedHeight
-                - TextureEnum.COMMON_EXPERIENCE_BOX.getHeight());
-        this.attachChild(experienceBoxStar);
-
-        final Sprite staminaBox = createALBImageSprite(TextureEnum.COMMON_STAMINA_BOX, this.simulatedLeftX + 320, this.simulatedHeight
-                - TextureEnum.COMMON_STAMINA_BOX.getHeight());
-        this.attachChild(staminaBox);
-        final Sprite staminaStick = createALBImageSprite(TextureEnum.COMMON_STAMINA_STICK, 56, 11);
-        staminaBox.attachChild(staminaStick);
+        final Sprite topBar = createALBImageSprite(TextureEnum.GUILD_TOPBAR, this.simulatedLeftX, this.simulatedHeight - TextureEnum.GUILD_TOPBAR.getHeight());
+        this.attachChild(topBar);
 
         final Sprite rechargeSprite = createALBF2ButtonSprite(TextureEnum.PARTY_RECHARGE, TextureEnum.PARTY_RECHARGE_PRESSED, this.simulatedRightX
                 - TextureEnum.PARTY_RECHARGE.getWidth() + 20, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight());
@@ -189,7 +188,6 @@ public class GuildScene extends BaseScene {
                     @Override
                     public void run() {
                         GuildUtils.editGuild(guild);
-
                     }
 
                 });
@@ -267,7 +265,8 @@ public class GuildScene extends BaseScene {
     private void createGuildBoards() {
         if (inGuild) {
             boards.add(createGuildInfoBoard());
-            boards.add(createGuildRankingBoard());
+            boards.add(createGuildListBoard());
+            // boards.add(createGuildRankingBoard());
             boards.add(createMemberListBoard());
             boards.add(createGuildWarehouseBoard());
             boards.add(createGuildBattleBoard());
@@ -281,18 +280,68 @@ public class GuildScene extends BaseScene {
         frame.attachChild(boards.get(0));
     }
 
+    private void createHeadBar(final String[] headBarStrings, final float[] headBarWidths, final IEntity board) {
+        final Sprite optionBackgroud = createALBImageSprite(TextureEnum.GUILD_OPTION_BG, 0, board.getHeight() - TextureEnum.GUILD_OPTION_BG.getHeight());
+        board.attachChild(optionBackgroud);
+        final float optionBarWidth = optionBackgroud.getWidth();
+        final float optionBarHeight = optionBackgroud.getHeight();
+        final float optionY = optionBarHeight * 0.5f;
+        float optionX = 0;
+        for (int i = 0; i < headBarStrings.length; i++) {
+            final float optionWidth = optionBarWidth * headBarWidths[i];
+            final String title = headBarStrings[i];
+            final Text titleText = new Text(optionX + optionWidth * 0.5f, optionY, headBarFont, title, vbom);
+            titleText.setColor(0XFFF8B551);
+            optionBackgroud.attachChild(titleText);
+            optionX += optionWidth;
+            if (i < headBarStrings.length - 1) {
+                final Sprite optionSeparator = createACImageSprite(TextureEnum.GUILD_OPTION_LINE, optionX, optionY + 2);
+                optionBackgroud.attachChild(optionSeparator);
+            }
+        }
+
+    }
+
+    private IEntity createScrollZone(final IEntity parent) {
+        final ClipEntity scrollZone = new ClipEntity(parent.getWidth() * 0.5f, 5 + SCROLL_ZONE_HEIGHT * 0.5f, SCROLL_ZONE_WIDTH, SCROLL_ZONE_HEIGHT);
+        scrollZone.setAlpha(0);
+        parent.attachChild(scrollZone);
+        return scrollZone;
+    }
+
+    private IEntity createScrollContainer(final IEntity parent) {
+        final IEntity scrollContainer = new Rectangle(parent.getWidth() * 0.5f, SCROLL_ZONE_HEIGHT * 0.5f, SCROLL_ZONE_WIDTH, SCROLL_ZONE_HEIGHT, vbom);
+        scrollContainer.setAlpha(0);
+        parent.attachChild(scrollContainer);
+        return scrollContainer;
+    }
+
+    private IEntity createTouchArea(final IEntity board) {
+        final IEntity touchArea = new Rectangle(board.getWidth() * 0.5f, 25 + TOUCH_AREA_HEIGHT * 0.5f, TOUCH_AREA_WIDTH, TOUCH_AREA_HEIGHT, vbom);
+        board.attachChild(touchArea);
+        touchArea.setAlpha(0);
+        this.registerTouchArea(touchArea);
+        return touchArea;
+    }
+
     private IEntity createGuildListBoard() {
         final IEntity board = createBoardBox();
+        this.createHeadBar(HEADBAR_GUILD_LIST, HBW_GUILD_LIST, board);
+        final List<Guild> guilds = GuildUtils.getTopGuilds();
+
         final Text guildNameTitle = new Text(257, 225, infoFont, "公会列表", vbom);
         board.attachChild(guildNameTitle);
+
+        final ScrollZone scrollZGone = new ScrollZone(board.getWidth() * 0.5f, 5 + SCROLL_ZONE_HEIGHT * 0.5f, SCROLL_ZONE_WIDTH, SCROLL_ZONE_HEIGHT, vbom);
+        final IEntity touchArea = createTouchArea(board);
         return board;
     }
 
     private IEntity createGuildApplyBoard() {
         final IEntity board = createBoardBox();
-        final Text guildNameTitle = new Text(257, 225, infoFont, "公会名称：", vbom);
+        final Text guildNameTitle = new Text(250, 225, infoFont, "公会名称：", vbom);
         board.attachChild(guildNameTitle);
-        final InputText guildNameText = new InputText(512, 225, "请输入", "输入公会名称", infoFont, this);
+        final InputText guildNameText = new InputText(430, 225, 210, 40, "", "输入公会名称", 6, InputType.TYPE_CLASS_TEXT, infoFont, this, true, false, 0);
         board.attachChild(guildNameText);
         final F2ButtonSprite applyGuildSaveButton = createALBF2CommonButton(330, 50, "保存");
         board.attachChild(applyGuildSaveButton);
@@ -301,7 +350,16 @@ public class GuildScene extends BaseScene {
 
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                if (GuildUtils.applyGuild(guildNameText.getText())) {
+                final String guildName = guildNameText.getText();
+                if (guildName == null || guildName.replaceAll(" ", "").equals("")) {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(activity, "公会名不能为空！", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else if (GuildUtils.applyGuild(guildName)) {
+                    guild = GuildUtils.getUserGuild();
                     inGuild = true;
                     for (int i = 0; i < 7; i++) {
                         final Sprite focusedButton = focusedButtons[i];

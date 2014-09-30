@@ -3,9 +3,9 @@ package com.fight2.scene;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
+import org.andengine.engine.handler.timer.ITimerCallback;
+import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.IEntityModifier;
 import org.andengine.entity.modifier.MoveModifier;
@@ -50,8 +50,9 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
     private final float chatContainerInitY;
     private final IEntity chatScrollArea;
     private float allMessageBoxY = 0;
-    private Timer displayChatTimer;
+    private final TimerHandler timerHandler;
     private final SurfaceScrollDetector scrollDetector;
+    private boolean shouldDisplay;
 
     public ChatScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -99,6 +100,17 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
         init();
+        timerHandler = new TimerHandler(1.0f, new ITimerCallback() {
+            @Override
+            public void onTimePassed(final TimerHandler pTimerHandler) {
+                if (shouldDisplay) {
+                    displayChat(true);
+                    pTimerHandler.reset();
+                }
+
+            }
+        });
+        activity.getEngine().registerUpdateHandler(timerHandler);
     }
 
     private void goBack() {
@@ -179,7 +191,8 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
     @Override
     public void updateScene() {
         activity.getGameHub().needSmallChatRoom(false);
-        scheduleDisplayChat();
+        shouldDisplay = true;
+        timerHandler.reset();
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -197,16 +210,6 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
             }
 
         });
-    }
-
-    private void scheduleDisplayChat() {
-        displayChatTimer = new Timer();
-        displayChatTimer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                displayChat(true);
-            }
-        }, 2000, 800);// Update text every 0.8 second
     }
 
     private void displayChat(final boolean isDelay) {
@@ -296,8 +299,7 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
 
     @Override
     public void leaveScene() {
-        displayChatTimer.cancel();
-        displayChatTimer.purge();
+        shouldDisplay = false;
     }
 
     @Override

@@ -17,6 +17,7 @@ import com.fight2.entity.Arena;
 import com.fight2.entity.ArenaContinuousWin;
 import com.fight2.entity.ArenaRanking;
 import com.fight2.entity.ArenaReward;
+import com.fight2.entity.Guild;
 import com.fight2.entity.ArenaReward.ArenaRewardType;
 import com.fight2.entity.ArenaRewardItem;
 import com.fight2.entity.ArenaRewardItem.ArenaRewardItemType;
@@ -129,6 +130,13 @@ public class ArenaUtils {
                 final User user = new User();
                 user.setId(userJson.getInt("id"));
                 user.setName(userJson.getString("name"));
+                final JSONObject guildJson = userJson.optJSONObject("guild");
+                if (guildJson != null) {
+                    final Guild guild = new Guild();
+                    guild.setId(guildJson.getInt("id"));
+                    guild.setName(guildJson.getString("name"));
+                    user.setGuild(guild);
+                }
                 arenaRanking.setUser(user);
                 arenaRankings.add(arenaRanking);
             }
