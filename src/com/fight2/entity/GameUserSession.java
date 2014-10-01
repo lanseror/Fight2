@@ -7,6 +7,7 @@ import java.util.Set;
 
 public class GameUserSession {
     private final static GameUserSession INSTANCE = new GameUserSession();
+    private int id;
     private String name;
     private final List<Card> cards;
     private PartyInfo partyInfo;
@@ -18,6 +19,14 @@ public class GameUserSession {
 
     public static GameUserSession getInstance() {
         return INSTANCE;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(final int id) {
+        this.id = id;
     }
 
     public String getName() {

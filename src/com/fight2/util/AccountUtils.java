@@ -79,6 +79,7 @@ public class AccountUtils {
         try {
             final JSONObject loginJson = HttpUtils.getJSONFromUrl(loginUrl);
             final GameUserSession session = GameUserSession.getInstance();
+            session.setId(loginJson.getInt("id"));
             session.setName(loginJson.getString("name"));
             final Set<Integer> inPartyCards = session.getInPartyCards();
 

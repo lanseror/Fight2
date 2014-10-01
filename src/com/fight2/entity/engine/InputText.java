@@ -37,12 +37,22 @@ public class InputText extends Rectangle {
     private final boolean multiLine;
     private OnConfirmListener confirmListener;
 
+    public InputText(final float pX, final float pY, final String value, final String title, final Font font, final BaseScene scene, final boolean editable) {
+        this(pY, pY, 1, 1, value, title, DEFAULT_SIZE, InputType.TYPE_CLASS_TEXT, font, scene, false, false, 0, editable);
+    }
+
     public InputText(final float pX, final float pY, final String value, final String title, final Font font, final BaseScene scene) {
         this(pY, pY, 1, 1, value, title, DEFAULT_SIZE, InputType.TYPE_CLASS_TEXT, font, scene, false, false, 0);
     }
 
     public InputText(final float pX, final float pY, final float width, final float height, final String value, final String title, final int size,
             final int inputType, final Font font, final BaseScene scene, final boolean showBorder, final boolean multiLine, final int border) {
+        this(pX, pY, width, height, value, title, size, inputType, font, scene, showBorder, multiLine, border, true);
+    }
+
+    public InputText(final float pX, final float pY, final float width, final float height, final String value, final String title, final int size,
+            final int inputType, final Font font, final BaseScene scene, final boolean showBorder, final boolean multiLine, final int border,
+            final boolean editable) {
         super(pX, pY, width, height, scene.getVbom());
         this.setColor(Color.BLACK);
         if (showBorder) {
@@ -69,16 +79,18 @@ public class InputText extends Rectangle {
         }
         this.attachChild(this.text);
 
-        final TextureEnum iconEnum = TextureEnum.COMMON_INPUT_ICON;
-        final F2ButtonSprite touchSprite = scene.createALBF2ButtonSprite(iconEnum, iconEnum, width + 10, 0);
-        scene.registerTouchArea(touchSprite);
-        touchSprite.setOnClickListener(new F2OnClickListener() {
-            @Override
-            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                showTextInput();
-            }
-        });
-        this.attachChild(touchSprite);
+        if (editable) {
+            final TextureEnum iconEnum = TextureEnum.COMMON_INPUT_ICON;
+            final F2ButtonSprite touchSprite = scene.createALBF2ButtonSprite(iconEnum, iconEnum, width + 10, 0);
+            scene.registerTouchArea(touchSprite);
+            touchSprite.setOnClickListener(new F2OnClickListener() {
+                @Override
+                public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                    showTextInput();
+                }
+            });
+            this.attachChild(touchSprite);
+        }
     }
 
     public String getText() {

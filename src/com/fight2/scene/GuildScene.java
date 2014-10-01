@@ -62,11 +62,13 @@ public class GuildScene extends BaseScene {
     private int focusedIndex = 0;
     private Guild guild;
     private boolean inGuild;
+    private boolean isAdmin;
 
     public GuildScene(final GameActivity activity) throws IOException {
         super(activity);
         this.guild = GuildUtils.getUserGuild();
         inGuild = (this.guild != null);
+        isAdmin = (guild.getPresident().getId() == session.getId());
         buttonFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
         infoFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
         headBarFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
@@ -136,7 +138,8 @@ public class GuildScene extends BaseScene {
         final float height = textureEnum.getHeight();
         final float pX = x + width * 0.5f;
         final float pY = y + height * 0.5f;
-        final Sprite sprite = new Sprite(pX, pY, width, height, texture, vbom) {
+        final Sprite button = new Sprite(pX, pY, width, height, texture, vbom);
+        final IEntity touchArea = new Rectangle(button.getWidth() * 0.5f, button.getHeight() * 0.5f, button.getWidth(), button.getHeight() + 20, vbom) {
             @Override
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 if (pSceneTouchEvent.isActionUp()) {
@@ -146,7 +149,10 @@ public class GuildScene extends BaseScene {
                 return false;
             }
         };
-        return sprite;
+        touchArea.setAlpha(0);
+        button.attachChild(touchArea);
+        this.registerTouchArea(touchArea);
+        return button;
     }
 
     private void createButtons() {
@@ -161,7 +167,6 @@ public class GuildScene extends BaseScene {
             focusedButtons[i] = focusedButton;
             final Sprite unfocusedButton = createButton(TextureEnum.GUILD_FRAME_BUTTON, 20 + i * (buttonWidth + buttonGap), 11, i);
             frame.attachChild(unfocusedButton);
-            this.registerTouchArea(unfocusedButton);
             unfocusedButtons[i] = unfocusedButton;
             final Text focusedText = new Text(buttonWidth * 0.5f, buttonHeight * 0.5f, buttonFont, buttonTextStrings[i], vbom);
             focusedButton.attachChild(focusedText);
@@ -185,7 +190,8 @@ public class GuildScene extends BaseScene {
         this.leftAlignEntity(presidentName, 140);
         final Text qqTitle = new Text(430, 335, infoFont, "QQ群 ：", vbom);
         board.attachChild(qqTitle);
-        final InputText qq = new InputText(600, 335, 210, 40, guild.getQq(), "输入QQ群号码", 12, InputType.TYPE_CLASS_NUMBER, infoFont, this, true, false, 0);
+        final InputText qq = new InputText(600, 335, 210, 40, guild.getQq(), "输入QQ群号码", 12, InputType.TYPE_CLASS_NUMBER, infoFont, this, true, false, 0,
+                isAdmin);
         board.attachChild(qq);
         qq.setConfirmListener(new OnConfirmListener() {
             @Override
@@ -207,7 +213,8 @@ public class GuildScene extends BaseScene {
         board.attachChild(ranking);
         final Text noticeTitle = new Text(80, 255, infoFont, "公   告 ：", vbom);
         board.attachChild(noticeTitle);
-        final InputText notice = new InputText(435, 195, 590, 140, guild.getNotice(), "输入公告", 75, InputType.TYPE_CLASS_TEXT, infoFont, this, true, true, 6);
+        final InputText notice = new InputText(435, 195, 590, 140, guild.getNotice(), "输入公告", 75, InputType.TYPE_CLASS_TEXT, infoFont, this, true, true, 6,
+                isAdmin);
         board.attachChild(notice);
         notice.setConfirmListener(new OnConfirmListener() {
             @Override
@@ -405,6 +412,7 @@ public class GuildScene extends BaseScene {
                     if (GuildUtils.joinGuild(guild.getId())) {
                         GuildScene.this.guild = GuildUtils.getUserGuild();
                         inGuild = true;
+                        isAdmin = true;
                         for (int i = 0; i < 7; i++) {
                             final Sprite focusedButton = focusedButtons[i];
                             if (focusedButton != null) {
