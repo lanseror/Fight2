@@ -14,6 +14,7 @@ public class Card {
     private int skillLevel;
     private int templateId;
     private int version;
+    private int amount;
 
     public int getId() {
         return id;
@@ -117,6 +118,14 @@ public class Card {
 
     public void setVersion(final int version) {
         this.version = version;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public void setAmount(final int amount) {
+        this.amount = amount;
     }
 
 }

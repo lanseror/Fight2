@@ -28,6 +28,7 @@ import com.fight2.scene.PartyScene;
 import com.fight2.scene.PlayerInfoScene;
 import com.fight2.scene.QuestScene;
 import com.fight2.scene.SummonScene;
+import com.fight2.scene.UserStoreroomScene;
 
 public class ResourceManager {
     private static ResourceManager INSTANCE = new ResourceManager();
@@ -178,6 +179,8 @@ public class ResourceManager {
             scenes.put(SceneEnum.PlayerInfo, playerInfoScene);
             final BaseScene guildScene = new GuildScene(activity);
             scenes.put(SceneEnum.Guild, guildScene);
+            final BaseScene userStoreroomScene = new UserStoreroomScene(activity);
+            scenes.put(SceneEnum.Storeroom, userStoreroomScene);
 
             final BaseScene arenaScene = new ArenaScene(activity);
             scenes.put(SceneEnum.Arena, arenaScene);

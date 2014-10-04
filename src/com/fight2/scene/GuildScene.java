@@ -68,7 +68,7 @@ public class GuildScene extends BaseScene {
         super(activity);
         this.guild = GuildUtils.getUserGuild();
         inGuild = (this.guild != null);
-        isAdmin = (guild.getPresident().getId() == session.getId());
+        isAdmin = (inGuild && (guild.getPresident().getId() == session.getId()));
         buttonFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
         infoFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
         headBarFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);

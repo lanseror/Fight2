@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -23,6 +24,7 @@ import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
+import com.fight2.entity.UserStoreroom;
 
 public class AccountUtils {
     private static final String INSTALLATION = "INSTALLATION";
@@ -174,5 +176,58 @@ public class AccountUtils {
             LogUtils.e(e);
         }
         return false;
+    }
+
+    public static UserStoreroom getUserStoreroom(final GameActivity activity) {
+        final UserStoreroom userStoreroom = new UserStoreroom();
+        final String url = HttpUtils.HOST_URL + "/user-storeroom/get";
+        try {
+            final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
+            userStoreroom.setId(responseJson.getInt("id"));
+            userStoreroom.setStamina(responseJson.getInt("stamina"));
+            userStoreroom.setTicket(responseJson.getInt("ticket"));
+            final JSONArray cardJsonArray = responseJson.getJSONArray("cards");
+            final List<Card> cards = new ArrayList<Card>();
+            for (int i = 0; i < cardJsonArray.length(); i++) {
+                final JSONObject cardJson = cardJsonArray.getJSONObject(i);
+                final Card card = new Card();
+                card.setId(cardJson.getInt("id"));
+                card.setHp(cardJson.getInt("hp"));
+                card.setAtk(cardJson.getInt("atk"));
+                card.setName(cardJson.getString("name"));
+                card.setStar(cardJson.getInt("star"));
+                final String image = cardJson.getString("image");
+                if (image != null && !"".equals(image)) {
+                    final String localImage = ImageUtils.getLocalString(image, activity);
+                    card.setImage(localImage);
+                    TextureFactory.getInstance().addCardResource(activity, localImage);
+                }
+                card.setAmount(cardJson.getInt("amount"));
+                cards.add(card);
+            }
+            userStoreroom.setCards(cards);
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        }
+        return userStoreroom;
+    }
+
+    public static int receiveCardFromUserStoreroom(final GameActivity activity, final int cardTemplateId) {
+        final String url = HttpUtils.HOST_URL + "/user-storeroom/receive-card?id=" + cardTemplateId;
+        try {
+            final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
+            final int size = responseJson.getInt("size");
+            return size;
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -50,6 +50,7 @@ public class MainScene extends BaseScene {
     private static final float[] SUMMON_VERTICES = { 414, 1, 572, 106, 675, 60, 745, 1 };
     private static final float[] HOTEL_VERTICES = { 196, 303, 440, 311, 456, 172, 352, 109, 202, 121 };
     private static final float[] BILLBOARD_VERTICES = { 425, 91, 485, 258, 616, 238, 609, 94, 570, 132, 525, 89 };
+    private static final float[] STOREROOM_VERTICES = { 0, 420, 50, 360, 150, 190, 150, 90, 0, 90 };
 
     private final Map<Sprite, Sprite> buttonSprites = new HashMap<Sprite, Sprite>();
 
@@ -239,6 +240,8 @@ public class MainScene extends BaseScene {
                         focusSprite(congressSprite);
                     } else if (checkContains(GATE_VERTICES, x, y)) {
                         focusSprite(gateSprite);
+                    } else if (checkContains(STOREROOM_VERTICES, x, y)) {
+                        // focusSprite(gateSprite);
                     }
                 } else if (pSceneTouchEvent.isActionUp()) {
                     for (final Text tipText : tipTexts) {
@@ -268,6 +271,9 @@ public class MainScene extends BaseScene {
                     } else if (checkContains(GATE_VERTICES, x, y)) {
                         unfocusSprite(gateSprite);
                         ResourceManager.getInstance().setCurrentScene(SceneEnum.Quest);
+                    } else if (checkContains(STOREROOM_VERTICES, x, y)) {
+                        // unfocusSprite(gateSprite);
+                        ResourceManager.getInstance().setCurrentScene(SceneEnum.Storeroom);
                     }
                 }
                 return true;

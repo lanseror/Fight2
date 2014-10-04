@@ -12,5 +12,6 @@ public enum SceneEnum {
     Chat,
     Quest,
     PlayerInfo,
-    Guild;
+    Guild,
+    Storeroom;
 }
