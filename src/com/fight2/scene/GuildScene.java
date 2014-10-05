@@ -43,7 +43,7 @@ public class GuildScene extends BaseScene {
     private final Sprite[] focusedButtons = new Sprite[7];
     private final Sprite[] unfocusedButtons = new Sprite[7];
     private final static String[] NOGUILD_STRINGS = { "公会列表", "创建公会" };
-    private final static String[] INGUILD_STRINGS = { "公会信息", "公会排名", "成员列表", "公会仓库", "公会战", "炼金房", "投票" };
+    private final static String[] INGUILD_STRINGS = { "公会信息", "公会排名", "成员列表", "公会仓库", "炼金房", "投票", "退出公会" };
     private final static String[] HEADBAR_GUILD_LIST = { "NO.", "公会名", "" };
     private final static float[] HBW_GUILD_LIST = { 0.1f, 0.5f, 0.4f };
     private final static String[] HEADBAR_GUILD_RANK = { "NO.", "公会名", "会长" };
@@ -66,9 +66,6 @@ public class GuildScene extends BaseScene {
 
     public GuildScene(final GameActivity activity) throws IOException {
         super(activity);
-        this.guild = GuildUtils.getUserGuild();
-        inGuild = (this.guild != null);
-        isAdmin = (inGuild && (guild.getPresident().getId() == session.getId()));
         buttonFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
         infoFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
         headBarFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
@@ -106,11 +103,6 @@ public class GuildScene extends BaseScene {
         });
         this.attachChild(backButton);
         this.registerTouchArea(backButton);
-
-        createButtons();
-        createGuildBoards();
-
-        focusButton(focusedIndex);
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
@@ -156,6 +148,16 @@ public class GuildScene extends BaseScene {
     }
 
     private void createButtons() {
+        for (int i = 0; i < 7; i++) {
+            final Sprite focusedButton = focusedButtons[i];
+            if (focusedButton != null) {
+                focusedButton.detachSelf();
+            }
+            final Sprite unfocusedButton = unfocusedButtons[i];
+            if (unfocusedButton != null) {
+                unfocusedButton.detachSelf();
+            }
+        }
         final float buttonWidth = TextureEnum.GUILD_FRAME_BUTTON.getWidth();
         final float buttonHeight = TextureEnum.GUILD_FRAME_BUTTON.getHeight();
         final float buttonGap = 0;
@@ -307,13 +309,6 @@ public class GuildScene extends BaseScene {
         return board;
     }
 
-    private IEntity createGuildBattleBoard() {
-        final IEntity board = createBoardBox();
-        final Text guildNameTitle = new Text(257, 225, infoFont, "公会战", vbom);
-        board.attachChild(guildNameTitle);
-        return board;
-    }
-
     private IEntity createGuildFactoryBoard() {
         final IEntity board = createBoardBox();
         final Text guildNameTitle = new Text(257, 225, infoFont, "炼金房", vbom);
@@ -328,15 +323,42 @@ public class GuildScene extends BaseScene {
         return board;
     }
 
+    private IEntity createQuitGuildBoard() {
+        final IEntity board = createBoardBox();
+        final F2ButtonSprite quitGuildButton = createACF2CommonButton(board.getWidth() * 0.5f, board.getHeight() * 0.5f, "退出公会");
+        board.attachChild(quitGuildButton);
+        this.registerTouchArea(quitGuildButton);
+        quitGuildButton.setOnClickListener(new F2OnClickListener() {
+            @Override
+            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                if (GuildUtils.quitGuild()) {
+                    updateScene();
+                } else {
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(activity, "退出公会失败！", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+        });
+        return board;
+    }
+
     private void createGuildBoards() {
+        for (final IEntity board : boards) {
+            board.detachSelf();
+        }
+        boards.clear();
         if (inGuild) {
             boards.add(createGuildInfoBoard());
             boards.add(createGuildRankingBoard());
             boards.add(createMemberListBoard());
             boards.add(createGuildWarehouseBoard());
-            boards.add(createGuildBattleBoard());
             boards.add(createGuildFactoryBoard());
             boards.add(createGuildVotingBoard());
+            boards.add(createQuitGuildBoard());
         } else {
             boards.add(createGuildListBoard());
             boards.add(createGuildApplyBoard());
@@ -462,26 +484,7 @@ public class GuildScene extends BaseScene {
                         }
                     });
                 } else if (GuildUtils.applyGuild(guildName)) {
-                    guild = GuildUtils.getUserGuild();
-                    inGuild = true;
-                    for (int i = 0; i < 7; i++) {
-                        final Sprite focusedButton = focusedButtons[i];
-                        if (focusedButton != null) {
-                            focusedButton.detachSelf();
-                        }
-                        final Sprite unfocusedButton = unfocusedButtons[i];
-                        if (unfocusedButton != null) {
-                            focusedButton.detachSelf();
-                        }
-                    }
-                    for (final IEntity board : boards) {
-                        board.detachSelf();
-                    }
-                    boards.clear();
-                    focusedIndex = 0;
-                    createButtons();
-                    createGuildBoards();
-                    focusButton(focusedIndex);
+                    updateScene();
                 }
             }
 
@@ -498,6 +501,13 @@ public class GuildScene extends BaseScene {
     @Override
     public void updateScene() {
         activity.getGameHub().needSmallChatRoom(true);
+        focusedIndex = 0;
+        this.guild = GuildUtils.getUserGuild();
+        inGuild = (this.guild != null);
+        isAdmin = (inGuild && (guild.getPresident().getId() == session.getId()));
+        createButtons();
+        createGuildBoards();
+        focusButton(focusedIndex);
     }
 
     @Override

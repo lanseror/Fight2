@@ -13,7 +13,7 @@ public class F2CommonButton extends F2ButtonSprite {
 
     public F2CommonButton(final float pX, final float pY, final String text, final VertexBufferObjectManager vbom) {
         super(pX, pY, TextureFactory.getInstance().getAssetTextureRegion(TextureEnum.COMMON_BUTTON), vbom);
-        final Font buttonTextFont = ResourceManager.getInstance().getFont(FontEnum.Bold, 28);
+        final Font buttonTextFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
         final Text saveText = new Text(this.getWidth() * 0.5f, this.getHeight() * 0.5f, buttonTextFont, text, vbom);
         this.attachChild(saveText);
     }

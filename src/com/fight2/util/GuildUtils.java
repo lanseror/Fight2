@@ -86,6 +86,22 @@ public class GuildUtils {
 
     }
 
+    public static boolean quitGuild() {
+        final String url = HttpUtils.HOST_URL + "/guild/quit";
+        try {
+            final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
+            final int status = responseJson.getInt("status");
+            return status == 0;
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
     public static List<User> getMembers(final int id) {
         final String url = HttpUtils.HOST_URL + "/guild/members?id=" + id;
         try {
