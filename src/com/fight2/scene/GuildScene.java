@@ -50,6 +50,8 @@ public class GuildScene extends BaseScene {
     private final static float[] HBW_GUILD_RANK = { 0.1f, 0.5f, 0.4f };
     private final static String[] HEADBAR_GUILD_MEMBER = { "NO.", "名称", "头衔", "身价" };
     private final static float[] HBW_GUILD_MEMBER = { 0.1f, 0.3f, 0.3f, 0.3f };
+    private final static String[] HEADBAR_GUILD_POLL = { "NO.", "名称", "身价", "" };
+    private final static float[] HBW_GUILD_POLL = { 0.1f, 0.3f, 0.3f, 0.3f };
     private final List<IEntity> boards = new ArrayList<IEntity>();
     private final Sprite frame;
 
@@ -316,10 +318,53 @@ public class GuildScene extends BaseScene {
         return board;
     }
 
-    private IEntity createGuildVotingBoard() {
+    private IEntity createGuildPollBoard() {
         final IEntity board = createBoardBox();
-        final Text guildNameTitle = new Text(257, 225, infoFont, "投票", vbom);
-        board.attachChild(guildNameTitle);
+        this.createHeadBar(HEADBAR_GUILD_POLL, HBW_GUILD_POLL, board);
+        final List<User> members = GuildUtils.getMembers(guild.getId());
+        final ScrollZone scrollZone = new ScrollZone(board.getWidth() * 0.5f, 5 + SCROLL_ZONE_HEIGHT * 0.5f, SCROLL_ZONE_WIDTH, SCROLL_ZONE_HEIGHT, vbom);
+        final IEntity touchArea = scrollZone.createTouchArea(SCROLL_ZONE_WIDTH * 0.5f, SCROLL_ZONE_HEIGHT * 0.5f, TOUCH_AREA_WIDTH, TOUCH_AREA_HEIGHT);
+        board.attachChild(scrollZone);
+        this.registerTouchArea(touchArea);
+
+        for (int i = 0; i < members.size(); i++) {
+            final User member = members.get(i);
+            final IEntity row = new Rectangle(0, 0, SCROLL_ZONE_WIDTH, 64, vbom);
+            row.setAlpha(0);
+            if (i < members.size() - 1) {
+                final Sprite line = this.createACImageSprite(TextureEnum.GUILD_SCROLL_ROW_SEPARATOR, SCROLL_ZONE_WIDTH * 0.5f, 1);
+                row.attachChild(line);
+            }
+            final float rowY = row.getHeight() * 0.5f;
+            final Text number = new Text(25, rowY, rankingFont, String.valueOf(i + 1), vbom);
+            row.attachChild(number);
+            final Text memberName = new Text(100, rowY, rankingFont, member.getName(), vbom);
+            row.attachChild(memberName);
+            this.leftAlignEntity(memberName, (HBW_GUILD_POLL[0]) * SCROLL_ZONE_WIDTH + 25);
+            final Text salaryText = new Text(100, rowY, rankingFont, "100", vbom);
+            row.attachChild(salaryText);
+            this.leftAlignEntity(salaryText, (HBW_GUILD_POLL[0] + HBW_GUILD_POLL[1]) * SCROLL_ZONE_WIDTH + 25);
+            final F2ButtonSprite voteButton = createACF2CommonButton(300, rowY, "投票");
+            this.leftAlignEntity(voteButton, (HBW_GUILD_POLL[0] + HBW_GUILD_POLL[1] + HBW_GUILD_POLL[2]) * SCROLL_ZONE_WIDTH + 25);
+            row.attachChild(voteButton);
+            this.registerTouchArea(voteButton);
+            voteButton.setOnClickListener(new F2OnClickListener() {
+                @Override
+                public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                    if (GuildUtils.vote(member.getId())) {
+                        updateScene();
+                    } else {
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(activity, "投票失败！", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
+                }
+            });
+            scrollZone.attachRow(row);
+        }
         return board;
     }
 
@@ -357,7 +402,7 @@ public class GuildScene extends BaseScene {
             boards.add(createMemberListBoard());
             boards.add(createGuildWarehouseBoard());
             boards.add(createGuildFactoryBoard());
-            boards.add(createGuildVotingBoard());
+            boards.add(createGuildPollBoard());
             boards.add(createQuitGuildBoard());
         } else {
             boards.add(createGuildListBoard());

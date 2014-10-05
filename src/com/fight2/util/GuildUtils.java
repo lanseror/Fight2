@@ -179,4 +179,17 @@ public class GuildUtils {
         return false;
     }
 
+    public static boolean vote(final int candidateId) {
+        final String url = HttpUtils.HOST_URL + "/guild/vote?id=" + candidateId;
+        try {
+            final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
+            final int status = responseJson.getInt("status");
+            return status == 0;
+        } catch (final ClientProtocolException e) {
+            LogUtils.e(e);
+        } catch (final Exception e) {
+            LogUtils.e(e);
+        }
+        return false;
+    }
 }
