@@ -13,6 +13,8 @@ import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.texture.region.TextureRegionFactory;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
+import android.widget.Toast;
+
 import com.fight2.GameActivity;
 import com.fight2.constant.ConfigEnum;
 import com.fight2.constant.TextureEnum;
@@ -212,6 +214,15 @@ public abstract class BaseScene extends Scene {
             onStarted();
         }
         super.onManagedUpdate(pSecondsElapsed);
+    }
+
+    public void alert(final String message) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(activity, message, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void topAlignEntity(final IEntity entity, final float y) {

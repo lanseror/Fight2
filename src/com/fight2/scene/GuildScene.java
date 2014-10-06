@@ -15,7 +15,6 @@ import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 
 import android.text.InputType;
-import android.widget.Toast;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
@@ -320,12 +319,16 @@ public class GuildScene extends BaseScene {
 
     private IEntity createGuildPollBoard() {
         final IEntity board = createBoardBox();
+        if (GuildUtils.hasVoted()) {
+            final Text guildNameTitle = new Text(257, 225, infoFont, "你已经投过票", vbom);
+            board.attachChild(guildNameTitle);
+            return board;
+        }
         this.createHeadBar(HEADBAR_GUILD_POLL, HBW_GUILD_POLL, board);
         final List<User> members = GuildUtils.getMembers(guild.getId());
         final ScrollZone scrollZone = new ScrollZone(board.getWidth() * 0.5f, 5 + SCROLL_ZONE_HEIGHT * 0.5f, SCROLL_ZONE_WIDTH, SCROLL_ZONE_HEIGHT, vbom);
         final IEntity touchArea = scrollZone.createTouchArea(SCROLL_ZONE_WIDTH * 0.5f, SCROLL_ZONE_HEIGHT * 0.5f, TOUCH_AREA_WIDTH, TOUCH_AREA_HEIGHT);
         board.attachChild(scrollZone);
-        this.registerTouchArea(touchArea);
 
         for (int i = 0; i < members.size(); i++) {
             final User member = members.get(i);
@@ -351,20 +354,19 @@ public class GuildScene extends BaseScene {
             voteButton.setOnClickListener(new F2OnClickListener() {
                 @Override
                 public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                    if (GuildUtils.vote(member.getId())) {
+                    final int statusCode = GuildUtils.vote(member.getId());
+                    if (statusCode == 0) {
                         updateScene();
-                    } else {
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(activity, "投票失败！", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                    } else if (statusCode == 1) {
+                        alert("你已经投过票！");
+                    } else if (statusCode == 2) {
+                        alert("投票失败！");
                     }
                 }
             });
             scrollZone.attachRow(row);
         }
+        this.registerTouchArea(touchArea);
         return board;
     }
 
@@ -379,12 +381,7 @@ public class GuildScene extends BaseScene {
                 if (GuildUtils.quitGuild()) {
                     updateScene();
                 } else {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(activity, "退出公会失败！", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    alert("退出公会失败！");
                 }
             }
         });
@@ -522,12 +519,7 @@ public class GuildScene extends BaseScene {
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 final String guildName = guildNameText.getText();
                 if (guildName == null || guildName.replaceAll(" ", "").equals("")) {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(activity, "公会名不能为空！", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    alert("公会名不能为空！");
                 } else if (GuildUtils.applyGuild(guildName)) {
                     updateScene();
                 }
