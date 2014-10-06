@@ -319,7 +319,11 @@ public class GuildScene extends BaseScene {
 
     private IEntity createGuildPollBoard() {
         final IEntity board = createBoardBox();
-        if (GuildUtils.hasVoted()) {
+        if (!guild.isPollEnabled()) {
+            final Text guildNameTitle = new Text(257, 225, infoFont, "投票未开启", vbom);
+            board.attachChild(guildNameTitle);
+            return board;
+        } else if (GuildUtils.hasVoted()) {
             final Text guildNameTitle = new Text(257, 225, infoFont, "你已经投过票", vbom);
             board.attachChild(guildNameTitle);
             return board;
@@ -356,6 +360,7 @@ public class GuildScene extends BaseScene {
                 public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                     final int statusCode = GuildUtils.vote(member.getId());
                     if (statusCode == 0) {
+                        alert("你已经投了一票给" + member.getName());
                         updateScene();
                     } else if (statusCode == 1) {
                         alert("你已经投过票！");

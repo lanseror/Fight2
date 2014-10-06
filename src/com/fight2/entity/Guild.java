@@ -5,6 +5,7 @@ public class Guild {
     private String name;
     private String qq;
     private String notice;
+    private boolean pollEnabled;
     private User president;
 
     public int getId() {
@@ -37,6 +38,14 @@ public class Guild {
 
     public void setNotice(final String notice) {
         this.notice = notice;
+    }
+
+    public boolean isPollEnabled() {
+        return pollEnabled;
+    }
+
+    public void setPollEnabled(final boolean pollEnabled) {
+        this.pollEnabled = pollEnabled;
     }
 
     public User getPresident() {

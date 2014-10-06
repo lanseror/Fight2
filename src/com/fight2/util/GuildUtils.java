@@ -54,6 +54,7 @@ public class GuildUtils {
             guild.setName(guildJson.getString("name"));
             guild.setNotice(guildJson.optString("notice"));
             guild.setQq(guildJson.optString("qq"));
+            guild.setPollEnabled(guildJson.getBoolean("pollEnabled"));
             final User president = new User();
             final JSONObject presidentJson = guildJson.getJSONObject("president");
             president.setId(presidentJson.getInt("id"));
