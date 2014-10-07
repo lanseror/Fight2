@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
@@ -60,6 +62,14 @@ public class GuildUtils {
             president.setId(presidentJson.getInt("id"));
             president.setName(presidentJson.getString("name"));
             guild.setPresident(president);
+            // Arena user
+            final JSONArray arenaUserJSONArray = guildJson.getJSONArray("arenaUsers");
+            final Set<Integer> arenaUsers = new HashSet<Integer>();
+            for (int i = 0; i < arenaUserJSONArray.length(); i++) {
+                arenaUsers.add(arenaUserJSONArray.getInt(i));
+            }
+            guild.setArenaUsers(arenaUsers);
+
             return guild;
         } catch (final ClientProtocolException e) {
             throw new RuntimeException(e);
@@ -89,6 +99,38 @@ public class GuildUtils {
 
     public static boolean quitGuild() {
         final String url = HttpUtils.HOST_URL + "/guild/quit";
+        try {
+            final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
+            final int status = responseJson.getInt("status");
+            return status == 0;
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public static boolean addArenaUser(final int id) {
+        final String url = HttpUtils.HOST_URL + "/guild/add-arena-user?id=" + id;
+        try {
+            final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
+            final int status = responseJson.getInt("status");
+            return status == 0;
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public static boolean removeArenaUser(final int id) {
+        final String url = HttpUtils.HOST_URL + "/guild/remove-arena-user?id=" + id;
         try {
             final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
             final int status = responseJson.getInt("status");

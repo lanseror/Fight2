@@ -26,6 +26,7 @@ public enum TextureEnum {
     COMMON_EXPERIENCE_STICK("images/common_experience_stick.png", 205, 67),
     COMMON_BUTTON("images/common_button.png", 129, 49),
     COMMON_INPUT_ICON("images/common_input_icon.png", 54, 53),
+    COMMON_CHECKBOX_ON("images/common_checkbox_on.png", 40, 40),
 
     // Chat room images.
     CHAT_INPUT_BG("images/chat_input_backgroud.png", 755, 75),

@@ -2,7 +2,9 @@ package com.fight2.scene;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.andengine.entity.IEntity;
 import org.andengine.entity.primitive.Rectangle;
@@ -23,6 +25,7 @@ import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Guild;
 import com.fight2.entity.ScrollZone;
 import com.fight2.entity.User;
+import com.fight2.entity.engine.CheckboxSprite;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.engine.InputText;
@@ -47,7 +50,7 @@ public class GuildScene extends BaseScene {
     private final static float[] HBW_GUILD_LIST = { 0.1f, 0.5f, 0.4f };
     private final static String[] HEADBAR_GUILD_RANK = { "NO.", "公会名", "会长" };
     private final static float[] HBW_GUILD_RANK = { 0.1f, 0.5f, 0.4f };
-    private final static String[] HEADBAR_GUILD_MEMBER = { "NO.", "名称", "头衔", "身价" };
+    private final static String[] HEADBAR_GUILD_MEMBER = { "NO.", "名称", "身价", "出战" };
     private final static float[] HBW_GUILD_MEMBER = { 0.1f, 0.3f, 0.3f, 0.3f };
     private final static String[] HEADBAR_GUILD_POLL = { "NO.", "名称", "身价", "" };
     private final static float[] HBW_GUILD_POLL = { 0.1f, 0.3f, 0.3f, 0.3f };
@@ -64,6 +67,7 @@ public class GuildScene extends BaseScene {
     private Guild guild;
     private boolean inGuild;
     private boolean isAdmin;
+    private final Set<User> selectedArenaUsers = new HashSet<User>();
 
     public GuildScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -273,10 +277,10 @@ public class GuildScene extends BaseScene {
         final IEntity board = createBoardBox();
         this.createHeadBar(HEADBAR_GUILD_MEMBER, HBW_GUILD_MEMBER, board);
         final List<User> members = GuildUtils.getMembers(guild.getId());
+        final Set<Integer> arenaUsers = guild.getArenaUsers();
         final ScrollZone scrollZone = new ScrollZone(board.getWidth() * 0.5f, 5 + SCROLL_ZONE_HEIGHT * 0.5f, SCROLL_ZONE_WIDTH, SCROLL_ZONE_HEIGHT, vbom);
         final IEntity touchArea = scrollZone.createTouchArea(SCROLL_ZONE_WIDTH * 0.5f, SCROLL_ZONE_HEIGHT * 0.5f, TOUCH_AREA_WIDTH, TOUCH_AREA_HEIGHT);
         board.attachChild(scrollZone);
-        this.registerTouchArea(touchArea);
 
         for (int i = 0; i < members.size(); i++) {
             final User member = members.get(i);
@@ -292,15 +296,65 @@ public class GuildScene extends BaseScene {
             final Text memberName = new Text(100, rowY, rankingFont, member.getName(), vbom);
             row.attachChild(memberName);
             this.leftAlignEntity(memberName, (HBW_GUILD_MEMBER[0]) * SCROLL_ZONE_WIDTH + 25);
-            final Text titleName = new Text(100, rowY, rankingFont, "天使长", vbom);
-            row.attachChild(titleName);
-            this.leftAlignEntity(titleName, (HBW_GUILD_MEMBER[0] + HBW_GUILD_MEMBER[1]) * SCROLL_ZONE_WIDTH + 25);
-            final Text salaryName = new Text(100, rowY, rankingFont, "100", vbom);
-            row.attachChild(salaryName);
-            this.leftAlignEntity(salaryName, (HBW_GUILD_MEMBER[0] + HBW_GUILD_MEMBER[1] + HBW_GUILD_MEMBER[2]) * SCROLL_ZONE_WIDTH + 25);
+            final Text salaryText = new Text(100, rowY, rankingFont, "100", vbom);
+            row.attachChild(salaryText);
+            this.leftAlignEntity(salaryText, (HBW_GUILD_MEMBER[0] + HBW_GUILD_MEMBER[1]) * SCROLL_ZONE_WIDTH + 25);
+            final boolean isArenaUser = arenaUsers.contains(member.getId());
+            if (isAdmin) {
+                if (isArenaUser) {
+                    selectedArenaUsers.add(member);
+                }
+                final CheckboxSprite checkedIcon = new CheckboxSprite(200, rowY, isArenaUser, vbom);
+                row.attachChild(checkedIcon);
+                checkedIcon.setX((HBW_GUILD_MEMBER[0] + HBW_GUILD_MEMBER[1] + HBW_GUILD_MEMBER[2] + HBW_GUILD_MEMBER[3] * 0.5f) * SCROLL_ZONE_WIDTH);
+                final IEntity checkedIconTouchArea = new Rectangle(200, rowY, HBW_GUILD_MEMBER[3] * SCROLL_ZONE_WIDTH, 64, vbom) {
+                    @Override
+                    public boolean onAreaTouched(final TouchEvent touchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                        if (touchEvent.isActionUp()) {
+                            clickCheckedIcon(checkedIcon, member);
+                        }
+                        return true;
+                    }
+                };
+                checkedIconTouchArea.setAlpha(0);
+                checkedIconTouchArea.setX((HBW_GUILD_MEMBER[0] + HBW_GUILD_MEMBER[1] + HBW_GUILD_MEMBER[2] + HBW_GUILD_MEMBER[3] * 0.5f) * SCROLL_ZONE_WIDTH);
+                row.attachChild(checkedIconTouchArea);
+                this.registerTouchArea(checkedIconTouchArea);
+            } else if (isArenaUser) {
+                final Sprite checkedIcon = createACImageSprite(TextureEnum.COMMON_CHECKBOX_ON, 200, rowY);
+                row.attachChild(checkedIcon);
+                checkedIcon.setX((HBW_GUILD_MEMBER[0] + HBW_GUILD_MEMBER[1] + HBW_GUILD_MEMBER[2] + HBW_GUILD_MEMBER[3] * 0.5f) * SCROLL_ZONE_WIDTH);
+            }
+
             scrollZone.attachRow(row);
         }
+        this.registerTouchArea(touchArea);
         return board;
+    }
+
+    private void clickCheckedIcon(final CheckboxSprite checkboxSprite, final User member) {
+        if (checkboxSprite.isChecked()) {
+            if (GuildUtils.removeArenaUser(member.getId())) {
+                selectedArenaUsers.remove(member);
+                checkboxSprite.switchCheckbox();
+            } else {
+                alert("保存失败！");
+            }
+        } else {
+            if (selectedArenaUsers.size() >= 3) {
+                alert("最多只可以3个人出战！");
+                return;
+            }
+
+            if (GuildUtils.addArenaUser(member.getId())) {
+                selectedArenaUsers.add(member);
+                checkboxSprite.switchCheckbox();
+            } else {
+                alert("保存失败！");
+            }
+
+        }
+
     }
 
     private IEntity createGuildWarehouseBoard() {
@@ -543,6 +597,7 @@ public class GuildScene extends BaseScene {
     @Override
     public void updateScene() {
         activity.getGameHub().needSmallChatRoom(true);
+        selectedArenaUsers.clear();
         focusedIndex = 0;
         this.guild = GuildUtils.getUserGuild();
         inGuild = (this.guild != null);

@@ -1,5 +1,7 @@
 package com.fight2.entity;
 
+import java.util.Set;
+
 public class Guild {
     private int id;
     private String name;
@@ -7,6 +9,7 @@ public class Guild {
     private String notice;
     private boolean pollEnabled;
     private User president;
+    private Set<Integer> arenaUsers;
 
     public int getId() {
         return id;
@@ -54,6 +57,14 @@ public class Guild {
 
     public void setPresident(final User president) {
         this.president = president;
+    }
+
+    public Set<Integer> getArenaUsers() {
+        return arenaUsers;
+    }
+
+    public void setArenaUsers(final Set<Integer> arenaUsers) {
+        this.arenaUsers = arenaUsers;
     }
 
 }
