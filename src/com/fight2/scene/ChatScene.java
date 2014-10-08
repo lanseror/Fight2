@@ -100,7 +100,7 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
         init();
-        timerHandler = new TimerHandler(1.0f, new ITimerCallback() {
+        timerHandler = new TimerHandler(0.5f, new ITimerCallback() {
             @Override
             public void onTimePassed(final TimerHandler pTimerHandler) {
                 if (shouldDisplay) {

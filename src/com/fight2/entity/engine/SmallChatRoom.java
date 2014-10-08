@@ -79,7 +79,7 @@ public class SmallChatRoom extends Rectangle {
 
         chatTimeText.setPosition(this.getWidth() - chatTimeTextWidth * 0.5f - 10, chatTimeTextHeight * 0.5f + 5);
         this.attachChild(chatTimeText);
-        timerHandler = new TimerHandler(1.0f, new ITimerCallback() {
+        timerHandler = new TimerHandler(0.5f, new ITimerCallback() {
             @Override
             public void onTimePassed(final TimerHandler pTimerHandler) {
                 if (isNeeded) {

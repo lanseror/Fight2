@@ -254,6 +254,7 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
         final TextureEnum itemGridEnum = TextureEnum.ARENA_REWARD_ITEM_GRID;
         final TextureEnum ticketEnum = TextureEnum.COMMON_ARENA_TICKET;
         final TextureEnum staminaEnum = TextureEnum.COMMON_STAMINA;
+        final TextureEnum guildContributionEnum = TextureEnum.COMMON_GUILD_CONTRIBUTION;
         final float itemWidth = 194;
         final float itemGridInitX = itemWidth * 0.5f;
         final float itemGridY = 100;
@@ -284,6 +285,15 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
                 staminaGrid.attachChild(staminaImg);
                 staminaGrid.attachChild(amountText);
                 rewardGrid.attachChild(staminaGrid);
+            } else if (rewardItemType == ArenaRewardItemType.GuildContribution) {
+                final IEntity guildContributionGrid = createACImageSprite(itemGridEnum, itemGridInitX + itemWidth * itemIndex, itemGridY);
+                final IEntity guildContributionImg = createACImageSprite(guildContributionEnum, itemX, itemY + 3);
+                final Text itemText = new Text(itemX, itemGridEnum.getHeight() + 25, itemFont, "公会贡献值", vbom);
+                itemText.setColor(0XFFFFE8C6);
+                guildContributionGrid.attachChild(itemText);
+                guildContributionGrid.attachChild(guildContributionImg);
+                guildContributionGrid.attachChild(amountText);
+                rewardGrid.attachChild(guildContributionGrid);
             } else if (rewardItemType == ArenaRewardItemType.Card) {
                 final Card card = rewardItem.getCard();
                 final ITextureRegion cardTexture = TextureFactory.getInstance().getTextureRegion(card.getImage());

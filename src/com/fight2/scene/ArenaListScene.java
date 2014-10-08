@@ -132,25 +132,25 @@ public class ArenaListScene extends BaseScene {
                 listSelectedBar.setVisible(true);
             }
 
-            final IEntity touchArea = createListTouchArea(arenaId, arenaY);
+            final IEntity touchArea = createListTouchArea(arena, arenaY);
             listFrame.attachChild(touchArea);
             this.registerTouchArea(touchArea);
         }
         if (!listSelectedBar.isVisible() && !arenas.isEmpty()) {
             listSelectedBar.setY(arenaStartY);
             listSelectedBar.setVisible(true);
-            ArenaUtils.setSelectedArenaId(arenas.get(0).getId());
+            ArenaUtils.setSelectedArena(arenas.get(0));
         }
         activity.getGameHub().needSmallChatRoom(true);
     }
 
-    private IEntity createListTouchArea(final int id, final float arenaY) {
+    private IEntity createListTouchArea(final Arena arena, final float arenaY) {
         final IEntity touchArea = new Rectangle(280, arenaY, 530, 55, vbom) {
             @Override
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 if (pSceneTouchEvent.isActionUp()) {
                     listSelectedBar.setY(arenaY);
-                    ArenaUtils.setSelectedArenaId(id);
+                    ArenaUtils.setSelectedArena(arena);
                 }
                 return true;
             }

@@ -287,12 +287,16 @@ public class ArenaScene extends BaseScene {
             @Override
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 if (pSceneTouchEvent.isActionDown()) {
-                    try {
-                        final User player = players[index];
-                        final Scene preBattleScene = new PreBattleScene(activity, index, player);
-                        activity.getEngine().setScene(preBattleScene);
-                    } catch (final IOException e) {
-                        Debug.e(e);
+                    if (ArenaUtils.getSelectedArena().isGuildArena() && !ArenaUtils.checkAttack()) {
+                        alert("你需要公会授权才能战斗！");
+                    } else {
+                        try {
+                            final User player = players[index];
+                            final Scene preBattleScene = new PreBattleScene(activity, index, player);
+                            activity.getEngine().setScene(preBattleScene);
+                        } catch (final IOException e) {
+                            Debug.e(e);
+                        }
                     }
                     return true;
                 }

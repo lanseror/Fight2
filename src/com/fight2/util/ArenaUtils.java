@@ -17,11 +17,11 @@ import com.fight2.entity.Arena;
 import com.fight2.entity.ArenaContinuousWin;
 import com.fight2.entity.ArenaRanking;
 import com.fight2.entity.ArenaReward;
-import com.fight2.entity.Guild;
 import com.fight2.entity.ArenaReward.ArenaRewardType;
 import com.fight2.entity.ArenaRewardItem;
 import com.fight2.entity.ArenaRewardItem.ArenaRewardItemType;
 import com.fight2.entity.Card;
+import com.fight2.entity.Guild;
 import com.fight2.entity.User;
 import com.fight2.entity.UserArenaInfo;
 import com.fight2.entity.UserArenaRecord;
@@ -34,13 +34,23 @@ import com.fight2.entity.battle.SkillRecord;
 import com.fight2.entity.battle.SkillType;
 
 public class ArenaUtils {
+    private static Arena selectedArena;
     private static int selectedArenaId = 0;
+
+    public static Arena getSelectedArena() {
+        return selectedArena;
+    }
+
+    public static void setSelectedArena(final Arena selectedArena) {
+        ArenaUtils.selectedArena = selectedArena;
+        setSelectedArenaId(selectedArena.getId());
+    }
 
     public static int getSelectedArenaId() {
         return selectedArenaId;
     }
 
-    public static void setSelectedArenaId(final int selectedArenaId) {
+    private static void setSelectedArenaId(final int selectedArenaId) {
         ArenaUtils.selectedArenaId = selectedArenaId;
     }
 
@@ -227,6 +237,7 @@ public class ArenaUtils {
                 arena.setName(jsonObject.getString("name"));
                 arena.setOnlineNumber(jsonObject.getInt("onlineNumber"));
                 arena.setRemainTime(jsonObject.getString("remainTime"));
+                arena.setGuildArena(jsonObject.getBoolean("guildArena"));
                 arenas.add(arena);
             }
             return arenas;
@@ -291,6 +302,20 @@ public class ArenaUtils {
             throw new RuntimeException(e);
         }
         return battleResult;
+    }
+
+    public static boolean checkAttack() {
+        final String url = HttpUtils.HOST_URL + "/arena/check-attack";
+        try {
+            final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
+            final int status = responseJson.getInt("status");
+            return status == 0;
+        } catch (final ClientProtocolException e) {
+            LogUtils.e(e);
+        } catch (final Exception e) {
+            LogUtils.e(e);
+        }
+        return false;
     }
 
     public static String getTestString(final GameActivity activity) {

@@ -4,16 +4,17 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.SparseArray;
+
 import com.fight2.entity.Guild;
+import com.fight2.entity.GuildArenaUser;
 import com.fight2.entity.User;
 
 public class GuildUtils {
@@ -64,9 +65,13 @@ public class GuildUtils {
             guild.setPresident(president);
             // Arena user
             final JSONArray arenaUserJSONArray = guildJson.getJSONArray("arenaUsers");
-            final Set<Integer> arenaUsers = new HashSet<Integer>();
+            final SparseArray<GuildArenaUser> arenaUsers = new SparseArray<GuildArenaUser>();
             for (int i = 0; i < arenaUserJSONArray.length(); i++) {
-                arenaUsers.add(arenaUserJSONArray.getInt(i));
+                final JSONObject arenaUserJSON = arenaUserJSONArray.getJSONObject(i);
+                final GuildArenaUser guildArenaUser = new GuildArenaUser();
+                guildArenaUser.setId(arenaUserJSON.getInt("id"));
+                guildArenaUser.setLocked(arenaUserJSON.getBoolean("locked"));
+                arenaUsers.append(guildArenaUser.getId(), guildArenaUser);
             }
             guild.setArenaUsers(arenaUsers);
 
@@ -129,12 +134,12 @@ public class GuildUtils {
 
     }
 
-    public static boolean removeArenaUser(final int id) {
+    public static int removeArenaUser(final int id) {
         final String url = HttpUtils.HOST_URL + "/guild/remove-arena-user?id=" + id;
         try {
             final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
             final int status = responseJson.getInt("status");
-            return status == 0;
+            return status;
         } catch (final ClientProtocolException e) {
             throw new RuntimeException(e);
         } catch (final IOException e) {

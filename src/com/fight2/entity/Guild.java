@@ -1,6 +1,6 @@
 package com.fight2.entity;
 
-import java.util.Set;
+import android.util.SparseArray;
 
 public class Guild {
     private int id;
@@ -9,7 +9,7 @@ public class Guild {
     private String notice;
     private boolean pollEnabled;
     private User president;
-    private Set<Integer> arenaUsers;
+    private SparseArray<GuildArenaUser> arenaUsers;
 
     public int getId() {
         return id;
@@ -59,11 +59,11 @@ public class Guild {
         this.president = president;
     }
 
-    public Set<Integer> getArenaUsers() {
+    public SparseArray<GuildArenaUser> getArenaUsers() {
         return arenaUsers;
     }
 
-    public void setArenaUsers(final Set<Integer> arenaUsers) {
+    public void setArenaUsers(final SparseArray<GuildArenaUser> arenaUsers) {
         this.arenaUsers = arenaUsers;
     }
 

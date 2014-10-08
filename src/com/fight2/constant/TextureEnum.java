@@ -19,6 +19,7 @@ public enum TextureEnum {
     COMMON_ARENA_TICKET("images/common_arena_ticket.png", 109, 76),
     COMMON_STAMINA("images/common_stamina.png", 120, 138),
     COMMON_MIGHT_ICON("images/common_might_icon.png", 44, 44),
+    COMMON_GUILD_CONTRIBUTION("images/common_guild_contribution.png", 36, 36),
     COMMON_STAMINA_BOX("images/common_stamina_box.png", 262, 65),
     COMMON_STAMINA_STICK("images/common_stamina_stick.png", 203, 37),
     COMMON_EXPERIENCE_BOX("images/common_experience_box.png", 267, 67),
@@ -120,8 +121,8 @@ public enum TextureEnum {
     ARENA_BATTLE_REWARD("images/arena_battle_reward.png", 130, 132),
     ARENA_BATTLE_REWARD_FCS("images/arena_battle_reward_fcs.png", 130, 132),
     ARENA_BATTLE_CONTINUOUS_WIN("images/arena_battle_continuous_win.png", 121, 118),
-    ARENA_RESULT_WIN("images/arena_result_win.png", 140, 35),
-    ARENA_RESULT_LOSE("images/arena_result_lose.png", 140, 35),
+    ARENA_RESULT_WIN("images/arena_result_win.png", 218, 44),
+    ARENA_RESULT_LOSE("images/arena_result_lose.png", 218, 44),
 
     // Arena list scene images.
     ARENA_LIST_FRAME("images/arena_list_frame.png", 790, 489),
@@ -166,11 +167,8 @@ public enum TextureEnum {
     PREBATTLE_INFO_RIGHT("images/prebattle_info_right.png", 283, 84),
     PREBATTLE_NAME_BOX("images/prebattle_name_box.png", 378, 77),
     PREBATTLE_COMBO_SKILL_LEFT("images/prebattle_combo_skill_left.png", 285, 122),
-    PREBATTLE_COMBO_SKILL_RIGHT("images/prebattle_combo_skill_right.png", 285, 122),
+    PREBATTLE_COMBO_SKILL_RIGHT("images/prebattle_combo_skill_right.png", 285, 122);
 
-    TEST_CARD1("card/card1.jpg", 100, 100),
-    TEST_CARD2("card/card2.jpg", 100, 100),
-    TEST_CARD3("card/card3.jpg", 100, 100);
     private final String url;
     private final float width;
     private final float height;

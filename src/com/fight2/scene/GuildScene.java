@@ -17,12 +17,14 @@ import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 
 import android.text.InputType;
+import android.util.SparseArray;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Guild;
+import com.fight2.entity.GuildArenaUser;
 import com.fight2.entity.ScrollZone;
 import com.fight2.entity.User;
 import com.fight2.entity.engine.CheckboxSprite;
@@ -277,7 +279,7 @@ public class GuildScene extends BaseScene {
         final IEntity board = createBoardBox();
         this.createHeadBar(HEADBAR_GUILD_MEMBER, HBW_GUILD_MEMBER, board);
         final List<User> members = GuildUtils.getMembers(guild.getId());
-        final Set<Integer> arenaUsers = guild.getArenaUsers();
+        final SparseArray<GuildArenaUser> arenaUsers = guild.getArenaUsers();
         final ScrollZone scrollZone = new ScrollZone(board.getWidth() * 0.5f, 5 + SCROLL_ZONE_HEIGHT * 0.5f, SCROLL_ZONE_WIDTH, SCROLL_ZONE_HEIGHT, vbom);
         final IEntity touchArea = scrollZone.createTouchArea(SCROLL_ZONE_WIDTH * 0.5f, SCROLL_ZONE_HEIGHT * 0.5f, TOUCH_AREA_WIDTH, TOUCH_AREA_HEIGHT);
         board.attachChild(scrollZone);
@@ -299,7 +301,8 @@ public class GuildScene extends BaseScene {
             final Text salaryText = new Text(100, rowY, rankingFont, "100", vbom);
             row.attachChild(salaryText);
             this.leftAlignEntity(salaryText, (HBW_GUILD_MEMBER[0] + HBW_GUILD_MEMBER[1]) * SCROLL_ZONE_WIDTH + 25);
-            final boolean isArenaUser = arenaUsers.contains(member.getId());
+            final GuildArenaUser guildArenaUser = arenaUsers.get(member.getId());
+            final boolean isArenaUser = guildArenaUser != null;
             if (isAdmin) {
                 if (isArenaUser) {
                     selectedArenaUsers.add(member);
@@ -311,7 +314,7 @@ public class GuildScene extends BaseScene {
                     @Override
                     public boolean onAreaTouched(final TouchEvent touchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                         if (touchEvent.isActionUp()) {
-                            clickCheckedIcon(checkedIcon, member);
+                            clickCheckedIcon(checkedIcon, member, guildArenaUser);
                         }
                         return true;
                     }
@@ -332,11 +335,19 @@ public class GuildScene extends BaseScene {
         return board;
     }
 
-    private void clickCheckedIcon(final CheckboxSprite checkboxSprite, final User member) {
+    private void clickCheckedIcon(final CheckboxSprite checkboxSprite, final User member, final GuildArenaUser guildArenaUser) {
+        if (guildArenaUser != null && guildArenaUser.isLocked()) {
+            alert("此出战人员已锁定！");
+            return;
+        }
+
         if (checkboxSprite.isChecked()) {
-            if (GuildUtils.removeArenaUser(member.getId())) {
+            final int status = GuildUtils.removeArenaUser(member.getId());
+            if (status == 0) {
                 selectedArenaUsers.remove(member);
                 checkboxSprite.switchCheckbox();
+            } else if (status == 2) {
+                alert("此出战人员已锁定！");
             } else {
                 alert("保存失败！");
             }

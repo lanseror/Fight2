@@ -41,7 +41,8 @@ public class ArenaRewardItem {
     public static enum ArenaRewardItemType {
         ArenaTicket,
         Stamina,
-        Card
+        Card,
+        GuildContribution;
     }
 
 }
