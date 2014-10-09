@@ -18,13 +18,16 @@ import org.andengine.opengl.texture.region.ITextureRegion;
 
 import android.text.InputType;
 import android.util.SparseArray;
+import android.widget.Toast;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
+import com.fight2.entity.Card;
 import com.fight2.entity.Guild;
 import com.fight2.entity.GuildArenaUser;
+import com.fight2.entity.GuildStoreroom;
 import com.fight2.entity.ScrollZone;
 import com.fight2.entity.User;
 import com.fight2.entity.engine.CheckboxSprite;
@@ -32,6 +35,7 @@ import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.engine.InputText;
 import com.fight2.entity.engine.InputText.OnConfirmListener;
+import com.fight2.util.AccountUtils;
 import com.fight2.util.GuildUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
@@ -53,18 +57,20 @@ public class GuildScene extends BaseScene {
     private final static float[] HBW_GUILD_LIST = { 0.1f, 0.5f, 0.4f };
     private final static String[] HEADBAR_GUILD_RANK = { "NO.", "公会名", "会长" };
     private final static float[] HBW_GUILD_RANK = { 0.1f, 0.5f, 0.4f };
-    private final static String[] HEADBAR_GUILD_MEMBER = { "NO.", "名称", "工资", "出战" };
+    private final static String[] HEADBAR_GUILD_MEMBER = { "NO.", "名称", "身价", "出战" };
     private final static float[] HBW_GUILD_MEMBER = { 0.1f, 0.3f, 0.3f, 0.3f };
-    private final static String[] HEADBAR_GUILD_POLL = { "NO.", "名称", "工资", "" };
+    private final static String[] HEADBAR_GUILD_POLL = { "NO.", "名称", "身价", "" };
     private final static float[] HBW_GUILD_POLL = { 0.1f, 0.3f, 0.3f, 0.3f };
     private final Sprite frame;
 
     private final Font buttonFont;
     private final Font infoFont;
+    private final Font amountFont;
     private final Font headBarFont;
     private final Font rankingFont;
     private final Font headTitleFont;
     private final Text headTitleText;
+    private final Text contributionText;
     private int focusedIndex = 0;
     private Guild guild;
     private boolean inGuild;
@@ -76,6 +82,7 @@ public class GuildScene extends BaseScene {
         super(activity);
         buttonFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
         infoFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
+        this.amountFont = ResourceManager.getInstance().getFont(FontEnum.Default, 30);
         headBarFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
         rankingFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
         headTitleFont = ResourceManager.getInstance().getFont(FontEnum.Default, 30);
@@ -84,6 +91,7 @@ public class GuildScene extends BaseScene {
         headTitleText = new Text(frame.getWidth() * 0.5f, frame.getHeight() - 25, headTitleFont, "公会信息", 15, vbom);
         headTitleText.setColor(0XFF390800);
         frame.attachChild(headTitleText);
+        contributionText = new Text(125, 43, amountFont, String.valueOf(session.getGuildContribution()), 10, vbom);
         init();
     }
 
@@ -95,6 +103,7 @@ public class GuildScene extends BaseScene {
 
         final Sprite topBar = createALBImageSprite(TextureEnum.GUILD_TOPBAR, this.simulatedLeftX, this.simulatedHeight - TextureEnum.GUILD_TOPBAR.getHeight());
         this.attachChild(topBar);
+        topBar.attachChild(contributionText);
 
         final Sprite rechargeSprite = createALBF2ButtonSprite(TextureEnum.PARTY_RECHARGE, TextureEnum.PARTY_RECHARGE_PRESSED, this.simulatedRightX
                 - TextureEnum.PARTY_RECHARGE.getWidth() + 20, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight());
@@ -368,8 +377,77 @@ public class GuildScene extends BaseScene {
 
     private IEntity createGuildWarehouseBoard() {
         final IEntity board = createBoardBox();
-        final Text guildNameTitle = new Text(257, 225, infoFont, "公会仓库", vbom);
-        board.attachChild(guildNameTitle);
+        final GuildStoreroom storeroom = GuildUtils.getGuildStoreroom(activity);
+        final ScrollZone scrollZone = new ScrollZone(board.getWidth() * 0.5f, 5 + SCROLL_ZONE_HEIGHT * 0.5f, SCROLL_ZONE_WIDTH, SCROLL_ZONE_HEIGHT, vbom);
+        final IEntity touchArea = scrollZone.createTouchArea(SCROLL_ZONE_WIDTH * 0.5f, SCROLL_ZONE_HEIGHT * 0.5f, TOUCH_AREA_WIDTH, TOUCH_AREA_HEIGHT);
+        board.attachChild(scrollZone);
+
+        final IEntity row1 = new Rectangle(0, 0, SCROLL_ZONE_WIDTH, 150, vbom);
+        row1.setAlpha(0);
+        final float row1Y = row1.getHeight() * 0.5f;
+        final Sprite line = this.createACImageSprite(TextureEnum.GUILD_SCROLL_ROW_SEPARATOR, SCROLL_ZONE_WIDTH * 0.5f, 1);
+        row1.attachChild(line);
+        // Ticket
+        final TextureEnum ticketEnum = TextureEnum.COMMON_ARENA_TICKET;
+        final Text ticketAmountText = new Text(95, 25, amountFont, String.format("×%s", storeroom.getTicket()), vbom);
+        ticketAmountText.setColor(0XFFAECE01);
+        final IEntity ticketImg = createACImageSprite(ticketEnum, 200, row1Y);
+        row1.attachChild(ticketImg);
+        row1.attachChild(ticketAmountText);
+        this.leftAlignEntity(ticketAmountText, ticketImg.getX() + ticketImg.getWidth() * 0.5f + 2);
+        // Stamina
+        final TextureEnum staminaEnum = TextureEnum.COMMON_STAMINA;
+        final Text staminaAmountText = new Text(400, 25, amountFont, String.format("×%s", storeroom.getStamina()), vbom);
+        staminaAmountText.setColor(0XFFAECE01);
+        final IEntity staminaImg = createACImageSprite(staminaEnum, 500, row1Y - 5);
+        row1.attachChild(staminaImg);
+        row1.attachChild(staminaAmountText);
+        this.leftAlignEntity(staminaAmountText, staminaImg.getX() + staminaImg.getWidth() * 0.5f + 2);
+        scrollZone.attachRow(row1);
+
+        final List<Card> cards = storeroom.getCards();
+        for (int i = 0; i < cards.size(); i++) {
+            final Card card = cards.get(i);
+            final IEntity cardRow = new Rectangle(0, 0, SCROLL_ZONE_WIDTH, 190, vbom);
+            cardRow.setAlpha(0);
+            final float cardRowY = cardRow.getHeight() * 0.5f;
+            final Sprite cardRowLine = this.createACImageSprite(TextureEnum.GUILD_SCROLL_ROW_SEPARATOR, SCROLL_ZONE_WIDTH * 0.5f, 1);
+            cardRow.attachChild(cardRowLine);
+            final ITextureRegion cardTexture = TextureFactory.getInstance().getTextureRegion(card.getImage());
+            final Sprite cardSprite = new Sprite(220, cardRowY, 110, 165, cardTexture, vbom);
+            final Text cardAmountText = new Text(300, 25, amountFont, String.format("×%s", card.getAmount()), vbom);
+            cardAmountText.setColor(0XFFAECE01);
+            this.leftAlignEntity(cardAmountText, cardSprite.getX() + cardSprite.getWidth() * 0.5f + 5);
+            cardRow.attachChild(cardSprite);
+            cardRow.attachChild(cardAmountText);
+            // Receive button
+            final F2ButtonSprite receiveButton = createACF2CommonButton(550, cardRowY, "提取");
+            cardRow.attachChild(receiveButton);
+            // this.registerTouchArea(receiveButton);
+            receiveButton.setOnClickListener(new F2OnClickListener() {
+                @Override
+                public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                    final int size = AccountUtils.receiveCardFromUserStoreroom(activity, card.getId());
+                    if (size == 0) {
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(activity, "你的卡组已满！", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } else if (size < card.getAmount()) {
+                        card.setAmount(card.getAmount() - size);
+                        cardAmountText.setText(String.format("×%s", card.getAmount()));
+                    } else {
+                        updateScene();
+                    }
+                }
+            });
+
+            scrollZone.attachRow(cardRow);
+        }
+
+        this.registerTouchArea(touchArea);
         return board;
     }
 
@@ -678,6 +756,7 @@ public class GuildScene extends BaseScene {
         selectedArenaUsers.clear();
         focusedIndex = 0;
         this.guild = GuildUtils.getUserGuild();
+        contributionText.setText(String.valueOf(session.getGuildContribution()));
         inGuild = (this.guild != null);
         isAdmin = (inGuild && (guild.getPresident().getId() == session.getId()));
         createButtons();

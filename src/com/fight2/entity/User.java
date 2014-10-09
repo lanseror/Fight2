@@ -5,6 +5,7 @@ public class User {
     private String avatar;
     private String name;
     private Guild guild;
+    private int guildContribution;
 
     public int getId() {
         return id;
@@ -36,6 +37,14 @@ public class User {
 
     public void setGuild(final Guild guild) {
         this.guild = guild;
+    }
+
+    public int getGuildContribution() {
+        return guildContribution;
+    }
+
+    public void setGuildContribution(final int guildContribution) {
+        this.guildContribution = guildContribution;
     }
 
 }

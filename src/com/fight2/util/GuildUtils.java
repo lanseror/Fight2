@@ -15,6 +15,7 @@ import android.util.SparseArray;
 
 import com.fight2.GameActivity;
 import com.fight2.entity.Card;
+import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Guild;
 import com.fight2.entity.GuildArenaUser;
 import com.fight2.entity.GuildStoreroom;
@@ -78,6 +79,8 @@ public class GuildUtils {
             }
             guild.setArenaUsers(arenaUsers);
 
+            final GameUserSession session = GameUserSession.getInstance();
+            session.setGuildContribution(responseJson.getInt("guildContribution"));
             return guild;
         } catch (final ClientProtocolException e) {
             throw new RuntimeException(e);

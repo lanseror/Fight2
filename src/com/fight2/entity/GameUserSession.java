@@ -12,6 +12,7 @@ public class GameUserSession {
     private final List<Card> cards;
     private PartyInfo partyInfo;
     private final Set<Integer> inPartyCards = new HashSet<Integer>();
+    private int guildContribution;
 
     private GameUserSession() {
         cards = new ArrayList<Card>();
@@ -51,6 +52,14 @@ public class GameUserSession {
 
     public Set<Integer> getInPartyCards() {
         return inPartyCards;
+    }
+
+    public int getGuildContribution() {
+        return guildContribution;
+    }
+
+    public void setGuildContribution(final int guildContribution) {
+        this.guildContribution = guildContribution;
     }
 
 }
