@@ -13,8 +13,11 @@ import org.json.JSONObject;
 
 import android.util.SparseArray;
 
+import com.fight2.GameActivity;
+import com.fight2.entity.Card;
 import com.fight2.entity.Guild;
 import com.fight2.entity.GuildArenaUser;
+import com.fight2.entity.GuildStoreroom;
 import com.fight2.entity.User;
 
 public class GuildUtils {
@@ -76,6 +79,47 @@ public class GuildUtils {
             guild.setArenaUsers(arenaUsers);
 
             return guild;
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public static GuildStoreroom getGuildStoreroom(final GameActivity activity) {
+        final String url = HttpUtils.HOST_URL + "/guild/get-storeroom";
+        try {
+            final JSONObject storeroomJson = HttpUtils.getJSONFromUrl(url);
+            final GuildStoreroom storeroom = new GuildStoreroom();
+            storeroom.setId(storeroomJson.getInt("id"));
+            storeroom.setCoin(storeroomJson.getInt("coin"));
+            storeroom.setStamina(storeroomJson.getInt("stamina"));
+            storeroom.setTicket(storeroomJson.getInt("ticket"));
+            final JSONArray cardJsonArray = storeroomJson.getJSONArray("cards");
+            final List<Card> cards = new ArrayList<Card>();
+            for (int i = 0; i < cardJsonArray.length(); i++) {
+                final JSONObject cardJson = cardJsonArray.getJSONObject(i);
+                final Card card = new Card();
+                card.setId(cardJson.getInt("id"));
+                card.setHp(cardJson.getInt("hp"));
+                card.setAtk(cardJson.getInt("atk"));
+                card.setName(cardJson.getString("name"));
+                card.setStar(cardJson.getInt("star"));
+                final String image = cardJson.getString("image");
+                if (image != null && !"".equals(image)) {
+                    final String localImage = ImageUtils.getLocalString(image, activity);
+                    card.setImage(localImage);
+                    TextureFactory.getInstance().addCardResource(activity, localImage);
+                }
+                card.setAmount(cardJson.getInt("amount"));
+                cards.add(card);
+            }
+            storeroom.setCards(cards);
+
+            return storeroom;
         } catch (final ClientProtocolException e) {
             throw new RuntimeException(e);
         } catch (final IOException e) {

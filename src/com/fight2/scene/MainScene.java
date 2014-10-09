@@ -265,7 +265,12 @@ public class MainScene extends BaseScene {
                         unfocusSprite(hotelSprite);
                     } else if (checkContains(ARENA_VERTICES, x, y)) {
                         unfocusSprite(arenaSprite);
-                        ResourceManager.getInstance().setCurrentScene(SceneEnum.ArenaList);
+                        final Card myLeader = myParties[0].getCards()[0];
+                        if (myLeader != null) {
+                            ResourceManager.getInstance().setCurrentScene(SceneEnum.ArenaList);
+                        } else {
+                            alert("必须要有领军人物才能进去竞技场！");
+                        }
                     } else if (checkContains(CONGRESS_VERTICES, x, y)) {
                         unfocusSprite(congressSprite);
                     } else if (checkContains(GATE_VERTICES, x, y)) {

@@ -57,11 +57,11 @@ public class ChatUtils {
                 CHAT_MESSAGES.put(++containMsgSize, message);
             }
         } catch (final ClientProtocolException e) {
-            LogUtils.e(e);
+            throw new RuntimeException(e);
         } catch (final IOException e) {
-            LogUtils.e(e);
+            throw new RuntimeException(e);
         } catch (final JSONException e) {
-            LogUtils.e(e);
+            throw new RuntimeException(e);
         }
 
         return messages;

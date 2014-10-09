@@ -1,13 +1,13 @@
 package com.fight2.scene;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.andengine.entity.IEntity;
 import org.andengine.entity.primitive.Rectangle;
+import org.andengine.entity.scene.ITouchArea;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
@@ -46,17 +46,17 @@ public class GuildScene extends BaseScene {
     private static int TOUCH_AREA_HEIGHT = 280;
     private final Sprite[] focusedButtons = new Sprite[7];
     private final Sprite[] unfocusedButtons = new Sprite[7];
-    private final static String[] NOGUILD_STRINGS = { "公会列表", "创建公会" };
-    private final static String[] INGUILD_STRINGS = { "公会信息", "公会排名", "成员列表", "公会仓库", "炼金房", "投票", "退出公会" };
+    private final static GuildTapEnum[] NOGUILD_ENUMS = { GuildTapEnum.GuildList, GuildTapEnum.GuildApply };
+    private final static GuildTapEnum[] INGUILD_ENUMS = { GuildTapEnum.Info, GuildTapEnum.Ranking, GuildTapEnum.Members, GuildTapEnum.Warehouse,
+            GuildTapEnum.Factory, GuildTapEnum.Poll, GuildTapEnum.QuitGuild };
     private final static String[] HEADBAR_GUILD_LIST = { "NO.", "公会名", "" };
     private final static float[] HBW_GUILD_LIST = { 0.1f, 0.5f, 0.4f };
     private final static String[] HEADBAR_GUILD_RANK = { "NO.", "公会名", "会长" };
     private final static float[] HBW_GUILD_RANK = { 0.1f, 0.5f, 0.4f };
-    private final static String[] HEADBAR_GUILD_MEMBER = { "NO.", "名称", "身价", "出战" };
+    private final static String[] HEADBAR_GUILD_MEMBER = { "NO.", "名称", "工资", "出战" };
     private final static float[] HBW_GUILD_MEMBER = { 0.1f, 0.3f, 0.3f, 0.3f };
-    private final static String[] HEADBAR_GUILD_POLL = { "NO.", "名称", "身价", "" };
+    private final static String[] HEADBAR_GUILD_POLL = { "NO.", "名称", "工资", "" };
     private final static float[] HBW_GUILD_POLL = { 0.1f, 0.3f, 0.3f, 0.3f };
-    private final List<IEntity> boards = new ArrayList<IEntity>();
     private final Sprite frame;
 
     private final Font buttonFont;
@@ -69,6 +69,7 @@ public class GuildScene extends BaseScene {
     private Guild guild;
     private boolean inGuild;
     private boolean isAdmin;
+    private IEntity currentBoard;
     private final Set<User> selectedArenaUsers = new HashSet<User>();
 
     public GuildScene(final GameActivity activity) throws IOException {
@@ -116,18 +117,15 @@ public class GuildScene extends BaseScene {
     }
 
     private void focusButton(final int i) {
+        final GuildTapEnum[] guildTapEnums = inGuild ? INGUILD_ENUMS : NOGUILD_ENUMS;
         focusedButtons[focusedIndex].setVisible(false);
-        final IEntity unfocusedBoard = boards.get(focusedIndex);
-        unfocusedBoard.detachSelf();
         unfocusedButtons[focusedIndex].setVisible(true);
         focusedButtons[i].setVisible(true);
-        final String[] buttonTextStrings = inGuild ? INGUILD_STRINGS : NOGUILD_STRINGS;
-        headTitleText.setText(buttonTextStrings[i]);
-        final IEntity focusedBoard = boards.get(i);
-        frame.attachChild(focusedBoard);
+
+        headTitleText.setText(guildTapEnums[i].getName());
         unfocusedButtons[i].setVisible(false);
         focusedIndex = i;
-
+        switchBoard(guildTapEnums[i]);
     }
 
     public Sprite createButton(final TextureEnum textureEnum, final float x, final float y, final int index) {
@@ -168,8 +166,8 @@ public class GuildScene extends BaseScene {
         final float buttonWidth = TextureEnum.GUILD_FRAME_BUTTON.getWidth();
         final float buttonHeight = TextureEnum.GUILD_FRAME_BUTTON.getHeight();
         final float buttonGap = 0;
-        final String[] buttonTextStrings = inGuild ? INGUILD_STRINGS : NOGUILD_STRINGS;
-        for (int i = 0; i < buttonTextStrings.length; i++) {
+        final GuildTapEnum[] guildTapEnums = inGuild ? INGUILD_ENUMS : NOGUILD_ENUMS;
+        for (int i = 0; i < guildTapEnums.length; i++) {
             final Sprite focusedButton = createALBImageSprite(TextureEnum.GUILD_FRAME_BUTTON_FCS, 20 + i * (buttonWidth + buttonGap), 11);
             frame.attachChild(focusedButton);
             focusedButton.setVisible(false);
@@ -177,9 +175,9 @@ public class GuildScene extends BaseScene {
             final Sprite unfocusedButton = createButton(TextureEnum.GUILD_FRAME_BUTTON, 20 + i * (buttonWidth + buttonGap), 11, i);
             frame.attachChild(unfocusedButton);
             unfocusedButtons[i] = unfocusedButton;
-            final Text focusedText = new Text(buttonWidth * 0.5f, buttonHeight * 0.5f, buttonFont, buttonTextStrings[i], vbom);
+            final Text focusedText = new Text(buttonWidth * 0.5f, buttonHeight * 0.5f, buttonFont, guildTapEnums[i].name, vbom);
             focusedButton.attachChild(focusedText);
-            final Text unfocusedText = new Text(buttonWidth * 0.5f, buttonHeight * 0.5f, buttonFont, buttonTextStrings[i], vbom);
+            final Text unfocusedText = new Text(buttonWidth * 0.5f, buttonHeight * 0.5f, buttonFont, guildTapEnums[i].name, vbom);
             unfocusedText.setColor(0XFFF8B551);
             unfocusedButton.attachChild(unfocusedText);
         }
@@ -458,25 +456,99 @@ public class GuildScene extends BaseScene {
         return board;
     }
 
-    private void createGuildBoards() {
-        for (final IEntity board : boards) {
-            board.detachSelf();
-        }
-        boards.clear();
-        if (inGuild) {
-            boards.add(createGuildInfoBoard());
-            boards.add(createGuildRankingBoard());
-            boards.add(createMemberListBoard());
-            boards.add(createGuildWarehouseBoard());
-            boards.add(createGuildFactoryBoard());
-            boards.add(createGuildPollBoard());
-            boards.add(createQuitGuildBoard());
-        } else {
-            boards.add(createGuildListBoard());
-            boards.add(createGuildApplyBoard());
-        }
+    public IEntity getBoard(final GuildTapEnum guildTapEnum) {
 
-        frame.attachChild(boards.get(0));
+        switch (guildTapEnum) {
+            case Info:
+                currentBoard = createGuildInfoBoard();
+                break;
+            case Ranking:
+                currentBoard = createGuildRankingBoard();
+                break;
+            case Members:
+                currentBoard = createMemberListBoard();
+                break;
+            case Warehouse:
+                currentBoard = createGuildWarehouseBoard();
+                break;
+            case Factory:
+                currentBoard = createGuildFactoryBoard();
+                break;
+            case Poll:
+                currentBoard = createGuildPollBoard();
+                break;
+            case QuitGuild:
+                currentBoard = createQuitGuildBoard();
+                break;
+            case GuildList:
+                currentBoard = createGuildListBoard();
+                break;
+            case GuildApply:
+                currentBoard = createGuildApplyBoard();
+                break;
+
+        }
+        return currentBoard;
+    }
+
+    private void switchBoard(final GuildTapEnum guildTapEnum) {
+        if (currentBoard != null) {
+            currentBoard.detachSelf();
+        }
+        this.unregisterTouchAreas(new ITouchAreaMatcher() {
+            @Override
+            public boolean matches(final ITouchArea touchArea) {
+                if (touchArea instanceof IEntity) {
+                    boolean areaInScene = false;
+                    final IEntity entityTouchArea = (IEntity) touchArea;
+                    IEntity entityTouchAreaParent = entityTouchArea.getParent();
+                    while (entityTouchAreaParent != null) {
+                        if (entityTouchAreaParent == GuildScene.this) {
+                            areaInScene = true;
+                            break;
+                        }
+                        entityTouchAreaParent = entityTouchAreaParent.getParent();
+                    }
+                    return !areaInScene;
+                } else {
+                    return false;
+                }
+
+            }
+
+        });
+
+        switch (guildTapEnum) {
+            case Info:
+                currentBoard = createGuildInfoBoard();
+                break;
+            case Ranking:
+                currentBoard = createGuildRankingBoard();
+                break;
+            case Members:
+                currentBoard = createMemberListBoard();
+                break;
+            case Warehouse:
+                currentBoard = createGuildWarehouseBoard();
+                break;
+            case Factory:
+                currentBoard = createGuildFactoryBoard();
+                break;
+            case Poll:
+                currentBoard = createGuildPollBoard();
+                break;
+            case QuitGuild:
+                currentBoard = createQuitGuildBoard();
+                break;
+            case GuildList:
+                currentBoard = createGuildListBoard();
+                break;
+            case GuildApply:
+                currentBoard = createGuildApplyBoard();
+                break;
+
+        }
+        frame.attachChild(currentBoard);
     }
 
     private void createHeadBar(final String[] headBarStrings, final float[] headBarWidths, final IEntity board) {
@@ -557,13 +629,8 @@ public class GuildScene extends BaseScene {
                                 focusedButton.detachSelf();
                             }
                         }
-                        for (final IEntity board : boards) {
-                            board.detachSelf();
-                        }
-                        boards.clear();
                         focusedIndex = 0;
                         createButtons();
-                        createGuildBoards();
                         focusButton(focusedIndex);
                     }
                 }
@@ -614,7 +681,6 @@ public class GuildScene extends BaseScene {
         inGuild = (this.guild != null);
         isAdmin = (inGuild && (guild.getPresident().getId() == session.getId()));
         createButtons();
-        createGuildBoards();
         focusButton(focusedIndex);
     }
 
@@ -622,4 +688,25 @@ public class GuildScene extends BaseScene {
     public void leaveScene() {
     }
 
+    private enum GuildTapEnum {
+        Info("公会信息"),
+        Ranking("公会排名"),
+        Members("成员列表"),
+        Warehouse("公会仓库"),
+        Factory("炼金房"),
+        Poll("投票"),
+        QuitGuild("退出公会"),
+        GuildList("公会列表"),
+        GuildApply("创建公会");
+        private final String name;
+
+        private GuildTapEnum(final String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+    }
 }
