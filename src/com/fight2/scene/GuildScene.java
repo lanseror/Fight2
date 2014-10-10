@@ -52,7 +52,7 @@ public class GuildScene extends BaseScene {
     private final Sprite[] unfocusedButtons = new Sprite[7];
     private final static GuildTapEnum[] NOGUILD_ENUMS = { GuildTapEnum.GuildList, GuildTapEnum.GuildApply };
     private final static GuildTapEnum[] INGUILD_ENUMS = { GuildTapEnum.Info, GuildTapEnum.Ranking, GuildTapEnum.Members, GuildTapEnum.Warehouse,
-            GuildTapEnum.Factory, GuildTapEnum.Poll, GuildTapEnum.QuitGuild };
+            GuildTapEnum.Bid, GuildTapEnum.Poll, GuildTapEnum.QuitGuild };
     private final static String[] HEADBAR_GUILD_LIST = { "NO.", "公会名", "" };
     private final static float[] HBW_GUILD_LIST = { 0.1f, 0.5f, 0.4f };
     private final static String[] HEADBAR_GUILD_RANK = { "NO.", "公会名", "会长" };
@@ -61,6 +61,8 @@ public class GuildScene extends BaseScene {
     private final static float[] HBW_GUILD_MEMBER = { 0.1f, 0.3f, 0.3f, 0.3f };
     private final static String[] HEADBAR_GUILD_POLL = { "NO.", "名称", "身价", "" };
     private final static float[] HBW_GUILD_POLL = { 0.1f, 0.3f, 0.3f, 0.3f };
+    private final static String[] HEADBAR_GUILD_BID = { "NO.", "物品", "当前出价", "" };
+    private final static float[] HBW_GUILD_BID = { 0.1f, 0.4f, 0.2f, 0.3f };
     private final Sprite frame;
 
     private final Font buttonFont;
@@ -451,10 +453,63 @@ public class GuildScene extends BaseScene {
         return board;
     }
 
-    private IEntity createGuildFactoryBoard() {
+    private IEntity createGuildBidBoard() {
         final IEntity board = createBoardBox();
-        final Text guildNameTitle = new Text(257, 225, infoFont, "炼金房", vbom);
-        board.attachChild(guildNameTitle);
+        this.createHeadBar(HEADBAR_GUILD_BID, HBW_GUILD_BID, board);
+        final List<User> members = GuildUtils.getMembers(guild.getId());
+        final SparseArray<GuildArenaUser> arenaUsers = guild.getArenaUsers();
+        final ScrollZone scrollZone = new ScrollZone(board.getWidth() * 0.5f, 5 + SCROLL_ZONE_HEIGHT * 0.5f, SCROLL_ZONE_WIDTH, SCROLL_ZONE_HEIGHT, vbom);
+        final IEntity touchArea = scrollZone.createTouchArea(SCROLL_ZONE_WIDTH * 0.5f, SCROLL_ZONE_HEIGHT * 0.5f, TOUCH_AREA_WIDTH, TOUCH_AREA_HEIGHT);
+        board.attachChild(scrollZone);
+
+        for (int i = 0; i < members.size(); i++) {
+            final User member = members.get(i);
+            final IEntity row = new Rectangle(0, 0, SCROLL_ZONE_WIDTH, 64, vbom);
+            row.setAlpha(0);
+            if (i < members.size() - 1) {
+                final Sprite line = this.createACImageSprite(TextureEnum.GUILD_SCROLL_ROW_SEPARATOR, SCROLL_ZONE_WIDTH * 0.5f, 1);
+                row.attachChild(line);
+            }
+            final float rowY = row.getHeight() * 0.5f;
+            final Text number = new Text(25, rowY, rankingFont, String.valueOf(i + 1), vbom);
+            row.attachChild(number);
+            final Text memberName = new Text(100, rowY, rankingFont, member.getName(), vbom);
+            row.attachChild(memberName);
+            this.leftAlignEntity(memberName, (HBW_GUILD_MEMBER[0]) * SCROLL_ZONE_WIDTH + 25);
+            final Text salaryText = new Text(100, rowY, rankingFont, "100", vbom);
+            row.attachChild(salaryText);
+            this.leftAlignEntity(salaryText, (HBW_GUILD_MEMBER[0] + HBW_GUILD_MEMBER[1]) * SCROLL_ZONE_WIDTH + 25);
+            final GuildArenaUser guildArenaUser = arenaUsers.get(member.getId());
+            final boolean isArenaUser = guildArenaUser != null;
+            if (isAdmin) {
+                if (isArenaUser) {
+                    selectedArenaUsers.add(member);
+                }
+                final CheckboxSprite checkedIcon = new CheckboxSprite(200, rowY, isArenaUser, vbom);
+                row.attachChild(checkedIcon);
+                checkedIcon.setX((HBW_GUILD_MEMBER[0] + HBW_GUILD_MEMBER[1] + HBW_GUILD_MEMBER[2] + HBW_GUILD_MEMBER[3] * 0.5f) * SCROLL_ZONE_WIDTH);
+                final IEntity checkedIconTouchArea = new Rectangle(200, rowY, HBW_GUILD_MEMBER[3] * SCROLL_ZONE_WIDTH, 64, vbom) {
+                    @Override
+                    public boolean onAreaTouched(final TouchEvent touchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                        if (touchEvent.isActionUp()) {
+                            clickCheckedIcon(checkedIcon, member, guildArenaUser);
+                        }
+                        return true;
+                    }
+                };
+                checkedIconTouchArea.setAlpha(0);
+                checkedIconTouchArea.setX((HBW_GUILD_MEMBER[0] + HBW_GUILD_MEMBER[1] + HBW_GUILD_MEMBER[2] + HBW_GUILD_MEMBER[3] * 0.5f) * SCROLL_ZONE_WIDTH);
+                row.attachChild(checkedIconTouchArea);
+                this.registerTouchArea(checkedIconTouchArea);
+            } else if (isArenaUser) {
+                final Sprite checkedIcon = createACImageSprite(TextureEnum.COMMON_CHECKBOX_ON, 200, rowY);
+                row.attachChild(checkedIcon);
+                checkedIcon.setX((HBW_GUILD_MEMBER[0] + HBW_GUILD_MEMBER[1] + HBW_GUILD_MEMBER[2] + HBW_GUILD_MEMBER[3] * 0.5f) * SCROLL_ZONE_WIDTH);
+            }
+
+            scrollZone.attachRow(row);
+        }
+        this.registerTouchArea(touchArea);
         return board;
     }
 
@@ -549,8 +604,8 @@ public class GuildScene extends BaseScene {
             case Warehouse:
                 currentBoard = createGuildWarehouseBoard();
                 break;
-            case Factory:
-                currentBoard = createGuildFactoryBoard();
+            case Bid:
+                currentBoard = createGuildBidBoard();
                 break;
             case Poll:
                 currentBoard = createGuildPollBoard();
@@ -609,8 +664,8 @@ public class GuildScene extends BaseScene {
             case Warehouse:
                 currentBoard = createGuildWarehouseBoard();
                 break;
-            case Factory:
-                currentBoard = createGuildFactoryBoard();
+            case Bid:
+                currentBoard = createGuildBidBoard();
                 break;
             case Poll:
                 currentBoard = createGuildPollBoard();
@@ -772,7 +827,7 @@ public class GuildScene extends BaseScene {
         Ranking("公会排名"),
         Members("成员列表"),
         Warehouse("公会仓库"),
-        Factory("炼金房"),
+        Bid("拍卖"),
         Poll("投票"),
         QuitGuild("退出公会"),
         GuildList("公会列表"),
