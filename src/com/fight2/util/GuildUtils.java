@@ -301,4 +301,17 @@ public class GuildUtils {
         }
         return true;
     }
+
+    public static int sendCardToBid(final int cardTemplateId) {
+        final String url = HttpUtils.HOST_URL + "/guild/sent-card-to-bid?id=" + cardTemplateId;
+        try {
+            final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
+            final int status = responseJson.getInt("status");
+            return status;
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

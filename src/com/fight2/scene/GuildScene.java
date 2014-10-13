@@ -423,25 +423,26 @@ public class GuildScene extends BaseScene {
             cardRow.attachChild(cardSprite);
             cardRow.attachChild(cardAmountText);
             // Receive button
-            final F2ButtonSprite receiveButton = createACF2CommonButton(550, cardRowY, "提取");
+            final F2ButtonSprite receiveButton = createACF2CommonButton(550, cardRowY, "拍卖");
             cardRow.attachChild(receiveButton);
             // this.registerTouchArea(receiveButton);
             receiveButton.setOnClickListener(new F2OnClickListener() {
                 @Override
                 public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                    final int size = AccountUtils.receiveCardFromUserStoreroom(activity, card.getId());
-                    if (size == 0) {
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(activity, "你的卡组已满！", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    } else if (size < card.getAmount()) {
-                        card.setAmount(card.getAmount() - size);
-                        cardAmountText.setText(String.format("×%s", card.getAmount()));
+                    final int status = GuildUtils.sendCardToBid(card.getId());
+                    if (status == 0) {
+                        alert("已经加入到拍卖阵列");
+                        final int amount = card.getAmount();
+                        if (amount > 1) {
+                            card.setAmount(amount - 1);
+                            cardAmountText.setText(String.format("×%s", card.getAmount()));
+                        } else {
+                            updateScene();
+                        }
+                    } else if (status == 2) {
+                        alert("拍卖阵列已满");
                     } else {
-                        updateScene();
+                        alert("错误");
                     }
                 }
             });
