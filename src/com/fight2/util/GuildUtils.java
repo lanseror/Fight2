@@ -14,6 +14,9 @@ import org.json.JSONObject;
 import android.util.SparseArray;
 
 import com.fight2.GameActivity;
+import com.fight2.entity.Bid;
+import com.fight2.entity.Bid.BidItemType;
+import com.fight2.entity.Bid.BidStatus;
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Guild;
@@ -307,6 +310,83 @@ public class GuildUtils {
         try {
             final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
             final int status = responseJson.getInt("status");
+            return status;
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static int sendItemToBid(final BidItemType itemType) {
+        final String url = HttpUtils.HOST_URL + "/guild/sent-item-to-bid?itemType=" + itemType;
+        try {
+            final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
+            final int status = responseJson.getInt("status");
+            return status;
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static List<Bid> getBids(final GameActivity activity) {
+        final String url = HttpUtils.HOST_URL + "/bid/list-by-guild";
+        try {
+            final List<Bid> bids = new ArrayList<Bid>();
+            final JSONArray bidJsonArray = HttpUtils.getJSONArrayFromUrl(url);
+            for (int i = 0; i < bidJsonArray.length(); i++) {
+                final JSONObject bidJson = bidJsonArray.getJSONObject(i);
+                final Bid bid = new Bid();
+                bid.setId(bidJson.getInt("id"));
+                bid.setAmount(bidJson.getInt("amount"));
+                bid.setPrice(bidJson.getInt("price"));
+                bid.setStatus(BidStatus.valueOf(bidJson.getString("status")));
+                final BidItemType itemType = BidItemType.valueOf(bidJson.getString("type"));
+                bid.setType(itemType);
+                if (itemType == BidItemType.Card) {
+                    final Card card = new Card();
+                    final JSONObject cardJson = bidJson.getJSONObject("card");
+                    card.setId(cardJson.getInt("id"));
+                    card.setHp(cardJson.getInt("hp"));
+                    card.setAtk(cardJson.getInt("atk"));
+                    card.setName(cardJson.getString("name"));
+                    card.setStar(cardJson.getInt("star"));
+                    final String image = cardJson.getString("image");
+                    if (image != null && !"".equals(image)) {
+                        final String localImage = ImageUtils.getLocalString(image, activity);
+                        card.setImage(localImage);
+                        TextureFactory.getInstance().addCardResource(activity, localImage);
+                    }
+                    card.setAmount(cardJson.getInt("amount"));
+                    bid.setCard(card);
+                }
+                bid.setVersion(bidJson.getInt("version"));
+                bid.setMyBid(bidJson.getBoolean("isMyBid"));
+                bids.add(bid);
+            }
+            return bids;
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public static int bid(final Bid bid) {
+        final String url = HttpUtils.HOST_URL + "/bid/bid?id=" + bid.getId() + "&version=" + bid.getVersion();
+        try {
+            final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
+            final int status = responseJson.getInt("status");
+            if (status == 0 || status == 2) {
+                final JSONObject bidJson = responseJson.getJSONObject("bid");
+                bid.setPrice(bidJson.getInt("price"));
+                bid.setVersion(bidJson.getInt("version"));
+            }
             return status;
         } catch (final ClientProtocolException e) {
             throw new RuntimeException(e);

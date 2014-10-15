@@ -18,12 +18,13 @@ import org.andengine.opengl.texture.region.ITextureRegion;
 
 import android.text.InputType;
 import android.util.SparseArray;
-import android.widget.Toast;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
+import com.fight2.entity.Bid;
+import com.fight2.entity.Bid.BidItemType;
 import com.fight2.entity.Card;
 import com.fight2.entity.Guild;
 import com.fight2.entity.GuildArenaUser;
@@ -35,7 +36,6 @@ import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.engine.InputText;
 import com.fight2.entity.engine.InputText.OnConfirmListener;
-import com.fight2.util.AccountUtils;
 import com.fight2.util.GuildUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
@@ -62,17 +62,20 @@ public class GuildScene extends BaseScene {
     private final static String[] HEADBAR_GUILD_POLL = { "NO.", "名称", "身价", "" };
     private final static float[] HBW_GUILD_POLL = { 0.1f, 0.3f, 0.3f, 0.3f };
     private final static String[] HEADBAR_GUILD_BID = { "NO.", "物品", "当前出价", "" };
-    private final static float[] HBW_GUILD_BID = { 0.1f, 0.4f, 0.2f, 0.3f };
+    private final static float[] HBW_GUILD_BID = { 0.1f, 0.3f, 0.2f, 0.4f };
     private final Sprite frame;
 
     private final Font buttonFont;
     private final Font infoFont;
     private final Font amountFont;
+    private final Font contributionFont;
     private final Font headBarFont;
     private final Font rankingFont;
     private final Font headTitleFont;
+    private final Font tipsFont;
     private final Text headTitleText;
     private final Text contributionText;
+
     private int focusedIndex = 0;
     private Guild guild;
     private boolean inGuild;
@@ -82,18 +85,20 @@ public class GuildScene extends BaseScene {
 
     public GuildScene(final GameActivity activity) throws IOException {
         super(activity);
-        buttonFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
-        infoFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
+        this.buttonFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
+        this.infoFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
+        this.tipsFont = ResourceManager.getInstance().getFont(FontEnum.Default, 20);
         this.amountFont = ResourceManager.getInstance().getFont(FontEnum.Default, 30);
-        headBarFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
-        rankingFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
-        headTitleFont = ResourceManager.getInstance().getFont(FontEnum.Default, 30);
-        frame = createALBImageSprite(TextureEnum.GUILD_FRAME, this.simulatedLeftX, FRAME_BOTTOM);
+        this.contributionFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
+        this.headBarFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
+        this.rankingFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
+        this.headTitleFont = ResourceManager.getInstance().getFont(FontEnum.Default, 30);
+        this.frame = createALBImageSprite(TextureEnum.GUILD_FRAME, this.simulatedLeftX, FRAME_BOTTOM);
         this.attachChild(frame);
         headTitleText = new Text(frame.getWidth() * 0.5f, frame.getHeight() - 25, headTitleFont, "公会信息", 15, vbom);
         headTitleText.setColor(0XFF390800);
         frame.attachChild(headTitleText);
-        contributionText = new Text(125, 43, amountFont, String.valueOf(session.getGuildContribution()), 10, vbom);
+        contributionText = new Text(125, 43, contributionFont, String.valueOf(session.getGuildContribution()), 10, vbom);
         init();
     }
 
@@ -384,28 +389,98 @@ public class GuildScene extends BaseScene {
         final IEntity touchArea = scrollZone.createTouchArea(SCROLL_ZONE_WIDTH * 0.5f, SCROLL_ZONE_HEIGHT * 0.5f, TOUCH_AREA_WIDTH, TOUCH_AREA_HEIGHT);
         board.attachChild(scrollZone);
 
-        final IEntity row1 = new Rectangle(0, 0, SCROLL_ZONE_WIDTH, 150, vbom);
-        row1.setAlpha(0);
-        final float row1Y = row1.getHeight() * 0.5f;
-        final Sprite line = this.createACImageSprite(TextureEnum.GUILD_SCROLL_ROW_SEPARATOR, SCROLL_ZONE_WIDTH * 0.5f, 1);
-        row1.attachChild(line);
         // Ticket
-        final TextureEnum ticketEnum = TextureEnum.COMMON_ARENA_TICKET;
-        final Text ticketAmountText = new Text(95, 25, amountFont, String.format("×%s", storeroom.getTicket()), vbom);
-        ticketAmountText.setColor(0XFFAECE01);
-        final IEntity ticketImg = createACImageSprite(ticketEnum, 200, row1Y);
-        row1.attachChild(ticketImg);
-        row1.attachChild(ticketAmountText);
-        this.leftAlignEntity(ticketAmountText, ticketImg.getX() + ticketImg.getWidth() * 0.5f + 2);
+        final int ticketAmount = storeroom.getTicket();
+        if (ticketAmount > 0) {
+            final IEntity ticketRow = new Rectangle(0, 0, SCROLL_ZONE_WIDTH, 150, vbom);
+            ticketRow.setAlpha(0);
+            final float ticketRowY = ticketRow.getHeight() * 0.5f;
+            final Sprite ticketLine = this.createACImageSprite(TextureEnum.GUILD_SCROLL_ROW_SEPARATOR, SCROLL_ZONE_WIDTH * 0.5f, 1);
+            ticketRow.attachChild(ticketLine);
+            final TextureEnum ticketEnum = TextureEnum.COMMON_ARENA_TICKET;
+            final Text ticketAmountText = new Text(95, 25, amountFont, String.format("×%s", storeroom.getTicket()), 10, vbom);
+            ticketAmountText.setColor(0XFFAECE01);
+            final IEntity ticketImg = createACImageSprite(ticketEnum, 350, ticketRowY);
+            ticketRow.attachChild(ticketImg);
+            ticketRow.attachChild(ticketAmountText);
+            this.leftAlignEntity(ticketAmountText, ticketImg.getX() + ticketImg.getWidth() * 0.5f + 2);
+            if (isAdmin) {
+                // Bid button
+                final F2ButtonSprite bidButton = createACF2CommonButton(625, ticketRowY, "拍卖");
+                ticketRow.attachChild(bidButton);
+                this.registerTouchArea(bidButton);
+                bidButton.setOnClickListener(new F2OnClickListener() {
+                    @Override
+                    public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                        if (ticketAmount < 5) {
+                            alert("未达到拍卖要求的最小数量！");
+                            return;
+                        }
+                        final int status = GuildUtils.sendItemToBid(BidItemType.ArenaTicket);
+                        if (status == 0) {
+                            alert("已经加入到拍卖阵列");
+                            if (ticketAmount > 5) {
+                                storeroom.setTicket(ticketAmount - 5);
+                                ticketAmountText.setText(String.format("×%s", ticketAmount - 5));
+                            } else {
+                                updateScene();
+                            }
+                        } else if (status == 2) {
+                            alert("拍卖阵列已满");
+                        } else {
+                            alert("错误");
+                        }
+                    }
+                });
+            }
+            scrollZone.attachRow(ticketRow);
+        }
         // Stamina
-        final TextureEnum staminaEnum = TextureEnum.COMMON_STAMINA;
-        final Text staminaAmountText = new Text(400, 25, amountFont, String.format("×%s", storeroom.getStamina()), vbom);
-        staminaAmountText.setColor(0XFFAECE01);
-        final IEntity staminaImg = createACImageSprite(staminaEnum, 500, row1Y - 5);
-        row1.attachChild(staminaImg);
-        row1.attachChild(staminaAmountText);
-        this.leftAlignEntity(staminaAmountText, staminaImg.getX() + staminaImg.getWidth() * 0.5f + 2);
-        scrollZone.attachRow(row1);
+        final int staminaAmount = storeroom.getStamina();
+        if (staminaAmount > 0) {
+            final IEntity staminaRow = new Rectangle(0, 0, SCROLL_ZONE_WIDTH, 150, vbom);
+            staminaRow.setAlpha(0);
+            final float staminaRowY = staminaRow.getHeight() * 0.5f;
+            final Sprite staminaLine = this.createACImageSprite(TextureEnum.GUILD_SCROLL_ROW_SEPARATOR, SCROLL_ZONE_WIDTH * 0.5f, 1);
+            staminaRow.attachChild(staminaLine);
+            final TextureEnum staminaEnum = TextureEnum.COMMON_STAMINA;
+            final Text staminaAmountText = new Text(400, 25, amountFont, String.format("×%s", staminaAmount), 10, vbom);
+            staminaAmountText.setColor(0XFFAECE01);
+            final IEntity staminaImg = createACImageSprite(staminaEnum, 350, staminaRowY - 5);
+            staminaRow.attachChild(staminaImg);
+            staminaRow.attachChild(staminaAmountText);
+            this.leftAlignEntity(staminaAmountText, staminaImg.getX() + staminaImg.getWidth() * 0.5f + 2);
+            if (isAdmin) {
+                // Bid button
+                final F2ButtonSprite bidButton = createACF2CommonButton(625, staminaRowY, "拍卖");
+                staminaRow.attachChild(bidButton);
+                this.registerTouchArea(bidButton);
+                bidButton.setOnClickListener(new F2OnClickListener() {
+                    @Override
+                    public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                        if (staminaAmount < 5) {
+                            alert("未达到拍卖要求的最小数量！");
+                            return;
+                        }
+                        final int status = GuildUtils.sendItemToBid(BidItemType.Stamina);
+                        if (status == 0) {
+                            alert("已经加入到拍卖阵列");
+                            if (staminaAmount > 5) {
+                                storeroom.setStamina(staminaAmount - 5);
+                                staminaAmountText.setText(String.format("×%s", staminaAmount - 5));
+                            } else {
+                                updateScene();
+                            }
+                        } else if (status == 2) {
+                            alert("拍卖阵列已满");
+                        } else {
+                            alert("错误");
+                        }
+                    }
+                });
+            }
+            scrollZone.attachRow(staminaRow);
+        }
 
         final List<Card> cards = storeroom.getCards();
         for (int i = 0; i < cards.size(); i++) {
@@ -416,36 +491,38 @@ public class GuildScene extends BaseScene {
             final Sprite cardRowLine = this.createACImageSprite(TextureEnum.GUILD_SCROLL_ROW_SEPARATOR, SCROLL_ZONE_WIDTH * 0.5f, 1);
             cardRow.attachChild(cardRowLine);
             final ITextureRegion cardTexture = TextureFactory.getInstance().getTextureRegion(card.getImage());
-            final Sprite cardSprite = new Sprite(220, cardRowY, 110, 165, cardTexture, vbom);
+            final Sprite cardSprite = new Sprite(350, cardRowY, 110, 165, cardTexture, vbom);
             final Text cardAmountText = new Text(300, 25, amountFont, String.format("×%s", card.getAmount()), vbom);
             cardAmountText.setColor(0XFFAECE01);
             this.leftAlignEntity(cardAmountText, cardSprite.getX() + cardSprite.getWidth() * 0.5f + 5);
             cardRow.attachChild(cardSprite);
             cardRow.attachChild(cardAmountText);
-            // Receive button
-            final F2ButtonSprite receiveButton = createACF2CommonButton(550, cardRowY, "拍卖");
-            cardRow.attachChild(receiveButton);
-            // this.registerTouchArea(receiveButton);
-            receiveButton.setOnClickListener(new F2OnClickListener() {
-                @Override
-                public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                    final int status = GuildUtils.sendCardToBid(card.getId());
-                    if (status == 0) {
-                        alert("已经加入到拍卖阵列");
-                        final int amount = card.getAmount();
-                        if (amount > 1) {
-                            card.setAmount(amount - 1);
-                            cardAmountText.setText(String.format("×%s", card.getAmount()));
+            if (isAdmin) {
+                // Bid button
+                final F2ButtonSprite bidButton = createACF2CommonButton(625, cardRowY, "拍卖");
+                cardRow.attachChild(bidButton);
+                this.registerTouchArea(bidButton);
+                bidButton.setOnClickListener(new F2OnClickListener() {
+                    @Override
+                    public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                        final int status = GuildUtils.sendCardToBid(card.getId());
+                        if (status == 0) {
+                            alert("已经加入到拍卖阵列");
+                            final int amount = card.getAmount();
+                            if (amount > 1) {
+                                card.setAmount(amount - 1);
+                                cardAmountText.setText(String.format("×%s", card.getAmount()));
+                            } else {
+                                updateScene();
+                            }
+                        } else if (status == 2) {
+                            alert("拍卖阵列已满");
                         } else {
-                            updateScene();
+                            alert("错误");
                         }
-                    } else if (status == 2) {
-                        alert("拍卖阵列已满");
-                    } else {
-                        alert("错误");
                     }
-                }
-            });
+                });
+            }
 
             scrollZone.attachRow(cardRow);
         }
@@ -457,56 +534,88 @@ public class GuildScene extends BaseScene {
     private IEntity createGuildBidBoard() {
         final IEntity board = createBoardBox();
         this.createHeadBar(HEADBAR_GUILD_BID, HBW_GUILD_BID, board);
-        final List<User> members = GuildUtils.getMembers(guild.getId());
-        final SparseArray<GuildArenaUser> arenaUsers = guild.getArenaUsers();
+        final List<Bid> bids = GuildUtils.getBids(activity);
         final ScrollZone scrollZone = new ScrollZone(board.getWidth() * 0.5f, 5 + SCROLL_ZONE_HEIGHT * 0.5f, SCROLL_ZONE_WIDTH, SCROLL_ZONE_HEIGHT, vbom);
         final IEntity touchArea = scrollZone.createTouchArea(SCROLL_ZONE_WIDTH * 0.5f, SCROLL_ZONE_HEIGHT * 0.5f, TOUCH_AREA_WIDTH, TOUCH_AREA_HEIGHT);
         board.attachChild(scrollZone);
 
-        for (int i = 0; i < members.size(); i++) {
-            final User member = members.get(i);
-            final IEntity row = new Rectangle(0, 0, SCROLL_ZONE_WIDTH, 64, vbom);
+        for (int i = 0; i < bids.size(); i++) {
+            final Bid bid = bids.get(i);
+            final IEntity row = new Rectangle(0, 0, SCROLL_ZONE_WIDTH, 190, vbom);
             row.setAlpha(0);
-            if (i < members.size() - 1) {
+            if (i < bids.size() - 1) {
                 final Sprite line = this.createACImageSprite(TextureEnum.GUILD_SCROLL_ROW_SEPARATOR, SCROLL_ZONE_WIDTH * 0.5f, 1);
                 row.attachChild(line);
             }
             final float rowY = row.getHeight() * 0.5f;
             final Text number = new Text(25, rowY, rankingFont, String.valueOf(i + 1), vbom);
             row.attachChild(number);
-            final Text memberName = new Text(100, rowY, rankingFont, member.getName(), vbom);
-            row.attachChild(memberName);
-            this.leftAlignEntity(memberName, (HBW_GUILD_MEMBER[0]) * SCROLL_ZONE_WIDTH + 25);
-            final Text salaryText = new Text(100, rowY, rankingFont, "100", vbom);
-            row.attachChild(salaryText);
-            this.leftAlignEntity(salaryText, (HBW_GUILD_MEMBER[0] + HBW_GUILD_MEMBER[1]) * SCROLL_ZONE_WIDTH + 25);
-            final GuildArenaUser guildArenaUser = arenaUsers.get(member.getId());
-            final boolean isArenaUser = guildArenaUser != null;
-            if (isAdmin) {
-                if (isArenaUser) {
-                    selectedArenaUsers.add(member);
-                }
-                final CheckboxSprite checkedIcon = new CheckboxSprite(200, rowY, isArenaUser, vbom);
-                row.attachChild(checkedIcon);
-                checkedIcon.setX((HBW_GUILD_MEMBER[0] + HBW_GUILD_MEMBER[1] + HBW_GUILD_MEMBER[2] + HBW_GUILD_MEMBER[3] * 0.5f) * SCROLL_ZONE_WIDTH);
-                final IEntity checkedIconTouchArea = new Rectangle(200, rowY, HBW_GUILD_MEMBER[3] * SCROLL_ZONE_WIDTH, 64, vbom) {
-                    @Override
-                    public boolean onAreaTouched(final TouchEvent touchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                        if (touchEvent.isActionUp()) {
-                            clickCheckedIcon(checkedIcon, member, guildArenaUser);
-                        }
-                        return true;
-                    }
-                };
-                checkedIconTouchArea.setAlpha(0);
-                checkedIconTouchArea.setX((HBW_GUILD_MEMBER[0] + HBW_GUILD_MEMBER[1] + HBW_GUILD_MEMBER[2] + HBW_GUILD_MEMBER[3] * 0.5f) * SCROLL_ZONE_WIDTH);
-                row.attachChild(checkedIconTouchArea);
-                this.registerTouchArea(checkedIconTouchArea);
-            } else if (isArenaUser) {
-                final Sprite checkedIcon = createACImageSprite(TextureEnum.COMMON_CHECKBOX_ON, 200, rowY);
-                row.attachChild(checkedIcon);
-                checkedIcon.setX((HBW_GUILD_MEMBER[0] + HBW_GUILD_MEMBER[1] + HBW_GUILD_MEMBER[2] + HBW_GUILD_MEMBER[3] * 0.5f) * SCROLL_ZONE_WIDTH);
+            final BidItemType itemType = bid.getType();
+            if (itemType == BidItemType.Card) {
+                final Card card = bid.getCard();
+                final ITextureRegion cardTexture = TextureFactory.getInstance().getTextureRegion(card.getImage());
+                final Sprite cardSprite = new Sprite(220, rowY, 110, 165, cardTexture, vbom);
+                final Text cardAmountText = new Text(300, 25, amountFont, String.format("×%s", bid.getAmount()), vbom);
+                cardAmountText.setColor(0XFFAECE01);
+                this.leftAlignEntity(cardAmountText, cardSprite.getX() + cardSprite.getWidth() * 0.5f + 5);
+                row.attachChild(cardSprite);
+                row.attachChild(cardAmountText);
+            } else if (itemType == BidItemType.ArenaTicket) {
+                // Ticket
+                final TextureEnum ticketEnum = TextureEnum.COMMON_ARENA_TICKET;
+                final Text ticketAmountText = new Text(95, 25, amountFont, String.format("×%s", bid.getAmount()), vbom);
+                ticketAmountText.setColor(0XFFAECE01);
+                final IEntity ticketImg = createACImageSprite(ticketEnum, 200, rowY);
+                row.attachChild(ticketImg);
+                row.attachChild(ticketAmountText);
+                this.leftAlignEntity(ticketAmountText, ticketImg.getX() + ticketImg.getWidth() * 0.5f + 2);
+            } else if (itemType == BidItemType.Stamina) {
+                // Stamina
+                final TextureEnum staminaEnum = TextureEnum.COMMON_STAMINA;
+                final Text staminaAmountText = new Text(400, 25, amountFont, String.format("×%s", bid.getAmount()), vbom);
+                staminaAmountText.setColor(0XFFAECE01);
+                final IEntity staminaImg = createACImageSprite(staminaEnum, 500, rowY - 5);
+                row.attachChild(staminaImg);
+                row.attachChild(staminaAmountText);
+                this.leftAlignEntity(staminaAmountText, staminaImg.getX() + staminaImg.getWidth() * 0.5f + 2);
             }
+
+            // Price
+            final Text price = new Text(25, rowY, amountFont, String.valueOf(bid.getPrice()), 8, vbom);
+            price.setX((HBW_GUILD_BID[0] + HBW_GUILD_BID[1] + HBW_GUILD_BID[2] * 0.5f) * SCROLL_ZONE_WIDTH - 25);
+            row.attachChild(price);
+            final IEntity contributionImg = createALBImageSprite(TextureEnum.COMMON_GUILD_CONTRIBUTION, price.getWidth() + 10, 0);
+            price.attachChild(contributionImg);
+            final Text tips = new Text(25, 55, tipsFont, "(你是最高出价者)", vbom);
+            tips.setColor(0XFFAECE01);
+            tips.setX((HBW_GUILD_BID[0] + HBW_GUILD_BID[1] + HBW_GUILD_BID[2] * 0.5f) * SCROLL_ZONE_WIDTH);
+            row.attachChild(tips);
+            tips.setVisible(bid.isMyBid());
+            // Bid button
+            final F2ButtonSprite bidButton = createACF2CommonButton(650, rowY, "出价");
+            row.attachChild(bidButton);
+            this.registerTouchArea(bidButton);
+            bidButton.setOnClickListener(new F2OnClickListener() {
+                @Override
+                public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                    final int status = GuildUtils.bid(bid);
+                    if (status == 0) {
+                        price.setText(String.valueOf(bid.getPrice()));
+                        contributionImg.setX(price.getWidth() + contributionImg.getWidth() * 0.5f + 10);
+                        bid.setMyBid(true);
+                        tips.setVisible(bid.isMyBid());
+                        alert("出价成功！");
+                    } else if (status == 2) {
+                        alert("你的出价已被别人超过，请重新出价！");
+                        price.setText(String.valueOf(bid.getPrice()));
+                        contributionImg.setX(price.getWidth() + contributionImg.getWidth() * 0.5f + 10);
+                        bid.setMyBid(false);
+                        tips.setVisible(bid.isMyBid());
+                    } else {
+                        alert("错误");
+                    }
+                }
+            });
 
             scrollZone.attachRow(row);
         }
