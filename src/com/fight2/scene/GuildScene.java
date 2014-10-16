@@ -62,7 +62,7 @@ public class GuildScene extends BaseScene {
     private final static String[] HEADBAR_GUILD_POLL = { "NO.", "名称", "身价", "" };
     private final static float[] HBW_GUILD_POLL = { 0.1f, 0.3f, 0.3f, 0.3f };
     private final static String[] HEADBAR_GUILD_BID = { "NO.", "物品", "当前出价", "" };
-    private final static float[] HBW_GUILD_BID = { 0.1f, 0.3f, 0.2f, 0.4f };
+    private final static float[] HBW_GUILD_BID = { 0.1f, 0.3f, 0.3f, 0.3f };
     private final Sprite frame;
 
     private final Font buttonFont;
@@ -591,8 +591,14 @@ public class GuildScene extends BaseScene {
             tips.setX((HBW_GUILD_BID[0] + HBW_GUILD_BID[1] + HBW_GUILD_BID[2] * 0.5f) * SCROLL_ZONE_WIDTH);
             row.attachChild(tips);
             tips.setVisible(bid.isMyBid());
+            // countDown
+            final Text countDown = new Text(25, 140, tipsFont, "剩余2天", vbom);
+            countDown.setColor(0XFFF8B451);
+            countDown.setX((HBW_GUILD_BID[0] + HBW_GUILD_BID[1] + HBW_GUILD_BID[2] * 0.5f) * SCROLL_ZONE_WIDTH);
+            row.attachChild(countDown);
             // Bid button
             final F2ButtonSprite bidButton = createACF2CommonButton(650, rowY, "出价");
+            bidButton.setX((HBW_GUILD_BID[0] + HBW_GUILD_BID[1] + HBW_GUILD_BID[2] + HBW_GUILD_BID[3] * 0.5f) * SCROLL_ZONE_WIDTH);
             row.attachChild(bidButton);
             this.registerTouchArea(bidButton);
             bidButton.setOnClickListener(new F2OnClickListener() {

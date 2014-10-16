@@ -55,10 +55,16 @@ public class MainScene extends BaseScene {
     private final Map<Sprite, Sprite> buttonSprites = new HashMap<Sprite, Sprite>();
 
     private final Font mFont;
-    private final Text summonText;
-    private final Text arenaText;
-    private final Text campText;
-    private final List<Text> tipTexts = new ArrayList<Text>();
+    private final IEntity summonTip;
+    private final IEntity arenaTip;
+    private final IEntity campTip;
+    private final IEntity gateTip;
+    private final IEntity storeroomTip;
+    private final IEntity guildTip;
+    private final IEntity congressTip;
+    private final IEntity hotelTip;
+    private final IEntity mailBoxTip;
+    private final List<IEntity> tips = new ArrayList<IEntity>();
 
     private final PartyInfo myPartyInfo = GameUserSession.getInstance().getPartyInfo();
     private final Party[] myParties = myPartyInfo.getParties();
@@ -71,12 +77,61 @@ public class MainScene extends BaseScene {
     public MainScene(final GameActivity activity) throws IOException {
         super(activity);
         this.mFont = ResourceManager.getInstance().getFont(FontEnum.Main);
-        summonText = new Text(this.simulatedLeftX + 570, 25, mFont, "召唤石", vbom);
-        arenaText = new Text(this.simulatedLeftX + 670, 345, mFont, "竞技场", vbom);
-        campText = new Text(this.simulatedLeftX + 720, 200, mFont, "训练营", vbom);
-        tipTexts.add(summonText);
-        tipTexts.add(arenaText);
-        tipTexts.add(campText);
+        final float tipTextX = TextureEnum.MAIN_TIPS.getWidth() * 0.5f;
+        final float tipTextY = TextureEnum.MAIN_TIPS.getHeight() * 0.5f;
+        final Text summonText = new Text(tipTextX, tipTextY, mFont, "召唤石", vbom);
+        summonText.setColor(0XFF8E2E11);
+        summonTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 510, 25);
+        summonTip.attachChild(summonText);
+        tips.add(summonTip);
+
+        final Text arenaText = new Text(tipTextX, tipTextY, mFont, "竞技场", vbom);
+        arenaText.setColor(0XFF8E2E11);
+        arenaTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 630, 365);
+        arenaTip.attachChild(arenaText);
+        tips.add(arenaTip);
+
+        final Text campText = new Text(tipTextX, tipTextY, mFont, "训练营", vbom);
+        campText.setColor(0XFF8E2E11);
+        campTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 650, 210);
+        campTip.attachChild(campText);
+        tips.add(campTip);
+
+        final Text gateText = new Text(tipTextX, tipTextY, mFont, "出城", vbom);
+        gateText.setColor(0XFF8E2E11);
+        gateTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 360, 438);
+        gateTip.attachChild(gateText);
+        tips.add(gateTip);
+
+        final Text storeroomText = new Text(tipTextX, tipTextY, mFont, "仓库", vbom);
+        storeroomText.setColor(0XFF8E2E11);
+        storeroomTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 40, 230);
+        storeroomTip.attachChild(storeroomText);
+        tips.add(storeroomTip);
+
+        final Text guildText = new Text(tipTextX, tipTextY, mFont, "公会", vbom);
+        guildText.setColor(0XFF8E2E11);
+        guildTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 960, 300);
+        guildTip.attachChild(guildText);
+        tips.add(guildTip);
+
+        final Text congressText = new Text(tipTextX, tipTextY, mFont, "国会", vbom);
+        congressText.setColor(0XFF8E2E11);
+        congressTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 800, 500);
+        congressTip.attachChild(congressText);
+        tips.add(congressTip);
+
+        final Text hotelText = new Text(tipTextX, tipTextY, mFont, "酒馆", vbom);
+        hotelText.setColor(0XFF8E2E11);
+        hotelTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 290, 285);
+        hotelTip.attachChild(hotelText);
+        tips.add(hotelTip);
+
+        final Text mailBoxText = new Text(tipTextX, tipTextY, mFont, "信箱", vbom);
+        mailBoxText.setColor(0XFF8E2E11);
+        mailBoxTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 990, 130);
+        mailBoxTip.attachChild(mailBoxText);
+        tips.add(mailBoxTip);
 
         init();
     }
@@ -170,8 +225,12 @@ public class MainScene extends BaseScene {
         this.attachChild(mailBoxFcsSprite);
         buttonSprites.put(mailBoxSprite, mailBoxFcsSprite);
 
-        final Sprite houseLeftSprite = createALBImageSprite(TextureEnum.MAIN_HOUSE_LEFT, 0, 0);
-        this.attachChild(houseLeftSprite);
+        final Sprite storeroomSprite = createALBImageSprite(TextureEnum.MAIN_STOREROOM, 0, 0);
+        this.attachChild(storeroomSprite);
+        final Sprite storeroomFcsSprite = createALBImageSprite(TextureEnum.MAIN_STOREROOM_FCS, 0, 0);
+        storeroomFcsSprite.setVisible(false);
+        this.attachChild(storeroomFcsSprite);
+        buttonSprites.put(storeroomSprite, storeroomFcsSprite);
 
         // final Sprite sunshineSprite = createImageSprite(TextureEnum.MAIN_SUNSHINE, 15);
         // this.attachChild(sunshineSprite);
@@ -207,9 +266,9 @@ public class MainScene extends BaseScene {
         final Sprite playerInfoStaminaBoxSprite = createALBImageSprite(TextureEnum.MAIN_PLAYER_INFO_STAMINA_BOX, 100, 83);
         playerInfoSprite.attachChild(playerInfoStaminaBoxSprite);
 
-        for (final Text tipText : tipTexts) {
-            tipText.setVisible(false);
-            this.attachChild(tipText);
+        for (final IEntity tip : tips) {
+            tip.setVisible(false);
+            this.attachChild(tip);
         }
 
         this.setOnSceneTouchListener(new IOnSceneTouchListener() {
@@ -219,8 +278,8 @@ public class MainScene extends BaseScene {
                 final float y = pSceneTouchEvent.getY();
                 resetButtons();
                 if (pSceneTouchEvent.isActionDown() || pSceneTouchEvent.isActionMove()) {
-                    for (final Text tipText : tipTexts) {
-                        tipText.setVisible(true);
+                    for (final IEntity tip : tips) {
+                        tip.setVisible(true);
                     }
                     if (checkContains(MAIL_VERTICES, x, y)) {
                         focusSprite(mailBoxSprite);
@@ -241,11 +300,11 @@ public class MainScene extends BaseScene {
                     } else if (checkContains(GATE_VERTICES, x, y)) {
                         focusSprite(gateSprite);
                     } else if (checkContains(STOREROOM_VERTICES, x, y)) {
-                        // focusSprite(gateSprite);
+                        focusSprite(storeroomSprite);
                     }
                 } else if (pSceneTouchEvent.isActionUp()) {
-                    for (final Text tipText : tipTexts) {
-                        tipText.setVisible(false);
+                    for (final IEntity tip : tips) {
+                        tip.setVisible(false);
                     }
 
                     if (checkContains(MAIL_VERTICES, x, y)) {
@@ -277,7 +336,7 @@ public class MainScene extends BaseScene {
                         unfocusSprite(gateSprite);
                         ResourceManager.getInstance().setCurrentScene(SceneEnum.Quest);
                     } else if (checkContains(STOREROOM_VERTICES, x, y)) {
-                        // unfocusSprite(gateSprite);
+                        unfocusSprite(storeroomSprite);
                         ResourceManager.getInstance().setCurrentScene(SceneEnum.Storeroom);
                     }
                 }
@@ -294,6 +353,7 @@ public class MainScene extends BaseScene {
                 unfocusSprite(arenaSprite);
                 unfocusSprite(congressSprite);
                 unfocusSprite(gateSprite);
+                unfocusSprite(storeroomSprite);
             }
         });
 
