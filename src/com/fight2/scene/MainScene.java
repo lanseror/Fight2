@@ -34,6 +34,7 @@ import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
+import com.fight2.util.BWShaderProgram;
 import com.fight2.util.ChatUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
@@ -55,15 +56,15 @@ public class MainScene extends BaseScene {
     private final Map<Sprite, Sprite> buttonSprites = new HashMap<Sprite, Sprite>();
 
     private final Font mFont;
-    private final IEntity summonTip;
-    private final IEntity arenaTip;
-    private final IEntity campTip;
-    private final IEntity gateTip;
-    private final IEntity storeroomTip;
-    private final IEntity guildTip;
-    private final IEntity congressTip;
-    private final IEntity hotelTip;
-    private final IEntity mailBoxTip;
+    private final Sprite summonTip;
+    private final Sprite arenaTip;
+    private final Sprite campTip;
+    private final Sprite gateTip;
+    private final Sprite storeroomTip;
+    private final Sprite guildTip;
+    private final Sprite congressTip;
+    private final Sprite hotelTip;
+    private final Sprite mailBoxTip;
     private final List<IEntity> tips = new ArrayList<IEntity>();
 
     private final PartyInfo myPartyInfo = GameUserSession.getInstance().getPartyInfo();
@@ -120,18 +121,21 @@ public class MainScene extends BaseScene {
         congressTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 800, 500);
         congressTip.attachChild(congressText);
         tips.add(congressTip);
+        congressTip.setShaderProgram(BWShaderProgram.getInstance());
 
         final Text hotelText = new Text(tipTextX, tipTextY, mFont, "酒馆", vbom);
         hotelText.setColor(0XFF8E2E11);
         hotelTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 290, 285);
         hotelTip.attachChild(hotelText);
         tips.add(hotelTip);
+        hotelTip.setShaderProgram(BWShaderProgram.getInstance());
 
         final Text mailBoxText = new Text(tipTextX, tipTextY, mFont, "信箱", vbom);
         mailBoxText.setColor(0XFF8E2E11);
         mailBoxTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 990, 130);
         mailBoxTip.attachChild(mailBoxText);
         tips.add(mailBoxTip);
+        mailBoxTip.setShaderProgram(BWShaderProgram.getInstance());
 
         init();
     }

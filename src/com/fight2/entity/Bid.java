@@ -9,6 +9,7 @@ public class Bid {
     private BidStatus status;
     private int version;
     private boolean isMyBid;
+    private int remainTime;
 
     public int getId() {
         return id;
@@ -57,7 +58,6 @@ public class Bid {
     public void setStatus(final BidStatus status) {
         this.status = status;
     }
-    
 
     public int getVersion() {
         return version;
@@ -67,7 +67,6 @@ public class Bid {
         this.version = version;
     }
 
-
     public boolean isMyBid() {
         return isMyBid;
     }
@@ -76,6 +75,13 @@ public class Bid {
         this.isMyBid = isMyBid;
     }
 
+    public int getRemainTime() {
+        return remainTime;
+    }
+
+    public void setRemainTime(final int remainTime) {
+        this.remainTime = remainTime;
+    }
 
     public enum BidItemType {
         ArenaTicket,
@@ -84,7 +90,7 @@ public class Bid {
     }
 
     public enum BidStatus {
-        Open,
-        closed
+        Started,
+        Closed
     }
 }

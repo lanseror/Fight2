@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.andengine.engine.handler.timer.ITimerCallback;
+import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.ITouchArea;
@@ -36,6 +38,7 @@ import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.engine.InputText;
 import com.fight2.entity.engine.InputText.OnConfirmListener;
+import com.fight2.util.DateUtils;
 import com.fight2.util.GuildUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
@@ -574,7 +577,7 @@ public class GuildScene extends BaseScene {
                 final TextureEnum staminaEnum = TextureEnum.COMMON_STAMINA;
                 final Text staminaAmountText = new Text(400, 25, amountFont, String.format("×%s", bid.getAmount()), vbom);
                 staminaAmountText.setColor(0XFFAECE01);
-                final IEntity staminaImg = createACImageSprite(staminaEnum, 500, rowY - 5);
+                final IEntity staminaImg = createACImageSprite(staminaEnum, 200, rowY - 5);
                 row.attachChild(staminaImg);
                 row.attachChild(staminaAmountText);
                 this.leftAlignEntity(staminaAmountText, staminaImg.getX() + staminaImg.getWidth() * 0.5f + 2);
@@ -592,10 +595,30 @@ public class GuildScene extends BaseScene {
             row.attachChild(tips);
             tips.setVisible(bid.isMyBid());
             // countDown
-            final Text countDown = new Text(25, 140, tipsFont, "剩余2天", vbom);
+            final Text countDown = new Text(25, 140, tipsFont, "剩余1234567890: 天已结束", 20, vbom);
             countDown.setColor(0XFFF8B451);
             countDown.setX((HBW_GUILD_BID[0] + HBW_GUILD_BID[1] + HBW_GUILD_BID[2] * 0.5f) * SCROLL_ZONE_WIDTH);
             row.attachChild(countDown);
+            final TimerHandler timerHandler = new TimerHandler(1.0f, new ITimerCallback() {
+                @Override
+                public void onTimePassed(final TimerHandler pTimerHandler) {
+                    final int remainTime = bid.getRemainTime();
+                    if (remainTime > 0) {
+                        countDown.setText(String.format("剩余%s", DateUtils.formatRemainTime(remainTime)));
+                        bid.setRemainTime(remainTime - 1);
+                        pTimerHandler.reset();
+                    } else {
+                        countDown.setText("已结束");
+                        if (GuildUtils.checkMyBid(bid.getId())) {
+                            tips.setText("你已得标");
+                        } else {
+                            tips.setText("你未得标");
+                        }
+                        tips.setVisible(true);
+                    }
+                }
+            });
+            activity.getEngine().registerUpdateHandler(timerHandler);
             // Bid button
             final F2ButtonSprite bidButton = createACF2CommonButton(650, rowY, "出价");
             bidButton.setX((HBW_GUILD_BID[0] + HBW_GUILD_BID[1] + HBW_GUILD_BID[2] + HBW_GUILD_BID[3] * 0.5f) * SCROLL_ZONE_WIDTH);
