@@ -387,7 +387,6 @@ public class GuildUtils {
                 final JSONObject bidJson = responseJson.getJSONObject("bid");
                 bid.setPrice(bidJson.getInt("price"));
                 bid.setVersion(bidJson.getInt("version"));
-                bid.setRemainTime(bidJson.getInt("remainTime"));
             }
             return status;
         } catch (final ClientProtocolException e) {
@@ -397,12 +396,12 @@ public class GuildUtils {
         }
     }
 
-    public static boolean checkMyBid(final int bidId) {
+    public static int checkMyBid(final int bidId) {
         final String url = HttpUtils.HOST_URL + "/bid/check-my-bid?id=" + bidId;
         try {
             final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
             final int status = responseJson.getInt("status");
-            return status == 0;
+            return status;
         } catch (final ClientProtocolException e) {
             throw new RuntimeException(e);
         } catch (final Exception e) {

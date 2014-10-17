@@ -594,31 +594,6 @@ public class GuildScene extends BaseScene {
             tips.setX((HBW_GUILD_BID[0] + HBW_GUILD_BID[1] + HBW_GUILD_BID[2] * 0.5f) * SCROLL_ZONE_WIDTH);
             row.attachChild(tips);
             tips.setVisible(bid.isMyBid());
-            // countDown
-            final Text countDown = new Text(25, 140, tipsFont, "剩余1234567890: 天已结束", 20, vbom);
-            countDown.setColor(0XFFF8B451);
-            countDown.setX((HBW_GUILD_BID[0] + HBW_GUILD_BID[1] + HBW_GUILD_BID[2] * 0.5f) * SCROLL_ZONE_WIDTH);
-            row.attachChild(countDown);
-            final TimerHandler timerHandler = new TimerHandler(1.0f, new ITimerCallback() {
-                @Override
-                public void onTimePassed(final TimerHandler pTimerHandler) {
-                    final int remainTime = bid.getRemainTime();
-                    if (remainTime > 0) {
-                        countDown.setText(String.format("剩余%s", DateUtils.formatRemainTime(remainTime)));
-                        bid.setRemainTime(remainTime - 1);
-                        pTimerHandler.reset();
-                    } else {
-                        countDown.setText("已结束");
-                        if (GuildUtils.checkMyBid(bid.getId())) {
-                            tips.setText("你已得标");
-                        } else {
-                            tips.setText("你未得标");
-                        }
-                        tips.setVisible(true);
-                    }
-                }
-            });
-            activity.getEngine().registerUpdateHandler(timerHandler);
             // Bid button
             final F2ButtonSprite bidButton = createACF2CommonButton(650, rowY, "出价");
             bidButton.setX((HBW_GUILD_BID[0] + HBW_GUILD_BID[1] + HBW_GUILD_BID[2] + HBW_GUILD_BID[3] * 0.5f) * SCROLL_ZONE_WIDTH);
@@ -645,6 +620,38 @@ public class GuildScene extends BaseScene {
                     }
                 }
             });
+
+            // countDown
+            final Text countDown = new Text(25, 140, tipsFont, "剩余1234567890: 天已结束", 20, vbom);
+            countDown.setColor(0XFFF8B451);
+            countDown.setX((HBW_GUILD_BID[0] + HBW_GUILD_BID[1] + HBW_GUILD_BID[2] * 0.5f) * SCROLL_ZONE_WIDTH);
+            row.attachChild(countDown);
+            final TimerHandler timerHandler = new TimerHandler(1.0f, new ITimerCallback() {
+                @Override
+                public void onTimePassed(final TimerHandler pTimerHandler) {
+                    final int remainTime = bid.getRemainTime();
+                    if (remainTime > 0) {
+                        countDown.setText(String.format("剩余%s", DateUtils.formatRemainTime(remainTime)));
+                        bid.setRemainTime(remainTime - 1);
+                        pTimerHandler.reset();
+                    } else {
+                        countDown.setText("已结束");
+                        final int status = GuildUtils.checkMyBid(bid.getId());
+                        if (status == 0) {
+                            tips.setText("你已得标");
+                        } else if (status == 1) {
+                            tips.setText("你未得标");
+                        } else if (status == 2) {
+                            pTimerHandler.reset();
+                        } else {
+                            tips.setText("错误");
+                        }
+                        bidButton.setVisible(false);
+                        tips.setVisible(true);
+                    }
+                }
+            });
+            activity.getEngine().registerUpdateHandler(timerHandler);
 
             scrollZone.attachRow(row);
         }
