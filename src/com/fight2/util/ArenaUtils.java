@@ -65,6 +65,7 @@ public class ArenaUtils {
             userArenaInfo.setRankNumber(responseJson.getInt("rankNumber"));
             userArenaInfo.setWin(responseJson.getInt("win"));
             userArenaInfo.setRemainTime(responseJson.getString("remainTime"));
+            userArenaInfo.setIssuedReward(responseJson.getInt("issuedReward"));
             final List<UserArenaRecord> arenaRecords = new ArrayList<UserArenaRecord>();
 
             final JSONArray arenaRecordsJsonArray = responseJson.getJSONArray("arenaRecords");

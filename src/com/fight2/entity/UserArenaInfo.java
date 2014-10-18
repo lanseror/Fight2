@@ -8,6 +8,15 @@ public class UserArenaInfo {
     private int win;
     private int lose;
     private String remainTime;
+    private int issuedReward;
+
+    public int getIssuedReward() {
+        return issuedReward;
+    }
+
+    public void setIssuedReward(final int issuedReward) {
+        this.issuedReward = issuedReward;
+    }
 
     private List<UserArenaRecord> arenaRecords;
 

@@ -260,7 +260,7 @@ public class ArenaScene extends BaseScene {
 
     private void showArenaReward() {
         try {
-            final BaseScene scene = new ArenaRewardScene(activity, rankText.getText());
+            final BaseScene scene = new ArenaRewardScene(activity, userArenaInfo);
             scene.updateScene();
             this.setChildScene(scene, false, false, true);
         } catch (final IOException e) {

@@ -27,6 +27,7 @@ import com.fight2.entity.ArenaReward.ArenaRewardType;
 import com.fight2.entity.ArenaRewardItem;
 import com.fight2.entity.ArenaRewardItem.ArenaRewardItemType;
 import com.fight2.entity.Card;
+import com.fight2.entity.UserArenaInfo;
 import com.fight2.util.ArenaUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
@@ -53,22 +54,24 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
     private final Text rankDescTitleText;
     private final Text mightDescText;
     private final Text rankDescText;
-    private static String MIGHT_DESC_TITLE = "已领取奖励: 0/18";
+    private static String MIGHT_DESC_TITLE = "已领取奖励: %s/%s";
     private static String RANK_DESC_TITLE = "你的排名：%s";
     private static String MIGHT_DESC = "在战斗中胜利可获得力量，从而赢得奖励。以下列表显示了你完成每个阶段时可以获得的奖励。达到力量要求后，系统会将奖励发送到你的宝库中。";
     private static String RANK_DESC = "只有最强大的英雄才配获得最丰厚的奖励！以下列表显示了你名列前茅时能够获得的奖励。完成赛季的战斗后，就会根据排名获得奖励。";
+    private final UserArenaInfo userArenaInfo;
 
-    public ArenaRewardScene(final GameActivity activity, final CharSequence rankString) throws IOException {
+    public ArenaRewardScene(final GameActivity activity, final UserArenaInfo userArenaInfo) throws IOException {
         super(activity);
+        this.userArenaInfo = userArenaInfo;
         this.descTitleFont = ResourceManager.getInstance().getFont(FontEnum.Bold, 30);
         this.descFont = ResourceManager.getInstance().getFont(FontEnum.Default, 18);
         this.mightFont = ResourceManager.getInstance().getFont(FontEnum.Bold, 26);
         this.rankFont = ResourceManager.getInstance().getFont(FontEnum.Bold, 30);
         this.amountFont = ResourceManager.getInstance().getFont(FontEnum.Default, 30);
         this.itemFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
-        this.mightDescTitleText = new Text(291, 145, descTitleFont, MIGHT_DESC_TITLE, vbom);
+        this.mightDescTitleText = new Text(291, 145, descTitleFont, MIGHT_DESC_TITLE, 15, vbom);
         mightDescTitleText.setColor(0XFF683905);
-        this.rankDescTitleText = new Text(291, 145, descTitleFont, String.format(RANK_DESC_TITLE, rankString), vbom);
+        this.rankDescTitleText = new Text(291, 145, descTitleFont, String.format(RANK_DESC_TITLE, userArenaInfo.getRankNumber()), vbom);
         rankDescTitleText.setColor(0XFF683905);
         final TextOptions textOptions = new TextOptions(AutoWrap.LETTERS, 485);
         this.mightDescText = new Text(291, 80, descFont, MIGHT_DESC, textOptions, vbom);
@@ -232,6 +235,7 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
             mightContainer.attachChild(rewardGrid);
         }
         scrollMightBottomY = CONTAINER_INIT_Y - mightGridBottomY + gridHeight * 0.5f;
+        mightDescTitleText.setText(String.format(MIGHT_DESC_TITLE, userArenaInfo.getIssuedReward(), mightRewards.size()));
 
         // Rank elements
         float rankGridBottomY = 0;
