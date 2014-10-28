@@ -160,7 +160,7 @@ public class UserStoreroomScene extends BaseScene {
         return board;
     }
 
-    private void createGuildBoards() {
+    private void createBoards() {
         for (final IEntity board : boards) {
             board.detachSelf();
         }
@@ -178,7 +178,7 @@ public class UserStoreroomScene extends BaseScene {
     @Override
     public void updateScene() {
         activity.getGameHub().needSmallChatRoom(true);
-        createGuildBoards();
+        createBoards();
     }
 
     @Override

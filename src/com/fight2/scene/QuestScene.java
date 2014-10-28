@@ -1,8 +1,10 @@
 package com.fight2.scene;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
@@ -30,14 +32,22 @@ import com.fight2.GameActivity;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.constant.TiledTextureEnum;
+import com.fight2.entity.QuestResult;
+import com.fight2.entity.QuestTile;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
+import com.fight2.util.AsyncTaskLoader;
+import com.fight2.util.IAsyncCallback;
+import com.fight2.util.QuestUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TiledTextureFactory;
 
 public class QuestScene extends BaseScene {
     private TMXTiledMap tmxTiledMap;
     private int direction = -1;
+    private QuestGoStatus goStatus;
+    private QuestResult questResult;
+    private final List<Sprite> treasureSprites = new ArrayList<Sprite>();
 
     public QuestScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -57,12 +67,22 @@ public class QuestScene extends BaseScene {
         tmxTiledMap.setPosition(this.cameraCenterX - 300, this.cameraCenterY - 250);
         tmxTiledMap.setScale(1.7f);
         this.attachChild(this.tmxTiledMap);
+        final List<QuestTile> treasures = QuestUtils.getQuestTreasure();
         final TMXLayer tmxLayer = this.tmxTiledMap.getTMXLayers().get(0);
+        for (final QuestTile treasure : treasures) {
+            final float treasureX = tmxLayer.getTileX(treasure.getCol()) + 0.5f * tmxTiledMap.getTileWidth();
+            final float treasureY = tmxLayer.getTileY(treasure.getRow()) + 0.5f * tmxTiledMap.getTileHeight();
+            final Sprite treasureSprite = this.createACImageSprite(TextureEnum.QUEST_TREASURE_BOX, treasureX, treasureY);
+            tmxTiledMap.attachChild(treasureSprite);
+            treasureSprites.add(treasureSprite);
+        }
+
         final float playerX = tmxLayer.getTileX(1) + 0.5f * tmxTiledMap.getTileWidth();
         final float playerY = tmxLayer.getTileY(5) + 0.5f * tmxTiledMap.getTileHeight();
         final ITiledTextureRegion playerTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.PLAYER);
         final AnimatedSprite player = new AnimatedSprite(playerX, playerY, playerTextureRegion, vbom);
         player.setCurrentTileIndex(4);
+
         tmxTiledMap.attachChild(player);
         this.setOnSceneTouchListener(new IOnSceneTouchListener() {
             @Override
@@ -72,12 +92,14 @@ public class QuestScene extends BaseScene {
                     final float sceneY = pSceneTouchEvent.getY();
                     final TMXTile tmxTile = tmxLayer.getTMXTileAt(sceneX, sceneY);
                     if (tmxTile != null && tmxTile.getGlobalTileID() > 0) {
-
+                        final float startX = player.getX();
+                        final float startY = player.getY();
                         final float[] playerSceneCordinates = player.getSceneCenterCoordinates();
                         final TMXTile currentTile = tmxLayer.getTMXTileAt(playerSceneCordinates[Constants.VERTEX_INDEX_X],
                                 playerSceneCordinates[Constants.VERTEX_INDEX_Y]);
                         // Debug.e("Found currentTile:" + currentTile.getTileColumn() + "," + currentTile.getTileRow());
                         final Path path = findPath(currentTile, tmxTile, tmxLayer);
+                        go(tmxTile);
                         final float[] xs = path.getCoordinatesX();
                         final float[] ys = path.getCoordinatesY();
                         player.registerEntityModifier(new PathModifier(path.getSize() * 1f, path, null, new IPathModifierListener() {
@@ -103,7 +125,6 @@ public class QuestScene extends BaseScene {
                                     } else if (x1 > x2 && y1 == y2) {// left
                                         changeDirection(player, 3);
                                     }
-
                                 }
                             }
 
@@ -116,6 +137,23 @@ public class QuestScene extends BaseScene {
                             public void onPathFinished(final PathModifier pPathModifier, final IEntity pEntity) {
                                 player.stopAnimation();
                                 direction = -1;
+                                if (goStatus == QuestGoStatus.Failed) {
+                                    player.setPosition(startX, startY);
+                                    goStatus = QuestGoStatus.Stopped;
+                                } else if (goStatus == QuestGoStatus.Arrived) {
+                                    goStatus = QuestGoStatus.Stopped;
+                                } else if (goStatus == QuestGoStatus.Treasure) {
+                                    try {
+                                        final QuestTreasureScene treasureScene = new QuestTreasureScene(questResult, activity);
+                                        activity.getEngine().setScene(treasureScene);
+                                        treasureScene.updateScene();
+                                    } catch (final IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
+                                    treasureSprites.get(questResult.getTreasureIndex()).detachSelf();
+                                    treasureSprites.remove(questResult.getTreasureIndex());
+                                    goStatus = QuestGoStatus.Stopped;
+                                }
                             }
                         }));
                         return true;
@@ -136,6 +174,44 @@ public class QuestScene extends BaseScene {
         });
         this.attachChild(backButton);
         this.registerTouchArea(backButton);
+    }
+
+    private void go(final TMXTile destTile) {
+        goStatus = QuestGoStatus.Started;
+        final IAsyncCallback callback = new IAsyncCallback() {
+
+            @Override
+            public void workToDo() {
+                questResult = QuestUtils.go(destTile.getTileRow(), destTile.getTileColumn());
+
+            }
+
+            @Override
+            public void onComplete() {
+                if (questResult.getStatus() == 0) {
+                    goStatus = QuestGoStatus.Arrived;
+                } else if (questResult.getStatus() == 1) {
+                    goStatus = QuestGoStatus.Treasure;
+                } else {
+                    goStatus = QuestGoStatus.Failed;
+                }
+
+            }
+        };
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new AsyncTaskLoader().execute(callback);
+            }
+        });
+    }
+
+    public enum QuestGoStatus {
+        Started,
+        Arrived,
+        Treasure,
+        Stopped,
+        Failed
     }
 
     @Override

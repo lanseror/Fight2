@@ -169,7 +169,10 @@ public enum TextureEnum {
     PREBATTLE_INFO_RIGHT("images/prebattle_info_right.png", 283, 84),
     PREBATTLE_NAME_BOX("images/prebattle_name_box.png", 378, 77),
     PREBATTLE_COMBO_SKILL_LEFT("images/prebattle_combo_skill_left.png", 285, 122),
-    PREBATTLE_COMBO_SKILL_RIGHT("images/prebattle_combo_skill_right.png", 285, 122);
+    PREBATTLE_COMBO_SKILL_RIGHT("images/prebattle_combo_skill_right.png", 285, 122),
+
+    // Quest images.
+    QUEST_TREASURE_BOX("images/quest_treasure_box.png", 95*0.4f, 84*0.4f);
 
     private final String url;
     private final float width;
