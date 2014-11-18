@@ -26,12 +26,7 @@ import com.fight2.entity.User;
 import com.fight2.entity.UserArenaInfo;
 import com.fight2.entity.UserArenaRecord;
 import com.fight2.entity.UserArenaRecord.UserArenaRecordStatus;
-import com.fight2.entity.battle.BattleRecord;
 import com.fight2.entity.battle.BattleResult;
-import com.fight2.entity.battle.SkillApplyParty;
-import com.fight2.entity.battle.SkillOperation;
-import com.fight2.entity.battle.SkillRecord;
-import com.fight2.entity.battle.SkillType;
 
 public class ArenaUtils {
     private static Arena selectedArena;
@@ -251,50 +246,11 @@ public class ArenaUtils {
         }
     }
 
-    public static BattleResult attack(final int index, final GameActivity activity) {
-        final String url = HttpUtils.HOST_URL + "/arena/attack.action?id=" + selectedArenaId + "&index=" + index;
-        final BattleResult battleResult = new BattleResult();
-        final List<BattleRecord> battleRecords = new ArrayList<BattleRecord>();
-        battleResult.setBattleRecord(battleRecords);
+    public static BattleResult attack(final int attackPlayerId, final GameActivity activity) {
+        final String url = HttpUtils.HOST_URL + "/arena/attack.action?id=" + selectedArenaId + "&attackId=" + attackPlayerId;
         try {
             final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
-            battleResult.setWinner(responseJson.getBoolean("isWinner"));
-            battleResult.setBaseMight(responseJson.getInt("baseMight"));
-            battleResult.setAliveMight(responseJson.getInt("aliveMight"));
-            battleResult.setCwMight(responseJson.getInt("cwMight"));
-            battleResult.setTotalMight(responseJson.getInt("totalMight"));
-            battleResult.setCwRate(responseJson.getInt("cwRate"));
-            final JSONArray battleRecordJsonArray = responseJson.getJSONArray("battleRecord");
-            for (int i = 0; i < battleRecordJsonArray.length(); i++) {
-                final JSONObject battleRecordJson = battleRecordJsonArray.getJSONObject(i);
-                final BattleRecord battleRecord = new BattleRecord();
-                battleRecord.setActionPlayer(battleRecordJson.getString("actionPlayer"));
-                battleRecord.setAtk(battleRecordJson.getInt("atk"));
-                battleRecord.setAtkParty(battleRecordJson.getInt("atkParty"));
-                battleRecord.setDefenceParty(battleRecordJson.getInt("defenceParty"));
-                final JSONObject skillJson = battleRecordJson.optJSONObject("skill");
-                if (skillJson != null) {
-                    final SkillRecord skill = new SkillRecord();
-                    battleRecord.setSkill(skill);
-                    skill.setCardIndex(skillJson.getInt("cardIndex"));
-                    skill.setEffect(skillJson.getString("effect"));
-                    skill.setName(skillJson.getString("name"));
-                    final List<SkillOperation> operations = new ArrayList<SkillOperation>();
-                    skill.setOperations(operations);
-                    final JSONArray operationJsonArray = skillJson.getJSONArray("operations");
-                    for (int operationIndex = 0; operationIndex < operationJsonArray.length(); operationIndex++) {
-                        final JSONObject operationJson = operationJsonArray.getJSONObject(operationIndex);
-                        final SkillOperation operation = new SkillOperation();
-                        operation.setPoint(operationJson.getInt("point"));
-                        operation.setSign(operationJson.getInt("sign"));
-                        operation.setSkillApplyParty(SkillApplyParty.valueOf(operationJson.getString("skillApplyParty")));
-                        operation.setSkillType(SkillType.valueOf(operationJson.getString("skillType")));
-                        operations.add(operation);
-                    }
-                }
-                battleRecords.add(battleRecord);
-            }
-
+            return BattleUtils.attack(responseJson);
         } catch (final JSONException e) {
             throw new RuntimeException(e);
         } catch (final ClientProtocolException e) {
@@ -302,7 +258,6 @@ public class ArenaUtils {
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
-        return battleResult;
     }
 
     public static boolean checkAttack() {

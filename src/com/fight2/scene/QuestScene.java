@@ -52,7 +52,8 @@ public class QuestScene extends BaseScene {
     private QuestGoStatus goStatus;
     private QuestResult questResult;
     private final List<Sprite> treasureSprites = new ArrayList<Sprite>();
-    private QuestTreasureData questTreasureData = new QuestTreasureData();;
+    private QuestTreasureData questTreasureData = new QuestTreasureData();
+    private static int GID = 11;
 
     public QuestScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -76,14 +77,13 @@ public class QuestScene extends BaseScene {
     protected void init() throws IOException {
         try {
             final TMXLoader tmxLoader = new TMXLoader(activity.getAssets(), activity.getTextureManager(), TextureOptions.BILINEAR_PREMULTIPLYALPHA, vbom);
-            this.tmxTiledMap = tmxLoader.loadFromAsset("tmx/my.tmx");
+            this.tmxTiledMap = tmxLoader.loadFromAsset("tmx/my2.tmx");
             this.tmxTiledMap.setOffsetCenter(0, 0);
-
+            tmxTiledMap.setScale(0.3f);
         } catch (final TMXLoadException e) {
             Debug.e(e);
         }
-        tmxTiledMap.setPosition(this.cameraCenterX - 300, this.cameraCenterY - 250);
-        tmxTiledMap.setScale(1.7f);
+//        tmxTiledMap.setPosition(this.cameraCenterX - 300, this.cameraCenterY - 250);
         this.attachChild(this.tmxTiledMap);
         final TMXLayer tmxLayer = this.tmxTiledMap.getTMXLayers().get(0);
         final QuestTreasureData newTreasureData = QuestUtils.getQuestTreasure(questTreasureData);
@@ -104,7 +104,7 @@ public class QuestScene extends BaseScene {
                     final float sceneX = pSceneTouchEvent.getX();
                     final float sceneY = pSceneTouchEvent.getY();
                     final TMXTile tmxTile = tmxLayer.getTMXTileAt(sceneX, sceneY);
-                    if (tmxTile != null && tmxTile.getGlobalTileID() > 0) {
+                    if (tmxTile != null && tmxTile.getGlobalTileID() == GID) {
                         final float startX = player.getX();
                         final float startY = player.getY();
                         final float[] playerSceneCordinates = player.getSceneCenterCoordinates();
@@ -170,6 +170,18 @@ public class QuestScene extends BaseScene {
                                         throw new RuntimeException(e);
                                     }
                                     removeTreasureSprite();
+                                    goStatus = QuestGoStatus.Stopped;
+                                } else if (goStatus == QuestGoStatus.Enemy) {
+                                    if (questResult.isTreasureUpdated()) {
+                                        refreshTreasureSprites(questResult.getQuestTreasureData());
+                                    }
+                                    try {
+                                        final PreBattleScene preBattleScene = new PreBattleScene(activity, questResult.getEnemy(), false);
+                                        activity.getEngine().setScene(preBattleScene);
+                                        preBattleScene.updateScene();
+                                    } catch (final IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
                                     goStatus = QuestGoStatus.Stopped;
                                 }
                             }
@@ -248,6 +260,8 @@ public class QuestScene extends BaseScene {
                     goStatus = QuestGoStatus.Arrived;
                 } else if (questResult.getStatus() == 1) {
                     goStatus = QuestGoStatus.Treasure;
+                } else if (questResult.getStatus() == 2) {
+                    goStatus = QuestGoStatus.Enemy;
                 } else {
                     goStatus = QuestGoStatus.Failed;
                 }
@@ -266,6 +280,7 @@ public class QuestScene extends BaseScene {
         Started,
         Arrived,
         Treasure,
+        Enemy,
         Stopped,
         Failed
     }
@@ -316,22 +331,22 @@ public class QuestScene extends BaseScene {
                 break;
             }
             final TMXTile rightTile = tmxLayer.getTMXTile(col + 1, row);
-            if (rightTile != null && rightTile.getGlobalTileID() > 0 && !visitedTiles.contains(rightTile)) { /* right */
+            if (rightTile != null && rightTile.getGlobalTileID() == GID && !visitedTiles.contains(rightTile)) { /* right */
                 visit(rightTile, currentPoint, queue);
                 visitedTiles.add(rightTile);
             }
             final TMXTile downTile = tmxLayer.getTMXTile(col, row + 1);
-            if (downTile != null && downTile.getGlobalTileID() > 0 && !visitedTiles.contains(downTile)) { /* down */
+            if (downTile != null && downTile.getGlobalTileID() == GID && !visitedTiles.contains(downTile)) { /* down */
                 visit(downTile, currentPoint, queue);
                 visitedTiles.add(downTile);
             }
             final TMXTile leftTile = tmxLayer.getTMXTile(col - 1, row);
-            if (leftTile != null && leftTile.getGlobalTileID() > 0 && !visitedTiles.contains(leftTile)) {/* left */
+            if (leftTile != null && leftTile.getGlobalTileID() == GID && !visitedTiles.contains(leftTile)) {/* left */
                 visit(leftTile, currentPoint, queue);
                 visitedTiles.add(leftTile);
             }
             final TMXTile upTile = tmxLayer.getTMXTile(col, row - 1);
-            if (upTile != null && upTile.getGlobalTileID() > 0 && !visitedTiles.contains(upTile)) {/* up */
+            if (upTile != null && upTile.getGlobalTileID() == GID && !visitedTiles.contains(upTile)) {/* up */
                 visit(upTile, currentPoint, queue);
                 visitedTiles.add(upTile);
             }

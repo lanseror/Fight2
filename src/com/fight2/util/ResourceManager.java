@@ -3,6 +3,7 @@ package com.fight2.util;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Stack;
 
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.font.FontFactory;
@@ -39,6 +40,7 @@ public class ResourceManager {
     private FontManager fontManager;
     private BaseScene currentScene;
     private SceneEnum currentSceneEnum;
+    private final Stack<SceneEnum> breadcrumbs = new Stack<SceneEnum>();
 
     private final Map<SceneEnum, BaseScene> scenes = new HashMap<SceneEnum, BaseScene>();
 
@@ -68,6 +70,7 @@ public class ResourceManager {
 
         loadScenes();
         // Resources loaded
+        breadcrumbs.clear();
         this.isResourceLoaded = true;
     }
 
@@ -91,6 +94,23 @@ public class ResourceManager {
         if (currentScene != null) {
             currentScene.leaveScene();
         }
+        final BaseScene scene = scenes.get(sceneEnum);
+        activity.getEngine().setScene(scene);
+        scene.updateScene();
+        currentScene = scene;
+        currentSceneEnum = sceneEnum;
+        breadcrumbs.push(currentSceneEnum);
+    }
+
+    public void sceneBack(final boolean isManaged) {
+        if (currentScene != null && isManaged) {
+            currentScene.leaveScene();
+        }
+        if (isManaged) {
+            breadcrumbs.pop();
+        }
+        final SceneEnum sceneEnum = breadcrumbs.peek();
+
         final BaseScene scene = scenes.get(sceneEnum);
         activity.getEngine().setScene(scene);
         scene.updateScene();
@@ -190,4 +210,5 @@ public class ResourceManager {
         }
 
     }
+
 }

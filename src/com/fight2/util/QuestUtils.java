@@ -4,15 +4,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.fight2.GameActivity;
 import com.fight2.entity.Card;
 import com.fight2.entity.QuestResult;
 import com.fight2.entity.QuestResult.TileItem;
 import com.fight2.entity.QuestTile;
 import com.fight2.entity.QuestTreasureData;
+import com.fight2.entity.User;
+import com.fight2.entity.battle.BattleResult;
 
 public class QuestUtils {
 
@@ -41,6 +45,12 @@ public class QuestUtils {
                     card.setTemplateId(cardTemplateJson.getInt("id"));
                     result.setCard(card);
                 }
+            } else if (result.getStatus() == 2) {
+                final JSONObject enymyJson = responseJson.getJSONObject("enemy");
+                final User enemy = new User();
+                enemy.setId(enymyJson.getInt("id"));
+                enemy.setName(enymyJson.getString("name"));
+                result.setEnemy(enemy);
             }
             final boolean treasureUpdated = responseJson.getBoolean("treasureUpdate");
             result.setTreasureUpdated(treasureUpdated);
@@ -95,5 +105,19 @@ public class QuestUtils {
             throw new RuntimeException(e);
         }
         return questTreasureData;
+    }
+
+    public static BattleResult attack(final int attackPlayerId, final GameActivity activity) {
+        final String url = HttpUtils.HOST_URL + "/quest/attack?id=" + attackPlayerId;
+        try {
+            final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
+            return BattleUtils.attack(responseJson);
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

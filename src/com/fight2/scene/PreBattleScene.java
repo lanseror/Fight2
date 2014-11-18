@@ -15,7 +15,6 @@ import org.andengine.util.debug.Debug;
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.MusicEnum;
-import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
@@ -45,7 +44,6 @@ public class PreBattleScene extends BaseScene {
     private final PartyInfo opponentPartyInfo;
     private final Party[] myParties = myPartyInfo.getParties();
     private final Party[] opponentParties;
-    private final int attackPlayerIndex;
 
     private final Font font = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
     private final Text skillTextLeft;
@@ -60,10 +58,13 @@ public class PreBattleScene extends BaseScene {
     private final Text hpTextLeft;
     private final Text atkTextRight;
     private final Text hpTextRight;
+    private final User attackPlayer;
+    private final boolean isArena;
 
-    public PreBattleScene(final GameActivity activity, final int attackPlayerIndex, final User attackPlayer) throws IOException {
+    public PreBattleScene(final GameActivity activity, final User attackPlayer, final boolean isArena) throws IOException {
         super(activity);
-        this.attackPlayerIndex = attackPlayerIndex;
+        this.attackPlayer = attackPlayer;
+        this.isArena = isArena;
         opponentPartyInfo = CardUtils.getPartyByUserId(activity, attackPlayer.getId());
         opponentParties = opponentPartyInfo.getParties();
         final Card myLeader = myParties[0].getCards()[0];
@@ -136,7 +137,7 @@ public class PreBattleScene extends BaseScene {
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 F2MusicManager.getInstance().playMusic(MusicEnum.ARENA_ATTACK);
                 try {
-                    final Scene battleScene = new BattleScene(activity, attackPlayerIndex, opponentParties);
+                    final Scene battleScene = new BattleScene(activity, attackPlayer.getId(), opponentParties, isArena);
                     activity.getEngine().setScene(battleScene);
                 } catch (final IOException e) {
                     Debug.e(e);
@@ -151,7 +152,7 @@ public class PreBattleScene extends BaseScene {
         retreatButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                ResourceManager.getInstance().setCurrentScene(SceneEnum.Arena);
+                ResourceManager.getInstance().sceneBack(false);
             }
         });
         this.attachChild(retreatButton);

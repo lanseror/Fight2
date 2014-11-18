@@ -10,7 +10,6 @@ import org.andengine.opengl.font.Font;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
-import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.battle.BattleResult;
 import com.fight2.entity.engine.F2ButtonSprite;
@@ -95,7 +94,7 @@ public class BattleResultScene extends BaseScene {
         confirmButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                ResourceManager.getInstance().setCurrentScene(SceneEnum.Arena);
+                ResourceManager.getInstance().sceneBack(false);
             }
         });
         this.attachChild(confirmButton);

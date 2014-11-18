@@ -292,7 +292,7 @@ public class ArenaScene extends BaseScene {
                     } else {
                         try {
                             final User player = players[index];
-                            final Scene preBattleScene = new PreBattleScene(activity, index, player);
+                            final Scene preBattleScene = new PreBattleScene(activity, player, true);
                             activity.getEngine().setScene(preBattleScene);
                         } catch (final IOException e) {
                             Debug.e(e);

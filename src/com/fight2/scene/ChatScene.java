@@ -32,7 +32,6 @@ import android.widget.EditText;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
-import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.ChatMessage;
 import com.fight2.entity.engine.ChatBoxCloseButton;
@@ -116,7 +115,7 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
     private void goBack() {
         final InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
-        ResourceManager.getInstance().setCurrentScene(SceneEnum.Main);
+        ResourceManager.getInstance().sceneBack(true);
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {

@@ -7,6 +7,7 @@ public class QuestResult {
     private Card card;
     private boolean treasureUpdated;
     private QuestTreasureData questTreasureData;
+    private User enemy;
 
     public int getStatus() {
         return status;
@@ -54,6 +55,14 @@ public class QuestResult {
 
     public void setQuestTreasureData(final QuestTreasureData questTreasureData) {
         this.questTreasureData = questTreasureData;
+    }
+
+    public User getEnemy() {
+        return enemy;
+    }
+
+    public void setEnemy(final User enemy) {
+        this.enemy = enemy;
     }
 
     public enum TileItem {

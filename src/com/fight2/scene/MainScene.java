@@ -369,7 +369,7 @@ public class MainScene extends BaseScene {
             @Override
             public void onTimePassed(final TimerHandler pTimerHandler) {
                 ChatUtils.get(activity);
-                pTimerHandler.reset();
+//                pTimerHandler.reset();
             }
         });
         activity.getEngine().registerUpdateHandler(timerHandler);
