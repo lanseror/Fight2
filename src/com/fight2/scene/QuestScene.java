@@ -25,9 +25,13 @@ import org.andengine.extension.tmx.TMXTile;
 import org.andengine.extension.tmx.TMXTiledMap;
 import org.andengine.extension.tmx.util.exception.TMXLoadException;
 import org.andengine.input.touch.TouchEvent;
+import org.andengine.input.touch.detector.ScrollDetector;
+import org.andengine.input.touch.detector.SurfaceScrollDetector;
+import org.andengine.input.touch.detector.ScrollDetector.IScrollDetectorListener;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.util.Constants;
+import org.andengine.util.adt.color.ColorUtils;
 import org.andengine.util.debug.Debug;
 
 import com.fight2.GameActivity;
@@ -45,7 +49,13 @@ import com.fight2.util.QuestUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TiledTextureFactory;
 
-public class QuestScene extends BaseScene {
+public class QuestScene extends BaseScene implements IScrollDetectorListener {
+    private final SurfaceScrollDetector mScrollDetector;
+    private float minY;
+    private float maxY;
+    private float minX;
+    private float maxX;
+    private boolean isScroolling;
     private final TimerHandler timerHandler;
     private TMXTiledMap tmxTiledMap;
     private int direction = -1;
@@ -53,10 +63,12 @@ public class QuestScene extends BaseScene {
     private QuestResult questResult;
     private final List<Sprite> treasureSprites = new ArrayList<Sprite>();
     private QuestTreasureData questTreasureData = new QuestTreasureData();
-    private static int GID = 11;
+    private static int GID = 0;
 
     public QuestScene(final GameActivity activity) throws IOException {
         super(activity);
+        this.mScrollDetector = new SurfaceScrollDetector(this);
+        this.getBackground().setColor(ColorUtils.convertABGRPackedIntToColor(0XFF205218));
         init();
         timerHandler = new TimerHandler(10, new ITimerCallback() {
             @Override
@@ -77,20 +89,25 @@ public class QuestScene extends BaseScene {
     protected void init() throws IOException {
         try {
             final TMXLoader tmxLoader = new TMXLoader(activity.getAssets(), activity.getTextureManager(), TextureOptions.BILINEAR_PREMULTIPLYALPHA, vbom);
-            this.tmxTiledMap = tmxLoader.loadFromAsset("tmx/my2.tmx");
-            this.tmxTiledMap.setOffsetCenter(0, 0);
-            tmxTiledMap.setScale(0.3f);
+            this.tmxTiledMap = tmxLoader.loadFromAsset("tmx/fight2.tmx");
+            tmxTiledMap.setScale(1.5f);
+            final float mapWidth = tmxTiledMap.getWidth() * 1.5f;
+            final float mapHeight = tmxTiledMap.getHeight() * 1.5f;
+            minY = this.simulatedHeight - mapHeight * 0.5f;
+            maxY = mapHeight * 0.5f;
+            minX = this.simulatedWidth - mapWidth * 0.5f;
+            maxX = mapWidth * 0.5f;
         } catch (final TMXLoadException e) {
             Debug.e(e);
         }
-//        tmxTiledMap.setPosition(this.cameraCenterX - 300, this.cameraCenterY - 250);
+        // tmxTiledMap.setPosition(this.cameraCenterX - 300, this.cameraCenterY - 250);
         this.attachChild(this.tmxTiledMap);
         final TMXLayer tmxLayer = this.tmxTiledMap.getTMXLayers().get(0);
         final QuestTreasureData newTreasureData = QuestUtils.getQuestTreasure(questTreasureData);
         refreshTreasureSprites(newTreasureData);
 
-        final float playerX = tmxLayer.getTileX(1) + 0.5f * tmxTiledMap.getTileWidth();
-        final float playerY = tmxLayer.getTileY(5) + 0.5f * tmxTiledMap.getTileHeight();
+        final float playerX = tmxLayer.getTileX(6) + 0.5f * tmxTiledMap.getTileWidth();
+        final float playerY = tmxLayer.getTileY(10) + 0.5f * tmxTiledMap.getTileHeight();
         final ITiledTextureRegion playerTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.PLAYER);
         final AnimatedSprite player = new AnimatedSprite(playerX, playerY, playerTextureRegion, vbom);
         player.setCurrentTileIndex(4);
@@ -100,7 +117,17 @@ public class QuestScene extends BaseScene {
         this.setOnSceneTouchListener(new IOnSceneTouchListener() {
             @Override
             public boolean onSceneTouchEvent(final Scene pScene, final TouchEvent pSceneTouchEvent) {
+                mScrollDetector.onTouchEvent(pSceneTouchEvent);
+                if (isScroolling) {
+                    if (pSceneTouchEvent.isActionUp()) {
+                        isScroolling = false;
+                        return true;
+                    } else {
+                        return true;
+                    }
+                }
                 if (pSceneTouchEvent.isActionUp()) {
+
                     final float sceneX = pSceneTouchEvent.getX();
                     final float sceneY = pSceneTouchEvent.getY();
                     final TMXTile tmxTile = tmxLayer.getTMXTileAt(sceneX, sceneY);
@@ -394,6 +421,42 @@ public class QuestScene extends BaseScene {
             return predecessor;
         }
 
+    }
+
+    private void offsetCamera(final float pDistanceX, final float pDistanceY) {
+        float offSetX = pDistanceX;
+        final float tiledMapX = tmxTiledMap.getX();
+        final float tiledMapY = tmxTiledMap.getY();
+        if (offSetX > 0 && tiledMapX + offSetX >= maxX) {
+            offSetX = maxX - tiledMapX;
+        }
+        if (offSetX < 0 && tiledMapX + offSetX <= minX) {
+            offSetX = minX - tiledMapX;
+        }
+        float offSetY = -pDistanceY;
+        if (offSetY > 0 && tiledMapY + offSetY >= maxY) {
+            offSetY = maxY - tiledMapY;
+        }
+        if (offSetY < 0 && tiledMapY + offSetY <= minY) {
+            offSetY = minY - tiledMapY;
+        }
+        tmxTiledMap.setPosition(tiledMapX + offSetX, tiledMapY + offSetY);
+    }
+
+    @Override
+    public void onScrollStarted(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
+        isScroolling = true;
+        offsetCamera(pDistanceX, pDistanceY);
+    }
+
+    @Override
+    public void onScroll(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
+        offsetCamera(pDistanceX, pDistanceY);
+    }
+
+    @Override
+    public void onScrollFinished(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
+        offsetCamera(pDistanceX, pDistanceY);
     }
 
 }

@@ -249,4 +249,12 @@ public class GameActivity extends LayoutGameActivity {
         }
     }
 
+    public Camera getCamera() {
+        return camera;
+    }
+
+    public void setCamera(final Camera camera) {
+        this.camera = camera;
+    }
+
 }
