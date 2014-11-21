@@ -109,11 +109,15 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         final QuestTreasureData newTreasureData = QuestUtils.getQuestTreasure(questTreasureData);
         refreshTreasureSprites(newTreasureData);
 
-        final float playerX = tmxLayer.getTileX(6) + 0.5f * tmxTiledMap.getTileWidth();
-        final float playerY = tmxLayer.getTileY(10) + playerHeight * 0.5f;
+        final float playerX = tmxLayer.getTileX(32) + 0.5f * tmxTiledMap.getTileWidth();
+        final float playerY = tmxLayer.getTileY(22) + playerHeight * 0.5f;
         final AnimatedSprite player = new AnimatedSprite(playerX, playerY, playerTextureRegion, vbom);
-        player.setCurrentTileIndex(4);
+        player.setCurrentTileIndex(53);
         player.setZIndex(100);
+
+        final float playerSceneX = playerX - tmxTiledMap.getWidth() * 0.5f;
+        final float playerSceneY = playerY - tmxTiledMap.getHeight() * 0.5f;
+        offsetMap(this.simulatedWidth * 0.5f - playerSceneX * SCALE, playerSceneY * SCALE - this.simulatedHeight * 0.5f);
 
         tmxTiledMap.attachChild(player);
         this.setOnSceneTouchListener(new IOnSceneTouchListener() {
@@ -468,7 +472,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
 
     }
 
-    private void offsetCamera(final float pDistanceX, final float pDistanceY) {
+    private void offsetMap(final float pDistanceX, final float pDistanceY) {
         float offSetX = pDistanceX;
         final float tiledMapX = tmxTiledMap.getX();
         final float tiledMapY = tmxTiledMap.getY();
@@ -491,17 +495,17 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     @Override
     public void onScrollStarted(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
         isScroolling = true;
-        offsetCamera(pDistanceX, pDistanceY);
+        offsetMap(pDistanceX, pDistanceY);
     }
 
     @Override
     public void onScroll(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
-        offsetCamera(pDistanceX, pDistanceY);
+        offsetMap(pDistanceX, pDistanceY);
     }
 
     @Override
     public void onScrollFinished(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
-        offsetCamera(pDistanceX, pDistanceY);
+        offsetMap(pDistanceX, pDistanceY);
     }
 
 }
