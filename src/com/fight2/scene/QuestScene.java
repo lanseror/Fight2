@@ -26,8 +26,8 @@ import org.andengine.extension.tmx.TMXTiledMap;
 import org.andengine.extension.tmx.util.exception.TMXLoadException;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.input.touch.detector.ScrollDetector;
-import org.andengine.input.touch.detector.SurfaceScrollDetector;
 import org.andengine.input.touch.detector.ScrollDetector.IScrollDetectorListener;
+import org.andengine.input.touch.detector.SurfaceScrollDetector;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.util.Constants;
@@ -64,6 +64,9 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     private final List<Sprite> treasureSprites = new ArrayList<Sprite>();
     private QuestTreasureData questTreasureData = new QuestTreasureData();
     private static int GID = 0;
+    private final float SCALE = 1.5f;
+    private final ITiledTextureRegion playerTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.HERO);
+    private final float playerHeight = playerTextureRegion.getHeight();
 
     public QuestScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -90,9 +93,9 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         try {
             final TMXLoader tmxLoader = new TMXLoader(activity.getAssets(), activity.getTextureManager(), TextureOptions.BILINEAR_PREMULTIPLYALPHA, vbom);
             this.tmxTiledMap = tmxLoader.loadFromAsset("tmx/fight2.tmx");
-            tmxTiledMap.setScale(1.5f);
-            final float mapWidth = tmxTiledMap.getWidth() * 1.5f;
-            final float mapHeight = tmxTiledMap.getHeight() * 1.5f;
+            tmxTiledMap.setScale(SCALE);
+            final float mapWidth = tmxTiledMap.getWidth() * SCALE;
+            final float mapHeight = tmxTiledMap.getHeight() * SCALE;
             minY = this.simulatedHeight - mapHeight * 0.5f;
             maxY = mapHeight * 0.5f;
             minX = this.simulatedWidth - mapWidth * 0.5f;
@@ -107,8 +110,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         refreshTreasureSprites(newTreasureData);
 
         final float playerX = tmxLayer.getTileX(6) + 0.5f * tmxTiledMap.getTileWidth();
-        final float playerY = tmxLayer.getTileY(10) + 0.5f * tmxTiledMap.getTileHeight();
-        final ITiledTextureRegion playerTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.PLAYER);
+        final float playerY = tmxLayer.getTileY(10) + playerHeight * 0.5f;
         final AnimatedSprite player = new AnimatedSprite(playerX, playerY, playerTextureRegion, vbom);
         player.setCurrentTileIndex(4);
         player.setZIndex(100);
@@ -142,7 +144,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                         go(tmxTile);
                         final float[] xs = path.getCoordinatesX();
                         final float[] ys = path.getCoordinatesY();
-                        player.registerEntityModifier(new PathModifier(path.getSize() * 1f, path, null, new IPathModifierListener() {
+                        player.registerEntityModifier(new PathModifier(path.getSize() * 0.6f, path, null, new IPathModifierListener() {
                             @Override
                             public void onPathStarted(final PathModifier pPathModifier, final IEntity pEntity) {
 
@@ -155,15 +157,22 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                                     final float y1 = ys[pWaypointIndex];
                                     final float x2 = xs[pWaypointIndex + 1];
                                     final float y2 = ys[pWaypointIndex + 1];
-
-                                    if (x1 == x2 && y1 < y2) { // up
+                                    if (x1 > x2 && y1 < y2) { // left up
                                         changeDirection(player, 0);
-                                    } else if (x1 < x2 && y1 == y2) {// right
+                                    } else if (x1 == x2 && y1 < y2) { // up
                                         changeDirection(player, 1);
-                                    } else if (x1 == x2 && y1 > y2) {// down
+                                    } else if (x1 < x2 && y1 < y2) { // right up
                                         changeDirection(player, 2);
                                     } else if (x1 > x2 && y1 == y2) {// left
                                         changeDirection(player, 3);
+                                    } else if (x1 < x2 && y1 == y2) {// right
+                                        changeDirection(player, 4);
+                                    } else if (x1 > x2 && y1 > y2) {// left down
+                                        changeDirection(player, 5);
+                                    } else if (x1 == x2 && y1 > y2) {// down
+                                        changeDirection(player, 6);
+                                    } else if (x1 < x2 && y1 > y2) {// down
+                                        changeDirection(player, 7);
                                     }
                                 }
                             }
@@ -328,16 +337,28 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             this.direction = newDirection;
             switch (newDirection) {
                 case 0:
-                    player.animate(new long[] { 200, 200, 200 }, 0, 2, true);
+                    player.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 0, 7, true);
                     break;
                 case 1:
-                    player.animate(new long[] { 200, 200, 200 }, 3, 5, true);
+                    player.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 9, 16, true);
                     break;
                 case 2:
-                    player.animate(new long[] { 200, 200, 200 }, 6, 8, true);
+                    player.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 18, 25, true);
                     break;
                 case 3:
-                    player.animate(new long[] { 200, 200, 200 }, 9, 11, true);
+                    player.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 27, 34, true);
+                    break;
+                case 4:
+                    player.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 36, 43, true);
+                    break;
+                case 5:
+                    player.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 45, 52, true);
+                    break;
+                case 6:
+                    player.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 54, 61, true);
+                    break;
+                case 7:
+                    player.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 63, 70, true);
                     break;
             }
         }
@@ -357,6 +378,17 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             if (pointTMXTile == desTile) {
                 break;
             }
+
+            final TMXTile upTile = tmxLayer.getTMXTile(col, row - 1);
+            if (upTile != null && upTile.getGlobalTileID() == GID && !visitedTiles.contains(upTile)) {/* up */
+                visit(upTile, currentPoint, queue);
+                visitedTiles.add(upTile);
+            }
+            final TMXTile leftTile = tmxLayer.getTMXTile(col - 1, row);
+            if (leftTile != null && leftTile.getGlobalTileID() == GID && !visitedTiles.contains(leftTile)) {/* left */
+                visit(leftTile, currentPoint, queue);
+                visitedTiles.add(leftTile);
+            }
             final TMXTile rightTile = tmxLayer.getTMXTile(col + 1, row);
             if (rightTile != null && rightTile.getGlobalTileID() == GID && !visitedTiles.contains(rightTile)) { /* right */
                 visit(rightTile, currentPoint, queue);
@@ -367,16 +399,29 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                 visit(downTile, currentPoint, queue);
                 visitedTiles.add(downTile);
             }
-            final TMXTile leftTile = tmxLayer.getTMXTile(col - 1, row);
-            if (leftTile != null && leftTile.getGlobalTileID() == GID && !visitedTiles.contains(leftTile)) {/* left */
-                visit(leftTile, currentPoint, queue);
-                visitedTiles.add(leftTile);
+            final TMXTile leftUpTile = tmxLayer.getTMXTile(col - 1, row - 1);
+            if (leftUpTile != null && leftUpTile.getGlobalTileID() == GID && !visitedTiles.contains(leftUpTile)) {/* left up */
+                visit(leftUpTile, currentPoint, queue);
+                visitedTiles.add(leftUpTile);
             }
-            final TMXTile upTile = tmxLayer.getTMXTile(col, row - 1);
-            if (upTile != null && upTile.getGlobalTileID() == GID && !visitedTiles.contains(upTile)) {/* up */
-                visit(upTile, currentPoint, queue);
-                visitedTiles.add(upTile);
+            final TMXTile rightUpTile = tmxLayer.getTMXTile(col + 1, row - 1);
+            if (rightUpTile != null && rightUpTile.getGlobalTileID() == GID && !visitedTiles.contains(rightUpTile)) {/* right up */
+                visit(rightUpTile, currentPoint, queue);
+                visitedTiles.add(rightUpTile);
             }
+
+            final TMXTile leftDownTile = tmxLayer.getTMXTile(col - 1, row + 1);
+            if (leftDownTile != null && leftDownTile.getGlobalTileID() == GID && !visitedTiles.contains(leftDownTile)) { /* left down */
+                visit(leftDownTile, currentPoint, queue);
+                visitedTiles.add(leftDownTile);
+            }
+
+            final TMXTile rightDownTile = tmxLayer.getTMXTile(col + 1, row + 1);
+            if (rightDownTile != null && rightDownTile.getGlobalTileID() == GID && !visitedTiles.contains(rightDownTile)) { /* right down */
+                visit(rightDownTile, currentPoint, queue);
+                visitedTiles.add(rightDownTile);
+            }
+
         }
 
         final Stack<TMXTile> stack = new Stack<TMXTile>();
@@ -392,8 +437,8 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         final Path path = new Path(stack.size());
         while (!stack.isEmpty()) {
             final TMXTile pathTMXTile = stack.pop();
-            path.to(tmxLayer.getTileX(pathTMXTile.getTileColumn()) + 0.5f * tmxTiledMap.getTileWidth(), tmxLayer.getTileY(pathTMXTile.getTileRow()) + 0.5f
-                    * tmxTiledMap.getTileHeight());
+            path.to(tmxLayer.getTileX(pathTMXTile.getTileColumn()) + 0.5f * tmxTiledMap.getTileWidth(), tmxLayer.getTileY(pathTMXTile.getTileRow())
+                    + playerHeight * 0.5f);
         }
         return path;
     }

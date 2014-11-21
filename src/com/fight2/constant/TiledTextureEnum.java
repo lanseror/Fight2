@@ -2,7 +2,8 @@ package com.fight2.constant;
 
 public enum TiledTextureEnum {
     MAIN_SUMMON_STONE_EFFECT("images/main_summon_stone_effect.png", 8, 1),
-    PLAYER("images/player.png", 3, 4);
+    PLAYER("images/player.png", 3, 4),
+    HERO("images/horse.png", 9, 8);
 
     private final String url;
     private final int tileColumns;
