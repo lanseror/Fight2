@@ -15,7 +15,7 @@ public enum TextureEnum {
     COMMON_HP_RIGHT_GREEN("images/common_hp_right_green.png", 10, 23),
     COMMON_HP_GREEN("images/common_hp_green.png", 285, 23),
     COMMON_CARD_COVER("images/common_card_cover.png", 810, 540),
-    COMMON_STAR("images/common_star.png", 26, 32),
+    COMMON_STAR("images/common_star.png", 30, 30),
     COMMON_ARENA_TICKET("images/common_arena_ticket.png", 109, 76),
     COMMON_STAMINA("images/common_stamina.png", 120, 138),
     COMMON_MIGHT_ICON("images/common_might_icon.png", 44, 44),
@@ -28,6 +28,11 @@ public enum TextureEnum {
     COMMON_BUTTON("images/common_button.png", 129, 49),
     COMMON_INPUT_ICON("images/common_input_icon.png", 54, 53),
     COMMON_CHECKBOX_ON("images/common_checkbox_on.png", 40, 40),
+    COMMON_CARD_FRAME_HUMAN("images/common_card_frame_human.png", 299, 450),
+    COMMON_CARD_FRAME_ANGEL("images/common_card_frame_angel.png", 300, 450),
+    COMMON_CARD_FRAME_DEVIL("images/common_card_frame_devil.png", 299, 453),
+    COMMON_CARD_FRAME_ELF("images/common_card_frame_elf.png", 315, 455),
+    COMMON_CARD_FRAME_HPATK("images/common_card_frame_hpatk.png", 160, 91),
 
     // Chat room images.
     CHAT_INPUT_BG("images/chat_input_backgroud.png", 755, 75),
@@ -172,7 +177,7 @@ public enum TextureEnum {
     PREBATTLE_COMBO_SKILL_RIGHT("images/prebattle_combo_skill_right.png", 285, 122),
 
     // Quest images.
-    QUEST_TREASURE_BOX("images/quest_treasure_box.png", 95*0.4f, 84*0.4f);
+    QUEST_TREASURE_BOX("images/quest_treasure_box.png", 95 * 0.4f, 84 * 0.4f);
 
     private final String url;
     private final float width;

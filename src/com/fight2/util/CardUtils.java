@@ -72,6 +72,7 @@ public class CardUtils {
                 card.setAvatar(cardJson.getString("avatar"));
                 card.setHp(cardJson.getInt("hp"));
                 card.setStar(cardJson.getInt("star"));
+                card.setLevel(cardJson.getInt("level"));
                 card.setImage(cardJson.getString("image"));
                 card.setName(cardJson.getString("name"));
                 card.setSkill(cardJson.optString("skill"));
