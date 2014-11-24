@@ -34,15 +34,15 @@ public class CardFrame extends Rectangle {
         super(x, y, width, height, activity.getVertexBufferObjectManager());
         this.activity = activity;
         this.vbom = activity.getVertexBufferObjectManager();
+        final BigDecimal decWidth = BigDecimal.valueOf(width);
+        final BigDecimal decBaseWidth = BigDecimal.valueOf(CARD_WIDTH);
+        final float scale = decWidth.divide(decBaseWidth, 6, RoundingMode.HALF_UP).floatValue();
+
         final ITextureRegion coverTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_COVER);
-        cardSprite = new Sprite(width * 0.5f, height * 0.5f, width, height, coverTexture, vbom);
+        cardSprite = new Sprite(width * 0.5f, height * 0.5f, width + 3 * scale, height + 3 * scale, coverTexture, vbom);
         this.attachChild(cardSprite);
 
         loadImageFromServer(card);
-
-        final BigDecimal decWidth = BigDecimal.valueOf(width);
-        final BigDecimal decBaseWidth = BigDecimal.valueOf(CARD_WIDTH);
-        final float scale = decWidth.divide(decBaseWidth, RoundingMode.HALF_UP).floatValue();
 
         final ITextureRegion starTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_STAR);
         for (int i = 0; i < card.getStar(); i++) {
@@ -63,31 +63,32 @@ public class CardFrame extends Rectangle {
         atkText.setText(String.valueOf(card.getAtk()));
         hpAtkFrame.attachChild(hpText);
         hpAtkFrame.attachChild(atkText);
-        final Font levelFont = ResourceManager.getInstance().getFont(FontEnum.Bold, (int) (32 * scale));
-        final Text levelText = new Text(10.5f * scale, 8.5f * scale, levelFont, String.valueOf(card.getLevel()), vbom);
-        levelText.setColor(0XFFFFE3B0);
-        this.attachChild(levelText);
 
         final ITextureRegion cardFrameTexture = getTexture(card);
-        final float frameY = (cardFrameTexture.getHeight() * 0.5f - 8.57f) * scale;
+        final float frameY = (cardFrameTexture.getHeight() * 0.5f - 11f) * scale;
         final Sprite cardFrameSprite = new Sprite(width * 0.5f, frameY, cardFrameTexture, vbom);
         cardFrameSprite.setScale(scale);
         this.attachChild(cardFrameSprite);
+
+        final Font levelFont = ResourceManager.getInstance().getFont(FontEnum.Bold, (int) (32 * scale));
+        final Text levelText = new Text(31.5f * scale, 25.5f * scale, levelFont, String.valueOf(card.getLevel()), vbom);
+        levelText.setColor(0XFFFFE3B0);
+        this.attachChild(levelText);
     }
 
     private static ITextureRegion getTexture(final Card card) {
         TextureEnum textureEnum;
         switch (card.getRace()) {
-            case 0:
+            case Human:
                 textureEnum = TextureEnum.COMMON_CARD_FRAME_HUMAN;
                 break;
-            case 1:
+            case Angel:
                 textureEnum = TextureEnum.COMMON_CARD_FRAME_ANGEL;
                 break;
-            case 2:
+            case Elf:
                 textureEnum = TextureEnum.COMMON_CARD_FRAME_ELF;
                 break;
-            case 3:
+            case Devil:
                 textureEnum = TextureEnum.COMMON_CARD_FRAME_DEVIL;
                 break;
             default:
@@ -121,7 +122,7 @@ public class CardFrame extends Rectangle {
 
                 if (image != null) {
                     final ITextureRegion texture = TEXTURE_FACTORY.getTextureRegion(image);
-                    final Sprite imageSprite = new Sprite(mWidth * 0.5f, mHeight * 0.5f, mWidth * getScaleX(), mHeight * getScaleY(), texture, vbom);
+                    final Sprite imageSprite = new Sprite(mWidth * 0.5f, mHeight * 0.5f, mWidth, mHeight, texture, vbom);
                     cardSprite.attachChild(imageSprite);
                 }
 

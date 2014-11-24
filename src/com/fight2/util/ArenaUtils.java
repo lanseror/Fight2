@@ -20,6 +20,7 @@ import com.fight2.entity.ArenaReward;
 import com.fight2.entity.ArenaReward.ArenaRewardType;
 import com.fight2.entity.ArenaRewardItem;
 import com.fight2.entity.ArenaRewardItem.ArenaRewardItemType;
+import com.fight2.entity.Card.Race;
 import com.fight2.entity.Card;
 import com.fight2.entity.Guild;
 import com.fight2.entity.User;
@@ -184,6 +185,7 @@ public class ArenaUtils {
                         card.setAtk(cardJson.getInt("atk"));
                         card.setHp(cardJson.getInt("hp"));
                         card.setStar(cardJson.getInt("star"));
+                        card.setRace(Race.valueOf(cardJson.getString("race")));
                         final String image = cardJson.getString("image");
                         if (image != null && !"".equals(image)) {
                             final String localImage = ImageUtils.getLocalString(image, activity);

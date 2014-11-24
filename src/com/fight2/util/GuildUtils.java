@@ -17,6 +17,7 @@ import com.fight2.GameActivity;
 import com.fight2.entity.Bid;
 import com.fight2.entity.Bid.BidItemType;
 import com.fight2.entity.Bid.BidStatus;
+import com.fight2.entity.Card.Race;
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Guild;
@@ -114,6 +115,7 @@ public class GuildUtils {
                 card.setAtk(cardJson.getInt("atk"));
                 card.setName(cardJson.getString("name"));
                 card.setStar(cardJson.getInt("star"));
+                card.setRace(Race.valueOf(cardJson.getString("race")));
                 final String image = cardJson.getString("image");
                 if (image != null && !"".equals(image)) {
                     final String localImage = ImageUtils.getLocalString(image, activity);
@@ -353,6 +355,7 @@ public class GuildUtils {
                     card.setAtk(cardJson.getInt("atk"));
                     card.setName(cardJson.getString("name"));
                     card.setStar(cardJson.getInt("star"));
+                    card.setRace(Race.valueOf(cardJson.getString("race")));
                     final String image = cardJson.getString("image");
                     if (image != null && !"".equals(image)) {
                         final String localImage = ImageUtils.getLocalString(image, activity);

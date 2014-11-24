@@ -29,8 +29,8 @@ public enum TextureEnum {
     COMMON_INPUT_ICON("images/common_input_icon.png", 54, 53),
     COMMON_CHECKBOX_ON("images/common_checkbox_on.png", 40, 40),
     COMMON_CARD_FRAME_HUMAN("images/common_card_frame_human.png", 299, 450),
-    COMMON_CARD_FRAME_ANGEL("images/common_card_frame_angel.png", 300, 450),
-    COMMON_CARD_FRAME_DEVIL("images/common_card_frame_devil.png", 299, 453),
+    COMMON_CARD_FRAME_ANGEL("images/common_card_frame_angel.png", 299, 450),
+    COMMON_CARD_FRAME_DEVIL("images/common_card_frame_devil.png", 299, 450),
     COMMON_CARD_FRAME_ELF("images/common_card_frame_elf.png", 315, 455),
     COMMON_CARD_FRAME_HPATK("images/common_card_frame_hpatk.png", 160, 91),
 

@@ -15,7 +15,7 @@ public class Card {
     private int templateId;
     private int version;
     private int amount;
-    private int race;
+    private Race race;
 
     public int getId() {
         return id;
@@ -129,12 +129,18 @@ public class Card {
         this.amount = amount;
     }
 
-    public int getRace() {
+    public Race getRace() {
         return race;
     }
 
-    public void setRace(final int race) {
+    public void setRace(final Race race) {
         this.race = race;
     }
 
+    public static enum Race {
+        Human,
+        Angel,
+        Elf,
+        Devil;
+    }
 }

@@ -13,6 +13,7 @@ import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
+import com.fight2.entity.Card.Race;
 
 public class CardUtils {
 
@@ -76,6 +77,7 @@ public class CardUtils {
                 card.setImage(cardJson.getString("image"));
                 card.setName(cardJson.getString("name"));
                 card.setSkill(cardJson.optString("skill"));
+                card.setRace(Race.valueOf(cardJson.getString("race")));
                 final JSONObject cardTemplateJson = cardJson.getJSONObject("cardTemplate");
                 card.setTemplateId(cardTemplateJson.getInt("id"));
                 cards.add(card);
@@ -125,6 +127,7 @@ public class CardUtils {
                         card.setStar(cardJson.getInt("star"));
                         card.setTier(cardJson.getInt("tier"));
                         card.setLevel(cardJson.getInt("level"));
+                        card.setRace(Race.valueOf(cardJson.getString("race")));
                         final String avatar = cardJson.optString("avatar");
                         if (avatar != null && !"".equals(avatar)) {
                             final String localAvatar = ImageUtils.getLocalString(avatar, activity);

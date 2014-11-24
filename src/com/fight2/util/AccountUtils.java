@@ -21,6 +21,7 @@ import android.content.Context;
 
 import com.fight2.GameActivity;
 import com.fight2.entity.Card;
+import com.fight2.entity.Card.Race;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
@@ -104,6 +105,7 @@ public class AccountUtils {
                 card.setSkill(cardJson.optString("skill"));
                 final JSONObject cardTemplateJson = cardJson.getJSONObject("cardTemplate");
                 card.setTemplateId(cardTemplateJson.getInt("id"));
+                card.setRace(Race.valueOf(cardJson.getString("race")));
                 cards.add(card);
             }
             TextureFactory.getInstance().loadCardsResource(activity);
@@ -203,6 +205,7 @@ public class AccountUtils {
                     TextureFactory.getInstance().addCardResource(activity, localImage);
                 }
                 card.setAmount(cardJson.getInt("amount"));
+                card.setRace(Race.valueOf(cardJson.getString("race")));
                 cards.add(card);
             }
             userStoreroom.setCards(cards);

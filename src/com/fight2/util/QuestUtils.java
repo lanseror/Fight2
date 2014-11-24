@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import com.fight2.GameActivity;
 import com.fight2.entity.Card;
 import com.fight2.entity.QuestResult;
+import com.fight2.entity.Card.Race;
 import com.fight2.entity.QuestResult.TileItem;
 import com.fight2.entity.QuestTile;
 import com.fight2.entity.QuestTreasureData;
@@ -41,6 +42,7 @@ public class QuestUtils {
                     card.setImage(cardJson.getString("image"));
                     card.setName(cardJson.getString("name"));
                     card.setSkill(cardJson.optString("skill"));
+                    card.setRace(Race.valueOf(cardJson.getString("race")));
                     final JSONObject cardTemplateJson = cardJson.getJSONObject("cardTemplate");
                     card.setTemplateId(cardTemplateJson.getInt("id"));
                     result.setCard(card);
