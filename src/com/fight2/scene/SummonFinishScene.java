@@ -3,12 +3,10 @@ package com.fight2.scene;
 import java.io.IOException;
 
 import org.andengine.entity.IEntity;
-import org.andengine.entity.modifier.DelayModifier;
 import org.andengine.entity.modifier.IEntityModifier;
 import org.andengine.entity.modifier.ParallelEntityModifier;
 import org.andengine.entity.modifier.RotationByModifier;
 import org.andengine.entity.modifier.ScaleModifier;
-import org.andengine.entity.modifier.SequenceEntityModifier;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
@@ -19,7 +17,6 @@ import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
-import org.andengine.util.adt.color.Color;
 import org.andengine.util.debug.Debug;
 
 import com.fight2.GameActivity;
@@ -40,6 +37,7 @@ public class SummonFinishScene extends BaseScene {
     private final static float CARD_HEIGHT = CARD_WIDTH * 1.5f;
     private final Sprite cardSprite;
     private final IEntity cardFrame;
+    private final IEntity cardAttributeFrame;
     private final TextureFactory textureFactory = TextureFactory.getInstance();
     private final Font mFont;
     private final Text hpText;
@@ -51,23 +49,27 @@ public class SummonFinishScene extends BaseScene {
         this.mFont = ResourceManager.getInstance().getFont(FontEnum.Default, 27);
         this.cardFrame = new Rectangle(cameraCenterX, cameraCenterY, CARD_WIDTH, CARD_HEIGHT, vbom);
         cardFrame.setRotation(90);
-        cardFrame.setColor(Color.WHITE);
+        cardFrame.setAlpha(0);
         this.attachChild(cardFrame);
         final ITextureRegion texture = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_CARD_COVER);
         this.cardSprite = new Sprite(CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f, CARD_WIDTH, CARD_HEIGHT, texture, vbom);
         cardFrame.attachChild(cardSprite);
         loadImageFromServer(card);
 
+        this.cardAttributeFrame = new Rectangle(CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f, CARD_WIDTH, CARD_HEIGHT, vbom);
+        cardFrame.attachChild(cardAttributeFrame);
+        cardAttributeFrame.setAlpha(0);
+        cardAttributeFrame.setVisible(false);
         final ITextureRegion starTexture = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_STAR);
         for (int i = 0; i < card.getStar(); i++) {
             final Sprite star = new Sprite(29 + 9f * i, CARD_HEIGHT - 8, starTexture, vbom);
             star.setScale(SCALE);
-            cardFrame.attachChild(star);
+            cardAttributeFrame.attachChild(star);
         }
         final ITextureRegion hpAtkFrameTexture = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_HPATK);
         final Sprite hpAtkFrame = new Sprite(CARD_WIDTH - 30, 25, hpAtkFrameTexture, vbom);
         hpAtkFrame.setScale(SCALE);
-        cardFrame.attachChild(hpAtkFrame);
+        cardAttributeFrame.attachChild(hpAtkFrame);
         hpText = new Text(70, 70, mFont, "0123456789", vbom);
         hpText.setColor(0XFFFFE3B0);
         atkText = new Text(70, 23, mFont, "0123456789", vbom);
@@ -80,7 +82,7 @@ public class SummonFinishScene extends BaseScene {
         final Text levelText = new Text(10.5f, 8.5f, levelFont, String.valueOf(card.getLevel()), vbom);
         levelText.setColor(0XFFFFE3B0);
         levelText.setScale(SCALE);
-        cardFrame.attachChild(levelText);
+        cardAttributeFrame.attachChild(levelText);
         init();
     }
 
@@ -150,6 +152,7 @@ public class SummonFinishScene extends BaseScene {
                     final Sprite cardFrameSprite = new Sprite(CARD_WIDTH * 0.5f, frameY, cardFrameTexture, vbom);
                     cardFrameSprite.setScale(SCALE);
                     imageSprite.attachChild(cardFrameSprite);
+                    cardAttributeFrame.setVisible(true);
                 }
 
             }

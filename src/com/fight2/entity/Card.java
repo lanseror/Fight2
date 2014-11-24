@@ -15,6 +15,7 @@ public class Card {
     private int templateId;
     private int version;
     private int amount;
+    private int race;
 
     public int getId() {
         return id;
@@ -126,6 +127,14 @@ public class Card {
 
     public void setAmount(final int amount) {
         this.amount = amount;
+    }
+
+    public int getRace() {
+        return race;
+    }
+
+    public void setRace(final int race) {
+        this.race = race;
     }
 
 }
