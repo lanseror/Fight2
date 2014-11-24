@@ -44,12 +44,6 @@ public class CardFrame extends Rectangle {
 
         loadImageFromServer(card);
 
-        final ITextureRegion starTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_STAR);
-        for (int i = 0; i < card.getStar(); i++) {
-            final Sprite star = new Sprite((87 + 27f * i) * scale, height - 24 * scale, starTexture.getWidth() * scale, starTexture.getHeight() * scale,
-                    starTexture, vbom);
-            this.attachChild(star);
-        }
         final Font mFont = ResourceManager.getInstance().getFont(FontEnum.Default, (int) (27 * scale));
         final ITextureRegion hpAtkFrameTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_HPATK);
         final Sprite hpAtkFrame = new Sprite(width - 90 * scale, 75 * scale, hpAtkFrameTexture.getWidth() * scale, hpAtkFrameTexture.getHeight() * scale,
@@ -74,6 +68,13 @@ public class CardFrame extends Rectangle {
         final Text levelText = new Text(31.5f * scale, 25.5f * scale, levelFont, String.valueOf(card.getLevel()), vbom);
         levelText.setColor(0XFFFFE3B0);
         this.attachChild(levelText);
+        
+        final ITextureRegion starTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_STAR);
+        for (int i = 0; i < card.getStar(); i++) {
+            final Sprite star = new Sprite((87 + 27f * i) * scale, height - 24 * scale, starTexture.getWidth() * scale, starTexture.getHeight() * scale,
+                    starTexture, vbom);
+            this.attachChild(star);
+        }
     }
 
     private static ITextureRegion getTexture(final Card card) {
