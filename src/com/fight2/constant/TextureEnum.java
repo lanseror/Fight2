@@ -33,6 +33,12 @@ public enum TextureEnum {
     COMMON_CARD_FRAME_DEVIL("images/common_card_frame_devil.png", 299, 450),
     COMMON_CARD_FRAME_ELF("images/common_card_frame_elf.png", 315, 455),
     COMMON_CARD_FRAME_HPATK("images/common_card_frame_hpatk.png", 160, 91),
+    COMMON_CARD_FRAME_TIER_GRID_HUMAN("images/common_card_frame_tier_grid_human.png", 36, 13),
+    COMMON_CARD_FRAME_TIER_STICK_HUMAN("images/common_card_frame_tier_stick_human.png", 34, 11),
+    COMMON_CARD_FRAME_TIER_STICK_ANGEL("images/common_card_frame_tier_stick_angel.png", 34, 11),
+    COMMON_CARD_FRAME_TIER_GRID_COMMON("images/common_card_frame_tier_grid_common.png", 35, 12),
+    COMMON_CARD_FRAME_TIER_STICK_ELF("images/common_card_frame_tier_stick_elf.png", 34, 11),
+    COMMON_CARD_FRAME_TIER_STICK_DEVIL("images/common_card_frame_tier_stick_devil.png", 34, 11),
 
     // Chat room images.
     CHAT_INPUT_BG("images/chat_input_backgroud.png", 755, 75),
