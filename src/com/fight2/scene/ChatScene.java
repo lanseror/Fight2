@@ -239,13 +239,13 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
         }
 
         final String name = chatMessage.getSender();
-        final Font nameFont = ResourceManager.getInstance().getFont(FontEnum.Bold, 28, 128);
+        final Font nameFont = ResourceManager.getInstance().newFont(FontEnum.Bold, 28, 128);
         final Text nameText = new Text(0, 0, nameFont, name, vbom);
         nameText.setColor(0XFFCF9030);
         final float nameWidth = nameText.getWidth();
         final float nameHeight = nameText.getHeight();
 
-        final Font font = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
+        final Font font = ResourceManager.getInstance().newFont(FontEnum.Default, 28);
         final String time = chatMessage.getDate();
         final Text timeText = new Text(0, 0, font, time, vbom);
         timeText.setColor(0XFF808080);

@@ -44,7 +44,7 @@ public class QuestTreasureScene extends BaseScene {
 
     public QuestTreasureScene(final QuestResult questResult, final GameActivity activity) throws IOException {
         super(activity);
-        this.mFont = ResourceManager.getInstance().getFont(FontEnum.Main, 24);
+        this.mFont = ResourceManager.getInstance().newFont(FontEnum.Main, 24);
         this.cardFrame = new Rectangle(cameraCenterX, cameraCenterY, CARD_WIDTH, CARD_HEIGHT, vbom);
         cardFrame.setRotation(90);
         cardFrame.setAlpha(0);

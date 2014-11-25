@@ -132,6 +132,7 @@ public class CardUtils {
                         if (avatar != null && !"".equals(avatar)) {
                             final String localAvatar = ImageUtils.getLocalString(avatar, activity);
                             card.setAvatar(localAvatar);
+                            card.setAvatarLoaded(true);
                             TextureFactory.getInstance().addCardResource(activity, localAvatar);
                         }
                         card.setImage(cardJson.getString("image"));

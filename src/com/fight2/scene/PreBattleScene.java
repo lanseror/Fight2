@@ -45,15 +45,15 @@ public class PreBattleScene extends BaseScene {
     private final Party[] myParties = myPartyInfo.getParties();
     private final Party[] opponentParties;
 
-    private final Font font = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
+    private final Font font = ResourceManager.getInstance().newFont(FontEnum.Default, 24);
     private final Text skillTextLeft;
     private final Text skillTextRight;
 
-    private final Font nameFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
+    private final Font nameFont = ResourceManager.getInstance().newFont(FontEnum.Default, 26);
     private final Text nameTextLeft;
     private final Text nameTextRight;
 
-    private final Font attributeFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
+    private final Font attributeFont = ResourceManager.getInstance().newFont(FontEnum.Default, 26);
     private final Text atkTextLeft;
     private final Text hpTextLeft;
     private final Text atkTextRight;

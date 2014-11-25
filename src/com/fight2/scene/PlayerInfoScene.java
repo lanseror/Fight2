@@ -43,7 +43,7 @@ public class PlayerInfoScene extends BaseScene {
 
     public PlayerInfoScene(final GameActivity activity) throws IOException {
         super(activity);
-        final Font font = ResourceManager.getInstance().getFont(FontEnum.Default);
+        final Font font = ResourceManager.getInstance().newFont(FontEnum.Default);
         nameTitleText = new Text(80, 426, font, "名称：", vbom);
         nameText = new Text(265, 426, font, session.getName(), 30, vbom);
         init();

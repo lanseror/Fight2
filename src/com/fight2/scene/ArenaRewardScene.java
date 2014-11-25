@@ -63,12 +63,12 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
     public ArenaRewardScene(final GameActivity activity, final UserArenaInfo userArenaInfo) throws IOException {
         super(activity);
         this.userArenaInfo = userArenaInfo;
-        this.descTitleFont = ResourceManager.getInstance().getFont(FontEnum.Bold, 30);
-        this.descFont = ResourceManager.getInstance().getFont(FontEnum.Default, 18);
-        this.mightFont = ResourceManager.getInstance().getFont(FontEnum.Bold, 26);
-        this.rankFont = ResourceManager.getInstance().getFont(FontEnum.Bold, 30);
-        this.amountFont = ResourceManager.getInstance().getFont(FontEnum.Default, 30);
-        this.itemFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
+        this.descTitleFont = ResourceManager.getInstance().newFont(FontEnum.Bold, 30);
+        this.descFont = ResourceManager.getInstance().newFont(FontEnum.Default, 18);
+        this.mightFont = ResourceManager.getInstance().newFont(FontEnum.Bold, 26);
+        this.rankFont = ResourceManager.getInstance().newFont(FontEnum.Bold, 30);
+        this.amountFont = ResourceManager.getInstance().newFont(FontEnum.Default, 30);
+        this.itemFont = ResourceManager.getInstance().newFont(FontEnum.Default, 24);
         this.mightDescTitleText = new Text(291, 145, descTitleFont, MIGHT_DESC_TITLE, 15, vbom);
         mightDescTitleText.setColor(0XFF683905);
         this.rankDescTitleText = new Text(291, 145, descTitleFont, String.format(RANK_DESC_TITLE, userArenaInfo.getRankNumber()), vbom);

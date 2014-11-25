@@ -35,10 +35,10 @@ public class BattleResultScene extends BaseScene {
 
     public BattleResultScene(final BattleResult battleResult, final GameActivity activity) throws IOException {
         super(activity);
-        this.optionFont = ResourceManager.getInstance().getFont(FontEnum.Default);
-        this.descFont = ResourceManager.getInstance().getFont(FontEnum.Default);
-        totoalMightFont = ResourceManager.getInstance().getFont(FontEnum.Default, 36);
-        rateFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
+        this.optionFont = ResourceManager.getInstance().newFont(FontEnum.Default);
+        this.descFont = ResourceManager.getInstance().newFont(FontEnum.Default);
+        totoalMightFont = ResourceManager.getInstance().newFont(FontEnum.Default, 36);
+        rateFont = ResourceManager.getInstance().newFont(FontEnum.Default, 26);
         final String optionResult = (battleResult.isWinner() ? "胜利" : "失败");
         final String result = (battleResult.isWinner() ? "你击败了对手！" : "对手已将你击败！");
         optionResultText = new Text(160, 415, optionFont, optionResult, vbom);

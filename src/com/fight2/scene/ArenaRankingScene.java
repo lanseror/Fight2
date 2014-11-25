@@ -44,8 +44,8 @@ public class ArenaRankingScene extends BaseScene implements IScrollDetectorListe
     public ArenaRankingScene(final GameActivity activity, final UserArenaInfo userArenaInfo) throws IOException {
         super(activity);
         this.userArenaInfo = userArenaInfo;
-        this.numFont = ResourceManager.getInstance().getFont(FontEnum.Bold, 26);
-        this.guildFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
+        this.numFont = ResourceManager.getInstance().newFont(FontEnum.Bold, 26);
+        this.guildFont = ResourceManager.getInstance().newFont(FontEnum.Default, 24);
         scrollDetector = new SurfaceScrollDetector(this);
         rankContainer = new Rectangle(frameCenter, CONTAINER_INIT_Y, frameWidth, CLIP_HEIGHT, vbom);
         rankContainer.setAlpha(0);

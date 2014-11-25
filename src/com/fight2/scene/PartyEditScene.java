@@ -39,6 +39,7 @@ import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
+import com.fight2.entity.engine.CardFrame;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.input.touch.detector.F2ScrollDetector;
@@ -89,7 +90,7 @@ public class PartyEditScene extends BaseScene {
         final BigDecimal bdFactor = BigDecimal.valueOf(BASE_PX).divide(devicePX, 2, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(430));
         factor = bdFactor.intValue();
         max_velocity = BigDecimal.valueOf(Math.sqrt(2 * ACCELERATION * DISTANCE_15CARDS)).floatValue();
-        this.mFont = ResourceManager.getInstance().getFont(FontEnum.Main);
+        this.mFont = ResourceManager.getInstance().newFont(FontEnum.Main);
 
         cardZoom = new Rectangle(250 + CARD_WIDTH * 0.7f, 170, CARD_WIDTH * 1.4f, CARD_HEIGHT * 1.4f, vbom);
         cardPack = new Rectangle(300, 170, 21000, 250, vbom);
@@ -115,7 +116,7 @@ public class PartyEditScene extends BaseScene {
                 this.attachChild(card);
                 addedCards[i] = card;
 
-                final Sprite removedCard = createRealScreenCardSprite(cardEntry, 10, 20);
+                final IEntity removedCard = createRealScreenCardSprite(cardEntry, 10, 20);
                 removedCard.setTag(i);
                 removedCard.setWidth(CARD_WIDTH);
                 removedCard.setHeight(CARD_HEIGHT);
@@ -261,7 +262,7 @@ public class PartyEditScene extends BaseScene {
         float appendX = initCardX;
         for (int i = 0; i < sessionCards.size(); i++) {
             final Card sessionCard = sessionCards.get(i);
-            final Sprite card = createRealScreenCardSprite(sessionCard, 10, 20);
+            final IEntity card = createRealScreenCardSprite(sessionCard, 10, 20);
             card.setTag(i);
             card.setWidth(CARD_WIDTH);
             card.setHeight(CARD_HEIGHT);
@@ -523,17 +524,14 @@ public class PartyEditScene extends BaseScene {
         }
     }
 
-    protected Sprite createRealScreenCardSprite(final Card card, final float x, final float y) {
+    protected IEntity createRealScreenCardSprite(final Card card, final float x, final float y) {
         final float width = CARD_WIDTH;
         final float height = CARD_HEIGHT;
         final BigDecimal factor = BigDecimal.valueOf(this.cameraHeight).divide(BigDecimal.valueOf(deviceHeight), 2, RoundingMode.HALF_DOWN);
         final float fakeWidth = BigDecimal.valueOf(this.deviceWidth).multiply(factor).floatValue();
         final float pX = (this.cameraWidth - fakeWidth) / 2 + x + width * 0.5f;
         final float pY = y + height * 0.5f;
-        Sprite sprite = null;
-        final TextureFactory textureFactory = TextureFactory.getInstance();
-        final ITextureRegion texture = textureFactory.getTextureRegion(card.getImage());
-        sprite = new Sprite(pX, pY, width, height, texture, vbom);
+        final IEntity sprite = new CardFrame(pX, pY, width, height, card, activity);
 
         return sprite;
     }

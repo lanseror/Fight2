@@ -35,7 +35,7 @@ public class BattlePartyFrame extends Rectangle {
     private final float initY;
     private final VertexBufferObjectManager vbom;
     private HpBar hpBar;
-    private final Font font = ResourceManager.getInstance().getFont(FontEnum.Main);
+    private final Font font = ResourceManager.getInstance().newFont(FontEnum.Main);
     private final Text atkText;
     private int atk;
     private int defence;

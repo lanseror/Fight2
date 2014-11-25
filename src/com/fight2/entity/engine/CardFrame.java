@@ -128,22 +128,20 @@ public class CardFrame extends Rectangle {
                 tierGridY = -1;
                 break;
         }
-        final float tierGridWidth = tierGridTexture.getWidth();
-        final float tierGridHeight = tierGridTexture.getHeight();
-        final float tierStickWidth = tierStickTexture.getWidth();
-        final float tierStickHeight = tierStickTexture.getHeight();
-        final Sprite tierGrid = new Sprite(tierGridX * scale, tierGridY * scale, tierGridWidth * scale, tierGridHeight * scale, tierGridTexture, vbom);
-        final Sprite tierStick = new Sprite(tierGridWidth * 0.5f, tierGridHeight * 0.5f - 1, tierStickWidth * scale, tierStickHeight * scale, tierStickTexture,
-                vbom);
+        final float tierGridWidth = tierGridTexture.getWidth() * scale;
+        final float tierGridHeight = tierGridTexture.getHeight() * scale;
+        final float tierStickWidth = tierStickTexture.getWidth() * scale;
+        final float tierStickHeight = tierStickTexture.getHeight() * scale;
+        final Sprite tierGrid = new Sprite(tierGridX * scale, tierGridY * scale, tierGridWidth, tierGridHeight, tierGridTexture, vbom);
+        final Sprite tierStick = new Sprite(tierGridWidth * 0.5f, tierGridHeight * 0.5f - 1, tierStickWidth, tierStickHeight, tierStickTexture, vbom);
         tierGrid.attachChild(tierStick);
         this.attachChild(tierGrid);
         final int tierCount = (int) Math.ceil(card.getStar() * 0.5);
         for (int i = 0; i < tierCount; i++) {
-            final Sprite tierGridAdd = new Sprite(tierGridX * scale + (tierGridWidth + 1) * scale * (i + 1), tierGridY * scale, tierGridWidth * scale,
-                    tierGridHeight * scale, tierGridTexture, vbom);
+            final Sprite tierGridAdd = new Sprite(tierGridX * scale + (tierGridWidth + scale) * (i + 1), tierGridY * scale, tierGridWidth, tierGridHeight,
+                    tierGridTexture, vbom);
             if ((card.getTier() - 1) > i) {
-                final Sprite tierStickAdd = new Sprite(tierGridWidth * 0.5f, tierGridHeight * 0.5f - 1, tierStickWidth * scale, tierStickHeight * scale,
-                        tierStickTexture, vbom);
+                final Sprite tierStickAdd = new Sprite(tierGridWidth * 0.5f, tierGridHeight * 0.5f - 1, tierStickWidth, tierStickHeight, tierStickTexture, vbom);
                 tierGridAdd.attachChild(tierStickAdd);
             }
             this.attachChild(tierGridAdd);
@@ -180,12 +178,23 @@ public class CardFrame extends Rectangle {
             @Override
             public void workToDo() {
                 try {
-                    avatar = ImageUtils.getLocalString(card.getAvatar(), activity);
-                    image = ImageUtils.getLocalString(card.getImage(), activity);
-                    TEXTURE_FACTORY.addCardResource(activity, avatar);
-                    TEXTURE_FACTORY.addCardResource(activity, image);
-                    card.setAvatar(avatar);
-                    card.setImage(image);
+                    if (!card.isAvatarLoaded()) {
+                        avatar = ImageUtils.getLocalString(card.getAvatar(), activity);
+                        TEXTURE_FACTORY.addCardResource(activity, avatar);
+                        card.setAvatar(avatar);
+                        card.setAvatarLoaded(true);
+                    } else {
+                        avatar = card.getAvatar();
+                    }
+
+                    if (!card.isImageLoaded()) {
+                        image = ImageUtils.getLocalString(card.getImage(), activity);
+                        TEXTURE_FACTORY.addCardResource(activity, image);
+                        card.setImage(image);
+                        card.setImageLoaded(true);
+                    } else {
+                        image = card.getImage();
+                    }
                 } catch (final IOException e) {
                     Debug.e(e);
                 }

@@ -44,10 +44,10 @@ public class SmallChatRoom extends Rectangle {
         this.setColor(Color.BLACK);
         this.setAlpha(0.3f);
 
-        final Font chatFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
+        final Font chatFont = ResourceManager.getInstance().newFont(FontEnum.Default, 28);
         chatText = new Text(0, 0, chatFont, SAMPLE_CHAT_STRING, CHAT_SIZE, vbom);
         chatText.setColor(0XFFE8BD80);
-        final Font chatTimeFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
+        final Font chatTimeFont = ResourceManager.getInstance().newFont(FontEnum.Default, 28);
         chatTimeText = new Text(0, 0, chatTimeFont, SAMPLE_CHAT_TIME_STRING, CHAT_SIZE, vbom);
         chatTimeText.setColor(0XFFE8BD80);
 
@@ -72,7 +72,7 @@ public class SmallChatRoom extends Rectangle {
         this.attachChild(openButton);
         adjustChatTextPosition();
         this.attachChild(chatText);
-        final Font testChatFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
+        final Font testChatFont = ResourceManager.getInstance().newFont(FontEnum.Default, 28);
         final Text testChatTimeText = new Text(0, 0, testChatFont, TEST_CHAT_TIME_STRING, CHAT_SIZE, vbom);
         final float chatTimeTextWidth = testChatTimeText.getWidth();
         final float chatTimeTextHeight = testChatTimeText.getHeight();
@@ -93,7 +93,7 @@ public class SmallChatRoom extends Rectangle {
                         // Debug.e("end1:" + rs1);
                         final String sender = chatMessage.getSender();
                         final String content = chatMessage.getContent();
-                        final Font chatFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28, 512);
+                        final Font chatFont = ResourceManager.getInstance().newFont(FontEnum.Default, 28, 512);
                         chatStringBuffer.append(chatTextHandler.handle(sender, content, chatFont));
                         // final long end2 = System.currentTimeMillis();
                         // final long rs2 = end2 - end1;

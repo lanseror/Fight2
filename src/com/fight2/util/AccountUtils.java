@@ -97,10 +97,13 @@ public class AccountUtils {
                 final String image = ImageUtils.getLocalString(cardJson.getString("image"), activity);
                 final Card card = new Card();
                 card.setId(cardJson.getInt("id"));
+                card.setStar(cardJson.getInt("star"));
                 card.setAtk(cardJson.getInt("atk"));
                 card.setAvatar(avatar);
+                card.setAvatarLoaded(true);
                 card.setHp(cardJson.getInt("hp"));
                 card.setImage(image);
+                card.setImageLoaded(true);
                 card.setName(cardJson.getString("name"));
                 card.setSkill(cardJson.optString("skill"));
                 final JSONObject cardTemplateJson = cardJson.getJSONObject("cardTemplate");

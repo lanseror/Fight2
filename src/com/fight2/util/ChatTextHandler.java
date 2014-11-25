@@ -18,7 +18,7 @@ public class ChatTextHandler {
 
     public ChatTextHandler(final int charactersMaximum, final VertexBufferObjectManager vbom) {
         super();
-        final Font chatHandlerFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
+        final Font chatHandlerFont = ResourceManager.getInstance().newFont(FontEnum.Default, 28);
         sampleText = new Text(0, 0, chatHandlerFont, SAMPLE_TEXT, vbom);
         final TextOptions textOptions = new TextOptions(AutoWrap.LETTERS, sampleText.getWidth() - 5);
         text = new Text(0, 0, chatHandlerFont, SAMPLE_TEXT, charactersMaximum, textOptions, vbom);

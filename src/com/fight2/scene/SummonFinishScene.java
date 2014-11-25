@@ -13,7 +13,6 @@ import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
-import org.andengine.util.debug.Debug;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.MusicEnum;
@@ -21,12 +20,8 @@ import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.engine.CardFrame;
-import com.fight2.util.AsyncTaskLoader;
 import com.fight2.util.F2MusicManager;
-import com.fight2.util.IAsyncCallback;
-import com.fight2.util.ImageUtils;
 import com.fight2.util.ResourceManager;
-import com.fight2.util.TextureFactory;
 
 public class SummonFinishScene extends BaseScene {
     private final static float CARD_WIDTH = 96.5f * 3;
@@ -34,7 +29,6 @@ public class SummonFinishScene extends BaseScene {
     // private final Sprite cardSprite;
     private final IEntity cardFrame;
     // private final IEntity cardAttributeFrame;
-    private final TextureFactory textureFactory = TextureFactory.getInstance();
     // private final Font mFont;
     // private final Text hpText;
     // private final Text atkText;
@@ -116,54 +110,6 @@ public class SummonFinishScene extends BaseScene {
         F2MusicManager.getInstance().playMusic(MusicEnum.SUMMON);
         final IEntityModifier modifier = new ParallelEntityModifier(new ScaleModifier(0.3f, SCALE, 1), new RotationByModifier(0.3f, 270));
         cardFrame.registerEntityModifier(modifier);
-    }
-
-    public void loadImageFromServer(final Card card) {
-        final IAsyncCallback callback = new IAsyncCallback() {
-            private String avatar;
-            private String image;
-
-            @Override
-            public void workToDo() {
-                try {
-                    avatar = ImageUtils.getLocalString(card.getAvatar(), activity);
-                    image = ImageUtils.getLocalString(card.getImage(), activity);
-                    textureFactory.addCardResource(activity, avatar);
-                    textureFactory.addCardResource(activity, image);
-                    card.setAvatar(avatar);
-                    card.setImage(image);
-                } catch (final IOException e) {
-                    Debug.e(e);
-                }
-
-            }
-
-            @Override
-            public void onComplete() {
-
-                if (image != null) {
-                    // final ITextureRegion texture = textureFactory.getTextureRegion(image);
-                    // final Sprite imageSprite = new Sprite(CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f, CARD_WIDTH, CARD_HEIGHT, texture, vbom);
-                    // cardSprite.attachChild(imageSprite);
-                    // final ITextureRegion cardFrameTexture = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_ANGEL);
-                    // final float frameY = (cardFrameTexture.getHeight() * 0.5f - 8.57f) * SCALE;
-                    // final Sprite cardFrameSprite = new Sprite(CARD_WIDTH * 0.5f, frameY, cardFrameTexture, vbom);
-                    // cardFrameSprite.setScale(SCALE);
-                    // imageSprite.attachChild(cardFrameSprite);
-                    // cardAttributeFrame.setVisible(true);
-                }
-
-            }
-
-        };
-
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                new AsyncTaskLoader().execute(callback);
-            }
-        });
-
     }
 
     @Override

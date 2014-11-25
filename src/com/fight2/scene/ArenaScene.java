@@ -75,13 +75,13 @@ public class ArenaScene extends BaseScene {
 
     public ArenaScene(final GameActivity activity) throws IOException {
         super(activity);
-        this.topBarFont = ResourceManager.getInstance().getFont(FontEnum.Main);
-        this.infoFont = ResourceManager.getInstance().getFont(FontEnum.Default);
-        this.remainTimeFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
-        this.boldFaceFont = ResourceManager.getInstance().getFont(FontEnum.Bold);
-        this.difficultyFont = ResourceManager.getInstance().getFont(FontEnum.Default, 21);
-        final Font cwTimeFont = ResourceManager.getInstance().getFont(FontEnum.Default, 20);
-        final Font cwRateFont = ResourceManager.getInstance().getFont(FontEnum.Default, 36);
+        this.topBarFont = ResourceManager.getInstance().newFont(FontEnum.Main);
+        this.infoFont = ResourceManager.getInstance().newFont(FontEnum.Default);
+        this.remainTimeFont = ResourceManager.getInstance().newFont(FontEnum.Default, 24);
+        this.boldFaceFont = ResourceManager.getInstance().newFont(FontEnum.Bold);
+        this.difficultyFont = ResourceManager.getInstance().newFont(FontEnum.Default, 21);
+        final Font cwTimeFont = ResourceManager.getInstance().newFont(FontEnum.Default, 20);
+        final Font cwRateFont = ResourceManager.getInstance().newFont(FontEnum.Default, 36);
         hpText = new Text(280, 48, topBarFont, "0123456789", vbom);
         atkText = new Text(480, 48, topBarFont, "0123456789", vbom);
         ticketText = new Text(670, 48, topBarFont, "0123456789", vbom);
@@ -308,7 +308,7 @@ public class ArenaScene extends BaseScene {
 
     @Override
     public void updateScene() {
-        final Font nameFont = ResourceManager.getInstance().getFont(FontEnum.Default, 20);
+        final Font nameFont = ResourceManager.getInstance().newFont(FontEnum.Default, 20);
         userArenaInfo = ArenaUtils.enter(activity);
         mightText.setText(String.valueOf(userArenaInfo.getMight()));
         winText.setText(String.valueOf(userArenaInfo.getWin()));

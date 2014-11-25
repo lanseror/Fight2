@@ -77,7 +77,7 @@ public class MainScene extends BaseScene {
 
     public MainScene(final GameActivity activity) throws IOException {
         super(activity);
-        this.mFont = ResourceManager.getInstance().getFont(FontEnum.Main);
+        this.mFont = ResourceManager.getInstance().newFont(FontEnum.Main);
         final float tipTextX = TextureEnum.MAIN_TIPS.getWidth() * 0.5f;
         final float tipTextY = TextureEnum.MAIN_TIPS.getHeight() * 0.5f;
         final Text summonText = new Text(tipTextX, tipTextY, mFont, "召唤石", vbom);

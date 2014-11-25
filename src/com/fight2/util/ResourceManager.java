@@ -14,6 +14,7 @@ import org.andengine.opengl.texture.TextureOptions;
 import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.util.SparseArray;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
@@ -44,6 +45,8 @@ public class ResourceManager {
 
     private final Map<SceneEnum, BaseScene> scenes = new HashMap<SceneEnum, BaseScene>();
 
+    private final Map<FontEnum, SparseArray<Font>> fontMap = new HashMap<FontEnum, SparseArray<Font>>();
+
     private ResourceManager() {
         // Private the constructor;
     }
@@ -71,6 +74,10 @@ public class ResourceManager {
         loadScenes();
         // Resources loaded
         breadcrumbs.clear();
+
+        for (final FontEnum fontEnum : FontEnum.values()) {
+            fontMap.put(fontEnum, new SparseArray<Font>());
+        }
         this.isResourceLoaded = true;
     }
 
@@ -122,40 +129,52 @@ public class ResourceManager {
         return currentSceneEnum;
     }
 
-    public Font getFont(final FontEnum fontEnum) {
+    public Font newFont(final FontEnum fontEnum) {
 
         switch (fontEnum) {
             case Main:
-                return getFont(fontEnum, 20);
+                return newFont(fontEnum, 20);
             case Battle:
-                return getFont(fontEnum, 36);
+                return newFont(fontEnum, 36);
             case Default:
-                return getFont(fontEnum, 30);
+                return newFont(fontEnum, 30);
             case Bold:
-                return getFont(fontEnum, 30);
+                return newFont(fontEnum, 30);
             default:
-                return getFont(fontEnum, 30);
+                return newFont(fontEnum, 30);
         }
 
     }
 
-    public Font getFont(final FontEnum fontEnum, final int size) {
+    public Font newFont(final FontEnum fontEnum, final int size) {
 
         switch (fontEnum) {
             case Main:
-                return getFont(fontEnum, size, 256);
+                return newFont(fontEnum, size, 256);
             case Battle:
-                return getFont(fontEnum, size, 512);
+                return newFont(fontEnum, size, 512);
             case Default:
-                return getFont(fontEnum, size, 256);
+                return newFont(fontEnum, size, 256);
             case Bold:
-                return getFont(fontEnum, size, 256);
+                return newFont(fontEnum, size, 256);
         }
         return null;
 
     }
 
-    public Font getFont(final FontEnum fontEnum, final int size, final int textureSize) {
+    public Font getFont(final FontEnum fontEnum, final int size) {
+
+        final SparseArray<Font> fonts = fontMap.get(fontEnum);
+        Font font = fonts.get(size);
+        if (font == null) {
+            font = newFont(fontEnum, size);
+            fonts.put(size, font);
+        }
+        return font;
+
+    }
+
+    public Font newFont(final FontEnum fontEnum, final int size, final int textureSize) {
         switch (fontEnum) {
             case Main:
                 final Font mainFont = FontFactory.create(fontManager, textureManager, textureSize, textureSize, Typeface.DEFAULT, size, Color.WHITE);

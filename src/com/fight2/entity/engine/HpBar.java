@@ -33,7 +33,7 @@ public class HpBar extends Rectangle {
     private ClipEntity mainClipEntity;
     private ClipEntity rightClipEntity;
     private Sprite rightHpSprite;
-    private final Font font = ResourceManager.getInstance().getFont(FontEnum.Main);
+    private final Font font = ResourceManager.getInstance().newFont(FontEnum.Main);
     private final Text hpText;
 
     public HpBar(final float pX, final float pY, final GameActivity activity, final int fullHp) {

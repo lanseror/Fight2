@@ -55,7 +55,7 @@ public class PartyScene extends BaseScene {
 
     public PartyScene(final GameActivity activity) throws IOException {
         super(activity);
-        this.mFont = ResourceManager.getInstance().getFont(FontEnum.Main);
+        this.mFont = ResourceManager.getInstance().newFont(FontEnum.Main);
         hpText = new Text(this.simulatedLeftX + 360, topbarY + 48, mFont, "0123456789", vbom);
         atkText = new Text(this.simulatedLeftX + 600, topbarY + 48, mFont, "0123456789", vbom);
         final float partyTextTop = frameTop - 82;

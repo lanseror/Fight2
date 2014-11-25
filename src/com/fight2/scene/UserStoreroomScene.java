@@ -45,8 +45,8 @@ public class UserStoreroomScene extends BaseScene {
 
     public UserStoreroomScene(final GameActivity activity) throws IOException {
         super(activity);
-        headTitleFont = ResourceManager.getInstance().getFont(FontEnum.Default, 30);
-        this.amountFont = ResourceManager.getInstance().getFont(FontEnum.Default, 30);
+        headTitleFont = ResourceManager.getInstance().newFont(FontEnum.Default, 30);
+        this.amountFont = ResourceManager.getInstance().newFont(FontEnum.Default, 30);
         frame = createALBImageSprite(TextureEnum.GUILD_FRAME, this.simulatedLeftX, FRAME_BOTTOM);
         this.attachChild(frame);
         headTitleText = new Text(frame.getWidth() * 0.5f, frame.getHeight() - 25, headTitleFont, "物品仓库", 15, vbom);

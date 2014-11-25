@@ -16,6 +16,8 @@ public class Card {
     private int version;
     private int amount;
     private Race race;
+    private boolean avatarLoaded = false;
+    private boolean imageLoaded = false;
 
     public int getId() {
         return id;
@@ -135,6 +137,22 @@ public class Card {
 
     public void setRace(final Race race) {
         this.race = race;
+    }
+
+    public boolean isAvatarLoaded() {
+        return avatarLoaded;
+    }
+
+    public void setAvatarLoaded(final boolean avatarLoaded) {
+        this.avatarLoaded = avatarLoaded;
+    }
+
+    public boolean isImageLoaded() {
+        return imageLoaded;
+    }
+
+    public void setImageLoaded(final boolean imageLoaded) {
+        this.imageLoaded = imageLoaded;
     }
 
     public static enum Race {

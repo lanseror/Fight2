@@ -88,14 +88,14 @@ public class GuildScene extends BaseScene {
 
     public GuildScene(final GameActivity activity) throws IOException {
         super(activity);
-        this.buttonFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
-        this.infoFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
-        this.tipsFont = ResourceManager.getInstance().getFont(FontEnum.Default, 20);
-        this.amountFont = ResourceManager.getInstance().getFont(FontEnum.Default, 30);
-        this.contributionFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
-        this.headBarFont = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
-        this.rankingFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
-        this.headTitleFont = ResourceManager.getInstance().getFont(FontEnum.Default, 30);
+        this.buttonFont = ResourceManager.getInstance().newFont(FontEnum.Default, 24);
+        this.infoFont = ResourceManager.getInstance().newFont(FontEnum.Default, 26);
+        this.tipsFont = ResourceManager.getInstance().newFont(FontEnum.Default, 20);
+        this.amountFont = ResourceManager.getInstance().newFont(FontEnum.Default, 30);
+        this.contributionFont = ResourceManager.getInstance().newFont(FontEnum.Default, 26);
+        this.headBarFont = ResourceManager.getInstance().newFont(FontEnum.Default, 24);
+        this.rankingFont = ResourceManager.getInstance().newFont(FontEnum.Default, 26);
+        this.headTitleFont = ResourceManager.getInstance().newFont(FontEnum.Default, 30);
         this.frame = createALBImageSprite(TextureEnum.GUILD_FRAME, this.simulatedLeftX, FRAME_BOTTOM);
         this.attachChild(frame);
         headTitleText = new Text(frame.getWidth() * 0.5f, frame.getHeight() - 25, headTitleFont, "公会信息", 15, vbom);

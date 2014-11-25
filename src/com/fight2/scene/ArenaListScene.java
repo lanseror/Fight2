@@ -41,7 +41,7 @@ public class ArenaListScene extends BaseScene {
 
     public ArenaListScene(final GameActivity activity) throws IOException {
         super(activity);
-        this.topBarFont = ResourceManager.getInstance().getFont(FontEnum.Main);
+        this.topBarFont = ResourceManager.getInstance().newFont(FontEnum.Main);
         hpText = new Text(280, 48, topBarFont, "0123456789", vbom);
         atkText = new Text(480, 48, topBarFont, "0123456789", vbom);
         ticketText = new Text(670, 48, topBarFont, "0123456789", vbom);
@@ -106,7 +106,7 @@ public class ArenaListScene extends BaseScene {
         }
         arenaEntities.clear();
 
-        final Font font = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
+        final Font font = ResourceManager.getInstance().newFont(FontEnum.Default, 28);
         final List<Arena> arenas = ArenaUtils.getArenas(activity);
 
         for (int i = 0; i < arenas.size(); i++) {

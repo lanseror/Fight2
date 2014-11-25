@@ -33,7 +33,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
     private float initY;
     private float initDistanceX;
     private float initDistanceY;
-    private Sprite copyCard;
+    private IEntity copyCard;
     private boolean scrollable = true;
 
     public CardPackScrollDetectorListener(final PartyEditScene partyEditScene, final IEntity cardPack, final IEntity cardZoom) {
