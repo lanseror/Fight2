@@ -13,62 +13,37 @@ import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
-import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
-import org.andengine.opengl.font.Font;
-import org.andengine.opengl.texture.region.ITextureRegion;
-import org.andengine.util.debug.Debug;
 
 import com.fight2.GameActivity;
-import com.fight2.constant.FontEnum;
 import com.fight2.constant.MusicEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.QuestResult;
 import com.fight2.entity.QuestResult.TileItem;
-import com.fight2.util.AsyncTaskLoader;
+import com.fight2.entity.engine.CardFrame;
 import com.fight2.util.F2MusicManager;
-import com.fight2.util.IAsyncCallback;
-import com.fight2.util.ImageUtils;
 import com.fight2.util.ResourceManager;
-import com.fight2.util.TextureFactory;
 
 public class QuestTreasureScene extends BaseScene {
     private final static int CARD_WIDTH = 300;
     private final static int CARD_HEIGHT = 450;
-    private final Sprite cardSprite;
     private final IEntity cardFrame;
-    private final TextureFactory textureFactory = TextureFactory.getInstance();
-    private final Font mFont;
 
     public QuestTreasureScene(final QuestResult questResult, final GameActivity activity) throws IOException {
         super(activity);
-        this.mFont = ResourceManager.getInstance().newFont(FontEnum.Main, 24);
         this.cardFrame = new Rectangle(cameraCenterX, cameraCenterY, CARD_WIDTH, CARD_HEIGHT, vbom);
         cardFrame.setRotation(90);
         cardFrame.setAlpha(0);
         cardFrame.setScale(0.33f);
         final TileItem tileItem = questResult.getItem();
-        final ITextureRegion texture = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_CARD_COVER);
-        this.cardSprite = new Sprite(CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f, CARD_WIDTH, CARD_HEIGHT, texture, vbom);
 
         this.attachChild(cardFrame);
         if (tileItem == TileItem.Card) {
-            cardFrame.attachChild(cardSprite);
             final Card card = questResult.getCard();
-            loadImageFromServer(card);
-            final Text hpText = new Text(40, 40, mFont, String.valueOf(card.getHp()), vbom);
-            final Text atkText = new Text(40, 15, mFont, String.valueOf(card.getAtk()), vbom);
-            final Text nameText = new Text(60, 75, mFont, card.getName(), vbom);
-            cardFrame.attachChild(hpText);
-            cardFrame.attachChild(atkText);
-            cardFrame.attachChild(nameText);
-            final ITextureRegion starTexture = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_STAR_1);
-            for (int i = 0; i < card.getStar(); i++) {
-                final Sprite star = new Sprite(15 + 19.5f * i, CARD_HEIGHT - 18, 19.5f, 24, starTexture, vbom);
-                cardFrame.attachChild(star);
-            }
+            final IEntity cardSprite = new CardFrame(CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f, CARD_WIDTH, CARD_HEIGHT, card, activity);
+            cardFrame.attachChild(cardSprite);
         } else if (tileItem == TileItem.Stamina) {
             final TextureEnum staminaEnum = TextureEnum.COMMON_STAMINA;
             final IEntity staminaImg = createACImageSprite(staminaEnum, CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f);
@@ -114,48 +89,6 @@ public class QuestTreasureScene extends BaseScene {
         F2MusicManager.getInstance().playMusic(MusicEnum.SUMMON);
         final IEntityModifier modifier = new ParallelEntityModifier(new ScaleModifier(0.3f, 0.33f, 1), new RotationByModifier(0.3f, 270));
         cardFrame.registerEntityModifier(modifier);
-    }
-
-    public void loadImageFromServer(final Card card) {
-        final IAsyncCallback callback = new IAsyncCallback() {
-            private String avatar;
-            private String image;
-
-            @Override
-            public void workToDo() {
-                try {
-                    avatar = ImageUtils.getLocalString(card.getAvatar(), activity);
-                    image = ImageUtils.getLocalString(card.getImage(), activity);
-                    textureFactory.addCardResource(activity, avatar);
-                    textureFactory.addCardResource(activity, image);
-                    card.setAvatar(avatar);
-                    card.setImage(image);
-                } catch (final IOException e) {
-                    Debug.e(e);
-                }
-
-            }
-
-            @Override
-            public void onComplete() {
-
-                if (image != null) {
-                    final ITextureRegion texture = textureFactory.getTextureRegion(image);
-                    final Sprite imageSprite = new Sprite(CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f, CARD_WIDTH, CARD_HEIGHT, texture, vbom);
-                    cardSprite.attachChild(imageSprite);
-                }
-
-            }
-
-        };
-
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                new AsyncTaskLoader().execute(callback);
-            }
-        });
-
     }
 
     @Override

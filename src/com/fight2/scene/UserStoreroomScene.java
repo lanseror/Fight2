@@ -11,7 +11,6 @@ import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
 import org.andengine.opengl.font.Font;
-import org.andengine.opengl.texture.region.ITextureRegion;
 
 import android.widget.Toast;
 
@@ -22,11 +21,11 @@ import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.ScrollZone;
 import com.fight2.entity.UserStoreroom;
+import com.fight2.entity.engine.CardFrame;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.AccountUtils;
 import com.fight2.util.ResourceManager;
-import com.fight2.util.TextureFactory;
 
 public class UserStoreroomScene extends BaseScene {
     private final static int FRAME_BOTTOM = 90;
@@ -122,8 +121,7 @@ public class UserStoreroomScene extends BaseScene {
             final float cardRowY = cardRow.getHeight() * 0.5f;
             final Sprite cardRowLine = this.createACImageSprite(TextureEnum.GUILD_SCROLL_ROW_SEPARATOR, SCROLL_ZONE_WIDTH * 0.5f, 1);
             cardRow.attachChild(cardRowLine);
-            final ITextureRegion cardTexture = TextureFactory.getInstance().getTextureRegion(card.getImage());
-            final Sprite cardSprite = new Sprite(220, cardRowY, 110, 165, cardTexture, vbom);
+           final IEntity cardSprite = new CardFrame(220, cardRowY, 110, 165, card, activity);
             final Text cardAmountText = new Text(300, 25, amountFont, String.format("×%s", card.getAmount()), vbom);
             cardAmountText.setColor(0XFFAECE01);
             this.leftAlignEntity(cardAmountText, cardSprite.getX() + cardSprite.getWidth() * 0.5f + 5);

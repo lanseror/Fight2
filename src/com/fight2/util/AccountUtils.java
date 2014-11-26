@@ -203,12 +203,8 @@ public class AccountUtils {
                 card.setAtk(cardJson.getInt("atk"));
                 card.setName(cardJson.getString("name"));
                 card.setStar(cardJson.getInt("star"));
-                final String image = cardJson.getString("image");
-                if (image != null && !"".equals(image)) {
-                    final String localImage = ImageUtils.getLocalString(image, activity);
-                    card.setImage(localImage);
-                    TextureFactory.getInstance().addCardResource(activity, localImage);
-                }
+                card.setAvatar(cardJson.getString("avatar"));
+                card.setImage(cardJson.getString("image"));
                 card.setAmount(cardJson.getInt("amount"));
                 card.setRace(Race.valueOf(cardJson.getString("race")));
                 cards.add(card);
