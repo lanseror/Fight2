@@ -33,6 +33,7 @@ import com.fight2.entity.GuildArenaUser;
 import com.fight2.entity.GuildStoreroom;
 import com.fight2.entity.ScrollZone;
 import com.fight2.entity.User;
+import com.fight2.entity.engine.CardFrame;
 import com.fight2.entity.engine.CheckboxSprite;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
@@ -493,8 +494,7 @@ public class GuildScene extends BaseScene {
             final float cardRowY = cardRow.getHeight() * 0.5f;
             final Sprite cardRowLine = this.createACImageSprite(TextureEnum.GUILD_SCROLL_ROW_SEPARATOR, SCROLL_ZONE_WIDTH * 0.5f, 1);
             cardRow.attachChild(cardRowLine);
-            final ITextureRegion cardTexture = TextureFactory.getInstance().getTextureRegion(card.getImage());
-            final Sprite cardSprite = new Sprite(350, cardRowY, 110, 165, cardTexture, vbom);
+            final IEntity cardSprite = new CardFrame(350, cardRowY, 110, 165, card, activity);
             final Text cardAmountText = new Text(300, 25, amountFont, String.format("×%s", card.getAmount()), vbom);
             cardAmountText.setColor(0XFFAECE01);
             this.leftAlignEntity(cardAmountText, cardSprite.getX() + cardSprite.getWidth() * 0.5f + 5);
@@ -556,8 +556,7 @@ public class GuildScene extends BaseScene {
             final BidItemType itemType = bid.getType();
             if (itemType == BidItemType.Card) {
                 final Card card = bid.getCard();
-                final ITextureRegion cardTexture = TextureFactory.getInstance().getTextureRegion(card.getImage());
-                final Sprite cardSprite = new Sprite(220, rowY, 110, 165, cardTexture, vbom);
+                final IEntity cardSprite = new CardFrame(220, rowY, 110, 165, card, activity);
                 final Text cardAmountText = new Text(300, 25, amountFont, String.format("×%s", bid.getAmount()), vbom);
                 cardAmountText.setColor(0XFFAECE01);
                 this.leftAlignEntity(cardAmountText, cardSprite.getX() + cardSprite.getWidth() * 0.5f + 5);
