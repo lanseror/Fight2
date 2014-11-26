@@ -221,15 +221,6 @@ public class CardFrame extends Rectangle {
             this.attachChild(tierStickAdd);
             tierStickAdd.setZIndex(7);
         }
-        // for (int i = 0; i < tierCount; i++) {
-        // final Sprite tierGridAdd = new Sprite(tierGridX * scale + (tierGridWidth + scale) * (i + 1), tierGridY * scale, tierGridWidth, tierGridHeight,
-        // tierGridTexture, vbom);
-        // if ((card.getTier() - 1) > i) {
-        // final Sprite tierStickAdd = new Sprite(tierGridWidth * 0.5f, tierGridHeight * 0.5f - 1, tierStickWidth, tierStickHeight, tierStickTexture, vbom);
-        // tierGridAdd.attachChild(tierStickAdd);
-        // }
-        // this.attachChild(tierGridAdd);
-        // }
 
     }
 
