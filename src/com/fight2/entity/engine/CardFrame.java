@@ -27,7 +27,7 @@ import com.fight2.util.TextureFactory;
 public class CardFrame extends Rectangle {
     private final static float CARD_WIDTH = 289.5f;
     private static final TextureFactory TEXTURE_FACTORY = TextureFactory.getInstance();
-    private final IEntity cardSprite;
+    private final IEntity cardCoverSprite;
     private final GameActivity activity;
     private final VertexBufferObjectManager vbom;
 
@@ -35,117 +35,201 @@ public class CardFrame extends Rectangle {
         super(x, y, width, height, activity.getVertexBufferObjectManager());
         this.activity = activity;
         this.vbom = activity.getVertexBufferObjectManager();
+        this.setAlpha(0);
         final BigDecimal decWidth = BigDecimal.valueOf(width);
         final BigDecimal decBaseWidth = BigDecimal.valueOf(CARD_WIDTH);
         final float scale = decWidth.divide(decBaseWidth, 6, RoundingMode.HALF_UP).floatValue();
-
         final ITextureRegion coverTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_COVER);
-        cardSprite = new Sprite(width * 0.5f, height * 0.5f, width + 3 * scale, height + 3 * scale, coverTexture, vbom);
-        this.attachChild(cardSprite);
+        cardCoverSprite = new Sprite(width * 0.5f, height * 0.5f, width + 3 * scale, height + 3 * scale, coverTexture, vbom);
+        cardCoverSprite.setZIndex(0);
+        this.attachChild(cardCoverSprite);
 
         loadImageFromServer(card);
-
-        final Font mFont = ResourceManager.getInstance().getFont(FontEnum.Default, (int) (27 * scale));
-        final ITextureRegion hpAtkFrameTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_HPATK);
-        final Sprite hpAtkFrame = new Sprite(width - 90 * scale, 75 * scale, hpAtkFrameTexture.getWidth() * scale, hpAtkFrameTexture.getHeight() * scale,
-                hpAtkFrameTexture, vbom);
-        this.attachChild(hpAtkFrame);
-        final Text hpText = new Text(70 * scale, 70 * scale, mFont, "0123456789", vbom);
-        hpText.setColor(0XFFFFE3B0);
-        final Text atkText = new Text(70 * scale, 23 * scale, mFont, "0123456789", vbom);
-        atkText.setColor(0XFFFFE3B0);
-        hpText.setText(String.valueOf(card.getHp()));
-        atkText.setText(String.valueOf(card.getAtk()));
-        hpAtkFrame.attachChild(hpText);
-        hpAtkFrame.attachChild(atkText);
 
         final Race race = card.getRace();
         final ITextureRegion cardFrameTexture = getTexture(race);
         final float frameY = (cardFrameTexture.getHeight() * 0.5f - 11f) * scale;
         final Sprite cardFrameSprite = new Sprite(width * 0.5f, frameY, cardFrameTexture, vbom);
         cardFrameSprite.setScale(scale);
+        cardFrameSprite.setZIndex(1);
         this.attachChild(cardFrameSprite);
 
         float levelX = 0;
         float levelY = 0;
+        float hpAtkX = 0;
+        float hpY = 0;
+        float atkY = 0;
         switch (race) {
             case Human:
                 levelX = 32f;
                 levelY = 24f;
+                hpAtkX = 193;
+                hpY = 83;
+                atkY = 36;
                 break;
             case Angel:
                 levelX = 28f;
                 levelY = 24f;
+                hpAtkX = 193;
+                hpY = 88;
+                atkY = 41;
                 break;
             case Elf:
                 levelX = 31f;
                 levelY = 23f;
+                hpAtkX = 193;
+                hpY = 88;
+                atkY = 41;
                 break;
             case Devil:
                 levelX = 32f;
                 levelY = 23f;
+                hpAtkX = 193;
+                hpY = 84;
+                atkY = 37;
                 break;
         }
+
+        final Font hpatkFont = ResourceManager.getInstance().getFont(FontEnum.Default, (int) (27 * scale));
+        final Text hpText = new Text(hpAtkX * scale, hpY * scale, hpatkFont, String.valueOf(card.getHp()), vbom);
+        hpText.setColor(0XFFFFE3B0);
+        final Text atkText = new Text(hpAtkX * scale, atkY * scale, hpatkFont, String.valueOf(card.getAtk()), vbom);
+        atkText.setColor(0XFFFFE3B0);
+        this.attachChild(hpText);
+        hpText.setZIndex(2);
+        this.attachChild(atkText);
+        atkText.setZIndex(3);
+
         final Font levelFont = ResourceManager.getInstance().getFont(FontEnum.Bold, (int) (30 * scale));
         final Text levelText = new Text(levelX * scale, levelY * scale, levelFont, String.valueOf(card.getLevel()), vbom);
         levelText.setColor(0XFFFFE3B0);
         this.attachChild(levelText);
+        levelText.setZIndex(4);
 
-        final ITextureRegion starTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_STAR);
-        for (int i = 0; i < card.getStar(); i++) {
-            final Sprite star = new Sprite((87 + 27f * i) * scale, height - 24 * scale, starTexture.getWidth() * scale, starTexture.getHeight() * scale,
-                    starTexture, vbom);
-            this.attachChild(star);
+        ITextureRegion starTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_STAR_1);
+        switch (card.getStar()) {
+            case 1:
+                starTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_STAR_1);
+                break;
+            case 2:
+                starTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_STAR_2);
+                break;
+            case 3:
+                starTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_STAR_3);
+                break;
+            case 4:
+                starTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_STAR_4);
+                break;
+            case 5:
+                starTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_STAR_5);
+                break;
+            case 6:
+                starTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_STAR_6);
+                break;
         }
+        final Sprite star = new Sprite((85 + starTexture.getWidth() * 0.5f) * scale, height - 24 * scale, starTexture.getWidth() * scale,
+                starTexture.getHeight() * scale, starTexture, vbom);
+        this.attachChild(star);
+        star.setZIndex(5);
 
-        ITextureRegion tierGridTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_HUMAN);
-        ITextureRegion tierStickTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_HUMAN);
+        ITextureRegion tierGridTexture1 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_HUMAN);
+        ITextureRegion tierGridTexture2 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_HUMAN_2);
+        ITextureRegion tierStickTexture1 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_HUMAN);
+        ITextureRegion tierStickTexture2 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_HUMAN_2);
+        ITextureRegion tierStickTexture3 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_HUMAN_3);
         float tierGridX = 114;
         float tierGridY = 1;
+        float tierStickX = 114;
+        float tierStickY = 1;
         switch (race) {
             case Human:
-                tierGridTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_HUMAN);
-                tierStickTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_HUMAN);
-                tierGridX = 112;
+                tierGridTexture1 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_HUMAN);
+                tierGridTexture2 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_HUMAN_2);
+                tierStickTexture2 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_HUMAN_2);
+                tierStickTexture3 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_HUMAN_3);
+                tierGridX = 164;
                 tierGridY = 1;
+                tierStickX = 128;
+                tierStickY = 0;
                 break;
             case Angel:
-                tierGridTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_COMMON);
-                tierStickTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_ANGEL);
-                tierGridX = 108;
+                tierGridTexture1 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_COMMON);
+                tierGridTexture2 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_COMMON_2);
+                tierStickTexture1 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_ANGEL);
+                tierStickTexture2 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_ANGEL_2);
+                tierStickTexture3 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_ANGEL_3);
+                tierGridX = 164;
                 tierGridY = 6.5f;
+                tierStickX = 130;
+                tierStickY = 5.5f;
                 break;
             case Elf:
-                tierGridTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_COMMON);
-                tierStickTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_ELF);
-                tierGridX = 99;
+                tierGridTexture1 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_COMMON);
+                tierGridTexture2 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_COMMON_2);
+                tierStickTexture1 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_ELF);
+                tierStickTexture2 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_ELF_2);
+                tierStickTexture3 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_ELF_3);
+                tierGridX = 153;
                 tierGridY = 1;
+                tierStickX = 117;
+                tierStickY = 0;
                 break;
             case Devil:
-                tierGridTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_COMMON);
-                tierStickTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_DEVIL);
-                tierGridX = 105;
-                tierGridY = -1;
+                tierGridTexture1 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_COMMON);
+                tierGridTexture2 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_COMMON_2);
+                tierStickTexture1 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_DEVIL);
+                tierStickTexture2 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_DEVIL_2);
+                tierStickTexture3 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_DEVIL_3);
+                tierGridX = 153;
+                tierGridY = -0.5f;
+                tierStickX = 116;
+                tierStickY = -1.5f;
                 break;
         }
-        final float tierGridWidth = tierGridTexture.getWidth() * scale;
-        final float tierGridHeight = tierGridTexture.getHeight() * scale;
-        final float tierStickWidth = tierStickTexture.getWidth() * scale;
-        final float tierStickHeight = tierStickTexture.getHeight() * scale;
-        final Sprite tierGrid = new Sprite(tierGridX * scale, tierGridY * scale, tierGridWidth, tierGridHeight, tierGridTexture, vbom);
-        final Sprite tierStick = new Sprite(tierGridWidth * 0.5f, tierGridHeight * 0.5f - 1, tierStickWidth, tierStickHeight, tierStickTexture, vbom);
-        tierGrid.attachChild(tierStick);
-        this.attachChild(tierGrid);
-        final int tierCount = (int) Math.ceil(card.getStar() * 0.5);
-        for (int i = 0; i < tierCount; i++) {
-            final Sprite tierGridAdd = new Sprite(tierGridX * scale + (tierGridWidth + scale) * (i + 1), tierGridY * scale, tierGridWidth, tierGridHeight,
-                    tierGridTexture, vbom);
-            if ((card.getTier() - 1) > i) {
-                final Sprite tierStickAdd = new Sprite(tierGridWidth * 0.5f, tierGridHeight * 0.5f - 1, tierStickWidth, tierStickHeight, tierStickTexture, vbom);
-                tierGridAdd.attachChild(tierStickAdd);
-            }
+
+        final int tierGridAddAmount = (int) Math.ceil(card.getStar() * 0.5) - 1;
+        if (tierGridAddAmount == 1) {
+            final float tierGridWidth = tierGridTexture1.getWidth() * scale;
+            final float tierGridHeight = tierGridTexture1.getHeight() * scale;
+            final Sprite tierGridAdd = new Sprite(tierGridX * scale + tierGridWidth * 0.5f, tierGridY * scale, tierGridWidth, tierGridHeight, tierGridTexture1,
+                    vbom);
             this.attachChild(tierGridAdd);
+            tierGridAdd.setZIndex(6);
+        } else if (tierGridAddAmount == 2) {
+            final float tierGridWidth = tierGridTexture2.getWidth() * scale;
+            final float tierGridHeight = tierGridTexture2.getHeight() * scale;
+            final Sprite tierGridAdd = new Sprite(tierGridX * scale + tierGridWidth * 0.5f, tierGridY * scale, tierGridWidth, tierGridHeight, tierGridTexture2,
+                    vbom);
+            this.attachChild(tierGridAdd);
+            tierGridAdd.setZIndex(6);
         }
+
+        final int tierStickAddAmount = card.getTier() - 1;
+        ITextureRegion tierStickTexture = tierStickTexture1;
+        if (tierStickAddAmount == 1) {
+            tierStickTexture = tierStickTexture1;
+        } else if (tierStickAddAmount == 2) {
+            tierStickTexture = tierStickTexture2;
+        } else if (tierStickAddAmount == 3) {
+            tierStickTexture = tierStickTexture3;
+        }
+        if (tierStickAddAmount > 0) {
+            final float tierStickWidth = tierStickTexture.getWidth() * scale;
+            final float tierStickHeight = tierStickTexture.getHeight() * scale;
+            final Sprite tierStickAdd = new Sprite(tierStickX * scale + tierStickWidth * 0.5f, tierStickY * scale, tierStickWidth, tierStickHeight,
+                    tierStickTexture, vbom);
+            this.attachChild(tierStickAdd);
+            tierStickAdd.setZIndex(7);
+        }
+        // for (int i = 0; i < tierCount; i++) {
+        // final Sprite tierGridAdd = new Sprite(tierGridX * scale + (tierGridWidth + scale) * (i + 1), tierGridY * scale, tierGridWidth, tierGridHeight,
+        // tierGridTexture, vbom);
+        // if ((card.getTier() - 1) > i) {
+        // final Sprite tierStickAdd = new Sprite(tierGridWidth * 0.5f, tierGridHeight * 0.5f - 1, tierStickWidth, tierStickHeight, tierStickTexture, vbom);
+        // tierGridAdd.attachChild(tierStickAdd);
+        // }
+        // this.attachChild(tierGridAdd);
+        // }
 
     }
 
@@ -207,7 +291,17 @@ public class CardFrame extends Rectangle {
                 if (image != null) {
                     final ITextureRegion texture = TEXTURE_FACTORY.getTextureRegion(image);
                     final Sprite imageSprite = new Sprite(mWidth * 0.5f, mHeight * 0.5f, mWidth, mHeight, texture, vbom);
-                    cardSprite.attachChild(imageSprite);
+                    imageSprite.setZIndex(0);
+                    final IEntity parent = cardCoverSprite.getParent();
+                    activity.runOnUpdateThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            cardCoverSprite.detachSelf();
+                            parent.attachChild(imageSprite);
+                            parent.sortChildren();
+                        }
+                    });
+
                 }
 
             }

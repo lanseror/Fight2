@@ -98,6 +98,8 @@ public class AccountUtils {
                 final Card card = new Card();
                 card.setId(cardJson.getInt("id"));
                 card.setStar(cardJson.getInt("star"));
+                card.setLevel(cardJson.getInt("level"));
+                card.setTier(cardJson.getInt("tier"));
                 card.setAtk(cardJson.getInt("atk"));
                 card.setAvatar(avatar);
                 card.setAvatarLoaded(true);

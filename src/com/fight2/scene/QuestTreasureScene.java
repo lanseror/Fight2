@@ -64,7 +64,7 @@ public class QuestTreasureScene extends BaseScene {
             cardFrame.attachChild(hpText);
             cardFrame.attachChild(atkText);
             cardFrame.attachChild(nameText);
-            final ITextureRegion starTexture = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_STAR);
+            final ITextureRegion starTexture = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_STAR_1);
             for (int i = 0; i < card.getStar(); i++) {
                 final Sprite star = new Sprite(15 + 19.5f * i, CARD_HEIGHT - 18, 19.5f, 24, starTexture, vbom);
                 cardFrame.attachChild(star);
