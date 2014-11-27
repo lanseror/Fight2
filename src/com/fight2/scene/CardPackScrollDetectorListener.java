@@ -13,19 +13,19 @@ import org.andengine.util.modifier.IModifier;
 
 import android.widget.Toast;
 
+import com.fight2.GameActivity;
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
+import com.fight2.entity.engine.CardFrame;
 import com.fight2.input.touch.detector.F2ScrollDetector;
 import com.fight2.util.SpriteUtils;
 
 public class CardPackScrollDetectorListener implements IScrollDetectorListener {
 
-    /**
-     * 
-     */
     private final PartyEditScene partyEditScene;
-    private final IEntity cardPack;
+    private final GameActivity activity;
+    private final CardPack cardPack;
     private final IEntity cardZoom;;
     private final float cardZoomX;
     private float initPointerID;
@@ -36,8 +36,9 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
     private IEntity copyCard;
     private boolean scrollable = true;
 
-    public CardPackScrollDetectorListener(final PartyEditScene partyEditScene, final IEntity cardPack, final IEntity cardZoom) {
+    public CardPackScrollDetectorListener(final PartyEditScene partyEditScene, final GameActivity activity, final CardPack cardPack, final IEntity cardZoom) {
         this.partyEditScene = partyEditScene;
+        this.activity = activity;
         this.cardPack = cardPack;
         this.cardZoom = cardZoom;
         this.cardZoomX = cardZoom.getX();
@@ -58,10 +59,8 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                 // Debug.e("Create copyCard");
                 focusedCard.setAlpha(0.5f);
                 final Card sessionCard = (Card) focusedCard.getUserData();
-                copyCard = this.partyEditScene.createRealScreenCardSprite(sessionCard, 10, 20);
+                copyCard = new CardFrame(0, 0, focusedCard.getWidth(), focusedCard.getHeight(), sessionCard, activity);
                 copyCard.setPosition(SpriteUtils.toContainerOuterX(focusedCard), SpriteUtils.toContainerOuterY(focusedCard));
-                copyCard.setWidth(focusedCard.getWidth());
-                copyCard.setHeight(focusedCard.getHeight());
                 copyCard.setUserData(sessionCard);
                 this.partyEditScene.attachChild(copyCard);
 
@@ -308,7 +307,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                 @Override
                 public void run() {
                     focusedCard.detachSelf();
-                    partyEditScene.removedCards.put(cardEntry, focusedCard);
+                    cardPack.removedCard(cardEntry, focusedCard);
                     GameUserSession.getInstance().getCards().remove(cardEntry);
                     partyEditScene.attachChild(avatar);
                     pItem.detachSelf();
@@ -394,10 +393,10 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                 @Override
                 public void run() {
                     focusedCard.detachSelf();
-                    CardPackScrollDetectorListener.this.partyEditScene.removedCards.put(cardEntry, focusedCard);
+                    cardPack.removedCard(cardEntry, focusedCard);
                     GameUserSession.getInstance().getCards().remove(cardEntry);
                     if (cardPack.getChildCount() == 0) {
-                        partyEditScene.revertCardToCardPack(beReplacedCardSprite);
+                        cardPack.revertCardToCardPack(beReplacedCardSprite);
                         beReplacedCardSprite.detachSelf();
                     }
                     pItem.detachSelf();
@@ -427,8 +426,8 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
 
         @Override
         public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
-            partyEditScene.revertCardToCardPack(replaceCardSprite);
-            partyEditScene.getActivity().runOnUpdateThread(new Runnable() {
+            cardPack.revertCardToCardPack(replaceCardSprite);
+            activity.runOnUpdateThread(new Runnable() {
                 @Override
                 public void run() {
                     replaceCardSprite.detachSelf();
