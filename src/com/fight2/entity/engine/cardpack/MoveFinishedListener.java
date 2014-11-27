@@ -1,4 +1,4 @@
-package com.fight2.scene;
+package com.fight2.entity.engine.cardpack;
 
 import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.IEntityModifier.IEntityModifierListener;

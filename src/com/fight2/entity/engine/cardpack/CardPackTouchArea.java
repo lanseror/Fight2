@@ -1,4 +1,4 @@
-package com.fight2.scene;
+package com.fight2.entity.engine.cardpack;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

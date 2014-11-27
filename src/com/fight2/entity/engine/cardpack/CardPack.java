@@ -1,4 +1,4 @@
-package com.fight2.scene;
+package com.fight2.entity.engine.cardpack;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,6 +10,7 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
+import com.fight2.scene.PartyEditScene;
 
 public class CardPack extends Rectangle {
     private final Map<Card, IEntity> removedCards = new HashMap<Card, IEntity>();
@@ -25,7 +26,7 @@ public class CardPack extends Rectangle {
         removedCards.put(card, removedCardSprite);
     }
 
-    protected void revertCardToCardPack(final IEntity inCardFrameSprite) {
+    public void revertCardToCardPack(final IEntity inCardFrameSprite) {
         final Card replaceCard = (Card) inCardFrameSprite.getUserData();
         final IEntity revertCard = removedCards.remove(replaceCard);
         final IEntity focusedCard = (IEntity) cardZoom.getUserData();

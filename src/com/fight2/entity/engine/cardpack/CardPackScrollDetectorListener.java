@@ -1,4 +1,4 @@
-package com.fight2.scene;
+package com.fight2.entity.engine.cardpack;
 
 import java.util.Set;
 
@@ -19,6 +19,7 @@ import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.engine.CardFrame;
 import com.fight2.input.touch.detector.F2ScrollDetector;
+import com.fight2.scene.PartyEditScene;
 import com.fight2.util.SpriteUtils;
 
 public class CardPackScrollDetectorListener implements IScrollDetectorListener {

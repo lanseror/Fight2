@@ -1,10 +1,12 @@
-package com.fight2.scene;
+package com.fight2.entity.engine.cardpack;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import org.andengine.engine.handler.BaseEntityUpdateHandler;
 import org.andengine.entity.IEntity;
+
+import com.fight2.scene.PartyEditScene;
 
 public class CardUpdateHandler extends BaseEntityUpdateHandler {
     public static float SCALE_FACTOR = 0.8f;

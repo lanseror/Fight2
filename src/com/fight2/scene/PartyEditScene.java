@@ -33,6 +33,12 @@ import com.fight2.entity.PartyInfo;
 import com.fight2.entity.engine.CardFrame;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
+import com.fight2.entity.engine.cardpack.CardPack;
+import com.fight2.entity.engine.cardpack.CardPackPhysicsHandler;
+import com.fight2.entity.engine.cardpack.CardPackScrollDetectorListener;
+import com.fight2.entity.engine.cardpack.CardPackTouchArea;
+import com.fight2.entity.engine.cardpack.CardUpdateHandler;
+import com.fight2.entity.engine.cardpack.MoveFinishedListener;
 import com.fight2.input.touch.detector.F2ScrollDetector;
 import com.fight2.util.CardUtils;
 import com.fight2.util.ResourceManager;
@@ -44,13 +50,13 @@ public class PartyEditScene extends BaseScene {
     public final static int CARD_HEIGHT = 165;
     public final static int CARD_Y = 120;
     private F2ScrollDetector scrollDetector;
-    int partyNumber;
+    public int partyNumber;
     private final TextureEnum[] partyNumberTexts = { TextureEnum.PARTY_NUMBER_1, TextureEnum.PARTY_NUMBER_2, TextureEnum.PARTY_NUMBER_3 };
-    final Sprite[] cardGrids = new Sprite[4];
+    public final Sprite[] cardGrids = new Sprite[4];
 
     private PhysicsHandler physicsHandler;
     private final Font hpatkFont;
-    final IEntity[] addedCards = new IEntity[4];
+    public final IEntity[] addedCards = new IEntity[4];
 
     final Rectangle cardZoom;
     private final CardPack cardPack;
@@ -338,7 +344,7 @@ public class PartyEditScene extends BaseScene {
         return switchButton;
     }
 
-    protected Sprite createCardAvatarSprite(final Card card, final float x, final float y) {
+    public Sprite createCardAvatarSprite(final Card card, final float x, final float y) {
         final float width = 135;
         final float height = 135;
         final BigDecimal factor = BigDecimal.valueOf(this.cameraHeight).divide(BigDecimal.valueOf(deviceHeight), 2, RoundingMode.HALF_DOWN);
