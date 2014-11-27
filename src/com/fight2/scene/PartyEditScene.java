@@ -27,11 +27,8 @@ import org.andengine.util.debug.Debug;
 import org.andengine.util.modifier.IModifier;
 
 import android.view.MotionEvent;
-import android.view.VelocityTracker;
-import android.widget.Toast;
 
 import com.fight2.GameActivity;
-import com.fight2.constant.ConfigEnum;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
@@ -44,28 +41,22 @@ import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.input.touch.detector.F2ScrollDetector;
 import com.fight2.util.CardUtils;
-import com.fight2.util.ConfigHelper;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.SpriteUtils;
 import com.fight2.util.TextureFactory;
 
 public class PartyEditScene extends BaseScene {
-    private final static int BASE_PX = 600;
     public final static int CARD_GAP = 20;
     public final static int CARD_WIDTH = 110;
     public final static int CARD_HEIGHT = 165;
     public final static int CARD_Y = 120;
-    private final static float DISTANCE_15CARDS = (CARD_WIDTH + CARD_GAP) * 14.5f;
-    private final static int ACCELERATION = 1300;
-    private final float max_velocity;
-    private final int factor;
     private F2ScrollDetector scrollDetector;
     int partyNumber;
     private final TextureEnum[] partyNumberTexts = { TextureEnum.PARTY_NUMBER_1, TextureEnum.PARTY_NUMBER_2, TextureEnum.PARTY_NUMBER_3 };
     final Sprite[] cardGrids = new Sprite[4];
 
     private PhysicsHandler mPhysicsHandler;
-    private final Font mFont;
+    private final Font hpatkFont;
     final Map<Card, IEntity> removedCards = new HashMap<Card, IEntity>();
     final IEntity[] addedCards = new IEntity[4];
 
@@ -86,18 +77,14 @@ public class PartyEditScene extends BaseScene {
     public PartyEditScene(final GameActivity activity, final int partyNumber) throws IOException {
         super(activity);
         this.partyNumber = partyNumber;
-        final BigDecimal devicePX = BigDecimal.valueOf(ConfigHelper.getInstance().getFloat(ConfigEnum.X_DPI));
-        final BigDecimal bdFactor = BigDecimal.valueOf(BASE_PX).divide(devicePX, 2, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(430));
-        factor = bdFactor.intValue();
-        max_velocity = BigDecimal.valueOf(Math.sqrt(2 * ACCELERATION * DISTANCE_15CARDS)).floatValue();
-        this.mFont = ResourceManager.getInstance().newFont(FontEnum.Main);
+        this.hpatkFont = ResourceManager.getInstance().getFont(FontEnum.Main, 20);
 
         cardZoom = new Rectangle(250 + CARD_WIDTH * 0.7f, 170, CARD_WIDTH * 1.4f, CARD_HEIGHT * 1.4f, vbom);
         cardPack = new Rectangle(300, 170, 21000, 250, vbom);
-        partyInfoHpText = new Text(this.simulatedLeftX + 360, topbarY + 48, mFont, "0123456789", vbom);
-        partyInfoAtkText = new Text(this.simulatedLeftX + 600, topbarY + 48, mFont, "0123456789", vbom);
-        partyHpText = new Text(this.simulatedLeftX + 165, frameY + 63, mFont, "0123456789", vbom);
-        partyAtkText = new Text(this.simulatedLeftX + 310, frameY + 63, mFont, "0123456789", vbom);
+        partyInfoHpText = new Text(this.simulatedLeftX + 360, topbarY + 48, hpatkFont, "0123456789", vbom);
+        partyInfoAtkText = new Text(this.simulatedLeftX + 600, topbarY + 48, hpatkFont, "0123456789", vbom);
+        partyHpText = new Text(this.simulatedLeftX + 165, frameY + 63, hpatkFont, "0123456789", vbom);
+        partyAtkText = new Text(this.simulatedLeftX + 310, frameY + 63, hpatkFont, "0123456789", vbom);
         init();
         updateScene();
     }
@@ -315,51 +302,10 @@ public class PartyEditScene extends BaseScene {
 
         final float touchAreaWidth = this.simulatedWidth - TextureEnum.COMMON_BACK_BUTTON_NORMAL.getWidth() - 80;
         final float touchAreaX = this.simulatedLeftX + touchAreaWidth * 0.5f;
-        final Rectangle touchArea = new Rectangle(touchAreaX, 160, touchAreaWidth, 280, vbom) {
-            private VelocityTracker velocityTracker;
-
-            @Override
-            public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                scrollDetector.onTouchEvent(pSceneTouchEvent);
-                scrollDetector.setSceneTouchEvent(pSceneTouchEvent);
-                final MotionEvent motionEvent = pSceneTouchEvent.getMotionEvent();
-                final int action = motionEvent.getAction();
-                if (velocityTracker == null) {
-                    velocityTracker = VelocityTracker.obtain();
-                }
-                velocityTracker.addMovement(motionEvent);
-                // Debug.e("Action:" + action);
-                switch (action) {
-                    case MotionEvent.ACTION_DOWN:
-                        PartyEditScene.this.mPhysicsHandler.reset();
-                        break;
-                    case MotionEvent.ACTION_CANCEL:
-                    case MotionEvent.ACTION_UP:
-                        velocityTracker.computeCurrentVelocity(factor);
-                        final float velocityX = velocityTracker.getXVelocity();
-                        final float velocityY = velocityTracker.getYVelocity();
-
-                        // Debug.e("velocityX:" + velocityX);
-                        if (velocityTracker != null) {
-                            velocityTracker.recycle();
-                            velocityTracker = null;
-                        }
-                        final int flag = velocityX > 0 ? 1 : -1;
-                        if (Math.abs(velocityX) > Math.abs(velocityY)) {
-                            PartyEditScene.this.mPhysicsHandler.setVelocityX(Math.abs(velocityX) > max_velocity ? flag * max_velocity : velocityX);
-                        }
-                        PartyEditScene.this.mPhysicsHandler.setAccelerationX(velocityX > 0 ? -ACCELERATION : ACCELERATION);
-                        break;
-
-                }
-                return true;
-            }
-        };
-        touchArea.setColor(Color.TRANSPARENT);
-
+        final Rectangle touchArea = new CardPackTouchArea(touchAreaX, 160, touchAreaWidth, 280, vbom, scrollDetector, mPhysicsHandler);
         this.registerTouchArea(touchArea);
-
         this.attachChild(touchArea);
+
         this.attachChild(cardPack);
         this.attachChild(cardZoom);
 
@@ -392,23 +338,13 @@ public class PartyEditScene extends BaseScene {
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 final Card[] cards = parties[0].getCards();
                 if (cards[0] == null) {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(activity, "你必须要有一个领军人物！", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    alert("你必须要有一个领军人物！");
                 } else {
                     final boolean isSaveOk = CardUtils.saveParties();
                     if (isSaveOk) {
                         ResourceManager.getInstance().setCurrentScene(SceneEnum.Party);
                     } else {
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(activity, "队伍保存失败！", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        alert("队伍保存失败！");
                     }
                 }
             }
@@ -422,12 +358,7 @@ public class PartyEditScene extends BaseScene {
         enhanceButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(activity, "你点击了强化！", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                alert("你点击了强化！");
             }
         });
         return enhanceButton;
