@@ -6,10 +6,10 @@ import java.math.RoundingMode;
 import org.andengine.engine.handler.BaseEntityUpdateHandler;
 import org.andengine.entity.IEntity;
 
-import com.fight2.scene.PartyEditScene;
+import com.fight2.scene.BaseCardPackScene;
 
 public class CardUpdateHandler extends BaseEntityUpdateHandler {
-    public static float SCALE_FACTOR = 0.8f;
+    public static float SCALE_FACTOR = 0.6f;
     /**
      * 
      */
@@ -47,7 +47,7 @@ public class CardUpdateHandler extends BaseEntityUpdateHandler {
             }
 
             if (isLeftmostZoomCard) {
-                float cardLeft = currentCard.getX() + currentCard.getScaleX() * PartyEditScene.CARD_WIDTH * 0.5f + PartyEditScene.CARD_GAP
+                float cardLeft = currentCard.getX() + currentCard.getScaleX() * BaseCardPackScene.CARD_WIDTH * 0.5f + BaseCardPackScene.CARD_GAP
                         * currentCard.getScaleX();
                 final int maxAdjustCard = pCardPack.getChildCount();
                 for (int indexDff = 1; indexDff < maxAdjustCard; indexDff++) {
@@ -59,7 +59,7 @@ public class CardUpdateHandler extends BaseEntityUpdateHandler {
                     final float adjustWidth = adjustCard.getScaleX() * currentCard.getWidth();
                     final float adjustCardX = cardLeft + adjustWidth * 0.5f;
                     adjustCard.setX(adjustCardX);
-                    cardLeft += adjustWidth + PartyEditScene.CARD_GAP * adjustCard.getScaleX();
+                    cardLeft += adjustWidth + BaseCardPackScene.CARD_GAP * adjustCard.getScaleX();
                 }
             }
 

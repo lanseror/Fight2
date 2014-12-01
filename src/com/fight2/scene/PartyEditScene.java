@@ -1,8 +1,6 @@
 package com.fight2.scene;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.Set;
 
@@ -44,24 +42,20 @@ import com.fight2.util.CardUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
 
-public class PartyEditScene extends BaseScene {
-    public final static int CARD_GAP = 20;
-    public final static int CARD_WIDTH = 110;
-    public final static int CARD_HEIGHT = 165;
-    public final static int CARD_Y = 120;
+public class PartyEditScene extends BaseCardPackScene {
     private F2ScrollDetector scrollDetector;
-    public int partyNumber;
+    private int partyNumber;
     private final TextureEnum[] partyNumberTexts = { TextureEnum.PARTY_NUMBER_1, TextureEnum.PARTY_NUMBER_2, TextureEnum.PARTY_NUMBER_3 };
-    public final Sprite[] cardGrids = new Sprite[4];
+    private final Sprite[] cardGrids = new Sprite[4];
 
     private PhysicsHandler physicsHandler;
     private final Font hpatkFont;
-    public final IEntity[] addedCards = new IEntity[4];
+    private final IEntity[] inGridCardSprites = new IEntity[4];
 
-    final Rectangle cardZoom;
+    private final Rectangle cardZoom;
     private final CardPack cardPack;
     private final float topbarY = cameraHeight - TextureEnum.PARTY_TOPBAR.getHeight();
-    private final float frameY = topbarY - TextureEnum.PARTY_EDIT_FRAME.getHeight() + 5;
+    private final float frameY = topbarY - TextureEnum.PARTY_EDIT_FRAME.getHeight() - 15;
 
     private final Text partyInfoHpText;
     private final Text partyInfoAtkText;
@@ -77,8 +71,8 @@ public class PartyEditScene extends BaseScene {
         this.partyNumber = partyNumber;
         this.hpatkFont = ResourceManager.getInstance().getFont(FontEnum.Main, 20);
 
-        cardZoom = new Rectangle(250 + CARD_WIDTH * 0.7f, 170, CARD_WIDTH * 1.4f, CARD_HEIGHT * 1.4f, vbom);
-        cardPack = new CardPack(300, 170, 21000, 250, vbom, cardZoom);
+        cardZoom = new Rectangle(250 + CARD_WIDTH * 0.7f, 145, CARD_WIDTH * 1.4f, CARD_HEIGHT * 1.4f, vbom);
+        cardPack = new CardPack(300, 145, 21000, CARD_HEIGHT, vbom, cardZoom);
         partyInfoHpText = new Text(this.simulatedLeftX + 360, topbarY + 48, hpatkFont, "0123456789", vbom);
         partyInfoAtkText = new Text(this.simulatedLeftX + 600, topbarY + 48, hpatkFont, "0123456789", vbom);
         partyHpText = new Text(this.simulatedLeftX + 165, frameY + 63, hpatkFont, "0123456789", vbom);
@@ -95,11 +89,11 @@ public class PartyEditScene extends BaseScene {
         for (int i = 0; i < partyCards.length; i++) {
             final Card card = partyCards[i];
             if (card != null) {
-                final IEntity cardSprite = createCardAvatarSprite(card, 10, 20);
-                cardSprite.setPosition(cardGrids[i]);
-                cardSprite.setUserData(card);
-                this.attachChild(cardSprite);
-                addedCards[i] = cardSprite;
+                final IEntity avatarSprite = createCardAvatarSprite(card, 10, 20);
+                avatarSprite.setPosition(cardGrids[i]);
+                avatarSprite.setUserData(card);
+                this.attachChild(avatarSprite);
+                inGridCardSprites[i] = avatarSprite;
 
                 final IEntity removedCardSprite = new CardFrame(0, CARD_Y, CARD_WIDTH, CARD_HEIGHT, card, activity);
                 removedCardSprite.setTag(i);
@@ -140,7 +134,8 @@ public class PartyEditScene extends BaseScene {
         frameSprite.attachChild(partyNumberSprite);
         cardPack.setColor(Color.TRANSPARENT);
         cardZoom.setColor(Color.TRANSPARENT);
-        this.scrollDetector = new F2ScrollDetector(new CardPackScrollDetectorListener(this, activity, cardPack, cardZoom));
+        final Card[] partyCards = parties[this.partyNumber - 1].getCards();
+        this.scrollDetector = new F2ScrollDetector(new CardPackScrollDetectorListener(this, cardPack, cardZoom, partyCards));
 
         final TextureEnum gridEnum = TextureEnum.PARTY_EDIT_FRAME_GRID;
         final float gridGap = 153;
@@ -164,7 +159,7 @@ public class PartyEditScene extends BaseScene {
                     final int action = motionEvent.getAction();
                     switch (action) {
                         case MotionEvent.ACTION_DOWN:
-                            movingCard = addedCards[frameIndex];
+                            movingCard = inGridCardSprites[frameIndex];
                             if (movingCard != null) {
                                 movingCard.setZIndex(100);
                                 PartyEditScene.this.sortChildren();
@@ -180,23 +175,21 @@ public class PartyEditScene extends BaseScene {
                             if (movingCard == null) {
                                 break;
                             }
-                            final Party[] parties = GameUserSession.getInstance().getPartyInfo().getParties();
-                            final Card[] partyCards = parties[partyNumber - 1].getCards();
                             boolean collidedWithOthers = false;
                             for (int i = 0; i < cardGrids.length; i++) {
                                 final IEntity cardFrame = cardGrids[i];
                                 if (i != frameIndex && cardFrame.contains(touchX, touchY)) {
                                     collidedWithOthers = true;
                                     movingCard.setPosition(cardFrame);
-                                    final IEntity toCard = addedCards[i];
-                                    addedCards[frameIndex] = toCard;
+                                    final IEntity toCard = inGridCardSprites[i];
+                                    inGridCardSprites[frameIndex] = toCard;
                                     final Card tempPartyCard = partyCards[frameIndex];
                                     partyCards[frameIndex] = partyCards[i];
                                     partyCards[i] = tempPartyCard;
                                     if (toCard != null) {
                                         toCard.setPosition(this);
                                     }
-                                    addedCards[i] = movingCard;
+                                    inGridCardSprites[i] = movingCard;
                                     break;
                                 }
                             }
@@ -211,8 +204,8 @@ public class PartyEditScene extends BaseScene {
 
                                         @Override
                                         public void run() {
-                                            addedCards[frameIndex].detachSelf();
-                                            addedCards[frameIndex] = null;
+                                            inGridCardSprites[frameIndex].detachSelf();
+                                            inGridCardSprites[frameIndex] = null;
 
                                         }
 
@@ -281,16 +274,18 @@ public class PartyEditScene extends BaseScene {
         this.attachChild(backButton);
         this.registerTouchArea(backButton);
 
-        final F2ButtonSprite enhanceButton = createEnhanceButton();
-        this.attachChild(enhanceButton);
-        this.registerTouchArea(enhanceButton);
-
         final F2ButtonSprite switchButton = createSwitchButton();
         this.attachChild(switchButton);
         this.registerTouchArea(switchButton);
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
+    }
+
+    @Override
+    public void leaveScene() {
+        // TODO Auto-generated method stub
+
     }
 
     private F2ButtonSprite createBackButton() {
@@ -315,18 +310,6 @@ public class PartyEditScene extends BaseScene {
         return backButton;
     }
 
-    private F2ButtonSprite createEnhanceButton() {
-        final F2ButtonSprite enhanceButton = createALBF2ButtonSprite(TextureEnum.PARTY_ENHANCE_BUTTON, TextureEnum.PARTY_ENHANCE_BUTTON_PRESSED,
-                this.simulatedRightX - 135, 220);
-        enhanceButton.setOnClickListener(new F2OnClickListener() {
-            @Override
-            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                alert("你点击了强化！");
-            }
-        });
-        return enhanceButton;
-    }
-
     private F2ButtonSprite createSwitchButton() {
         final F2ButtonSprite switchButton = createALBF2ButtonSprite(TextureEnum.PARTY_EDIT_SWITCH_BUTTON, TextureEnum.PARTY_EDIT_SWITCH_BUTTON_PRESSED,
                 this.simulatedRightX - 135, 390);
@@ -344,22 +327,13 @@ public class PartyEditScene extends BaseScene {
         return switchButton;
     }
 
-    public Sprite createCardAvatarSprite(final Card card, final float x, final float y) {
-        final float width = 135;
-        final float height = 135;
-        final BigDecimal factor = BigDecimal.valueOf(this.cameraHeight).divide(BigDecimal.valueOf(deviceHeight), 2, RoundingMode.HALF_DOWN);
-        final float fakeWidth = BigDecimal.valueOf(this.deviceWidth).multiply(factor).floatValue();
-        final float pX = (this.cameraWidth - fakeWidth) / 2 + x + width * 0.5f;
-        final float pY = y + height * 0.5f;
-        Sprite sprite = null;
-        final TextureFactory textureFactory = TextureFactory.getInstance();
-        final ITextureRegion texture = textureFactory.getTextureRegion(card.getAvatar());
-        sprite = new Sprite(pX, pY, width, height, texture, vbom);
-
-        return sprite;
+    @Override
+    public void onGridCardsChange() {
+        calculatePartyHpAtk();
+        updatePartyHpAtk();
     }
 
-    public void calculatePartyHpAtk() {
+    private void calculatePartyHpAtk() {
         final PartyInfo partyInfo = GameUserSession.getInstance().getPartyInfo();
         int partyInfoHp = 0;
         int partyInfoAtk = 0;
@@ -385,7 +359,7 @@ public class PartyEditScene extends BaseScene {
         partyInfo.setAtk(partyInfoAtk);
     }
 
-    public void updatePartyHpAtk() {
+    private void updatePartyHpAtk() {
         final PartyInfo partyInfo = GameUserSession.getInstance().getPartyInfo();
         final Party party = partyInfo.getParties()[partyNumber - 1];
         this.partyInfoHpText.setText(String.valueOf(partyInfo.getHp()));
@@ -396,9 +370,13 @@ public class PartyEditScene extends BaseScene {
     }
 
     @Override
-    public void leaveScene() {
-        // TODO Auto-generated method stub
+    public Sprite[] getCardGrids() {
+        return cardGrids;
+    }
 
+    @Override
+    public IEntity[] getInGridCardSprites() {
+        return inGridCardSprites;
     }
 
 }

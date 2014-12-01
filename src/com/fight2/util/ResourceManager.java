@@ -23,6 +23,7 @@ import com.fight2.entity.engine.ProgressBar;
 import com.fight2.scene.ArenaListScene;
 import com.fight2.scene.ArenaScene;
 import com.fight2.scene.BaseScene;
+import com.fight2.scene.CardUpgradeScene;
 import com.fight2.scene.ChatScene;
 import com.fight2.scene.GuildScene;
 import com.fight2.scene.MainScene;
@@ -71,13 +72,14 @@ public class ResourceManager {
         textureFactory.loadResource(textureManager, assetManager, progressBar);
         // progressBar.increase(90);
 
+        for (final FontEnum fontEnum : FontEnum.values()) {
+            fontMap.put(fontEnum, new SparseArray<Font>());
+        }
+
         loadScenes();
         // Resources loaded
         breadcrumbs.clear();
 
-        for (final FontEnum fontEnum : FontEnum.values()) {
-            fontMap.put(fontEnum, new SparseArray<Font>());
-        }
         this.isResourceLoaded = true;
     }
 
@@ -208,6 +210,8 @@ public class ResourceManager {
             scenes.put(SceneEnum.Main, mainScene);
             final BaseScene partyScene = new PartyScene(activity);
             scenes.put(SceneEnum.Party, partyScene);
+            final BaseScene cardUpgradeScene = new CardUpgradeScene(activity);
+            scenes.put(SceneEnum.CardUpgrade, cardUpgradeScene);
             final BaseScene summonScene = new SummonScene(activity);
             scenes.put(SceneEnum.Summon, summonScene);
             final BaseScene arenaListScene = new ArenaListScene(activity);

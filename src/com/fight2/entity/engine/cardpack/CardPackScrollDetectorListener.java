@@ -5,26 +5,21 @@ import java.util.Set;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.IEntityModifier.IEntityModifierListener;
 import org.andengine.entity.modifier.MoveModifier;
-import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.input.touch.detector.ScrollDetector;
 import org.andengine.input.touch.detector.ScrollDetector.IScrollDetectorListener;
 import org.andengine.util.modifier.IModifier;
 
-import android.widget.Toast;
-
 import com.fight2.GameActivity;
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
-import com.fight2.entity.Party;
 import com.fight2.entity.engine.CardFrame;
 import com.fight2.input.touch.detector.F2ScrollDetector;
-import com.fight2.scene.PartyEditScene;
+import com.fight2.scene.BaseCardPackScene;
 import com.fight2.util.SpriteUtils;
 
 public class CardPackScrollDetectorListener implements IScrollDetectorListener {
-
-    private final PartyEditScene partyEditScene;
+    private final BaseCardPackScene cardPackScene;
     private final GameActivity activity;
     private final CardPack cardPack;
     private final IEntity cardZoom;;
@@ -36,13 +31,15 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
     private float initDistanceY;
     private IEntity copyCard;
     private boolean scrollable = true;
+    private final Card[] inGridCards;
 
-    public CardPackScrollDetectorListener(final PartyEditScene partyEditScene, final GameActivity activity, final CardPack cardPack, final IEntity cardZoom) {
-        this.partyEditScene = partyEditScene;
-        this.activity = activity;
+    public CardPackScrollDetectorListener(final BaseCardPackScene cardPackScene, final CardPack cardPack, final IEntity cardZoom, final Card[] inGridCards) {
+        this.cardPackScene = cardPackScene;
+        this.activity = cardPackScene.getActivity();
         this.cardPack = cardPack;
         this.cardZoom = cardZoom;
         this.cardZoomX = cardZoom.getX();
+        this.inGridCards = inGridCards;
     }
 
     @Override
@@ -63,7 +60,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                 copyCard = new CardFrame(0, 0, focusedCard.getWidth(), focusedCard.getHeight(), sessionCard, activity);
                 copyCard.setPosition(SpriteUtils.toContainerOuterX(focusedCard), SpriteUtils.toContainerOuterY(focusedCard));
                 copyCard.setUserData(sessionCard);
-                this.partyEditScene.attachChild(copyCard);
+                this.cardPackScene.attachChild(copyCard);
 
             }
         }
@@ -115,21 +112,20 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                 } else {
                     final GameUserSession session = GameUserSession.getInstance();
                     final Set<Integer> inPartyCards = session.getInPartyCards();
-                    final Party[] parties = session.getPartyInfo().getParties();
-                    final Card[] partyCards = parties[this.partyEditScene.partyNumber - 1].getCards();
                     boolean collidedWithGrid = false;
                     boolean isReplace = false;
                     IEntity beReplacedCardSprite = null;
-                    Sprite cardGrid = null;
+                    IEntity cardGrid = null;
                     int cardGridIndex = 0;
                     int collidedCardTemplateId = -1;
-                    for (; cardGridIndex < this.partyEditScene.cardGrids.length; cardGridIndex++) {
-                        if (this.partyEditScene.cardGrids[cardGridIndex].contains(copyCard.getX(), copyCard.getY())) {
+                    final IEntity[] cardGrids = this.cardPackScene.getCardGrids();
+                    for (; cardGridIndex < cardGrids.length; cardGridIndex++) {
+                        if (cardGrids[cardGridIndex].contains(copyCard.getX(), copyCard.getY())) {
                             collidedWithGrid = true;
-                            if (partyCards[cardGridIndex] != null) {
-                                collidedCardTemplateId = partyCards[cardGridIndex].getTemplateId();
+                            if (inGridCards[cardGridIndex] != null) {
+                                collidedCardTemplateId = inGridCards[cardGridIndex].getTemplateId();
                             }
-                            beReplacedCardSprite = partyEditScene.addedCards[cardGridIndex];
+                            beReplacedCardSprite = cardPackScene.getInGridCardSprites()[cardGridIndex];
                             isReplace = (beReplacedCardSprite == null ? false : true);
                             break;
                         }
@@ -137,8 +133,8 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
 
                     boolean hasPosition = false;
                     if (!collidedWithGrid) {
-                        for (int partyCardIndex = 0; partyCardIndex < partyCards.length; partyCardIndex++) {
-                            final Card partyCard = partyCards[partyCardIndex];
+                        for (int partyCardIndex = 0; partyCardIndex < inGridCards.length; partyCardIndex++) {
+                            final Card partyCard = inGridCards[partyCardIndex];
                             if (partyCard == null) {
                                 hasPosition = true;
                                 cardGridIndex = partyCardIndex;
@@ -153,12 +149,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                         scrollable = false;
                         // Debug.e("Already had the template id will revert");
                         revertCard(focusedCard);
-                        partyEditScene.getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(partyEditScene.getActivity(), "该卡片已经在你的队伍中！", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        cardPackScene.alert("该卡片已经在你的队伍中！");
                     } else if (collidedWithGrid || hasPosition) {
                         scrollable = false;
                         // Debug.e("Add card");
@@ -167,20 +158,19 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                             inPartyCards.remove(collidedCardTemplateId);
                         }
                         inPartyCards.add(focusedCardTempalteId);
-                        partyCards[cardGridIndex] = cardEntry;
-                        partyEditScene.calculatePartyHpAtk();
-                        partyEditScene.updatePartyHpAtk();
-                        cardGrid = this.partyEditScene.cardGrids[cardGridIndex];
-                        final IEntity toReplaceCardAvatar = partyEditScene.createCardAvatarSprite(cardEntry, 10, 20);
+                        inGridCards[cardGridIndex] = cardEntry;
+                        cardPackScene.onGridCardsChange();
+                        cardGrid = cardGrids[cardGridIndex];
+                        final IEntity toReplaceCardAvatar = cardPackScene.createCardAvatarSprite(cardEntry, 10, 20);
                         toReplaceCardAvatar.setPosition(cardGrid);
                         toReplaceCardAvatar.setUserData(copyCard.getUserData());
-                        this.partyEditScene.addedCards[cardGridIndex] = toReplaceCardAvatar;
+                        this.cardPackScene.getInGridCardSprites()[cardGridIndex] = toReplaceCardAvatar;
 
                         final IEntityModifierListener modifierListener = isReplace ? new ReplacePartyCardModifierListener(focusedCard, cardEntry,
                                 beReplacedCardSprite, toReplaceCardAvatar) : new AddPartyCardModifierListener(focusedCard, cardEntry, toReplaceCardAvatar);
                         final MoveModifier modifier = new MoveModifier(0.1f, copyCard.getX(), copyCard.getY(), cardGrid.getX(), cardGrid.getY(),
                                 modifierListener);
-                        partyEditScene.getActivity().runOnUpdateThread(new Runnable() {
+                        cardPackScene.getActivity().runOnUpdateThread(new Runnable() {
                             @Override
                             public void run() {
                                 copyCard.clearEntityModifiers();
@@ -192,12 +182,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                         scrollable = false;
                         // Debug.e("NoPosition will revert");
                         revertCard(focusedCard);
-                        partyEditScene.getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(partyEditScene.getActivity(), "队伍已满！", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        cardPackScene.alert("队伍已满！");
                     }
                 }
             } else if (copyCard != null) {
@@ -222,7 +207,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
 
                     @Override
                     public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
-                        partyEditScene.getActivity().runOnUpdateThread(new Runnable() {
+                        cardPackScene.getActivity().runOnUpdateThread(new Runnable() {
                             @Override
                             public void run() {
                                 pItem.detachSelf();
@@ -235,7 +220,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                     }
 
                 });
-        partyEditScene.getActivity().runOnUpdateThread(new Runnable() {
+        cardPackScene.getActivity().runOnUpdateThread(new Runnable() {
             @Override
             public void run() {
                 copyCard.clearEntityModifiers();
@@ -276,7 +261,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                     final float duration = (cardPackIndex == focusedCardIndex - 1 ? 0.1f : 0.2f);
                     final MoveModifier cardEditModifier = new MoveModifier(duration, currentCard.getX(), currentCard.getY(), previousCard.getX(),
                             previousCard.getY());
-                    partyEditScene.getActivity().runOnUpdateThread(new Runnable() {
+                    activity.runOnUpdateThread(new Runnable() {
                         @Override
                         public void run() {
                             currentCard.clearEntityModifiers();
@@ -295,7 +280,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                     final float duration = (cardPackIndex == focusedCardIndex + 1 ? 0.1f : 0.2f);
                     final MoveModifier cardEditModifier = new MoveModifier(duration, currentCard.getX(), currentCard.getY(), previousCard.getX(),
                             previousCard.getY());
-                    partyEditScene.getActivity().runOnUpdateThread(new Runnable() {
+                    activity.runOnUpdateThread(new Runnable() {
                         @Override
                         public void run() {
                             currentCard.clearEntityModifiers();
@@ -304,15 +289,15 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                     });
                 }
             }
-            partyEditScene.getActivity().runOnUpdateThread(new Runnable() {
+            activity.runOnUpdateThread(new Runnable() {
                 @Override
                 public void run() {
                     focusedCard.detachSelf();
                     cardPack.removedCard(cardEntry, focusedCard);
                     GameUserSession.getInstance().getCards().remove(cardEntry);
-                    partyEditScene.attachChild(avatar);
+                    cardPackScene.attachChild(avatar);
                     pItem.detachSelf();
-                    partyEditScene.sortChildren();
+                    cardPackScene.sortChildren();
                 }
             });
 
@@ -341,7 +326,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
 
         @Override
         public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
-            partyEditScene.sortChildren();
+            cardPackScene.sortChildren();
             focusedCard.setAlpha(0);
             final int focusedCardIndex = focusedCard.getTag();
             final boolean isFocusedCardRightMost = (focusedCardIndex == cardPack.getChildCount() - 1);
@@ -358,7 +343,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                         cardZoom.setUserData(currentCard);
                         cardEditModifier.addModifierListener(new ReplacePartyCardFinishedModifierListener(beReplacedCardSprite));
                     }
-                    partyEditScene.getActivity().runOnUpdateThread(new Runnable() {
+                    activity.runOnUpdateThread(new Runnable() {
                         @Override
                         public void run() {
                             currentCard.clearEntityModifiers();
@@ -380,7 +365,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                         cardEditModifier.addModifierListener(new ReplacePartyCardFinishedModifierListener(beReplacedCardSprite));
                     }
 
-                    partyEditScene.getActivity().runOnUpdateThread(new Runnable() {
+                    activity.runOnUpdateThread(new Runnable() {
                         @Override
                         public void run() {
                             currentCard.clearEntityModifiers();
@@ -390,7 +375,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                 }
             }
 
-            partyEditScene.getActivity().runOnUpdateThread(new Runnable() {
+            activity.runOnUpdateThread(new Runnable() {
                 @Override
                 public void run() {
                     focusedCard.detachSelf();
@@ -401,8 +386,8 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                         beReplacedCardSprite.detachSelf();
                     }
                     pItem.detachSelf();
-                    partyEditScene.attachChild(toReplaceCardAvatar);
-                    partyEditScene.sortChildren();
+                    cardPackScene.attachChild(toReplaceCardAvatar);
+                    cardPackScene.sortChildren();
                     scrollable = true;
                 }
             });

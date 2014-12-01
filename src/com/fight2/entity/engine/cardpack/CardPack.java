@@ -10,6 +10,7 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
+import com.fight2.scene.BaseCardPackScene;
 import com.fight2.scene.PartyEditScene;
 
 public class CardPack extends Rectangle {
@@ -33,11 +34,11 @@ public class CardPack extends Rectangle {
         final float cardZoomX = cardZoom.getX();
         final float cardPackLeft = this.getX() - this.getWidth() * 0.5f;
         final float focusedX = cardZoomX - cardPackLeft;
-        final float focusedLeftCardX = focusedX - 1.5f * PartyEditScene.CARD_WIDTH - PartyEditScene.CARD_GAP;
-        final float focusedRightCardX = focusedX + 1.5f * (PartyEditScene.CARD_WIDTH + PartyEditScene.CARD_GAP);
+        final float focusedLeftCardX = focusedX - 1.5f * BaseCardPackScene.CARD_WIDTH - BaseCardPackScene.CARD_GAP;
+        final float focusedRightCardX = focusedX + 1.5f * (BaseCardPackScene.CARD_WIDTH + BaseCardPackScene.CARD_GAP);
         if (this.getChildCount() == 0) {
             revertCard.setTag(0);
-            revertCard.setPosition(focusedX, PartyEditScene.CARD_Y);
+            revertCard.setPosition(focusedX, BaseCardPackScene.CARD_Y);
             cardZoom.setUserData(revertCard);
             this.attachChild(revertCard);
         } else {
@@ -67,7 +68,7 @@ public class CardPack extends Rectangle {
                 final IEntity adjustCard = this.getChildByIndex(i);
                 adjustCard.setX(leftAdjustX);
                 adjustCard.setTag(i);
-                leftAdjustX -= PartyEditScene.CARD_WIDTH + PartyEditScene.CARD_GAP;
+                leftAdjustX -= BaseCardPackScene.CARD_WIDTH + BaseCardPackScene.CARD_GAP;
             }
             // Move right side cards
             float rightAdjustX = focusedRightCardX;
@@ -75,7 +76,7 @@ public class CardPack extends Rectangle {
                 final IEntity adjustCard = this.getChildByIndex(i);
                 adjustCard.setX(rightAdjustX);
                 adjustCard.setTag(i);
-                rightAdjustX += PartyEditScene.CARD_WIDTH + PartyEditScene.CARD_GAP;
+                rightAdjustX += BaseCardPackScene.CARD_WIDTH + BaseCardPackScene.CARD_GAP;
             }
 
         }

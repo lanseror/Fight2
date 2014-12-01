@@ -96,7 +96,7 @@ public class PartyScene extends BaseScene {
         }
 
         final F2ButtonSprite editSprite = createALBF2ButtonSprite(TextureEnum.PARTY_EDIT_BUTTON, TextureEnum.PARTY_EDIT_BUTTON_PRESSED,
-                this.simulatedRightX - 135, 220);
+                this.simulatedRightX - 135, 390);
         editSprite.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
@@ -110,6 +110,10 @@ public class PartyScene extends BaseScene {
         });
         this.attachChild(editSprite);
         this.registerTouchArea(editSprite);
+
+        final F2ButtonSprite enhanceButton = createEnhanceButton();
+        this.attachChild(enhanceButton);
+        this.registerTouchArea(enhanceButton);
 
         final F2ButtonSprite backButton = createALBF2ButtonSprite(TextureEnum.COMMON_BACK_BUTTON_NORMAL, TextureEnum.COMMON_BACK_BUTTON_PRESSED,
                 this.simulatedRightX - 135, 50);
@@ -134,6 +138,18 @@ public class PartyScene extends BaseScene {
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
+    }
+
+    private F2ButtonSprite createEnhanceButton() {
+        final F2ButtonSprite enhanceButton = createALBF2ButtonSprite(TextureEnum.PARTY_ENHANCE_BUTTON, TextureEnum.PARTY_ENHANCE_BUTTON_PRESSED,
+                this.simulatedRightX - 135, 220);
+        enhanceButton.setOnClickListener(new F2OnClickListener() {
+            @Override
+            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                ResourceManager.getInstance().setCurrentScene(SceneEnum.CardUpgrade);
+            }
+        });
+        return enhanceButton;
     }
 
     private Rectangle createGridCollisionArea(final IEntity sprite) {

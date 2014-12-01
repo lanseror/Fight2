@@ -4,6 +4,7 @@ public enum SceneEnum {
     Splash,
     Main,
     Party,
+    CardUpgrade,
     Summon,
     ArenaList,
     Arena,

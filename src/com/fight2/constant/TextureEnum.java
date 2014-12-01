@@ -116,6 +116,9 @@ public enum TextureEnum {
     PARTY_RECHARGE("images/party_recharge.png", 224, 77),
     PARTY_RECHARGE_PRESSED("images/party_recharge_fcs.png", 224, 77),
 
+    // Card upgrade scene images.
+    UPGRADE_FRAME("images/upgrade_frame.png", 933*0.8f, 460*0.8f),
+
     // Summon scene images.
     SUMMON_BG("images/summon_backgroud.jpg", 1136, 640),
     SUMMON_SUMMON_BUTTON("images/summon_summon_button.jpg", 300, 90),
