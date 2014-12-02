@@ -95,7 +95,7 @@ public class CardUpgradeScene extends BaseCardPackScene {
         this.attachChild(rechargeSprite);
         this.registerTouchArea(rechargeSprite);
 
-        final Sprite frameSprite = createALBImageSprite(TextureEnum.UPGRADE_FRAME, this.simulatedLeftX, frameY);
+        final Sprite frameSprite = createALBImageSprite(TextureEnum.UPGRADE_FRAME, this.simulatedLeftX + 50, frameY);
         this.attachChild(frameSprite);
 
         final Card[] inGridCards = new Card[7];
