@@ -89,7 +89,7 @@ public class PartyEditScene extends BaseCardPackScene {
         for (int i = 0; i < partyCards.length; i++) {
             final Card card = partyCards[i];
             if (card != null) {
-                final IEntity avatarSprite = createCardAvatarSprite(card, 10, 20);
+                final IEntity avatarSprite = createCardAvatarSprite(card, 135, 135);
                 avatarSprite.setPosition(cardGrids[i]);
                 avatarSprite.setUserData(card);
                 this.attachChild(avatarSprite);

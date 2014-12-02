@@ -19,19 +19,19 @@ import com.fight2.scene.BaseCardPackScene;
 import com.fight2.util.SpriteUtils;
 
 public class CardPackScrollDetectorListener implements IScrollDetectorListener {
-    private final BaseCardPackScene cardPackScene;
-    private final GameActivity activity;
-    private final CardPack cardPack;
-    private final IEntity cardZoom;;
-    private final float cardZoomX;
-    private float initPointerID;
-    private float initX;
-    private float initY;
-    private float initDistanceX;
-    private float initDistanceY;
-    private IEntity copyCard;
-    private boolean scrollable = true;
-    private final Card[] inGridCards;
+    protected final BaseCardPackScene cardPackScene;
+    protected final GameActivity activity;
+    protected final CardPack cardPack;
+    protected final IEntity cardZoom;;
+    protected final float cardZoomX;
+    protected float initPointerID;
+    protected float initX;
+    protected float initY;
+    protected float initDistanceX;
+    protected float initDistanceY;
+    protected IEntity copyCard;
+    protected boolean scrollable = true;
+    protected final Card[] inGridCards;
 
     public CardPackScrollDetectorListener(final BaseCardPackScene cardPackScene, final CardPack cardPack, final IEntity cardZoom, final Card[] inGridCards) {
         this.cardPackScene = cardPackScene;
@@ -101,17 +101,16 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
         final F2ScrollDetector scrollDetector = (F2ScrollDetector) pScollDetector;
         final TouchEvent touchEvent = scrollDetector.getSceneTouchEvent();
         final float finishedY = touchEvent.getY();
-        final IEntity focusedCard = (IEntity) cardZoom.getUserData();
-        if (focusedCard.getScaleX() > 1.8 * CardUpdateHandler.SCALE_FACTOR) {
+        final IEntity focusedCardSprite = (IEntity) cardZoom.getUserData();
+        if (focusedCardSprite.getScaleX() > 1.8 * CardUpdateHandler.SCALE_FACTOR) {
             // Debug.e("focusedCard.getScaleX() > 1.8");
-            if (pPointerID == initPointerID && copyCard != null && focusedCard.contains(initX, initY) && Math.abs(initDistanceY) > Math.abs(initDistanceX)) {
+            if (pPointerID == initPointerID && copyCard != null && focusedCardSprite.contains(initX, initY)
+                    && Math.abs(initDistanceY) > Math.abs(initDistanceX)) {
 
-                if (finishedY < SpriteUtils.toContainerOuterY(focusedCard)) {
+                if (finishedY < SpriteUtils.toContainerOuterY(focusedCardSprite)) {
                     // Debug.e("Y < focusedCard will revert");
-                    revertCard(focusedCard);
+                    revertCard(focusedCardSprite);
                 } else {
-                    final GameUserSession session = GameUserSession.getInstance();
-                    final Set<Integer> inPartyCards = session.getInPartyCards();
                     boolean collidedWithGrid = false;
                     boolean isReplace = false;
                     IEntity beReplacedCardSprite = null;
@@ -143,12 +142,14 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                         }
                     }
 
-                    final Card cardEntry = (Card) focusedCard.getUserData();
-                    final int focusedCardTempalteId = cardEntry.getTemplateId();
+                    final Card focusedCard = (Card) focusedCardSprite.getUserData();
+                    final int focusedCardTempalteId = focusedCard.getTemplateId();
+                    final GameUserSession session = GameUserSession.getInstance();
+                    final Set<Integer> inPartyCards = session.getInPartyCards();
                     if ((collidedWithGrid || hasPosition) && inPartyCards.contains(focusedCardTempalteId) && collidedCardTemplateId != focusedCardTempalteId) {
                         scrollable = false;
                         // Debug.e("Already had the template id will revert");
-                        revertCard(focusedCard);
+                        revertCard(focusedCardSprite);
                         cardPackScene.alert("该卡片已经在你的队伍中！");
                     } else if (collidedWithGrid || hasPosition) {
                         scrollable = false;
@@ -158,16 +159,17 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                             inPartyCards.remove(collidedCardTemplateId);
                         }
                         inPartyCards.add(focusedCardTempalteId);
-                        inGridCards[cardGridIndex] = cardEntry;
+                        inGridCards[cardGridIndex] = focusedCard;
                         cardPackScene.onGridCardsChange();
                         cardGrid = cardGrids[cardGridIndex];
-                        final IEntity toReplaceCardAvatar = cardPackScene.createCardAvatarSprite(cardEntry, 10, 20);
+                        final IEntity toReplaceCardAvatar = cardPackScene.createCardAvatarSprite(focusedCard, 135, 135);
                         toReplaceCardAvatar.setPosition(cardGrid);
                         toReplaceCardAvatar.setUserData(copyCard.getUserData());
                         this.cardPackScene.getInGridCardSprites()[cardGridIndex] = toReplaceCardAvatar;
 
-                        final IEntityModifierListener modifierListener = isReplace ? new ReplacePartyCardModifierListener(focusedCard, cardEntry,
-                                beReplacedCardSprite, toReplaceCardAvatar) : new AddPartyCardModifierListener(focusedCard, cardEntry, toReplaceCardAvatar);
+                        final IEntityModifierListener modifierListener = isReplace ? new ReplacePartyCardModifierListener(focusedCardSprite, focusedCard,
+                                beReplacedCardSprite, toReplaceCardAvatar) : new AddPartyCardModifierListener(focusedCardSprite, focusedCard,
+                                toReplaceCardAvatar);
                         final MoveModifier modifier = new MoveModifier(0.1f, copyCard.getX(), copyCard.getY(), cardGrid.getX(), cardGrid.getY(),
                                 modifierListener);
                         cardPackScene.getActivity().runOnUpdateThread(new Runnable() {
@@ -181,23 +183,23 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                     } else {
                         scrollable = false;
                         // Debug.e("NoPosition will revert");
-                        revertCard(focusedCard);
+                        revertCard(focusedCardSprite);
                         cardPackScene.alert("队伍已满！");
                     }
                 }
             } else if (copyCard != null) {
                 // Debug.e("Directly revert");
                 scrollable = false;
-                revertCard(focusedCard);
+                revertCard(focusedCardSprite);
             }
         } else if (copyCard != null) {
             // Debug.e("CoDirectly revert");
             scrollable = false;
-            revertCard(focusedCard);
+            revertCard(focusedCardSprite);
         }
     }
 
-    private void revertCard(final IEntity focusedCard) {
+    protected void revertCard(final IEntity focusedCard) {
         final MoveModifier revertModifier = new MoveModifier(0.1f, copyCard.getX(), copyCard.getY(), SpriteUtils.toContainerOuterX(focusedCard),
                 SpriteUtils.toContainerOuterY(focusedCard), new IEntityModifierListener() {
                     @Override

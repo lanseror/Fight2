@@ -2,9 +2,7 @@ package com.fight2.scene;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
-import org.andengine.engine.handler.physics.PhysicsHandler;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.background.Background;
@@ -28,9 +26,9 @@ import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.engine.cardpack.CardPack;
 import com.fight2.entity.engine.cardpack.CardPackPhysicsHandler;
-import com.fight2.entity.engine.cardpack.CardPackScrollDetectorListener;
 import com.fight2.entity.engine.cardpack.CardPackTouchArea;
 import com.fight2.entity.engine.cardpack.CardUpdateHandler;
+import com.fight2.entity.engine.cardpack.CardUpgradeScrollDetectorListener;
 import com.fight2.entity.engine.cardpack.MoveFinishedListener;
 import com.fight2.input.touch.detector.F2ScrollDetector;
 import com.fight2.util.CardUtils;
@@ -39,24 +37,24 @@ import com.fight2.util.TextureFactory;
 
 public class CardUpgradeScene extends BaseCardPackScene {
     private F2ScrollDetector scrollDetector;
-    private final int partyNumber = 1;
-    private final Sprite[] cardGrids = new Sprite[4];
+    private final Sprite[] cardGrids = new Sprite[7];
 
     private CardPackPhysicsHandler physicsHandler;
-    private final IEntity[] inGridCardSprites = new IEntity[4];
+    private final IEntity[] inGridCardSprites = new IEntity[7];
 
     private final Rectangle cardZoom;
     private final CardPack cardPack;
-    private final float frameY = cameraHeight - TextureEnum.UPGRADE_FRAME.getHeight()+5;
+    private final float frameY = cameraHeight - TextureEnum.UPGRADE_FRAME.getHeight() + 5;
 
     private final Party[] parties = GameUserSession.getInstance().getPartyInfo().getParties();
-    private final Set<Integer> inPartyCards = GameUserSession.getInstance().getInPartyCards();
 
     public CardUpgradeScene(final GameActivity activity) throws IOException {
         super(activity);
 
         cardZoom = new Rectangle(250 + CARD_WIDTH * 0.7f, 145, CARD_WIDTH * 1.4f, CARD_HEIGHT * 1.4f, vbom);
         cardPack = new CardPack(300, 145, 21000, CARD_HEIGHT, vbom, cardZoom);
+        cardPack.setColor(Color.TRANSPARENT);
+        cardZoom.setColor(Color.TRANSPARENT);
         init();
     }
 
@@ -100,102 +98,88 @@ public class CardUpgradeScene extends BaseCardPackScene {
         final Sprite frameSprite = createALBImageSprite(TextureEnum.UPGRADE_FRAME, this.simulatedLeftX, frameY);
         this.attachChild(frameSprite);
 
-        cardPack.setColor(Color.TRANSPARENT);
-        cardZoom.setColor(Color.TRANSPARENT);
-        final Card[] partyCards = parties[this.partyNumber - 1].getCards();
-        this.scrollDetector = new F2ScrollDetector(new CardPackScrollDetectorListener(this, cardPack, cardZoom, partyCards));
+        final Card[] inGridCards = new Card[7];
+        this.scrollDetector = new F2ScrollDetector(new CardUpgradeScrollDetectorListener(this, cardPack, cardZoom, inGridCards));
 
         final TextureEnum gridEnum = TextureEnum.PARTY_EDIT_FRAME_GRID;
-        final float gridGap = 153;
-        final float gridStartX = 148;
+        final float gridWidth = gridEnum.getWidth() * 0.72f;
+        final float gridHeight = gridEnum.getHeight() * 0.72f;
+        final float gridStartX = 294;
         final float frameLeft = frameSprite.getX() - frameSprite.getWidth() * 0.5f;
-        final float frameBottom = frameSprite.getY() - frameSprite.getHeight() * 0.5f;
+        float gridY = frameY + frameSprite.getHeight() + gridHeight * 0.5f - 12;
         final TextureFactory textureFactory = TextureFactory.getInstance();
         final ITextureRegion gridTexture = textureFactory.getAssetTextureRegion(gridEnum);
-        final float gridWidth = gridEnum.getWidth();
-        final float gridHeight = gridEnum.getHeight();
-        // for (int gridIndex = 0; gridIndex < 4; gridIndex++) {
-        // final int frameIndex = gridIndex;
-        // cardGrids[gridIndex] = new Sprite(frameLeft + gridStartX + gridGap * gridIndex, frameBottom + 161, gridWidth, gridHeight, gridTexture, vbom) {
-        // private IEntity movingCard = null;
-        //
-        // @Override
-        // public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-        // final float touchX = pSceneTouchEvent.getX();
-        // final float touchY = pSceneTouchEvent.getY();
-        // final MotionEvent motionEvent = pSceneTouchEvent.getMotionEvent();
-        // final int action = motionEvent.getAction();
-        // switch (action) {
-        // case MotionEvent.ACTION_DOWN:
-        // movingCard = inGridCardSprites[frameIndex];
-        // if (movingCard != null) {
-        // movingCard.setZIndex(100);
-        // CardUpgradeScene.this.sortChildren();
-        // }
-        // break;
-        // case MotionEvent.ACTION_MOVE:
-        // if (movingCard != null) {
-        // movingCard.setPosition(touchX, touchY);
-        // }
-        // break;
-        // case MotionEvent.ACTION_CANCEL:
-        // case MotionEvent.ACTION_UP:
-        // if (movingCard == null) {
-        // break;
-        // }
-        // boolean collidedWithOthers = false;
-        // for (int i = 0; i < cardGrids.length; i++) {
-        // final IEntity cardFrame = cardGrids[i];
-        // if (i != frameIndex && cardFrame.contains(touchX, touchY)) {
-        // collidedWithOthers = true;
-        // movingCard.setPosition(cardFrame);
-        // final IEntity toCard = inGridCardSprites[i];
-        // inGridCardSprites[frameIndex] = toCard;
-        // final Card tempPartyCard = partyCards[frameIndex];
-        // partyCards[frameIndex] = partyCards[i];
-        // partyCards[i] = tempPartyCard;
-        // if (toCard != null) {
-        // toCard.setPosition(this);
-        // }
-        // inGridCardSprites[i] = movingCard;
-        // break;
-        // }
-        // }
-        // if (!collidedWithOthers) {
-        // if (touchY < this.getY() - 50) {
-        // inPartyCards.remove(partyCards[frameIndex].getTemplateId());
-        // cardPack.revertCardToCardPack(movingCard);
-        // partyCards[frameIndex] = null;
-        // calculatePartyHpAtk();
-        // updatePartyHpAtk();
-        // activity.runOnUpdateThread(new Runnable() {
-        //
-        // @Override
-        // public void run() {
-        // inGridCardSprites[frameIndex].detachSelf();
-        // inGridCardSprites[frameIndex] = null;
-        //
-        // }
-        //
-        // });
-        //
-        // } else {
-        // movingCard.setPosition(this);
-        // }
-        // }
-        // movingCard.setZIndex(IEntity.ZINDEX_DEFAULT);
-        // CardUpgradeScene.this.sortChildren();
-        // movingCard = null;
-        // break;
-        //
-        // }
-        // return true;
-        // }
-        // };
-        // this.attachChild(cardGrids[gridIndex]);
-        // this.registerTouchArea(cardGrids[gridIndex]);
-        // cardGrids[gridIndex].setZIndex(10);
-        // }
+
+        for (int gridIndex = 0; gridIndex < 7; gridIndex++) {
+            final int frameIndex = gridIndex;
+            if (gridIndex % 2 == 1) {
+                gridY -= gridHeight + 5;
+            }
+            cardGrids[gridIndex] = new Sprite(frameLeft + gridStartX + gridWidth * ((gridIndex + 1) % 2), gridY, gridWidth, gridHeight, gridTexture, vbom) {
+                private IEntity movingCard = null;
+
+                @Override
+                public boolean onAreaTouched(final TouchEvent sceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                    final float touchX = sceneTouchEvent.getX();
+                    final float touchY = sceneTouchEvent.getY();
+                    final MotionEvent motionEvent = sceneTouchEvent.getMotionEvent();
+                    final int action = motionEvent.getAction();
+                    switch (action) {
+                        case MotionEvent.ACTION_DOWN:
+                            movingCard = inGridCardSprites[frameIndex];
+                            if (movingCard != null) {
+                                movingCard.setZIndex(100);
+                                CardUpgradeScene.this.sortChildren();
+                            }
+                            break;
+                        case MotionEvent.ACTION_MOVE:
+                            if (movingCard != null) {
+                                movingCard.setPosition(touchX, touchY);
+                            }
+                            break;
+                        case MotionEvent.ACTION_CANCEL:
+                        case MotionEvent.ACTION_UP:
+                            if (movingCard == null) {
+                                break;
+                            }
+                            if (touchY < this.getY() - 50) {
+                                cardPack.revertCardToCardPack(movingCard);
+                                inGridCards[frameIndex] = null;
+                                calculatePartyHpAtk();
+                                updatePartyHpAtk();
+                                activity.runOnUpdateThread(new Runnable() {
+
+                                    @Override
+                                    public void run() {
+                                        inGridCardSprites[frameIndex].detachSelf();
+                                        inGridCardSprites[frameIndex] = null;
+
+                                    }
+
+                                });
+
+                            } else {
+                                movingCard.setPosition(this);
+                            }
+                            movingCard.setZIndex(IEntity.ZINDEX_DEFAULT);
+                            CardUpgradeScene.this.sortChildren();
+                            movingCard = null;
+                            break;
+
+                    }
+                    return true;
+                }
+            };
+            this.attachChild(cardGrids[gridIndex]);
+            this.registerTouchArea(cardGrids[gridIndex]);
+            cardGrids[gridIndex].setZIndex(10);
+        }
+
+        final Sprite mainCardGrid = cardGrids[0];
+        mainCardGrid.setWidth(240);
+        mainCardGrid.setHeight(360);
+        mainCardGrid.setPosition(frameLeft + 125, frameY + frameSprite.getHeight() * 0.5f + 5);
+        mainCardGrid.setAlpha(0);
 
         // Insert cards to card pack.
         final float initCardX = cardZoom.getX() - (cardPack.getX() - 0.5f * cardPack.getWidth());
