@@ -5,16 +5,20 @@ import org.andengine.entity.modifier.IEntityModifier.IEntityModifierListener;
 import org.andengine.entity.modifier.MoveModifier;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.input.touch.detector.ScrollDetector;
+import org.andengine.util.modifier.IModifier;
 
 import com.fight2.entity.Card;
 import com.fight2.input.touch.detector.F2ScrollDetector;
-import com.fight2.scene.BaseCardPackScene;
+import com.fight2.scene.CardUpgradeScene;
+import com.fight2.util.CardUtils;
 import com.fight2.util.SpriteUtils;
 
 public class CardUpgradeScrollDetectorListener extends CardPackScrollDetectorListener {
+    private final CardUpgradeScene cardPackScene;
 
-    public CardUpgradeScrollDetectorListener(final BaseCardPackScene cardPackScene, final CardPack cardPack, final IEntity cardZoom, final Card[] inGridCards) {
+    public CardUpgradeScrollDetectorListener(final CardUpgradeScene cardPackScene, final CardPack cardPack, final IEntity cardZoom, final Card[] inGridCards) {
         super(cardPackScene, cardPack, cardZoom, inGridCards);
+        this.cardPackScene = cardPackScene;
     }
 
     @Override
@@ -34,50 +38,35 @@ public class CardUpgradeScrollDetectorListener extends CardPackScrollDetectorLis
                 if (finishedY < SpriteUtils.toContainerOuterY(focusedCardSprite)) {
                     revertCard(focusedCardSprite);
                 } else {
-                    boolean collidedWithGrid = false;
-                    boolean isReplace = false;
-                    IEntity beReplacedCardSprite = null;
                     IEntity cardGrid = null;
                     int cardGridIndex = 0;
                     final IEntity[] cardGrids = this.cardPackScene.getCardGrids();
-                    for (; cardGridIndex < cardGrids.length; cardGridIndex++) {
-                        if (cardGridIndex != 0 && cardGrids[cardGridIndex].contains(copyCard.getX(), copyCard.getY())) {
-                            collidedWithGrid = true;
-                            beReplacedCardSprite = cardPackScene.getInGridCardSprites()[cardGridIndex];
-                            isReplace = (beReplacedCardSprite == null ? false : true);
+
+                    boolean hasPosition = false;
+                    for (int partyCardIndex = 0; partyCardIndex < inGridCards.length; partyCardIndex++) {
+                        final Card partyCard = inGridCards[partyCardIndex];
+                        if (partyCard == null) {
+                            hasPosition = true;
+                            cardGridIndex = partyCardIndex;
                             break;
                         }
                     }
 
-                    boolean hasPosition = false;
-                    if (!collidedWithGrid) {
-                        for (int partyCardIndex = 0; partyCardIndex < inGridCards.length; partyCardIndex++) {
-                            final Card partyCard = inGridCards[partyCardIndex];
-                            if (partyCard == null) {
-                                hasPosition = true;
-                                cardGridIndex = partyCardIndex;
-                                break;
-                            }
-                        }
-                    }
-
                     final Card focusedCard = (Card) focusedCardSprite.getUserData();
-                    if (collidedWithGrid || hasPosition) {
+                    if (hasPosition) {
                         scrollable = false;
                         // Debug.e("Add card");
 
                         inGridCards[cardGridIndex] = focusedCard;
-                        cardPackScene.onGridCardsChange();
                         cardGrid = cardGrids[cardGridIndex];
-                        final IEntity toReplaceCardAvatar = cardGridIndex == 0 ? cardPackScene.createCardSprite(focusedCard, 206, 309) : cardPackScene
+                        final IEntity addCardAvatar = cardGridIndex == 0 ? cardPackScene.createCardSprite(focusedCard, 206, 309) : cardPackScene
                                 .createCardAvatarSprite(focusedCard, 97, 97);
-                        toReplaceCardAvatar.setPosition(cardGrid);
-                        toReplaceCardAvatar.setUserData(copyCard.getUserData());
-                        this.cardPackScene.getInGridCardSprites()[cardGridIndex] = toReplaceCardAvatar;
+                        addCardAvatar.setPosition(cardGrid);
+                        addCardAvatar.setUserData(copyCard.getUserData());
+                        this.cardPackScene.getInGridCardSprites()[cardGridIndex] = addCardAvatar;
+                        cardPackScene.onGridCardsChange();
 
-                        final IEntityModifierListener modifierListener = isReplace ? new ReplacePartyCardModifierListener(focusedCardSprite, focusedCard,
-                                beReplacedCardSprite, toReplaceCardAvatar) : new AddPartyCardModifierListener(focusedCardSprite, focusedCard,
-                                toReplaceCardAvatar);
+                        final IEntityModifierListener modifierListener = new UpgradeAddCardModifierListener(focusedCardSprite, focusedCard, addCardAvatar);
                         final MoveModifier modifier = new MoveModifier(0.1f, copyCard.getX(), copyCard.getY(), cardGrid.getX(), cardGrid.getY(),
                                 modifierListener);
                         cardPackScene.getActivity().runOnUpdateThread(new Runnable() {
@@ -92,7 +81,7 @@ public class CardUpgradeScrollDetectorListener extends CardPackScrollDetectorLis
                         scrollable = false;
                         // Debug.e("NoPosition will revert");
                         revertCard(focusedCardSprite);
-                        cardPackScene.alert("队伍已满！");
+                        cardPackScene.alert("队列已满！");
                     }
                 }
             } else if (copyCard != null) {
@@ -107,4 +96,15 @@ public class CardUpgradeScrollDetectorListener extends CardPackScrollDetectorLis
         }
     }
 
+    protected class UpgradeAddCardModifierListener extends AddCardModifierListener {
+
+        protected UpgradeAddCardModifierListener(final IEntity focusedCardSprite, final Card card, final IEntity avatar) {
+            super(focusedCardSprite, card, avatar);
+        }
+
+        @Override
+        public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
+            super.onModifierFinished(pModifier, pItem);
+        }
+    }
 }

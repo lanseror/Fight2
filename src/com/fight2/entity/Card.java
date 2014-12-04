@@ -10,6 +10,8 @@ public class Card {
     private int tier;// Evolution tier
     private int hp;
     private int atk;// Attack value;
+    private int exp;
+    private int baseExp;
     private String skill;
     private int skillLevel;
     private int templateId;
@@ -18,6 +20,33 @@ public class Card {
     private Race race;
     private boolean avatarLoaded = false;
     private boolean imageLoaded = false;
+
+    public Card() {
+        super();
+    }
+
+    public Card(final Card card) {
+        super();
+        this.id = card.getId();
+        this.avatar = card.getAvatar();
+        this.image = card.getImage();
+        this.name = card.getName();
+        this.star = card.getStar();
+        this.level = card.getLevel();
+        this.tier = card.getTier();
+        this.hp = card.getHp();
+        this.atk = card.getAtk();
+        this.exp = card.getExp();
+        this.baseExp = card.getBaseExp();
+        this.skill = card.getSkill();
+        this.skillLevel = card.getSkillLevel();
+        this.templateId = card.getTemplateId();
+        this.version = card.getVersion();
+        this.amount = card.getAmount();
+        this.race = card.getRace();
+        this.avatarLoaded = card.isAvatarLoaded();
+        this.imageLoaded = card.isImageLoaded();
+    }
 
     public int getId() {
         return id;
@@ -89,6 +118,22 @@ public class Card {
 
     public void setAtk(final int atk) {
         this.atk = atk;
+    }
+
+    public int getExp() {
+        return exp;
+    }
+
+    public void setExp(final int exp) {
+        this.exp = exp;
+    }
+
+    public int getBaseExp() {
+        return baseExp;
+    }
+
+    public void setBaseExp(final int baseExp) {
+        this.baseExp = baseExp;
     }
 
     public String getSkill() {

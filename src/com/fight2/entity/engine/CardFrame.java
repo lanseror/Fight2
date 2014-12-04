@@ -30,6 +30,9 @@ public class CardFrame extends Rectangle {
     private final IEntity cardCoverSprite;
     private final GameActivity activity;
     private final VertexBufferObjectManager vbom;
+    private final Text hpText;
+    private final Text atkText;
+    private final Text levelText;
 
     public CardFrame(final float x, final float y, final float width, final float height, final Card card, final GameActivity activity) {
         super(x, y, width, height, activity.getVertexBufferObjectManager());
@@ -91,9 +94,11 @@ public class CardFrame extends Rectangle {
         }
 
         final Font hpatkFont = ResourceManager.getInstance().getFont(FontEnum.Default, (int) (27 * scale));
-        final Text hpText = new Text(hpAtkX * scale, hpY * scale, hpatkFont, String.valueOf(card.getHp()), vbom);
+        hpText = new Text(hpAtkX * scale, hpY * scale, hpatkFont, "1234567890", vbom);
+        hpText.setText(String.valueOf(card.getHp()));
         hpText.setColor(0XFFFFE3B0);
-        final Text atkText = new Text(hpAtkX * scale, atkY * scale, hpatkFont, String.valueOf(card.getAtk()), vbom);
+        atkText = new Text(hpAtkX * scale, atkY * scale, hpatkFont, "1234567890", vbom);
+        atkText.setText(String.valueOf(card.getAtk()));
         atkText.setColor(0XFFFFE3B0);
         this.attachChild(hpText);
         hpText.setZIndex(2);
@@ -101,7 +106,8 @@ public class CardFrame extends Rectangle {
         atkText.setZIndex(3);
 
         final Font levelFont = ResourceManager.getInstance().getFont(FontEnum.Bold, (int) (30 * scale));
-        final Text levelText = new Text(levelX * scale, levelY * scale, levelFont, String.valueOf(card.getLevel()), vbom);
+        levelText = new Text(levelX * scale, levelY * scale, levelFont, "1234567890", vbom);
+        levelText.setText(String.valueOf(card.getLevel()));
         levelText.setColor(0XFFFFE3B0);
         this.attachChild(levelText);
         levelText.setZIndex(4);
@@ -222,6 +228,15 @@ public class CardFrame extends Rectangle {
             tierStickAdd.setZIndex(7);
         }
 
+    }
+
+    public void updateCardAttributes(final Card card) {
+        hpText.setText(String.valueOf(card.getHp()));
+        hpText.setColor(0XFF5AD61E);
+        atkText.setText(String.valueOf(card.getAtk()));
+        atkText.setColor(0XFF5AD61E);
+        levelText.setText(String.valueOf(card.getLevel()));
+        levelText.setColor(0XFF5AD61E);
     }
 
     private static ITextureRegion getTexture(final Race race) {

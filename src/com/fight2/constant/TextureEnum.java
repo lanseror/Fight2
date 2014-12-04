@@ -107,8 +107,8 @@ public enum TextureEnum {
     PARTY_EDIT_BG("images/party_edit_backgroud.png", 1136, 640),
     PARTY_EDIT_FRAME("images/party_edit_frame.png", 732, 247),
     PARTY_EDIT_FRAME_GRID("images/party_edit_frame_grid.png", 159, 148),
-    PARTY_EDIT_COVER_LEFT("images/party_edit_cover_left.png", 45, 178),
-    PARTY_EDIT_COVER_RIGHT("images/party_edit_cover_right.png", 442, 180),
+    PARTY_EDIT_COVER_LEFT("images/party_edit_cover_left.png", 180, 270),
+    PARTY_EDIT_COVER_RIGHT("images/party_edit_cover_right.png", 430, 270),
     PARTY_EDIT_SWITCH_BUTTON("images/party_edit_switch_button.png", 130, 132),
     PARTY_EDIT_SWITCH_BUTTON_PRESSED("images/party_edit_switch_button_fcs.png", 130, 132),
     PARTY_ENHANCE_BUTTON("images/party_enhance_button.png", 130, 132),
@@ -117,7 +117,8 @@ public enum TextureEnum {
     PARTY_RECHARGE_PRESSED("images/party_recharge_fcs.png", 224, 77),
 
     // Card upgrade scene images.
-    UPGRADE_FRAME("images/upgrade_frame.png", 933*0.8f, 460*0.8f),
+    UPGRADE_FRAME("images/upgrade_frame.png", 746, 368),
+    UPGRADE_FRAME_BUTTON("images/upgrade_frame_button.png", 268, 69),
 
     // Summon scene images.
     SUMMON_BG("images/summon_backgroud.jpg", 1136, 640),

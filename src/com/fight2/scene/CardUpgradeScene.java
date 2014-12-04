@@ -8,19 +8,20 @@ import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
+import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.util.adt.color.Color;
 
 import android.view.MotionEvent;
 
 import com.fight2.GameActivity;
+import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
-import com.fight2.entity.Party;
-import com.fight2.entity.PartyInfo;
 import com.fight2.entity.engine.CardFrame;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
@@ -40,16 +41,25 @@ public class CardUpgradeScene extends BaseCardPackScene {
     private final Sprite[] cardGrids = new Sprite[7];
 
     private CardPackPhysicsHandler physicsHandler;
+    private final Card[] inGridCards = new Card[7];
     private final IEntity[] inGridCardSprites = new IEntity[7];
 
     private final Rectangle cardZoom;
     private final CardPack cardPack;
     private final float frameY = cameraHeight - TextureEnum.UPGRADE_FRAME.getHeight() + 5;
-
-    private final Party[] parties = GameUserSession.getInstance().getPartyInfo().getParties();
+    private final Font hpatkFont;
+    private final Text hpText;
+    private final Text atkText;
 
     public CardUpgradeScene(final GameActivity activity) throws IOException {
         super(activity);
+        hpatkFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
+        hpText = new Text(630, 295, hpatkFont, "+0123456789", vbom);
+        hpText.setColor(0XFF5AD61E);
+        hpText.setText("");
+        atkText = new Text(630, 226, hpatkFont, "+0123456789", vbom);
+        atkText.setColor(0XFF5AD61E);
+        atkText.setText("");
 
         cardZoom = new Rectangle(250 + CARD_WIDTH * 0.7f, 145, CARD_WIDTH * 1.4f, CARD_HEIGHT * 1.4f, vbom);
         cardPack = new CardPack(300, 145, 21000, CARD_HEIGHT, vbom, cardZoom);
@@ -97,8 +107,13 @@ public class CardUpgradeScene extends BaseCardPackScene {
 
         final Sprite frameSprite = createALBImageSprite(TextureEnum.UPGRADE_FRAME, this.simulatedLeftX + 50, frameY);
         this.attachChild(frameSprite);
+        frameSprite.attachChild(hpText);
+        frameSprite.attachChild(atkText);
 
-        final Card[] inGridCards = new Card[7];
+        final F2ButtonSprite upgradeButton = createUpgradeButton();
+        frameSprite.attachChild(upgradeButton);
+        this.registerTouchArea(upgradeButton);
+
         this.scrollDetector = new F2ScrollDetector(new CardUpgradeScrollDetectorListener(this, cardPack, cardZoom, inGridCards));
 
         final TextureEnum gridEnum = TextureEnum.PARTY_EDIT_FRAME_GRID;
@@ -145,8 +160,7 @@ public class CardUpgradeScene extends BaseCardPackScene {
                             if (touchY < this.getY() - 50) {
                                 cardPack.revertCardToCardPack(movingCard);
                                 inGridCards[frameIndex] = null;
-                                calculatePartyHpAtk();
-                                updatePartyHpAtk();
+                                onGridCardsChange();
                                 activity.runOnUpdateThread(new Runnable() {
 
                                     @Override
@@ -217,11 +231,10 @@ public class CardUpgradeScene extends BaseCardPackScene {
         this.attachChild(cardZoom);
 
         // Add cover and buttons.
-        // final Sprite leftCover = createALBImageSprite(TextureEnum.PARTY_EDIT_COVER_LEFT, 0, 80);
-        // final Sprite rightCover = createALBImageSprite(TextureEnum.PARTY_EDIT_COVER_RIGHT, this.cameraWidth - TextureEnum.PARTY_EDIT_COVER_RIGHT.getWidth(),
-        // 80);
-        // this.attachChild(leftCover);
-        // this.attachChild(rightCover);
+        final Sprite leftCover = createALBImageSprite(TextureEnum.PARTY_EDIT_COVER_LEFT, 0, 0);
+        final Sprite rightCover = createALBImageSprite(TextureEnum.PARTY_EDIT_COVER_RIGHT, this.cameraWidth - TextureEnum.PARTY_EDIT_COVER_RIGHT.getWidth(), 0);
+        this.attachChild(leftCover);
+        this.attachChild(rightCover);
 
         final F2ButtonSprite backButton = createBackButton();
         this.attachChild(backButton);
@@ -241,23 +254,23 @@ public class CardUpgradeScene extends BaseCardPackScene {
 
     }
 
+    private F2ButtonSprite createUpgradeButton() {
+        final F2ButtonSprite upgradeButton = createALBF2ButtonSprite(TextureEnum.UPGRADE_FRAME_BUTTON, TextureEnum.UPGRADE_FRAME_BUTTON, 467, 40);
+        upgradeButton.setOnClickListener(new F2OnClickListener() {
+            @Override
+            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+            }
+        });
+        return upgradeButton;
+    }
+
     private F2ButtonSprite createBackButton() {
         final F2ButtonSprite backButton = createALBF2ButtonSprite(TextureEnum.COMMON_BACK_BUTTON_NORMAL, TextureEnum.COMMON_BACK_BUTTON_PRESSED,
                 this.simulatedRightX - 135, 50);
         backButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                final Card[] cards = parties[0].getCards();
-                if (cards[0] == null) {
-                    alert("你必须要有一个领军人物！");
-                } else {
-                    final boolean isSaveOk = CardUtils.saveParties();
-                    if (isSaveOk) {
-                        ResourceManager.getInstance().setCurrentScene(SceneEnum.Party);
-                    } else {
-                        alert("队伍保存失败！");
-                    }
-                }
+                ResourceManager.getInstance().setCurrentScene(SceneEnum.Party);
             }
         });
         return backButton;
@@ -277,38 +290,32 @@ public class CardUpgradeScene extends BaseCardPackScene {
 
     @Override
     public void onGridCardsChange() {
-        calculatePartyHpAtk();
-        updatePartyHpAtk();
-    }
-
-    private void calculatePartyHpAtk() {
-        final PartyInfo partyInfo = GameUserSession.getInstance().getPartyInfo();
-        int partyInfoHp = 0;
-        int partyInfoAtk = 0;
-        for (final Party party : partyInfo.getParties()) {
-            if (party == null) {
-                continue;
-            }
-            int partyHp = 0;
-            int partyAtk = 0;
-            for (final Card card : party.getCards()) {
-                if (card == null) {
-                    continue;
-                }
-                partyHp += card.getHp();
-                partyAtk += card.getAtk();
-            }
-            party.setHp(partyHp);
-            party.setAtk(partyAtk);
-            partyInfoHp += partyHp;
-            partyInfoAtk += partyAtk;
+        final Card mainCard = inGridCards[0];
+        if (mainCard == null) {
+            return;
         }
-        partyInfo.setHp(partyInfoHp);
-        partyInfo.setAtk(partyInfoAtk);
-    }
+        final Card manCardCopy = new Card(mainCard);
 
-    private void updatePartyHpAtk() {
+        for (int i = 1; i < inGridCards.length; i++) {
+            final Card supportCard = inGridCards[i];
+            if (supportCard == null) {
+                break;
+            }
+            final int baseExp = CardUtils.getBaseExp(supportCard);
+            final int exp = supportCard.getExp() / 2;
+            final int addExp = baseExp + exp;
+            manCardCopy.setExp(manCardCopy.getExp() + addExp);
+        }
 
+        CardUtils.mockUpgrade(manCardCopy);
+        final int addHp = manCardCopy.getHp() - mainCard.getHp();
+        final int addAtk = manCardCopy.getAtk() - mainCard.getAtk();
+
+        this.hpText.setText("+" + addHp);
+        this.atkText.setText("+" + addAtk);
+
+        final CardFrame mainCardSprite = (CardFrame) inGridCardSprites[0];
+        mainCardSprite.updateCardAttributes(manCardCopy);
     }
 
     @Override

@@ -160,16 +160,15 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
                         }
                         inPartyCards.add(focusedCardTempalteId);
                         inGridCards[cardGridIndex] = focusedCard;
-                        cardPackScene.onGridCardsChange();
                         cardGrid = cardGrids[cardGridIndex];
                         final IEntity toReplaceCardAvatar = cardPackScene.createCardAvatarSprite(focusedCard, 135, 135);
                         toReplaceCardAvatar.setPosition(cardGrid);
                         toReplaceCardAvatar.setUserData(copyCard.getUserData());
                         this.cardPackScene.getInGridCardSprites()[cardGridIndex] = toReplaceCardAvatar;
+                        cardPackScene.onGridCardsChange();
 
                         final IEntityModifierListener modifierListener = isReplace ? new ReplacePartyCardModifierListener(focusedCardSprite, focusedCard,
-                                beReplacedCardSprite, toReplaceCardAvatar) : new AddPartyCardModifierListener(focusedCardSprite, focusedCard,
-                                toReplaceCardAvatar);
+                                beReplacedCardSprite, toReplaceCardAvatar) : new AddCardModifierListener(focusedCardSprite, focusedCard, toReplaceCardAvatar);
                         final MoveModifier modifier = new MoveModifier(0.1f, copyCard.getX(), copyCard.getY(), cardGrid.getX(), cardGrid.getY(),
                                 modifierListener);
                         cardPackScene.getActivity().runOnUpdateThread(new Runnable() {
@@ -231,14 +230,14 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
         });
     }
 
-    protected class AddPartyCardModifierListener implements IEntityModifierListener {
-        private final IEntity focusedCard;
-        private final Card cardEntry;
-        private final IEntity avatar;
+    protected class AddCardModifierListener implements IEntityModifierListener {
+        protected final IEntity focusedCardSprite;
+        protected final Card card;
+        protected final IEntity avatar;
 
-        protected AddPartyCardModifierListener(final IEntity focusedCard, final Card cardEntry, final IEntity avatar) {
-            this.focusedCard = focusedCard;
-            this.cardEntry = cardEntry;
+        protected AddCardModifierListener(final IEntity focusedCardSprite, final Card card, final IEntity avatar) {
+            this.focusedCardSprite = focusedCardSprite;
+            this.card = card;
             this.avatar = avatar;
         }
 
@@ -249,8 +248,8 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
 
         @Override
         public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
-            focusedCard.setAlpha(0);
-            final int focusedCardIndex = focusedCard.getTag();
+            focusedCardSprite.setAlpha(0);
+            final int focusedCardIndex = focusedCardSprite.getTag();
             final boolean isFocusedCardRightMost = (focusedCardIndex == cardPack.getChildCount() - 1);
 
             if (isFocusedCardRightMost) {
@@ -294,9 +293,9 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
             activity.runOnUpdateThread(new Runnable() {
                 @Override
                 public void run() {
-                    focusedCard.detachSelf();
-                    cardPack.removedCard(cardEntry, focusedCard);
-                    GameUserSession.getInstance().getCards().remove(cardEntry);
+                    focusedCardSprite.detachSelf();
+                    cardPack.removedCard(card, focusedCardSprite);
+                    GameUserSession.getInstance().getCards().remove(card);
                     cardPackScene.attachChild(avatar);
                     pItem.detachSelf();
                     cardPackScene.sortChildren();
@@ -308,15 +307,15 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
     }
 
     protected class ReplacePartyCardModifierListener implements IEntityModifierListener {
-        private final IEntity focusedCard;
-        private final Card cardEntry;
+        private final IEntity focusedCardSprite;
+        private final Card card;
         private final IEntity beReplacedCardSprite;
         private final IEntity toReplaceCardAvatar;
 
         protected ReplacePartyCardModifierListener(final IEntity focusedCard, final Card cardEntry, final IEntity beReplacedCardSprite,
                 final IEntity toReplaceCardAvatar) {
-            this.focusedCard = focusedCard;
-            this.cardEntry = cardEntry;
+            this.focusedCardSprite = focusedCard;
+            this.card = cardEntry;
             this.beReplacedCardSprite = beReplacedCardSprite;
             this.toReplaceCardAvatar = toReplaceCardAvatar;
         }
@@ -329,8 +328,8 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
         @Override
         public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
             cardPackScene.sortChildren();
-            focusedCard.setAlpha(0);
-            final int focusedCardIndex = focusedCard.getTag();
+            focusedCardSprite.setAlpha(0);
+            final int focusedCardIndex = focusedCardSprite.getTag();
             final boolean isFocusedCardRightMost = (focusedCardIndex == cardPack.getChildCount() - 1);
 
             if (isFocusedCardRightMost) {
@@ -380,9 +379,9 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
             activity.runOnUpdateThread(new Runnable() {
                 @Override
                 public void run() {
-                    focusedCard.detachSelf();
-                    cardPack.removedCard(cardEntry, focusedCard);
-                    GameUserSession.getInstance().getCards().remove(cardEntry);
+                    focusedCardSprite.detachSelf();
+                    cardPack.removedCard(card, focusedCardSprite);
+                    GameUserSession.getInstance().getCards().remove(card);
                     if (cardPack.getChildCount() == 0) {
                         cardPack.revertCardToCardPack(beReplacedCardSprite);
                         beReplacedCardSprite.detachSelf();
