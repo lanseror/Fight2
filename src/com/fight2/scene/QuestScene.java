@@ -35,6 +35,7 @@ import org.andengine.util.adt.color.ColorUtils;
 import org.andengine.util.debug.Debug;
 
 import com.fight2.GameActivity;
+import com.fight2.constant.MusicEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.constant.TiledTextureEnum;
@@ -44,6 +45,7 @@ import com.fight2.entity.QuestTreasureData;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.AsyncTaskLoader;
+import com.fight2.util.F2MusicManager;
 import com.fight2.util.IAsyncCallback;
 import com.fight2.util.QuestUtils;
 import com.fight2.util.ResourceManager;
@@ -151,7 +153,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                         player.registerEntityModifier(new PathModifier(path.getSize() * 0.6f, path, null, new IPathModifierListener() {
                             @Override
                             public void onPathStarted(final PathModifier pPathModifier, final IEntity pEntity) {
-
+                                F2MusicManager.getInstance().playMusic(MusicEnum.HORSE, true);
                             }
 
                             @Override
@@ -224,6 +226,8 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                                     }
                                     goStatus = QuestGoStatus.Stopped;
                                 }
+                                F2MusicManager.getInstance().stopMusic();
+                                F2MusicManager.getInstance().playMusic(MusicEnum.HORSE8);
                             }
                         }));
                         return true;

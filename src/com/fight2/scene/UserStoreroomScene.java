@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
+import com.fight2.constant.MusicEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
@@ -25,6 +26,7 @@ import com.fight2.entity.engine.CardFrame;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.AccountUtils;
+import com.fight2.util.F2MusicManager;
 import com.fight2.util.ResourceManager;
 
 public class UserStoreroomScene extends BaseScene {
@@ -121,7 +123,7 @@ public class UserStoreroomScene extends BaseScene {
             final float cardRowY = cardRow.getHeight() * 0.5f;
             final Sprite cardRowLine = this.createACImageSprite(TextureEnum.GUILD_SCROLL_ROW_SEPARATOR, SCROLL_ZONE_WIDTH * 0.5f, 1);
             cardRow.attachChild(cardRowLine);
-           final IEntity cardSprite = new CardFrame(220, cardRowY, 110, 165, card, activity);
+            final IEntity cardSprite = new CardFrame(220, cardRowY, 110, 165, card, activity);
             final Text cardAmountText = new Text(300, 25, amountFont, String.format("×%s", card.getAmount()), vbom);
             cardAmountText.setColor(0XFFAECE01);
             this.leftAlignEntity(cardAmountText, cardSprite.getX() + cardSprite.getWidth() * 0.5f + 5);
@@ -177,10 +179,12 @@ public class UserStoreroomScene extends BaseScene {
     public void updateScene() {
         activity.getGameHub().needSmallChatRoom(true);
         createBoards();
+        F2MusicManager.getInstance().playMusic(MusicEnum.DOOR);
     }
 
     @Override
     public void leaveScene() {
+        F2MusicManager.getInstance().playMusic(MusicEnum.DOOR);
     }
 
 }
