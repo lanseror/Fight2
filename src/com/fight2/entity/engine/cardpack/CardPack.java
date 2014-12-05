@@ -10,11 +10,11 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
+import com.fight2.entity.engine.CardFrame;
 import com.fight2.scene.BaseCardPackScene;
-import com.fight2.scene.PartyEditScene;
 
 public class CardPack extends Rectangle {
-    private final Map<Card, IEntity> removedCards = new HashMap<Card, IEntity>();
+    private final Map<Card, CardFrame> removedCards = new HashMap<Card, CardFrame>();
     private final IEntity cardZoom;
 
     public CardPack(final float pX, final float pY, final float pWidth, final float pHeight, final VertexBufferObjectManager pVertexBufferObjectManager,
@@ -23,13 +23,14 @@ public class CardPack extends Rectangle {
         this.cardZoom = cardZoom;
     }
 
-    public void removedCard(final Card card, final IEntity removedCardSprite) {
+    public void removedCard(final Card card, final CardFrame removedCardSprite) {
         removedCards.put(card, removedCardSprite);
     }
 
     public void revertCardToCardPack(final IEntity inCardFrameSprite) {
         final Card replaceCard = (Card) inCardFrameSprite.getUserData();
-        final IEntity revertCard = removedCards.remove(replaceCard);
+        final CardFrame revertCard = removedCards.remove(replaceCard);
+        revertCard.revertCardAttributes();
         final IEntity focusedCard = (IEntity) cardZoom.getUserData();
         final float cardZoomX = cardZoom.getX();
         final float cardPackLeft = this.getX() - this.getWidth() * 0.5f;

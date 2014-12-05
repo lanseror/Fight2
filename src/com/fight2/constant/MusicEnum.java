@@ -7,10 +7,10 @@ public enum MusicEnum {
     // BATTLE_BG("Battle-Haven.mp3"),
     BATTLE_HIT("HeadHunterMissileHit2.wav"),
     BATTLE_WIN("Win Battle.mp3"),
-    BATTLE_LOSE("LoseCastle.mp3"),
-    DOOR("door.wav"),
-    HORSE("HORSE01.wav"),
-    HORSE8("HORSE08.wav");
+    BATTLE_LOSE("LoseCastle.mp3");
+//    DOOR("door.wav"),
+//    HORSE("HORSE01.wav"),
+//    HORSE8("HORSE08.wav");
 
     private final String url;
 

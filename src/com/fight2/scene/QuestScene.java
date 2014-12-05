@@ -153,7 +153,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                         player.registerEntityModifier(new PathModifier(path.getSize() * 0.6f, path, null, new IPathModifierListener() {
                             @Override
                             public void onPathStarted(final PathModifier pPathModifier, final IEntity pEntity) {
-                                F2MusicManager.getInstance().playMusic(MusicEnum.HORSE, true);
+//                                F2MusicManager.getInstance().playMusic(MusicEnum.HORSE, true);
                             }
 
                             @Override
@@ -227,7 +227,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                                     goStatus = QuestGoStatus.Stopped;
                                 }
                                 F2MusicManager.getInstance().stopMusic();
-                                F2MusicManager.getInstance().playMusic(MusicEnum.HORSE8);
+//                                F2MusicManager.getInstance().playMusic(MusicEnum.HORSE8);
                             }
                         }));
                         return true;

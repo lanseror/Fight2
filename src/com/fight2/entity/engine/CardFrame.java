@@ -33,6 +33,7 @@ public class CardFrame extends Rectangle {
     private final Text hpText;
     private final Text atkText;
     private final Text levelText;
+    private final Card card;
 
     public CardFrame(final float x, final float y, final float width, final float height, final Card card, final GameActivity activity) {
         super(x, y, width, height, activity.getVertexBufferObjectManager());
@@ -46,6 +47,7 @@ public class CardFrame extends Rectangle {
         cardCoverSprite = new Sprite(width * 0.5f, height * 0.5f, width + 3 * scale, height + 3 * scale, coverTexture, vbom);
         cardCoverSprite.setZIndex(0);
         this.attachChild(cardCoverSprite);
+        this.card = card;
 
         loadImageFromServer(card);
 
@@ -237,6 +239,15 @@ public class CardFrame extends Rectangle {
         atkText.setColor(0XFF5AD61E);
         levelText.setText(String.valueOf(card.getLevel()));
         levelText.setColor(0XFF5AD61E);
+    }
+
+    public void revertCardAttributes() {
+        hpText.setText(String.valueOf(card.getHp()));
+        hpText.setColor(0XFFFFE3B0);
+        atkText.setText(String.valueOf(card.getAtk()));
+        atkText.setColor(0XFFFFE3B0);
+        levelText.setText(String.valueOf(card.getLevel()));
+        levelText.setColor(0XFFFFE3B0);
     }
 
     private static ITextureRegion getTexture(final Race race) {

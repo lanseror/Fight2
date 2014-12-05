@@ -95,7 +95,7 @@ public class PartyEditScene extends BaseCardPackScene {
                 this.attachChild(avatarSprite);
                 inGridCardSprites[i] = avatarSprite;
 
-                final IEntity removedCardSprite = new CardFrame(0, CARD_Y, CARD_WIDTH, CARD_HEIGHT, card, activity);
+                final CardFrame removedCardSprite = new CardFrame(0, CARD_Y, CARD_WIDTH, CARD_HEIGHT, card, activity);
                 removedCardSprite.setTag(i);
                 removedCardSprite.setUserData(card);
                 cardPack.removedCard(card, removedCardSprite);

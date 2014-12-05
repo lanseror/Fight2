@@ -179,12 +179,12 @@ public class UserStoreroomScene extends BaseScene {
     public void updateScene() {
         activity.getGameHub().needSmallChatRoom(true);
         createBoards();
-        F2MusicManager.getInstance().playMusic(MusicEnum.DOOR);
+//        F2MusicManager.getInstance().playMusic(MusicEnum.DOOR);
     }
 
     @Override
     public void leaveScene() {
-        F2MusicManager.getInstance().playMusic(MusicEnum.DOOR);
+//        F2MusicManager.getInstance().playMusic(MusicEnum.DOOR);
     }
 
 }

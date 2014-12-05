@@ -13,6 +13,7 @@ import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.util.adt.color.Color;
+import org.json.JSONArray;
 
 import android.view.MotionEvent;
 
@@ -71,27 +72,29 @@ public class CardUpgradeScene extends BaseCardPackScene {
     @Override
     public void updateScene() {
         activity.getGameHub().needSmallChatRoom(false);
-        // final Party[] parties = GameUserSession.getInstance().getPartyInfo().getParties();
-        // final Card[] partyCards = parties[partyNumber - 1].getCards();
-        // for (int i = 0; i < partyCards.length; i++) {
-        // final Card card = partyCards[i];
-        // if (card != null) {
-        // final IEntity avatarSprite = createCardAvatarSprite(card, 10, 20);
-        // avatarSprite.setPosition(cardGrids[i]);
-        // avatarSprite.setUserData(card);
-        // this.attachChild(avatarSprite);
-        // inGridCardSprites[i] = avatarSprite;
-        //
-        // final IEntity removedCardSprite = new CardFrame(0, CARD_Y, CARD_WIDTH, CARD_HEIGHT, card, activity);
-        // removedCardSprite.setTag(i);
-        // removedCardSprite.setUserData(card);
-        // cardPack.removedCard(card, removedCardSprite);
-        // this.registerUpdateHandler(new CardUpdateHandler(cardZoom, removedCardSprite));
-        // }
-        //
-        // }
-        // this.sortChildren();
-        // this.updatePartyHpAtk();
+        // Insert cards to card pack.
+        cardPack.detachChildren();
+        final float initCardX = cardZoom.getX() - (cardPack.getX() - 0.5f * cardPack.getWidth());
+        final GameUserSession session = GameUserSession.getInstance();
+        final List<Card> sessionCards = session.getCards();
+        float appendX = initCardX;
+        for (int i = 0; i < sessionCards.size(); i++) {
+            final Card sessionCard = sessionCards.get(i);
+            final IEntity card = new CardFrame(appendX, CARD_Y, CARD_WIDTH, CARD_HEIGHT, sessionCard, activity);
+            card.setTag(i);
+            card.setWidth(CARD_WIDTH);
+            card.setHeight(CARD_HEIGHT);
+            card.setPosition(appendX, CARD_Y);
+            card.setUserData(sessionCard);
+            cardPack.attachChild(card);
+            if (i == 0) {
+                appendX += 1.5 * (CARD_GAP + CARD_WIDTH);
+                cardZoom.setUserData(card);
+            } else {
+                appendX += CARD_GAP + CARD_WIDTH;
+            }
+            this.registerUpdateHandler(new CardUpdateHandler(cardZoom, card));
+        }
     }
 
     @Override
@@ -195,29 +198,6 @@ public class CardUpgradeScene extends BaseCardPackScene {
         mainCardGrid.setPosition(frameLeft + 125, frameY + frameSprite.getHeight() * 0.5f + 5);
         mainCardGrid.setAlpha(0);
 
-        // Insert cards to card pack.
-        final float initCardX = cardZoom.getX() - (cardPack.getX() - 0.5f * cardPack.getWidth());
-        final GameUserSession session = GameUserSession.getInstance();
-        final List<Card> sessionCards = session.getCards();
-        float appendX = initCardX;
-        for (int i = 0; i < sessionCards.size(); i++) {
-            final Card sessionCard = sessionCards.get(i);
-            final IEntity card = new CardFrame(appendX, CARD_Y, CARD_WIDTH, CARD_HEIGHT, sessionCard, activity);
-            card.setTag(i);
-            card.setWidth(CARD_WIDTH);
-            card.setHeight(CARD_HEIGHT);
-            card.setPosition(appendX, CARD_Y);
-            card.setUserData(sessionCard);
-            cardPack.attachChild(card);
-            if (i == 0) {
-                appendX += 1.5 * (CARD_GAP + CARD_WIDTH);
-                cardZoom.setUserData(card);
-            } else {
-                appendX += CARD_GAP + CARD_WIDTH;
-            }
-            this.registerUpdateHandler(new CardUpdateHandler(cardZoom, card));
-        }
-
         final MoveFinishedListener moveFinishedListener = new MoveFinishedListener(cardPack, cardZoom, activity);
         physicsHandler = new CardPackPhysicsHandler(cardPack, cardZoom, moveFinishedListener);
         this.registerUpdateHandler(physicsHandler);
@@ -259,6 +239,44 @@ public class CardUpgradeScene extends BaseCardPackScene {
         upgradeButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                final Card mainCard = inGridCards[0];
+                if (mainCard == null) {
+                    return;
+                }
+                final JSONArray cardIdsJson = new JSONArray();
+                for (final Card card : inGridCards) {
+                    if (card == null) {
+                        continue;
+                    }
+                    cardIdsJson.put(card.getId());
+                }
+                if (cardIdsJson.length() < 2) {
+                    return;
+                }
+
+                final boolean isOk = CardUtils.upgrade(cardIdsJson, mainCard);
+                if (isOk) {
+                    for (int i = 1; i < inGridCards.length; i++) {
+                        inGridCards[i] = null;
+                        final IEntity inGridCardSprite = inGridCardSprites[i];
+                        inGridCardSprites[i] = null;
+                        if (inGridCardSprite != null) {
+                            activity.runOnUpdateThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    inGridCardSprite.detachSelf();
+                                }
+
+                            });
+
+                        }
+                    }
+                    final CardFrame mainCardSprite = (CardFrame) inGridCardSprites[0];
+                    mainCardSprite.revertCardAttributes();
+                } else {
+                    alert("出错了。");
+                }
+
             }
         });
         return upgradeButton;
@@ -299,7 +317,7 @@ public class CardUpgradeScene extends BaseCardPackScene {
         for (int i = 1; i < inGridCards.length; i++) {
             final Card supportCard = inGridCards[i];
             if (supportCard == null) {
-                break;
+                continue;
             }
             final int baseExp = CardUtils.getBaseExp(supportCard);
             final int exp = supportCard.getExp() / 2;
@@ -311,11 +329,17 @@ public class CardUpgradeScene extends BaseCardPackScene {
         final int addHp = manCardCopy.getHp() - mainCard.getHp();
         final int addAtk = manCardCopy.getAtk() - mainCard.getAtk();
 
-        this.hpText.setText("+" + addHp);
-        this.atkText.setText("+" + addAtk);
-
         final CardFrame mainCardSprite = (CardFrame) inGridCardSprites[0];
-        mainCardSprite.updateCardAttributes(manCardCopy);
+        if (manCardCopy.getLevel() == mainCard.getLevel()) {
+            this.hpText.setText("");
+            this.atkText.setText("");
+            mainCardSprite.revertCardAttributes();
+        } else {
+            this.hpText.setText("+" + addHp);
+            this.atkText.setText("+" + addAtk);
+            mainCardSprite.updateCardAttributes(manCardCopy);
+        }
+
     }
 
     @Override

@@ -101,7 +101,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
         final F2ScrollDetector scrollDetector = (F2ScrollDetector) pScollDetector;
         final TouchEvent touchEvent = scrollDetector.getSceneTouchEvent();
         final float finishedY = touchEvent.getY();
-        final IEntity focusedCardSprite = (IEntity) cardZoom.getUserData();
+        final CardFrame focusedCardSprite = (CardFrame) cardZoom.getUserData();
         if (focusedCardSprite.getScaleX() > 1.8 * CardUpdateHandler.SCALE_FACTOR) {
             // Debug.e("focusedCard.getScaleX() > 1.8");
             if (pPointerID == initPointerID && copyCard != null && focusedCardSprite.contains(initX, initY)
@@ -231,11 +231,11 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
     }
 
     protected class AddCardModifierListener implements IEntityModifierListener {
-        protected final IEntity focusedCardSprite;
+        protected final CardFrame focusedCardSprite;
         protected final Card card;
         protected final IEntity avatar;
 
-        protected AddCardModifierListener(final IEntity focusedCardSprite, final Card card, final IEntity avatar) {
+        protected AddCardModifierListener(final CardFrame focusedCardSprite, final Card card, final IEntity avatar) {
             this.focusedCardSprite = focusedCardSprite;
             this.card = card;
             this.avatar = avatar;
@@ -307,12 +307,12 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
     }
 
     protected class ReplacePartyCardModifierListener implements IEntityModifierListener {
-        private final IEntity focusedCardSprite;
+        private final CardFrame focusedCardSprite;
         private final Card card;
         private final IEntity beReplacedCardSprite;
         private final IEntity toReplaceCardAvatar;
 
-        protected ReplacePartyCardModifierListener(final IEntity focusedCard, final Card cardEntry, final IEntity beReplacedCardSprite,
+        protected ReplacePartyCardModifierListener(final CardFrame focusedCard, final Card cardEntry, final IEntity beReplacedCardSprite,
                 final IEntity toReplaceCardAvatar) {
             this.focusedCardSprite = focusedCard;
             this.card = cardEntry;

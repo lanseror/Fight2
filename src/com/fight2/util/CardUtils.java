@@ -74,6 +74,8 @@ public class CardUtils {
                 card.setHp(cardJson.getInt("hp"));
                 card.setStar(cardJson.getInt("star"));
                 card.setLevel(cardJson.getInt("level"));
+                card.setBaseExp(cardJson.getInt("baseExp"));
+                card.setExp(cardJson.getInt("exp"));
                 card.setImage(cardJson.getString("image"));
                 card.setName(cardJson.getString("name"));
                 card.setSkill(cardJson.optString("skill"));
@@ -187,6 +189,27 @@ public class CardUtils {
             final int upgradeAtk = upgradeHp * currentAtk / currentHp;
             card.setHp(upgradeHp);
             card.setAtk(upgradeAtk);
+        }
+
+    }
+
+    public static boolean upgrade(final JSONArray cardIdsJson, final Card card) {
+        final String url = HttpUtils.HOST_URL + "/card/upgrade";
+        try {
+            final String responseJsonStr = HttpUtils.postJSONString(url, cardIdsJson.toString());
+            final JSONObject responseJson = new JSONObject(responseJsonStr);
+            final int status = responseJson.getInt("status");
+            if (status == 0) {
+                final JSONObject cardJson = responseJson.getJSONObject("card");
+                card.setAtk(cardJson.getInt("atk"));
+                card.setHp(cardJson.getInt("hp"));
+                card.setLevel(cardJson.getInt("level"));
+                card.setBaseExp(cardJson.getInt("baseExp"));
+                card.setExp(cardJson.getInt("exp"));
+            }
+            return status == 0;
+        } catch (IOException | JSONException e) {
+            throw new RuntimeException(e);
         }
 
     }

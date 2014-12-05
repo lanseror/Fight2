@@ -101,6 +101,8 @@ public class AccountUtils {
                 card.setLevel(cardJson.getInt("level"));
                 card.setTier(cardJson.getInt("tier"));
                 card.setAtk(cardJson.getInt("atk"));
+                card.setBaseExp(cardJson.getInt("baseExp"));
+                card.setExp(cardJson.getInt("exp"));
                 card.setAvatar(avatar);
                 card.setAvatarLoaded(true);
                 card.setHp(cardJson.getInt("hp"));
@@ -201,6 +203,8 @@ public class AccountUtils {
                 card.setId(cardJson.getInt("id"));
                 card.setHp(cardJson.getInt("hp"));
                 card.setAtk(cardJson.getInt("atk"));
+                card.setBaseExp(cardJson.getInt("baseExp"));
+                card.setExp(cardJson.getInt("exp"));
                 card.setName(cardJson.getString("name"));
                 card.setStar(cardJson.getInt("star"));
                 card.setAvatar(cardJson.getString("avatar"));

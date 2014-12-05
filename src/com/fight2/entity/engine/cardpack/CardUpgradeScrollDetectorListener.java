@@ -8,9 +8,9 @@ import org.andengine.input.touch.detector.ScrollDetector;
 import org.andengine.util.modifier.IModifier;
 
 import com.fight2.entity.Card;
+import com.fight2.entity.engine.CardFrame;
 import com.fight2.input.touch.detector.F2ScrollDetector;
 import com.fight2.scene.CardUpgradeScene;
-import com.fight2.util.CardUtils;
 import com.fight2.util.SpriteUtils;
 
 public class CardUpgradeScrollDetectorListener extends CardPackScrollDetectorListener {
@@ -29,7 +29,7 @@ public class CardUpgradeScrollDetectorListener extends CardPackScrollDetectorLis
         final F2ScrollDetector scrollDetector = (F2ScrollDetector) pScollDetector;
         final TouchEvent touchEvent = scrollDetector.getSceneTouchEvent();
         final float finishedY = touchEvent.getY();
-        final IEntity focusedCardSprite = (IEntity) cardZoom.getUserData();
+        final CardFrame focusedCardSprite = (CardFrame) cardZoom.getUserData();
         if (focusedCardSprite.getScaleX() > 1.8 * CardUpdateHandler.SCALE_FACTOR) {
             // Debug.e("focusedCard.getScaleX() > 1.8");
             if (pPointerID == initPointerID && copyCard != null && focusedCardSprite.contains(initX, initY)
@@ -98,7 +98,7 @@ public class CardUpgradeScrollDetectorListener extends CardPackScrollDetectorLis
 
     protected class UpgradeAddCardModifierListener extends AddCardModifierListener {
 
-        protected UpgradeAddCardModifierListener(final IEntity focusedCardSprite, final Card card, final IEntity avatar) {
+        protected UpgradeAddCardModifierListener(final CardFrame focusedCardSprite, final Card card, final IEntity avatar) {
             super(focusedCardSprite, card, avatar);
         }
 
