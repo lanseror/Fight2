@@ -279,7 +279,7 @@ public class CardFrame extends Rectangle {
             @Override
             public void workToDo() {
                 try {
-                    if (!card.isAvatarLoaded()) {
+                    if (!card.isAvatarLoaded() && card.getAvatar() != null) {
                         avatar = ImageUtils.getLocalString(card.getAvatar(), activity);
                         TEXTURE_FACTORY.addCardResource(activity, avatar);
                         card.setAvatar(avatar);

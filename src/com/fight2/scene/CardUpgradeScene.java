@@ -134,7 +134,7 @@ public class CardUpgradeScene extends BaseCardPackScene {
                 gridY -= gridHeight + 5;
             }
             cardGrids[gridIndex] = new Sprite(frameLeft + gridStartX + gridWidth * ((gridIndex + 1) % 2), gridY, gridWidth, gridHeight, gridTexture, vbom) {
-                private IEntity movingCard = null;
+                private IEntity movingCardSprite = null;
 
                 @Override
                 public boolean onAreaTouched(final TouchEvent sceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
@@ -144,26 +144,29 @@ public class CardUpgradeScene extends BaseCardPackScene {
                     final int action = motionEvent.getAction();
                     switch (action) {
                         case MotionEvent.ACTION_DOWN:
-                            movingCard = inGridCardSprites[frameIndex];
-                            if (movingCard != null) {
-                                movingCard.setZIndex(100);
+                            movingCardSprite = inGridCardSprites[frameIndex];
+                            if (movingCardSprite != null) {
+                                movingCardSprite.setZIndex(100);
                                 CardUpgradeScene.this.sortChildren();
                             }
                             break;
                         case MotionEvent.ACTION_MOVE:
-                            if (movingCard != null) {
-                                movingCard.setPosition(touchX, touchY);
+                            if (movingCardSprite != null) {
+                                movingCardSprite.setPosition(touchX, touchY);
                             }
                             break;
                         case MotionEvent.ACTION_CANCEL:
                         case MotionEvent.ACTION_UP:
-                            if (movingCard == null) {
+                            if (movingCardSprite == null) {
                                 break;
                             }
                             if (touchY < this.getY() - 50) {
-                                cardPack.revertCardToCardPack(movingCard);
+                                cardPack.revertCardToCardPack(movingCardSprite);
                                 inGridCards[frameIndex] = null;
                                 onGridCardsChange();
+                                if (frameIndex == 0) {
+                                    revert(false);
+                                }
                                 activity.runOnUpdateThread(new Runnable() {
 
                                     @Override
@@ -176,11 +179,11 @@ public class CardUpgradeScene extends BaseCardPackScene {
                                 });
 
                             } else {
-                                movingCard.setPosition(this);
+                                movingCardSprite.setPosition(this);
                             }
-                            movingCard.setZIndex(IEntity.ZINDEX_DEFAULT);
+                            movingCardSprite.setZIndex(IEntity.ZINDEX_DEFAULT);
                             CardUpgradeScene.this.sortChildren();
-                            movingCard = null;
+                            movingCardSprite = null;
                             break;
 
                     }
@@ -230,8 +233,7 @@ public class CardUpgradeScene extends BaseCardPackScene {
 
     @Override
     public void leaveScene() {
-        // TODO Auto-generated method stub
-
+        revert(true);
     }
 
     private F2ButtonSprite createUpgradeButton() {
@@ -340,6 +342,31 @@ public class CardUpgradeScene extends BaseCardPackScene {
             mainCardSprite.updateCardAttributes(manCardCopy);
         }
 
+    }
+
+    private void revert(final boolean includedMainCard) {
+        final int startIndex = includedMainCard ? 0 : 1;
+        for (int i = startIndex; i < inGridCardSprites.length; i++) {
+            final int gridIndex = i;
+            final IEntity cardSprite = inGridCardSprites[gridIndex];
+            if (cardSprite == null) {
+                continue;
+            }
+            cardPack.revertCardToCardPack(cardSprite);
+            inGridCards[gridIndex] = null;
+            this.hpText.setText("");
+            this.atkText.setText("");
+            activity.runOnUpdateThread(new Runnable() {
+
+                @Override
+                public void run() {
+                    inGridCardSprites[gridIndex].detachSelf();
+                    inGridCardSprites[gridIndex] = null;
+
+                }
+
+            });
+        }
     }
 
     @Override

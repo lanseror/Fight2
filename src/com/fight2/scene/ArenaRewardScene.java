@@ -16,7 +16,6 @@ import org.andengine.input.touch.detector.ScrollDetector;
 import org.andengine.input.touch.detector.ScrollDetector.IScrollDetectorListener;
 import org.andengine.input.touch.detector.SurfaceScrollDetector;
 import org.andengine.opengl.font.Font;
-import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.util.adt.color.Color;
 
 import com.fight2.GameActivity;
@@ -28,9 +27,9 @@ import com.fight2.entity.ArenaRewardItem;
 import com.fight2.entity.ArenaRewardItem.ArenaRewardItemType;
 import com.fight2.entity.Card;
 import com.fight2.entity.UserArenaInfo;
+import com.fight2.entity.engine.CardFrame;
 import com.fight2.util.ArenaUtils;
 import com.fight2.util.ResourceManager;
-import com.fight2.util.TextureFactory;
 
 public class ArenaRewardScene extends BaseScene implements IScrollDetectorListener {
     private final static float CLIP_HEIGHT = 460;
@@ -300,9 +299,8 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
                 rewardGrid.attachChild(guildContributionGrid);
             } else if (rewardItemType == ArenaRewardItemType.Card) {
                 final Card card = rewardItem.getCard();
-                final ITextureRegion cardTexture = TextureFactory.getInstance().getTextureRegion(card.getImage());
                 final float cardAdjustX = (itemIndex > 0 ? 15 : 0);
-                final Sprite cardSprite = new Sprite(itemGridInitX + (itemWidth - cardAdjustX) * itemIndex, itemGridY + 15, 110, 165, cardTexture, vbom);
+                final CardFrame cardSprite = new CardFrame(itemGridInitX + (itemWidth - cardAdjustX) * itemIndex, itemGridY + 15, 110, 165, card, activity);
                 amountText.setX(cardSprite.getWidth() + amountText.getWidth() * 0.5f + 5);
                 cardSprite.attachChild(amountText);
                 rewardGrid.attachChild(cardSprite);

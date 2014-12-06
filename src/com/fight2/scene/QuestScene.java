@@ -61,7 +61,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     private final TimerHandler timerHandler;
     private TMXTiledMap tmxTiledMap;
     private int direction = -1;
-    private QuestGoStatus goStatus;
+    private QuestGoStatus goStatus = QuestGoStatus.Stopped;
     private QuestResult questResult;
     private final List<Sprite> treasureSprites = new ArrayList<Sprite>();
     private QuestTreasureData questTreasureData = new QuestTreasureData();
@@ -134,7 +134,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                         return true;
                     }
                 }
-                if (pSceneTouchEvent.isActionUp()) {
+                if (pSceneTouchEvent.isActionUp() && goStatus == QuestGoStatus.Stopped) {
 
                     final float sceneX = pSceneTouchEvent.getX();
                     final float sceneY = pSceneTouchEvent.getY();
@@ -153,7 +153,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                         player.registerEntityModifier(new PathModifier(path.getSize() * 0.6f, path, null, new IPathModifierListener() {
                             @Override
                             public void onPathStarted(final PathModifier pPathModifier, final IEntity pEntity) {
-//                                F2MusicManager.getInstance().playMusic(MusicEnum.HORSE, true);
+                                F2MusicManager.getInstance().playMusic(MusicEnum.HORSE, true);
                             }
 
                             @Override
@@ -227,7 +227,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                                     goStatus = QuestGoStatus.Stopped;
                                 }
                                 F2MusicManager.getInstance().stopMusic();
-//                                F2MusicManager.getInstance().playMusic(MusicEnum.HORSE8);
+                                F2MusicManager.getInstance().playMusic(MusicEnum.HORSE8);
                             }
                         }));
                         return true;
