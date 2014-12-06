@@ -5,6 +5,7 @@ public enum SceneEnum {
     Main,
     Party,
     CardUpgrade,
+    CardEvolution,
     Summon,
     ArenaList,
     Arena,

@@ -26,33 +26,33 @@ import com.fight2.entity.GameUserSession;
 import com.fight2.entity.engine.CardFrame;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
+import com.fight2.entity.engine.cardpack.CardEvolutionScrollDetectorListener;
 import com.fight2.entity.engine.cardpack.CardPack;
 import com.fight2.entity.engine.cardpack.CardPackPhysicsHandler;
 import com.fight2.entity.engine.cardpack.CardPackTouchArea;
 import com.fight2.entity.engine.cardpack.CardUpdateHandler;
-import com.fight2.entity.engine.cardpack.CardUpgradeScrollDetectorListener;
 import com.fight2.entity.engine.cardpack.MoveFinishedListener;
 import com.fight2.input.touch.detector.F2ScrollDetector;
 import com.fight2.util.CardUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
 
-public class CardUpgradeScene extends BaseCardPackScene {
+public class CardEvolutionScene extends BaseCardPackScene {
     private F2ScrollDetector scrollDetector;
-    private final Sprite[] cardGrids = new Sprite[7];
+    private final Sprite[] cardGrids = new Sprite[2];
 
     private CardPackPhysicsHandler physicsHandler;
-    private final Card[] inGridCards = new Card[7];
-    private final IEntity[] inGridCardSprites = new IEntity[7];
+    private final Card[] inGridCards = new Card[2];
+    private final IEntity[] inGridCardSprites = new IEntity[2];
 
     private final Rectangle cardZoom;
     private final CardPack cardPack;
-    private final float frameY = cameraHeight - TextureEnum.UPGRADE_FRAME.getHeight() + 5;
+    private final float frameY = cameraHeight - TextureEnum.EVOLUTION_FRAME.getHeight() + 5;
     private final Font hpatkFont;
     private final Text hpText;
     private final Text atkText;
 
-    public CardUpgradeScene(final GameActivity activity) throws IOException {
+    public CardEvolutionScene(final GameActivity activity) throws IOException {
         super(activity);
         hpatkFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
         hpText = new Text(630, 295, hpatkFont, "+0123456789", vbom);
@@ -108,32 +108,29 @@ public class CardUpgradeScene extends BaseCardPackScene {
         this.attachChild(rechargeSprite);
         this.registerTouchArea(rechargeSprite);
 
-        final Sprite frameSprite = createALBImageSprite(TextureEnum.UPGRADE_FRAME, this.simulatedLeftX + 50, frameY);
+        final Sprite frameSprite = createALBImageSprite(TextureEnum.EVOLUTION_FRAME, this.simulatedLeftX + 50, frameY);
         this.attachChild(frameSprite);
         frameSprite.attachChild(hpText);
         frameSprite.attachChild(atkText);
 
-        final F2ButtonSprite upgradeButton = createUpgradeButton();
-        frameSprite.attachChild(upgradeButton);
-        this.registerTouchArea(upgradeButton);
+        final F2ButtonSprite evolutionButton = createEvolutionButton();
+        frameSprite.attachChild(evolutionButton);
+//        this.registerTouchArea(evolutionButton);
 
-        this.scrollDetector = new F2ScrollDetector(new CardUpgradeScrollDetectorListener(this, cardPack, cardZoom, inGridCards));
+        this.scrollDetector = new F2ScrollDetector(new CardEvolutionScrollDetectorListener(this, cardPack, cardZoom, inGridCards));
 
         final TextureEnum gridEnum = TextureEnum.PARTY_EDIT_FRAME_GRID;
-        final float gridWidth = gridEnum.getWidth() * 0.72f;
-        final float gridHeight = gridEnum.getHeight() * 0.72f;
-        final float gridStartX = 294;
+        final float gridWidth = 240;
+        final float gridHeight = 360;
+        final float gridStartX = 129;
         final float frameLeft = frameSprite.getX() - frameSprite.getWidth() * 0.5f;
-        float gridY = frameY + frameSprite.getHeight() + gridHeight * 0.5f - 12;
+        final float gridY = frameY + frameSprite.getHeight() * 0.5f + 5;
         final TextureFactory textureFactory = TextureFactory.getInstance();
         final ITextureRegion gridTexture = textureFactory.getAssetTextureRegion(gridEnum);
 
-        for (int gridIndex = 0; gridIndex < 7; gridIndex++) {
+        for (int gridIndex = 0; gridIndex < 2; gridIndex++) {
             final int frameIndex = gridIndex;
-            if (gridIndex % 2 == 1) {
-                gridY -= gridHeight + 5;
-            }
-            cardGrids[gridIndex] = new Sprite(frameLeft + gridStartX + gridWidth * ((gridIndex + 1) % 2), gridY, gridWidth, gridHeight, gridTexture, vbom) {
+            cardGrids[gridIndex] = new Sprite(frameLeft + gridStartX + (gridWidth - 15) * gridIndex, gridY, gridWidth, gridHeight, gridTexture, vbom) {
                 private IEntity movingCardSprite = null;
 
                 @Override
@@ -147,7 +144,7 @@ public class CardUpgradeScene extends BaseCardPackScene {
                             movingCardSprite = inGridCardSprites[frameIndex];
                             if (movingCardSprite != null) {
                                 movingCardSprite.setZIndex(100);
-                                CardUpgradeScene.this.sortChildren();
+                                CardEvolutionScene.this.sortChildren();
                             }
                             break;
                         case MotionEvent.ACTION_MOVE:
@@ -173,7 +170,6 @@ public class CardUpgradeScene extends BaseCardPackScene {
                                     public void run() {
                                         inGridCardSprites[frameIndex].detachSelf();
                                         inGridCardSprites[frameIndex] = null;
-
                                     }
 
                                 });
@@ -182,7 +178,7 @@ public class CardUpgradeScene extends BaseCardPackScene {
                                 movingCardSprite.setPosition(this);
                             }
                             movingCardSprite.setZIndex(IEntity.ZINDEX_DEFAULT);
-                            CardUpgradeScene.this.sortChildren();
+                            CardEvolutionScene.this.sortChildren();
                             movingCardSprite = null;
                             break;
 
@@ -192,14 +188,9 @@ public class CardUpgradeScene extends BaseCardPackScene {
             };
             this.attachChild(cardGrids[gridIndex]);
             this.registerTouchArea(cardGrids[gridIndex]);
+            cardGrids[gridIndex].setAlpha(0);
             cardGrids[gridIndex].setZIndex(10);
         }
-
-        final Sprite mainCardGrid = cardGrids[0];
-        mainCardGrid.setWidth(240);
-        mainCardGrid.setHeight(360);
-        mainCardGrid.setPosition(frameLeft + 125, frameY + frameSprite.getHeight() * 0.5f + 5);
-        mainCardGrid.setAlpha(0);
 
         final MoveFinishedListener moveFinishedListener = new MoveFinishedListener(cardPack, cardZoom, activity);
         physicsHandler = new CardPackPhysicsHandler(cardPack, cardZoom, moveFinishedListener);
@@ -236,9 +227,9 @@ public class CardUpgradeScene extends BaseCardPackScene {
         revert(true);
     }
 
-    private F2ButtonSprite createUpgradeButton() {
-        final F2ButtonSprite upgradeButton = createALBF2ButtonSprite(TextureEnum.UPGRADE_FRAME_BUTTON, TextureEnum.UPGRADE_FRAME_BUTTON, 467, 40);
-        upgradeButton.setOnClickListener(new F2OnClickListener() {
+    private F2ButtonSprite createEvolutionButton() {
+        final F2ButtonSprite evolutionButton = createALBF2ButtonSprite(TextureEnum.EVOLUTION_FRAME_BUTTON, TextureEnum.EVOLUTION_FRAME_BUTTON, 467, 40);
+        evolutionButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 final Card mainCard = inGridCards[0];
@@ -281,7 +272,7 @@ public class CardUpgradeScene extends BaseCardPackScene {
 
             }
         });
-        return upgradeButton;
+        return evolutionButton;
     }
 
     private F2ButtonSprite createBackButton() {
@@ -302,7 +293,7 @@ public class CardUpgradeScene extends BaseCardPackScene {
         enhanceButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                ResourceManager.getInstance().setCurrentScene(SceneEnum.CardEvolution);
+                ResourceManager.getInstance().setCurrentScene(SceneEnum.CardUpgrade);
             }
         });
         return enhanceButton;

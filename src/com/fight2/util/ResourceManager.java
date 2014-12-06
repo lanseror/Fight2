@@ -23,6 +23,7 @@ import com.fight2.entity.engine.ProgressBar;
 import com.fight2.scene.ArenaListScene;
 import com.fight2.scene.ArenaScene;
 import com.fight2.scene.BaseScene;
+import com.fight2.scene.CardEvolutionScene;
 import com.fight2.scene.CardUpgradeScene;
 import com.fight2.scene.ChatScene;
 import com.fight2.scene.GuildScene;
@@ -212,6 +213,8 @@ public class ResourceManager {
             scenes.put(SceneEnum.Party, partyScene);
             final BaseScene cardUpgradeScene = new CardUpgradeScene(activity);
             scenes.put(SceneEnum.CardUpgrade, cardUpgradeScene);
+            final BaseScene cardEvolutionScene = new CardEvolutionScene(activity);
+            scenes.put(SceneEnum.CardEvolution, cardEvolutionScene);
             final BaseScene summonScene = new SummonScene(activity);
             scenes.put(SceneEnum.Summon, summonScene);
             final BaseScene arenaListScene = new ArenaListScene(activity);

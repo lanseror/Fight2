@@ -40,7 +40,7 @@ public class BattlePartyFrame extends Rectangle {
     private int atk;
     private int defence;
     private final Party party;
-    private final Sprite[] cardSprites = new Sprite[4];
+    private final IEntity[] cardSprites = new IEntity[4];
     private final boolean isBottom;
     private final GameActivity activity;
 
@@ -80,8 +80,7 @@ public class BattlePartyFrame extends Rectangle {
                 continue;
             }
 
-            final ITextureRegion texture = textureFactory.getTextureRegion(card.getImage());
-            final Sprite cardSprite = new Sprite(startX + 65 * i, 80, CARD_WIDTH, CARD_HEIGHT, texture, vbom);
+            final CardFrame cardSprite = new CardFrame(startX + 65 * i, 80, CARD_WIDTH, CARD_HEIGHT, card, activity);
             cardSprites[i] = cardSprite;
             final ITextureRegion textureFcs = textureFactory.getAssetTextureRegion(TextureEnum.BATTLE_CARD_SKILL_FCS);
             final Sprite cardSpriteFcs = new Sprite(CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f, textureFcs, vbom);
@@ -142,7 +141,7 @@ public class BattlePartyFrame extends Rectangle {
     }
 
     public void useSkill(final int cardIndex, final OnFinishedCallback onFirstStepFinishedCallback, final OnFinishedCallback onFinishedCallback) {
-        final Sprite cardSprite = cardSprites[cardIndex];
+        final IEntity cardSprite = cardSprites[cardIndex];
         final float x = cardSprite.getX();
         final float fromY = cardSprite.getY();
         final float toY = (isBottom ? fromY + 40 : fromY - 30);
