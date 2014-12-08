@@ -8,9 +8,11 @@ import org.andengine.input.touch.detector.ScrollDetector;
 import org.andengine.util.modifier.IModifier;
 
 import com.fight2.entity.Card;
+import com.fight2.entity.GameUserSession;
 import com.fight2.entity.engine.CardFrame;
 import com.fight2.input.touch.detector.F2ScrollDetector;
 import com.fight2.scene.CardEvolutionScene;
+import com.fight2.scene.BaseCardPackScene.GridChangeAction;
 import com.fight2.util.SpriteUtils;
 
 public class CardEvolutionScrollDetectorListener extends CardPackScrollDetectorListener {
@@ -63,9 +65,9 @@ public class CardEvolutionScrollDetectorListener extends CardPackScrollDetectorL
                         addCardAvatar.setPosition(cardGrid);
                         addCardAvatar.setUserData(copyCard.getUserData());
                         this.cardPackScene.getInGridCardSprites()[cardGridIndex] = addCardAvatar;
-                        cardPackScene.onGridCardsChange();
+                        cardPackScene.onGridCardsChange(cardGridIndex, GridChangeAction.Add);
 
-                        final IEntityModifierListener modifierListener = new UpgradeAddCardModifierListener(focusedCardSprite, focusedCard, addCardAvatar);
+                        final IEntityModifierListener modifierListener = new EvoAddCardModifierListener(focusedCardSprite, focusedCard, addCardAvatar);
                         final MoveModifier modifier = new MoveModifier(0.1f, copyCard.getX(), copyCard.getY(), cardGrid.getX(), cardGrid.getY(),
                                 modifierListener);
                         cardPackScene.getActivity().runOnUpdateThread(new Runnable() {
@@ -95,15 +97,70 @@ public class CardEvolutionScrollDetectorListener extends CardPackScrollDetectorL
         }
     }
 
-    protected class UpgradeAddCardModifierListener extends AddCardModifierListener {
+    protected class EvoAddCardModifierListener extends AddCardModifierListener {
 
-        protected UpgradeAddCardModifierListener(final CardFrame focusedCardSprite, final Card card, final IEntity avatar) {
+        protected EvoAddCardModifierListener(final CardFrame focusedCardSprite, final Card card, final IEntity avatar) {
             super(focusedCardSprite, card, avatar);
         }
 
         @Override
         public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
-            super.onModifierFinished(pModifier, pItem);
+
+            focusedCardSprite.setAlpha(0);
+            final int focusedCardIndex = focusedCardSprite.getTag();
+            final boolean isFocusedCardRightMost = (focusedCardIndex == cardPack.getChildCount() - 1);
+
+            if (isFocusedCardRightMost) {
+                for (int cardPackIndex = focusedCardIndex - 1; cardPackIndex >= 0; cardPackIndex--) {
+                    final IEntity previousCard = cardPack.getChildByIndex(cardPackIndex + 1);
+                    final IEntity currentCard = cardPack.getChildByIndex(cardPackIndex);
+                    if (cardPackIndex == focusedCardIndex - 1) {
+                        cardZoom.setUserData(currentCard);
+                    }
+                    final float duration = (cardPackIndex == focusedCardIndex - 1 ? 0.1f : 0.2f);
+                    final MoveModifier cardEditModifier = new MoveModifier(duration, currentCard.getX(), currentCard.getY(), previousCard.getX(),
+                            previousCard.getY());
+                    activity.runOnUpdateThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            currentCard.clearEntityModifiers();
+                            currentCard.registerEntityModifier(cardEditModifier);
+                        }
+                    });
+                }
+            } else {
+                for (int cardPackIndex = focusedCardIndex + 1; cardPackIndex < cardPack.getChildCount(); cardPackIndex++) {
+                    final IEntity previousCard = cardPack.getChildByIndex(cardPackIndex - 1);
+                    final IEntity currentCard = cardPack.getChildByIndex(cardPackIndex);
+                    currentCard.setTag(cardPackIndex - 1);
+                    if (cardPackIndex == focusedCardIndex + 1) {
+                        cardZoom.setUserData(currentCard);
+                    }
+                    final float duration = (cardPackIndex == focusedCardIndex + 1 ? 0.1f : 0.2f);
+                    final MoveModifier cardEditModifier = new MoveModifier(duration, currentCard.getX(), currentCard.getY(), previousCard.getX(),
+                            previousCard.getY());
+                    activity.runOnUpdateThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            currentCard.clearEntityModifiers();
+                            currentCard.registerEntityModifier(cardEditModifier);
+                        }
+                    });
+                }
+            }
+            activity.runOnUpdateThread(new Runnable() {
+                @Override
+                public void run() {
+                    focusedCardSprite.detachSelf();
+                    cardPack.removedCard(card, focusedCardSprite);
+                    GameUserSession.getInstance().getCards().remove(card);
+                    cardPackScene.attachChild(avatar);
+                    pItem.detachSelf();
+                    cardPackScene.sortChildren();
+                }
+            });
+
+            scrollable = true;
         }
     }
 }

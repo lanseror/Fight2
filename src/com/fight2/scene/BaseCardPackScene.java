@@ -33,10 +33,15 @@ public abstract class BaseCardPackScene extends BaseScene {
         return cardSprite;
     }
 
-    public abstract void onGridCardsChange();
+    public abstract void onGridCardsChange(int changeIndex, GridChangeAction changeAction);
 
     public abstract IEntity[] getCardGrids();
 
     public abstract IEntity[] getInGridCardSprites();
+
+    public enum GridChangeAction {
+        Add,
+        Remove;
+    }
 
 }

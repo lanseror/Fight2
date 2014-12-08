@@ -1,9 +1,12 @@
 package com.fight2.scene;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.andengine.entity.IEntity;
+import org.andengine.entity.IEntityMatcher;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
@@ -22,7 +25,6 @@ import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
-import com.fight2.entity.GameUserSession;
 import com.fight2.entity.engine.CardFrame;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
@@ -45,12 +47,15 @@ public class CardEvolutionScene extends BaseCardPackScene {
     private final Card[] inGridCards = new Card[2];
     private final IEntity[] inGridCardSprites = new IEntity[2];
 
+    private final List<Card> cardPackCards = new ArrayList<Card>(CardUtils.getEvocards());
+
     private final Rectangle cardZoom;
     private final CardPack cardPack;
     private final float frameY = cameraHeight - TextureEnum.EVOLUTION_FRAME.getHeight() + 5;
     private final Font hpatkFont;
     private final Text hpText;
     private final Text atkText;
+    private final List<CardUpdateHandler> cardUpdateHandlers = new ArrayList<CardUpdateHandler>();
 
     public CardEvolutionScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -63,7 +68,7 @@ public class CardEvolutionScene extends BaseCardPackScene {
         atkText.setText("");
 
         cardZoom = new Rectangle(250 + CARD_WIDTH * 0.7f, 145, CARD_WIDTH * 1.4f, CARD_HEIGHT * 1.4f, vbom);
-        cardPack = new CardPack(300, 145, 21000, CARD_HEIGHT, vbom, cardZoom);
+        cardPack = new CardPack(300, 145, 21000, CARD_HEIGHT, activity, cardZoom);
         cardPack.setColor(Color.TRANSPARENT);
         cardZoom.setColor(Color.TRANSPARENT);
         init();
@@ -73,19 +78,26 @@ public class CardEvolutionScene extends BaseCardPackScene {
     public void updateScene() {
         activity.getGameHub().needSmallChatRoom(false);
         // Insert cards to card pack.
+        updateCardPack();
+    }
+
+    public void updateCardPack() {
+        // Insert cards to card pack.
         cardPack.detachChildren();
+        for (final CardUpdateHandler cardUpdateHandler : cardUpdateHandlers) {
+            this.unregisterUpdateHandler(cardUpdateHandler);
+        }
+        cardUpdateHandlers.clear();
         final float initCardX = cardZoom.getX() - (cardPack.getX() - 0.5f * cardPack.getWidth());
-        final GameUserSession session = GameUserSession.getInstance();
-        final List<Card> sessionCards = session.getCards();
         float appendX = initCardX;
-        for (int i = 0; i < sessionCards.size(); i++) {
-            final Card sessionCard = sessionCards.get(i);
-            final IEntity card = new CardFrame(appendX, CARD_Y, CARD_WIDTH, CARD_HEIGHT, sessionCard, activity);
+        for (int i = 0; i < cardPackCards.size(); i++) {
+            final Card cardPackCard = cardPackCards.get(i);
+            final IEntity card = new CardFrame(appendX, CARD_Y, CARD_WIDTH, CARD_HEIGHT, cardPackCard, activity);
             card.setTag(i);
             card.setWidth(CARD_WIDTH);
             card.setHeight(CARD_HEIGHT);
             card.setPosition(appendX, CARD_Y);
-            card.setUserData(sessionCard);
+            card.setUserData(cardPackCard);
             cardPack.attachChild(card);
             if (i == 0) {
                 appendX += 1.5 * (CARD_GAP + CARD_WIDTH);
@@ -93,7 +105,9 @@ public class CardEvolutionScene extends BaseCardPackScene {
             } else {
                 appendX += CARD_GAP + CARD_WIDTH;
             }
-            this.registerUpdateHandler(new CardUpdateHandler(cardZoom, card));
+            final CardUpdateHandler cardUpdateHandler = new CardUpdateHandler(cardZoom, card);
+            cardUpdateHandlers.add(cardUpdateHandler);
+            this.registerUpdateHandler(cardUpdateHandler);
         }
     }
 
@@ -115,7 +129,7 @@ public class CardEvolutionScene extends BaseCardPackScene {
 
         final F2ButtonSprite evolutionButton = createEvolutionButton();
         frameSprite.attachChild(evolutionButton);
-//        this.registerTouchArea(evolutionButton);
+        // this.registerTouchArea(evolutionButton);
 
         this.scrollDetector = new F2ScrollDetector(new CardEvolutionScrollDetectorListener(this, cardPack, cardZoom, inGridCards));
 
@@ -160,10 +174,7 @@ public class CardEvolutionScene extends BaseCardPackScene {
                             if (touchY < this.getY() - 50) {
                                 cardPack.revertCardToCardPack(movingCardSprite);
                                 inGridCards[frameIndex] = null;
-                                onGridCardsChange();
-                                if (frameIndex == 0) {
-                                    revert(false);
-                                }
+                                onGridCardsChange(frameIndex, GridChangeAction.Remove);
                                 activity.runOnUpdateThread(new Runnable() {
 
                                     @Override
@@ -224,7 +235,7 @@ public class CardEvolutionScene extends BaseCardPackScene {
 
     @Override
     public void leaveScene() {
-        revert(true);
+        revert();
     }
 
     private F2ButtonSprite createEvolutionButton() {
@@ -300,44 +311,52 @@ public class CardEvolutionScene extends BaseCardPackScene {
     }
 
     @Override
-    public void onGridCardsChange() {
-        final Card mainCard = inGridCards[0];
-        if (mainCard == null) {
-            return;
-        }
-        final Card manCardCopy = new Card(mainCard);
-
-        for (int i = 1; i < inGridCards.length; i++) {
-            final Card supportCard = inGridCards[i];
-            if (supportCard == null) {
-                continue;
+    public void onGridCardsChange(final int changeIndex, final GridChangeAction changeAction) {
+        final List<Card> evoCards = new ArrayList<Card>(2);
+        for (int i = 0; i < inGridCards.length; i++) {
+            final Card evoCard = inGridCards[i];
+            if (evoCard != null) {
+                evoCards.add(evoCard);
             }
-            final int baseExp = CardUtils.getBaseExp(supportCard);
-            final int exp = supportCard.getExp() / 2;
-            final int addExp = baseExp + exp;
-            manCardCopy.setExp(manCardCopy.getExp() + addExp);
         }
 
-        CardUtils.mockUpgrade(manCardCopy);
-        final int addHp = manCardCopy.getHp() - mainCard.getHp();
-        final int addAtk = manCardCopy.getAtk() - mainCard.getAtk();
+        if (changeAction == GridChangeAction.Add && evoCards.size() == 1) {
+            cardPackCards.clear();
+            final Card addedCard = evoCards.get(0);
+            cardPackCards.add(addedCard);
+            final Set<Card> userCards = CardUtils.getUsercardsByTemplateId(addedCard.getTemplateId());
+            for (final Card userCard : userCards) {
+                if (userCard != addedCard) {
+                    cardPackCards.add(userCard);
+                }
+            }
+            cardPack.filterCards(new IEntityMatcher() {
 
-        final CardFrame mainCardSprite = (CardFrame) inGridCardSprites[0];
-        if (manCardCopy.getLevel() == mainCard.getLevel()) {
-            this.hpText.setText("");
-            this.atkText.setText("");
-            mainCardSprite.revertCardAttributes();
-        } else {
-            this.hpText.setText("+" + addHp);
-            this.atkText.setText("+" + addAtk);
-            mainCardSprite.updateCardAttributes(manCardCopy);
+                @Override
+                public boolean matches(final IEntity pEntity) {
+                    final CardFrame cardSprite = (CardFrame) pEntity;
+                    final Card card = cardSprite.getCard();
+                    if (card.getTemplateId() == addedCard.getTemplateId()) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            });
+
+        } else if (changeAction == GridChangeAction.Remove && evoCards.size() == 0) {
+            cardPackCards.clear();
+            final List<Card> userEvoCards = CardUtils.getEvocards();
+            for (final Card userEvoCard : userEvoCards) {
+                cardPackCards.add(userEvoCard);
+            }
+            this.updateCardPack();
         }
 
     }
 
-    private void revert(final boolean includedMainCard) {
-        final int startIndex = includedMainCard ? 0 : 1;
-        for (int i = startIndex; i < inGridCardSprites.length; i++) {
+    private void revert() {
+        for (int i = 0; i < inGridCardSprites.length; i++) {
             final int gridIndex = i;
             final IEntity cardSprite = inGridCardSprites[gridIndex];
             if (cardSprite == null) {

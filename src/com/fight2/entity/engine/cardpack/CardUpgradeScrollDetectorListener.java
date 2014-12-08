@@ -11,6 +11,7 @@ import com.fight2.entity.Card;
 import com.fight2.entity.engine.CardFrame;
 import com.fight2.input.touch.detector.F2ScrollDetector;
 import com.fight2.scene.CardUpgradeScene;
+import com.fight2.scene.BaseCardPackScene.GridChangeAction;
 import com.fight2.util.SpriteUtils;
 
 public class CardUpgradeScrollDetectorListener extends CardPackScrollDetectorListener {
@@ -64,7 +65,7 @@ public class CardUpgradeScrollDetectorListener extends CardPackScrollDetectorLis
                         addCardAvatar.setPosition(cardGrid);
                         addCardAvatar.setUserData(copyCard.getUserData());
                         this.cardPackScene.getInGridCardSprites()[cardGridIndex] = addCardAvatar;
-                        cardPackScene.onGridCardsChange();
+                        cardPackScene.onGridCardsChange(cardGridIndex, GridChangeAction.Add);
 
                         final IEntityModifierListener modifierListener = new UpgradeAddCardModifierListener(focusedCardSprite, focusedCard, addCardAvatar);
                         final MoveModifier modifier = new MoveModifier(0.1f, copyCard.getX(), copyCard.getY(), cardGrid.getX(), cardGrid.getY(),

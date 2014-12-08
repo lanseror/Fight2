@@ -72,7 +72,7 @@ public class PartyEditScene extends BaseCardPackScene {
         this.hpatkFont = ResourceManager.getInstance().getFont(FontEnum.Main, 20);
 
         cardZoom = new Rectangle(250 + CARD_WIDTH * 0.7f, 145, CARD_WIDTH * 1.4f, CARD_HEIGHT * 1.4f, vbom);
-        cardPack = new CardPack(300, 145, 21000, CARD_HEIGHT, vbom, cardZoom);
+        cardPack = new CardPack(300, 145, 21000, CARD_HEIGHT, activity, cardZoom);
         partyInfoHpText = new Text(this.simulatedLeftX + 360, topbarY + 48, hpatkFont, "0123456789", vbom);
         partyInfoAtkText = new Text(this.simulatedLeftX + 600, topbarY + 48, hpatkFont, "0123456789", vbom);
         partyHpText = new Text(this.simulatedLeftX + 165, frameY + 63, hpatkFont, "0123456789", vbom);
@@ -328,7 +328,7 @@ public class PartyEditScene extends BaseCardPackScene {
     }
 
     @Override
-    public void onGridCardsChange() {
+    public void onGridCardsChange(final int changeIndex, final GridChangeAction changeAction) {
         calculatePartyHpAtk();
         updatePartyHpAtk();
     }

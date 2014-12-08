@@ -33,6 +33,7 @@ import com.fight2.entity.engine.cardpack.CardUpdateHandler;
 import com.fight2.entity.engine.cardpack.CardUpgradeScrollDetectorListener;
 import com.fight2.entity.engine.cardpack.MoveFinishedListener;
 import com.fight2.input.touch.detector.F2ScrollDetector;
+import com.fight2.scene.BaseCardPackScene.GridChangeAction;
 import com.fight2.util.CardUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
@@ -63,7 +64,7 @@ public class CardUpgradeScene extends BaseCardPackScene {
         atkText.setText("");
 
         cardZoom = new Rectangle(250 + CARD_WIDTH * 0.7f, 145, CARD_WIDTH * 1.4f, CARD_HEIGHT * 1.4f, vbom);
-        cardPack = new CardPack(300, 145, 21000, CARD_HEIGHT, vbom, cardZoom);
+        cardPack = new CardPack(300, 145, 21000, CARD_HEIGHT, activity, cardZoom);
         cardPack.setColor(Color.TRANSPARENT);
         cardZoom.setColor(Color.TRANSPARENT);
         init();
@@ -163,7 +164,7 @@ public class CardUpgradeScene extends BaseCardPackScene {
                             if (touchY < this.getY() - 50) {
                                 cardPack.revertCardToCardPack(movingCardSprite);
                                 inGridCards[frameIndex] = null;
-                                onGridCardsChange();
+                                onGridCardsChange(frameIndex, GridChangeAction.Remove);
                                 if (frameIndex == 0) {
                                     revert(false);
                                 }
@@ -223,9 +224,9 @@ public class CardUpgradeScene extends BaseCardPackScene {
         this.attachChild(backButton);
         this.registerTouchArea(backButton);
 
-        final F2ButtonSprite enhanceButton = createEnhanceButton();
-        this.attachChild(enhanceButton);
-        this.registerTouchArea(enhanceButton);
+        final F2ButtonSprite evolutionButton = createEvolutionButton();
+        this.attachChild(evolutionButton);
+        this.registerTouchArea(evolutionButton);
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
@@ -296,20 +297,20 @@ public class CardUpgradeScene extends BaseCardPackScene {
         return backButton;
     }
 
-    private F2ButtonSprite createEnhanceButton() {
-        final F2ButtonSprite enhanceButton = createALBF2ButtonSprite(TextureEnum.PARTY_ENHANCE_BUTTON, TextureEnum.PARTY_ENHANCE_BUTTON_PRESSED,
+    private F2ButtonSprite createEvolutionButton() {
+        final F2ButtonSprite evolutionButton = createALBF2ButtonSprite(TextureEnum.UPGRADE_EVO_BUTTON, TextureEnum.UPGRADE_EVO_BUTTON_PRESSED,
                 this.simulatedRightX - 135, 220);
-        enhanceButton.setOnClickListener(new F2OnClickListener() {
+        evolutionButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 ResourceManager.getInstance().setCurrentScene(SceneEnum.CardEvolution);
             }
         });
-        return enhanceButton;
+        return evolutionButton;
     }
 
     @Override
-    public void onGridCardsChange() {
+    public void onGridCardsChange(final int changeIndex, final GridChangeAction changeAction) {
         final Card mainCard = inGridCards[0];
         if (mainCard == null) {
             return;

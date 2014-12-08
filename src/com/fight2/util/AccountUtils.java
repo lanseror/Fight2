@@ -114,7 +114,9 @@ public class AccountUtils {
                 card.setTemplateId(cardTemplateJson.getInt("id"));
                 card.setRace(Race.valueOf(cardJson.getString("race")));
                 cards.add(card);
+                CardUtils.addUserCard(card);
             }
+            CardUtils.refreshEvoCards();
             TextureFactory.getInstance().loadCardsResource(activity);
 
             final JSONObject partyInfoJson = HttpUtils.getJSONFromUrl(partyUrl);

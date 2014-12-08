@@ -232,6 +232,10 @@ public class CardFrame extends Rectangle {
 
     }
 
+    public Card getCard() {
+        return card;
+    }
+
     public void updateCardAttributes(final Card card) {
         hpText.setText(String.valueOf(card.getHp()));
         hpText.setColor(0XFF5AD61E);

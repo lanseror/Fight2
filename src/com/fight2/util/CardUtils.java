@@ -1,21 +1,61 @@
 package com.fight2.util;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.SparseArray;
+
 import com.fight2.GameActivity;
 import com.fight2.entity.Card;
+import com.fight2.entity.Card.Race;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
-import com.fight2.entity.Card.Race;
 
 public class CardUtils {
+    private final static SparseArray<Set<Card>> userCards = new SparseArray<Set<Card>>();
+    private final static List<Card> evoCards = new ArrayList<Card>();
+
+    public static void addUserCard(final Card card) {
+        final int templateId = card.getTemplateId();
+        if (userCards.indexOfKey(templateId) < 0) {
+            final Set<Card> cardSet = new LinkedHashSet<Card>();
+            userCards.put(templateId, cardSet);
+        }
+        final Set<Card> cardSet = userCards.get(templateId);
+        cardSet.add(card);
+    }
+
+    public static void refreshEvoCards() {
+        for (int i = 0; i < userCards.size(); i++) {
+            final Set<Card> cardSet = userCards.valueAt(i);
+            if (cardSet.size() > 1) {
+                for (final Card card : cardSet) {
+                    evoCards.add(card);
+                }
+            }
+        }
+    }
+
+    public static SparseArray<Set<Card>> getUsercards() {
+        return userCards;
+    }
+
+    public static Set<Card> getUsercardsByTemplateId(final int templateId) {
+        return userCards.get(templateId);
+    }
+
+    public static List<Card> getEvocards() {
+        return evoCards;
+    }
 
     public static boolean saveParties() {
         final String url = HttpUtils.HOST_URL + "/party/edit";

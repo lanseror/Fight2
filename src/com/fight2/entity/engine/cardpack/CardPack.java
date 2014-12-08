@@ -1,13 +1,17 @@
 package com.fight2.entity.engine.cardpack;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.andengine.entity.IEntity;
 import org.andengine.entity.IEntityComparator;
+import org.andengine.entity.IEntityMatcher;
+import org.andengine.entity.modifier.MoveModifier;
 import org.andengine.entity.primitive.Rectangle;
-import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
+import com.fight2.GameActivity;
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.engine.CardFrame;
@@ -16,15 +20,51 @@ import com.fight2.scene.BaseCardPackScene;
 public class CardPack extends Rectangle {
     private final Map<Card, CardFrame> removedCards = new HashMap<Card, CardFrame>();
     private final IEntity cardZoom;
+    private final GameActivity activity;
+    private final List<CardFrame> unmatchFilterCards = new ArrayList<CardFrame>();
 
-    public CardPack(final float pX, final float pY, final float pWidth, final float pHeight, final VertexBufferObjectManager pVertexBufferObjectManager,
-            final IEntity cardZoom) {
-        super(pX, pY, pWidth, pHeight, pVertexBufferObjectManager);
+    public CardPack(final float pX, final float pY, final float pWidth, final float pHeight, final GameActivity activity, final IEntity cardZoom) {
+        super(pX, pY, pWidth, pHeight, activity.getVertexBufferObjectManager());
+        this.activity = activity;
         this.cardZoom = cardZoom;
     }
 
     public void removedCard(final Card card, final CardFrame removedCardSprite) {
         removedCards.put(card, removedCardSprite);
+    }
+
+    public void filterCards(final IEntityMatcher entityMatcher) {
+        for (int i = 0; i < this.getChildCount(); i++) {
+            final CardFrame cardSprite = (CardFrame) this.getChildByIndex(i);
+            if (!entityMatcher.matches(cardSprite)) {
+                this.unmatchFilterCards.add(cardSprite);
+            }
+        }
+        final CardFrame focusedCardSprite = (CardFrame) cardZoom.getUserData();
+        final int focusedCardIndex = focusedCardSprite.getTag();
+        activity.runOnUpdateThread(new Runnable() {
+
+            @Override
+            public void run() {
+                for (final CardFrame cardSprite : unmatchFilterCards) {
+                    final int cardIndex = cardSprite.getTag();
+                    if (cardIndex < focusedCardIndex) {
+                        for (int cardPackIndex = cardIndex - 1; cardPackIndex >= 0; cardPackIndex--) {
+                            final IEntity previousCard = getChildByIndex(cardPackIndex + 1);
+                            final IEntity currentCard = getChildByIndex(cardPackIndex);
+                            currentCard.setPosition(previousCard);
+                        }
+                    }
+                    cardSprite.detachSelf();
+                }
+                for (int i = 0; i < getChildCount(); i++) {
+                    final CardFrame cardSprite = (CardFrame) getChildByIndex(i);
+                    cardSprite.setTag(i);
+                }
+            }
+
+        });
+
     }
 
     public void revertCardToCardPack(final IEntity inCardFrameSprite) {
