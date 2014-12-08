@@ -22,6 +22,7 @@ import android.content.Context;
 import com.fight2.GameActivity;
 import com.fight2.entity.Card;
 import com.fight2.entity.Card.Race;
+import com.fight2.entity.CardTemplate;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
@@ -82,13 +83,26 @@ public class AccountUtils {
         try {
             final JSONObject loginJson = HttpUtils.getJSONFromUrl(loginUrl);
             final GameUserSession session = GameUserSession.getInstance();
-            session.setId(loginJson.getInt("id"));
-            session.setName(loginJson.getString("name"));
+            final JSONObject userJson = loginJson.getJSONObject("user");
+            session.setId(userJson.getInt("id"));
+            session.setName(userJson.getString("name"));
+
+            final JSONArray cardTemplateJSONArray = loginJson.getJSONArray("cardTemplates");
+            for (int i = 0; i < cardTemplateJSONArray.length(); i++) {
+                final JSONObject cardTemplateJson = cardTemplateJSONArray.getJSONObject(i);
+                final CardTemplate cardTemplate = new CardTemplate();
+                cardTemplate.setId(cardTemplateJson.getInt("id"));
+                cardTemplate.setAtk(cardTemplateJson.getInt("atk"));
+                cardTemplate.setHp(cardTemplateJson.getInt("hp"));
+                CardUtils.addCardTemplate(cardTemplate);
+            }
+
             final Set<Integer> inPartyCards = session.getInPartyCards();
 
             // Get cards.
             final List<Card> cards = session.getCards();
             cards.clear();
+            CardUtils.clearUserCard();
 
             final JSONArray cardJsonArray = HttpUtils.getJSONArrayFromUrl(cardUrl);
             for (int cardIndex = 0; cardIndex < cardJsonArray.length(); cardIndex++) {

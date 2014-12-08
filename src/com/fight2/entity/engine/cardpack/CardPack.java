@@ -8,7 +8,6 @@ import java.util.Map;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.IEntityComparator;
 import org.andengine.entity.IEntityMatcher;
-import org.andengine.entity.modifier.MoveModifier;
 import org.andengine.entity.primitive.Rectangle;
 
 import com.fight2.GameActivity;
@@ -55,6 +54,8 @@ public class CardPack extends Rectangle {
                             currentCard.setPosition(previousCard);
                         }
                     }
+                }
+                for (final CardFrame cardSprite : unmatchFilterCards) {
                     cardSprite.detachSelf();
                 }
                 for (int i = 0; i < getChildCount(); i++) {

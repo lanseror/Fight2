@@ -1,6 +1,8 @@
 package com.fight2.util;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -16,13 +18,23 @@ import android.util.SparseArray;
 import com.fight2.GameActivity;
 import com.fight2.entity.Card;
 import com.fight2.entity.Card.Race;
+import com.fight2.entity.CardTemplate;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
 
 public class CardUtils {
+    private final static SparseArray<CardTemplate> cardTemplates = new SparseArray<CardTemplate>();
     private final static SparseArray<Set<Card>> userCards = new SparseArray<Set<Card>>();
     private final static List<Card> evoCards = new ArrayList<Card>();
+
+    public static void addCardTemplate(final CardTemplate cardTemplate) {
+        cardTemplates.put(cardTemplate.getId(), cardTemplate);
+    }
+
+    public static void clearUserCard() {
+        userCards.clear();
+    }
 
     public static void addUserCard(final Card card) {
         final int templateId = card.getTemplateId();
@@ -35,6 +47,7 @@ public class CardUtils {
     }
 
     public static void refreshEvoCards() {
+        evoCards.clear();
         for (int i = 0; i < userCards.size(); i++) {
             final Set<Card> cardSet = userCards.valueAt(i);
             if (cardSet.size() > 1) {
@@ -201,10 +214,14 @@ public class CardUtils {
         }
     }
 
+    public static int getMaxLevel(final Card card) {
+        return card.getStar() * 10 + (card.getTier() - 1) * 10;
+    }
+
     public static void mockUpgrade(final Card card) {
         final int exp = card.getExp();
         final int currentLevel = card.getLevel();
-        final int maxLevel = card.getStar() * 10 + (card.getTier() - 1) * 10;
+        final int maxLevel = getMaxLevel(card);
 
         int level = 1;
         int levelExp = 0;
@@ -231,6 +248,37 @@ public class CardUtils {
             card.setAtk(upgradeAtk);
         }
 
+    }
+
+    public static int getEvoPercent(final Card card) {
+        final int cardMaxLevel = getMaxLevel(card);
+        final int cardPercent = card.getLevel() == cardMaxLevel ? 10 : 5;
+        return cardPercent;
+    }
+
+    public static Card mockEvolution(final Card card1, final Card card2) {
+        final int templateId = card1.getTemplateId();
+        final CardTemplate cardTemplate = cardTemplates.get(templateId);
+        final Card higherTierCard = card1.getTier() > card2.getTier() ? card1 : card2;
+        final int baseHp = (int) (cardTemplate.getHp() * Math.pow(1.2, higherTierCard.getTier()));
+        final int card1MaxLevel = getMaxLevel(card1);
+        final double card1Rate = card1.getLevel() == card1MaxLevel ? 0.1 : 0.05;
+        final int card1AddHp = (int) (card1.getHp() * card1Rate);
+        final int card2MaxLevel = getMaxLevel(card2);
+        final double card2Rate = card2.getLevel() == card2MaxLevel ? 0.1 : 0.05;
+        final int card2AddHp = (int) (card2.getHp() * card2Rate);
+
+        final int evoHp = baseHp + card1AddHp + card2AddHp;
+
+        final BigDecimal templateAtk = BigDecimal.valueOf(cardTemplate.getAtk());
+        final BigDecimal templateHp = BigDecimal.valueOf(cardTemplate.getHp());
+        final BigDecimal evoHpDecimal = BigDecimal.valueOf(evoHp);
+        final int evoAtk = templateAtk.divide(templateHp, 6, RoundingMode.HALF_UP).multiply(evoHpDecimal).intValue();
+
+        final Card evoCard = new Card();
+        evoCard.setHp(evoHp);
+        evoCard.setAtk(evoAtk);
+        return evoCard;
     }
 
     public static boolean upgrade(final JSONArray cardIdsJson, final Card card) {

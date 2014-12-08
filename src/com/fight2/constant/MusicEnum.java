@@ -10,7 +10,8 @@ public enum MusicEnum {
     BATTLE_LOSE("LoseCastle.mp3"),
     DOOR("door.mp3"),
     HORSE("HORSE01.ogg"),
-    HORSE8("HORSE08.ogg");
+    HORSE8("HORSE08.ogg"),
+    LOADING("loading.ogg");
 
     private final String url;
 

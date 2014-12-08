@@ -125,6 +125,7 @@ public enum TextureEnum {
     // Card evolution scene images.
     EVOLUTION_FRAME("images/evolution_frame.png", 746, 368),
     EVOLUTION_FRAME_BUTTON("images/evolution_frame_button.png", 268, 69),
+    EVOLUTION_ICON("images/evolution_icon.png", 92, 45),
 
     // Summon scene images.
     SUMMON_BG("images/summon_backgroud.jpg", 1136, 640),

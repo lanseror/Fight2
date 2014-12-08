@@ -12,6 +12,7 @@ import com.fight2.GameActivity;
 import com.fight2.constant.MusicEnum;
 
 public class F2MusicManager {
+    private final boolean disable = false;
     private static F2MusicManager INSTANCE = new F2MusicManager();
     private final Map<MusicEnum, Music> datas = new HashMap<MusicEnum, Music>();
     private Music currentMusic;
@@ -39,6 +40,9 @@ public class F2MusicManager {
     }
 
     public void stopMusic() {
+        if (disable) {
+            return;
+        }
         final Music oldMusic = currentMusic;
         if (oldMusic != null && !oldMusic.isReleased()) {
             oldMusic.pause();
@@ -47,6 +51,9 @@ public class F2MusicManager {
     }
 
     public void playMusic(final MusicEnum musicEnum, final boolean looping) {
+        if (disable) {
+            return;
+        }
         final Music oldMusic = currentMusic;
         currentMusic = datas.get(musicEnum);
         if (oldMusic != null && !oldMusic.isReleased()) {

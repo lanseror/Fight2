@@ -60,10 +60,10 @@ public class CardEvolutionScene extends BaseCardPackScene {
     public CardEvolutionScene(final GameActivity activity) throws IOException {
         super(activity);
         hpatkFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
-        hpText = new Text(630, 295, hpatkFont, "+0123456789", vbom);
+        hpText = new Text(630, 301, hpatkFont, "+0123456789", vbom);
         hpText.setColor(0XFF5AD61E);
         hpText.setText("");
-        atkText = new Text(630, 226, hpatkFont, "+0123456789", vbom);
+        atkText = new Text(630, 232, hpatkFont, "+0123456789", vbom);
         atkText.setColor(0XFF5AD61E);
         atkText.setText("");
 
@@ -78,6 +78,11 @@ public class CardEvolutionScene extends BaseCardPackScene {
     public void updateScene() {
         activity.getGameHub().needSmallChatRoom(false);
         // Insert cards to card pack.
+        cardPackCards.clear();
+        final List<Card> userEvoCards = CardUtils.getEvocards();
+        for (final Card userEvoCard : userEvoCards) {
+            cardPackCards.add(userEvoCard);
+        }
         updateCardPack();
     }
 
@@ -320,37 +325,61 @@ public class CardEvolutionScene extends BaseCardPackScene {
             }
         }
 
-        if (changeAction == GridChangeAction.Add && evoCards.size() == 1) {
-            cardPackCards.clear();
-            final Card addedCard = evoCards.get(0);
-            cardPackCards.add(addedCard);
-            final Set<Card> userCards = CardUtils.getUsercardsByTemplateId(addedCard.getTemplateId());
-            for (final Card userCard : userCards) {
-                if (userCard != addedCard) {
-                    cardPackCards.add(userCard);
-                }
-            }
-            cardPack.filterCards(new IEntityMatcher() {
+        if (changeAction == GridChangeAction.Add) {
+            final Card evoCard = inGridCards[changeIndex];
+            final IEntity gridCardSprite = inGridCardSprites[changeIndex];
+            final float spriteWidth = gridCardSprite.getWidth();
+            final float spriteHeight = gridCardSprite.getHeight();
+            final IEntity evoPercentFrame = new Rectangle(spriteWidth * 0.5f, spriteHeight * 0.5f, 200, 50, vbom);
+            evoPercentFrame.setColor(Color.BLACK);
+            evoPercentFrame.setAlpha(0.5f);
+            final Sprite evoIcon = this.createACImageSprite(TextureEnum.EVOLUTION_ICON, 46, 25);
+            evoPercentFrame.attachChild(evoIcon);
+            final int evoPercent = CardUtils.getEvoPercent(evoCard);
+            final Text evoPercentText = new Text(125, 25, hpatkFont, "+" + evoPercent + "%", vbom);
+            evoPercentFrame.attachChild(evoPercentText);
+            evoPercentFrame.setZIndex(100);
+            gridCardSprite.attachChild(evoPercentFrame);
 
-                @Override
-                public boolean matches(final IEntity pEntity) {
-                    final CardFrame cardSprite = (CardFrame) pEntity;
-                    final Card card = cardSprite.getCard();
-                    if (card.getTemplateId() == addedCard.getTemplateId()) {
-                        return true;
-                    } else {
-                        return false;
+            if (evoCards.size() == 1) {
+                cardPackCards.clear();
+                final Card addedCard = evoCards.get(0);
+                cardPackCards.add(addedCard);
+                final Set<Card> userCards = CardUtils.getUsercardsByTemplateId(addedCard.getTemplateId());
+                for (final Card userCard : userCards) {
+                    if (userCard != addedCard) {
+                        cardPackCards.add(userCard);
                     }
                 }
-            });
+                cardPack.filterCards(new IEntityMatcher() {
 
-        } else if (changeAction == GridChangeAction.Remove && evoCards.size() == 0) {
-            cardPackCards.clear();
-            final List<Card> userEvoCards = CardUtils.getEvocards();
-            for (final Card userEvoCard : userEvoCards) {
-                cardPackCards.add(userEvoCard);
+                    @Override
+                    public boolean matches(final IEntity pEntity) {
+                        final CardFrame cardSprite = (CardFrame) pEntity;
+                        final Card card = cardSprite.getCard();
+                        if (card.getTemplateId() == addedCard.getTemplateId()) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                });
+            } else if (evoCards.size() == 2) {
+                final Card mockEvoCard = CardUtils.mockEvolution(evoCards.get(0), evoCards.get(1));
+                this.hpText.setText(String.valueOf(mockEvoCard.getHp()));
+                this.atkText.setText(String.valueOf(mockEvoCard.getAtk()));
             }
-            this.updateCardPack();
+        } else if (changeAction == GridChangeAction.Remove) {
+            this.hpText.setText("");
+            this.atkText.setText("");
+            if (evoCards.size() == 0) {
+                cardPackCards.clear();
+                final List<Card> userEvoCards = CardUtils.getEvocards();
+                for (final Card userEvoCard : userEvoCards) {
+                    cardPackCards.add(userEvoCard);
+                }
+                this.updateCardPack();
+            }
         }
 
     }

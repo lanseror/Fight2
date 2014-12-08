@@ -215,6 +215,7 @@ public class GameActivity extends LayoutGameActivity {
     @Override
     public synchronized void onGameCreated() {
         super.onGameCreated();
+        F2MusicManager.getInstance().playMusic(MusicEnum.LOADING, true);
         loadAdditionResources();
     }
 
