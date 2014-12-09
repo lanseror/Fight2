@@ -248,20 +248,18 @@ public class CardEvolutionScene extends BaseCardPackScene {
         evolutionButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                final Card mainCard = inGridCards[0];
-                if (mainCard == null) {
+                if (inGridCards[0] == null || inGridCards[1] == null) {
                     return;
                 }
                 final JSONArray cardIdsJson = new JSONArray();
                 for (final Card card : inGridCards) {
-                    if (card == null) {
-                        continue;
-                    }
                     cardIdsJson.put(card.getId());
                 }
-                if (cardIdsJson.length() < 2) {
-                    return;
-                }
+
+                final Card card1 = inGridCards[0];
+                final Card card2 = inGridCards[1];
+                final Card mainCard = card1.getTier() > card2.getTier() ? card1 : card2;
+                final Card supportCard = card1.getTier() > card2.getTier() ? card2 : card1;
 
                 final boolean isOk = CardUtils.upgrade(cardIdsJson, mainCard);
                 if (isOk) {

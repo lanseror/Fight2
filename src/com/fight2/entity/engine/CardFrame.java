@@ -19,6 +19,7 @@ import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.Card.Race;
 import com.fight2.util.AsyncTaskLoader;
+import com.fight2.util.CardUtils;
 import com.fight2.util.IAsyncCallback;
 import com.fight2.util.ImageUtils;
 import com.fight2.util.ResourceManager;
@@ -195,7 +196,7 @@ public class CardFrame extends Rectangle {
                 break;
         }
 
-        final int tierGridAddAmount = (int) Math.ceil(card.getStar() * 0.5) - 1;
+        final int tierGridAddAmount = CardUtils.getMaxEvoTier(card) - 1;
         if (tierGridAddAmount == 1) {
             final float tierGridWidth = tierGridTexture1.getWidth() * scale;
             final float tierGridHeight = tierGridTexture1.getHeight() * scale;
