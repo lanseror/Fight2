@@ -291,20 +291,22 @@ public class CardUtils {
         return evoCard;
     }
 
-    public static boolean upgrade(final JSONArray cardIdsJson, final Card card) {
+    public static boolean upgrade(final JSONArray cardIdsJson, final Card mainCard) {
         final String url = HttpUtils.HOST_URL + "/card/upgrade";
+
         try {
             final String responseJsonStr = HttpUtils.postJSONString(url, cardIdsJson.toString());
             final JSONObject responseJson = new JSONObject(responseJsonStr);
             final int status = responseJson.getInt("status");
             if (status == 0) {
                 final JSONObject cardJson = responseJson.getJSONObject("card");
-                card.setAtk(cardJson.getInt("atk"));
-                card.setHp(cardJson.getInt("hp"));
-                card.setLevel(cardJson.getInt("level"));
-                card.setBaseExp(cardJson.getInt("baseExp"));
-                card.setExp(cardJson.getInt("exp"));
+                mainCard.setAtk(cardJson.getInt("atk"));
+                mainCard.setHp(cardJson.getInt("hp"));
+                mainCard.setLevel(cardJson.getInt("level"));
+                mainCard.setBaseExp(cardJson.getInt("baseExp"));
+                mainCard.setExp(cardJson.getInt("exp"));
             }
+
             return status == 0;
         } catch (IOException | JSONException e) {
             throw new RuntimeException(e);
@@ -312,26 +314,35 @@ public class CardUtils {
 
     }
 
-    public static boolean evolution(final JSONArray cardIdsJson, final Card card) {
+    public static int evolution(final JSONArray cardIdsJson, final Card[] evoCards) {
         final String url = HttpUtils.HOST_URL + "/card/evo";
         try {
+            int result = -1;
             final String responseJsonStr = HttpUtils.postJSONString(url, cardIdsJson.toString());
             final JSONObject responseJson = new JSONObject(responseJsonStr);
             final int status = responseJson.getInt("status");
             if (status == 0) {
                 final JSONObject cardJson = responseJson.getJSONObject("card");
-                card.setAtk(cardJson.getInt("atk"));
-                card.setHp(cardJson.getInt("hp"));
-                card.setLevel(cardJson.getInt("level"));
-                card.setTier(cardJson.getInt("tier"));
-                card.setAvatar(cardJson.getString("avatar"));
-                card.setAvatarLoaded(false);
-                card.setImage(cardJson.getString("image"));
-                card.setImageLoaded(false);
-                card.setBaseExp(cardJson.getInt("baseExp"));
-                card.setExp(cardJson.getInt("exp"));
+                final int id = cardJson.getInt("id");
+                for (int i = 0; i < evoCards.length; i++) {
+                    final Card card = evoCards[i];
+                    if (card.getId() == id) {
+                        card.setAtk(cardJson.getInt("atk"));
+                        card.setHp(cardJson.getInt("hp"));
+                        card.setLevel(cardJson.getInt("level"));
+                        card.setTier(cardJson.getInt("tier"));
+                        card.setAvatar(cardJson.getString("avatar"));
+                        card.setAvatarLoaded(false);
+                        card.setImage(cardJson.getString("image"));
+                        card.setImageLoaded(false);
+                        card.setBaseExp(cardJson.getInt("baseExp"));
+                        card.setExp(cardJson.getInt("exp"));
+                        result = i;
+                        break;
+                    }
+                }
             }
-            return status == 0;
+            return result;
         } catch (IOException | JSONException e) {
             throw new RuntimeException(e);
         }

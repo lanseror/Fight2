@@ -258,11 +258,9 @@ public class CardEvolutionScene extends BaseCardPackScene {
 
                 final Card card1 = inGridCards[0];
                 final Card card2 = inGridCards[1];
-                final Card mainCard = card1.getTier() > card2.getTier() ? card1 : card2;
-                final Card supportCard = card1.getTier() > card2.getTier() ? card2 : card1;
 
-                final boolean isOk = CardUtils.upgrade(cardIdsJson, mainCard);
-                if (isOk) {
+                final int result = CardUtils.evolution(cardIdsJson, inGridCards);
+                if (result == 0 || result == 1) {
                     for (int i = 1; i < inGridCards.length; i++) {
                         inGridCards[i] = null;
                         final IEntity inGridCardSprite = inGridCardSprites[i];

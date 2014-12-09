@@ -33,7 +33,6 @@ import com.fight2.entity.engine.cardpack.CardUpdateHandler;
 import com.fight2.entity.engine.cardpack.CardUpgradeScrollDetectorListener;
 import com.fight2.entity.engine.cardpack.MoveFinishedListener;
 import com.fight2.input.touch.detector.F2ScrollDetector;
-import com.fight2.scene.BaseCardPackScene.GridChangeAction;
 import com.fight2.util.CardUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
