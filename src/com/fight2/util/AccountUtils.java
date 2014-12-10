@@ -22,7 +22,6 @@ import android.content.Context;
 
 import com.fight2.GameActivity;
 import com.fight2.entity.Card;
-import com.fight2.entity.Card.Race;
 import com.fight2.entity.CardTemplate;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
@@ -108,26 +107,7 @@ public class AccountUtils {
             final JSONArray cardJsonArray = HttpUtils.getJSONArrayFromUrl(cardUrl);
             for (int cardIndex = 0; cardIndex < cardJsonArray.length(); cardIndex++) {
                 final JSONObject cardJson = cardJsonArray.getJSONObject(cardIndex);
-                final String avatar = ImageUtils.getLocalString(cardJson.getString("avatar"), activity);
-                final String image = ImageUtils.getLocalString(cardJson.getString("image"), activity);
-                final Card card = new Card();
-                card.setId(cardJson.getInt("id"));
-                card.setStar(cardJson.getInt("star"));
-                card.setLevel(cardJson.getInt("level"));
-                card.setTier(cardJson.getInt("tier"));
-                card.setAtk(cardJson.getInt("atk"));
-                card.setBaseExp(cardJson.getInt("baseExp"));
-                card.setExp(cardJson.getInt("exp"));
-                card.setAvatar(avatar);
-                card.setAvatarLoaded(true);
-                card.setHp(cardJson.getInt("hp"));
-                card.setImage(image);
-                card.setImageLoaded(true);
-                card.setName(cardJson.getString("name"));
-                card.setSkill(cardJson.optString("skill"));
-                final JSONObject cardTemplateJson = cardJson.getJSONObject("cardTemplate");
-                card.setTemplateId(cardTemplateJson.getInt("id"));
-                card.setRace(Race.valueOf(cardJson.getString("race")));
+                final Card card = CardUtils.cardFromJson(cardJson);
                 cards.add(card);
             }
             CardUtils.refreshUserCards();
@@ -215,18 +195,7 @@ public class AccountUtils {
             final List<Card> cards = new ArrayList<Card>();
             for (int i = 0; i < cardJsonArray.length(); i++) {
                 final JSONObject cardJson = cardJsonArray.getJSONObject(i);
-                final Card card = new Card();
-                card.setId(cardJson.getInt("id"));
-                card.setHp(cardJson.getInt("hp"));
-                card.setAtk(cardJson.getInt("atk"));
-                card.setBaseExp(cardJson.getInt("baseExp"));
-                card.setExp(cardJson.getInt("exp"));
-                card.setName(cardJson.getString("name"));
-                card.setStar(cardJson.getInt("star"));
-                card.setAvatar(cardJson.getString("avatar"));
-                card.setImage(cardJson.getString("image"));
-                card.setAmount(cardJson.getInt("amount"));
-                card.setRace(Race.valueOf(cardJson.getString("race")));
+                final Card card = CardUtils.cardFromJson(cardJson);
                 cards.add(card);
             }
             userStoreroom.setCards(cards);

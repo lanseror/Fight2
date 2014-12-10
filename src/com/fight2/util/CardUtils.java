@@ -86,6 +86,34 @@ public class CardUtils {
         return evoCards;
     }
 
+    public static Card cardFromJson(final JSONObject cardJson) {
+        final Card card = new Card();
+        try {
+            card.setId(cardJson.getInt("id"));
+            card.setStar(cardJson.getInt("star"));
+            card.setLevel(cardJson.getInt("level"));
+            card.setTier(cardJson.getInt("tier"));
+            card.setAtk(cardJson.getInt("atk"));
+            card.setHp(cardJson.getInt("hp"));
+            card.setBaseExp(cardJson.getInt("baseExp"));
+            card.setExp(cardJson.getInt("exp"));
+            if (cardJson.has("avatar")) {
+                card.setAvatar(cardJson.getString("avatar"));
+            }
+            card.setImage(cardJson.getString("image"));
+            card.setName(cardJson.getString("name"));
+            card.setSkill(cardJson.optString("skill"));
+            if (cardJson.has("cardTemplate")) {
+                final JSONObject cardTemplateJson = cardJson.getJSONObject("cardTemplate");
+                card.setTemplateId(cardTemplateJson.getInt("id"));
+            }
+            card.setRace(Race.valueOf(cardJson.getString("race")));
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        }
+        return card;
+    }
+
     public static boolean saveParties() {
         final String url = HttpUtils.HOST_URL + "/party/edit";
         final GameUserSession session = GameUserSession.getInstance();
@@ -136,21 +164,7 @@ public class CardUtils {
             final int status = responseJson.getInt("status");
             if (status == 0) {
                 final JSONObject cardJson = responseJson.getJSONObject("card");
-                final Card card = new Card();
-                card.setId(cardJson.getInt("id"));
-                card.setAtk(cardJson.getInt("atk"));
-                card.setAvatar(cardJson.getString("avatar"));
-                card.setHp(cardJson.getInt("hp"));
-                card.setStar(cardJson.getInt("star"));
-                card.setLevel(cardJson.getInt("level"));
-                card.setBaseExp(cardJson.getInt("baseExp"));
-                card.setExp(cardJson.getInt("exp"));
-                card.setImage(cardJson.getString("image"));
-                card.setName(cardJson.getString("name"));
-                card.setSkill(cardJson.optString("skill"));
-                card.setRace(Race.valueOf(cardJson.getString("race")));
-                final JSONObject cardTemplateJson = cardJson.getJSONObject("cardTemplate");
-                card.setTemplateId(cardTemplateJson.getInt("id"));
+                final Card card = CardUtils.cardFromJson(cardJson);
                 cards.add(card);
                 return card;
             } else {

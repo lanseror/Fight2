@@ -109,16 +109,7 @@ public class GuildUtils {
             final List<Card> cards = new ArrayList<Card>();
             for (int i = 0; i < cardJsonArray.length(); i++) {
                 final JSONObject cardJson = cardJsonArray.getJSONObject(i);
-                final Card card = new Card();
-                card.setId(cardJson.getInt("id"));
-                card.setHp(cardJson.getInt("hp"));
-                card.setAtk(cardJson.getInt("atk"));
-                card.setName(cardJson.getString("name"));
-                card.setStar(cardJson.getInt("star"));
-                card.setRace(Race.valueOf(cardJson.getString("race")));
-                card.setAvatar(cardJson.getString("avatar"));
-                card.setImage(cardJson.getString("image"));
-                card.setAmount(cardJson.getInt("amount"));
+                final Card card = CardUtils.cardFromJson(cardJson);
                 cards.add(card);
             }
             storeroom.setCards(cards);
@@ -344,17 +335,8 @@ public class GuildUtils {
                 final BidItemType itemType = BidItemType.valueOf(bidJson.getString("type"));
                 bid.setType(itemType);
                 if (itemType == BidItemType.Card) {
-                    final Card card = new Card();
                     final JSONObject cardJson = bidJson.getJSONObject("card");
-                    card.setId(cardJson.getInt("id"));
-                    card.setHp(cardJson.getInt("hp"));
-                    card.setAtk(cardJson.getInt("atk"));
-                    card.setName(cardJson.getString("name"));
-                    card.setStar(cardJson.getInt("star"));
-                    card.setRace(Race.valueOf(cardJson.getString("race")));
-                    card.setAvatar(cardJson.getString("avatar"));
-                    card.setImage(cardJson.getString("image"));
-                    card.setAmount(cardJson.getInt("amount"));
+                    final Card card = CardUtils.cardFromJson(cardJson);
                     bid.setCard(card);
                 }
                 bid.setVersion(bidJson.getInt("version"));

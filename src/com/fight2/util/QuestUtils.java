@@ -33,18 +33,7 @@ public class QuestUtils {
                 result.setItem(tileItem);
                 if (tileItem == TileItem.Card) {
                     final JSONObject cardJson = responseJson.getJSONObject("card");
-                    final Card card = new Card();
-                    card.setId(cardJson.getInt("id"));
-                    card.setAtk(cardJson.getInt("atk"));
-                    card.setAvatar(cardJson.getString("avatar"));
-                    card.setHp(cardJson.getInt("hp"));
-                    card.setStar(cardJson.getInt("star"));
-                    card.setImage(cardJson.getString("image"));
-                    card.setName(cardJson.getString("name"));
-                    card.setSkill(cardJson.optString("skill"));
-                    card.setRace(Race.valueOf(cardJson.getString("race")));
-                    final JSONObject cardTemplateJson = cardJson.getJSONObject("cardTemplate");
-                    card.setTemplateId(cardTemplateJson.getInt("id"));
+                    final Card card = CardUtils.cardFromJson(cardJson);
                     result.setCard(card);
                 }
             } else if (result.getStatus() == 2) {
