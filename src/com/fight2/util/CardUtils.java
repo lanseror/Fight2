@@ -205,22 +205,7 @@ public class CardUtils {
                     final JSONObject partyGridJson = partyGridJsonArray.getJSONObject(partyCardIndex);
                     final JSONObject cardJson = partyGridJson.optJSONObject("card");
                     if (cardJson != null) {
-                        final Card card = new Card();
-                        card.setId(cardJson.getInt("id"));
-                        card.setAtk(cardJson.getInt("atk"));
-                        card.setHp(cardJson.getInt("hp"));
-                        card.setStar(cardJson.getInt("star"));
-                        card.setTier(cardJson.getInt("tier"));
-                        card.setLevel(cardJson.getInt("level"));
-                        card.setRace(Race.valueOf(cardJson.getString("race")));
-                        final String avatar = cardJson.optString("avatar");
-                        if (avatar != null && !"".equals(avatar)) {
-                            final String localAvatar = ImageUtils.getLocalString(avatar, activity);
-                            card.setAvatar(localAvatar);
-                            card.setAvatarLoaded(true);
-                            TextureFactory.getInstance().addCardResource(activity, localAvatar);
-                        }
-                        card.setImage(cardJson.getString("image"));
+                        final Card card = CardUtils.cardFromJson(cardJson);
                         partyCards[partyCardIndex] = card;
                     }
                 }

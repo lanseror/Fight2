@@ -69,11 +69,13 @@ public class PreBattleScene extends BaseScene {
         opponentParties = opponentPartyInfo.getParties();
         final Card myLeader = myParties[0].getCards()[0];
         final Card opponentLeader = opponentParties[0].getCards()[0];
-        final ITextureRegion myTexture = textureFactory.getTextureRegion(myLeader.getImage());
-        myCardSprite = new Sprite(this.cameraCenterX - CARD_CENTER_X - GAP, this.cameraCenterY, CARD_WIDTH, CARD_HEIGHT, myTexture, vbom);
+        final ITextureRegion coverTexture = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_CARD_COVER);
+
+        myCardSprite = new Sprite(this.cameraCenterX - CARD_CENTER_X - GAP, this.cameraCenterY, CARD_WIDTH, CARD_HEIGHT, coverTexture, vbom);
         this.attachChild(myCardSprite);
-        final ITextureRegion opponentTexture = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_CARD_COVER);
-        this.opponentCardSprite = new Sprite(this.cameraCenterX + CARD_CENTER_X + GAP, this.cameraCenterY, CARD_WIDTH, CARD_HEIGHT, opponentTexture, vbom);
+        loadMyImageFromServer(myLeader);
+
+        this.opponentCardSprite = new Sprite(this.cameraCenterX + CARD_CENTER_X + GAP, this.cameraCenterY, CARD_WIDTH, CARD_HEIGHT, coverTexture, vbom);
         this.attachChild(opponentCardSprite);
         loadImageFromServer(opponentLeader);
 
@@ -191,9 +193,14 @@ public class PreBattleScene extends BaseScene {
             @Override
             public void workToDo() {
                 try {
-                    image = ImageUtils.getLocalString(card.getImage(), activity);
-                    textureFactory.addCardResource(activity, image);
-                    card.setImage(image);
+                    if (!card.isImageLoaded()) {
+                        image = ImageUtils.getLocalString(card.getImage(), activity);
+                        textureFactory.addCardResource(activity, image);
+                        card.setImage(image);
+                        card.setImageLoaded(true);
+                    } else {
+                        image = card.getImage();
+                    }
                 } catch (final IOException e) {
                     Debug.e(e);
                 }
@@ -207,6 +214,49 @@ public class PreBattleScene extends BaseScene {
                     final ITextureRegion texture = textureFactory.getTextureRegion(image);
                     final Sprite imageSprite = new Sprite(CARD_CENTER_X, CARD_CENTER_Y, CARD_WIDTH, CARD_HEIGHT, texture, vbom);
                     opponentCardSprite.attachChild(imageSprite);
+                }
+
+            }
+
+        };
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new AsyncTaskLoader().execute(callback);
+            }
+        });
+
+    }
+
+    public void loadMyImageFromServer(final Card card) {
+        final IAsyncCallback callback = new IAsyncCallback() {
+            private String image;
+
+            @Override
+            public void workToDo() {
+                try {
+                    if (!card.isImageLoaded()) {
+                        image = ImageUtils.getLocalString(card.getImage(), activity);
+                        textureFactory.addCardResource(activity, image);
+                        card.setImage(image);
+                        card.setImageLoaded(true);
+                    } else {
+                        image = card.getImage();
+                    }
+                } catch (final IOException e) {
+                    Debug.e(e);
+                }
+
+            }
+
+            @Override
+            public void onComplete() {
+
+                if (image != null) {
+                    final ITextureRegion texture = textureFactory.getTextureRegion(image);
+                    final Sprite imageSprite = new Sprite(CARD_CENTER_X, CARD_CENTER_Y, CARD_WIDTH, CARD_HEIGHT, texture, vbom);
+                    myCardSprite.attachChild(imageSprite);
                 }
 
             }

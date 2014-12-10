@@ -1,5 +1,7 @@
 package com.fight2.entity.engine;
 
+import java.io.IOException;
+
 import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.DelayModifier;
 import org.andengine.entity.modifier.IEntityModifier;
@@ -12,6 +14,7 @@ import org.andengine.entity.text.Text;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
+import org.andengine.util.debug.Debug;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
@@ -20,8 +23,10 @@ import com.fight2.entity.Card;
 import com.fight2.entity.Party;
 import com.fight2.scene.BattleScene.ModifierFinishedListener;
 import com.fight2.scene.BattleScene.OnFinishedCallback;
+import com.fight2.util.AsyncTaskLoader;
+import com.fight2.util.IAsyncCallback;
+import com.fight2.util.ImageUtils;
 import com.fight2.util.ResourceManager;
-import com.fight2.util.StringUtils;
 import com.fight2.util.TextureFactory;
 
 public class BattlePartyFrame extends Rectangle {
@@ -101,11 +106,49 @@ public class BattlePartyFrame extends Rectangle {
             if (card == null) {
                 continue;
             }
-            final String avatar = card.getAvatar();
-            final ITextureRegion texture = StringUtils.isEmpty(avatar) ? textureFactory.getAssetTextureRegion(TextureEnum.COMMON_DEFAULT_AVATAR)
-                    : textureFactory.getTextureRegion(avatar);
+            final ITextureRegion texture = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_CARD_COVER);
             final Sprite cardSprite = new Sprite(startX + (AVATAR_WIDTH + avatarGap) * i, AVATAR_HEIGHT * 0.5f, AVATAR_WIDTH, AVATAR_HEIGHT, texture, vbom);
             cardSprites[i] = cardSprite;
+            final IAsyncCallback callback = new IAsyncCallback() {
+                private String avatar;
+
+                @Override
+                public void workToDo() {
+                    try {
+                        if (card.getAvatar() != null && !card.isAvatarLoaded()) {
+                            avatar = ImageUtils.getLocalString(card.getAvatar(), activity);
+                            textureFactory.addCardResource(activity, avatar);
+                            card.setAvatar(avatar);
+                            card.setAvatarLoaded(true);
+                        } else {
+                            avatar = card.getAvatar();
+                        }
+                    } catch (final IOException e) {
+                        Debug.e(e);
+                    }
+
+                }
+
+                @Override
+                public void onComplete() {
+
+                    if (avatar != null) {
+                        final ITextureRegion texture = textureFactory.getTextureRegion(avatar);
+                        final Sprite imageSprite = new Sprite(AVATAR_WIDTH * 0.5f, AVATAR_HEIGHT * 0.5f, AVATAR_WIDTH, AVATAR_HEIGHT, texture, vbom);
+                        cardSprite.attachChild(imageSprite);
+                    }
+
+                }
+
+            };
+
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    new AsyncTaskLoader().execute(callback);
+                }
+            });
+
             final ITextureRegion textureFcs = textureFactory.getAssetTextureRegion(TextureEnum.BATTLE_AVATAR_SKILL_FCS);
             final Sprite cardSpriteFcs = new Sprite(AVATAR_WIDTH * 0.5f, AVATAR_HEIGHT * 0.5f, textureFcs, vbom);
             cardSpriteFcs.setVisible(false);

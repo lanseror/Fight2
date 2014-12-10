@@ -71,25 +71,6 @@ public class TextureFactory {
         return imageDatas;
     }
 
-    public void loadCardsResource(final GameActivity activity) throws IOException {
-        final GameUserSession session = GameUserSession.getInstance();
-        final Collection<Card> cards = session.getCards();
-        cardDatas.clear();
-        for (final Card card : cards) {
-            final String avatar = card.getAvatar();
-            if (!cardDatas.containsKey(avatar)) {
-                final ITextureRegion textureRegion = createIextureRegion(activity, avatar);
-                cardDatas.put(avatar, textureRegion);
-            }
-            final String image = card.getImage();
-            if (!cardDatas.containsKey(image)) {
-                final ITextureRegion textureRegion = createIextureRegion(activity, image);
-                cardDatas.put(image, textureRegion);
-            }
-        }
-
-    }
-
     public void addCardResource(final GameActivity activity, final String image) throws IOException {
         if (!cardDatas.containsKey(image)) {
             final ITextureRegion textureRegion = createIextureRegion(activity, image);

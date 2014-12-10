@@ -111,7 +111,6 @@ public class AccountUtils {
                 cards.add(card);
             }
             CardUtils.refreshUserCards();
-            TextureFactory.getInstance().loadCardsResource(activity);
 
             final JSONObject partyInfoJson = HttpUtils.getJSONFromUrl(partyUrl);
             final PartyInfo partyInfo = new PartyInfo();
