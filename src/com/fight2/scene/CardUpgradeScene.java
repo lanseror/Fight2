@@ -1,7 +1,7 @@
 package com.fight2.scene;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 
 import org.andengine.entity.IEntity;
 import org.andengine.entity.primitive.Rectangle;
@@ -34,6 +34,7 @@ import com.fight2.entity.engine.cardpack.CardUpgradeScrollDetectorListener;
 import com.fight2.entity.engine.cardpack.MoveFinishedListener;
 import com.fight2.input.touch.detector.F2ScrollDetector;
 import com.fight2.util.CardUtils;
+import com.fight2.util.PartyUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
 
@@ -76,10 +77,10 @@ public class CardUpgradeScene extends BaseCardPackScene {
         cardPack.detachChildren();
         final float initCardX = cardZoom.getX() - (cardPack.getX() - 0.5f * cardPack.getWidth());
         final GameUserSession session = GameUserSession.getInstance();
-        final List<Card> sessionCards = session.getCards();
+        final Collection<Card> sessionCards = session.getCards();
         float appendX = initCardX;
-        for (int i = 0; i < sessionCards.size(); i++) {
-            final Card sessionCard = sessionCards.get(i);
+        int i = 0;
+        for (final Card sessionCard : sessionCards) {
             final IEntity card = new CardFrame(appendX, CARD_Y, CARD_WIDTH, CARD_HEIGHT, sessionCard, activity);
             card.setTag(i);
             card.setWidth(CARD_WIDTH);
@@ -94,6 +95,7 @@ public class CardUpgradeScene extends BaseCardPackScene {
                 appendX += CARD_GAP + CARD_WIDTH;
             }
             this.registerUpdateHandler(new CardUpdateHandler(cardZoom, card));
+            i++;
         }
     }
 
@@ -275,6 +277,8 @@ public class CardUpgradeScene extends BaseCardPackScene {
                     }
                     final CardFrame mainCardSprite = (CardFrame) inGridCardSprites[0];
                     mainCardSprite.revertCardAttributes();
+                    CardUtils.refreshUserCards();
+                    PartyUtils.refreshPartyHpAtk();
                 } else {
                     alert("出错了。");
                 }

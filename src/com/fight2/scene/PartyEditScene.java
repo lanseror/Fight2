@@ -1,7 +1,7 @@
 package com.fight2.scene;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 import java.util.Set;
 
 import org.andengine.engine.handler.physics.PhysicsHandler;
@@ -39,6 +39,7 @@ import com.fight2.entity.engine.cardpack.CardUpdateHandler;
 import com.fight2.entity.engine.cardpack.MoveFinishedListener;
 import com.fight2.input.touch.detector.F2ScrollDetector;
 import com.fight2.util.CardUtils;
+import com.fight2.util.PartyUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
 
@@ -198,15 +199,13 @@ public class PartyEditScene extends BaseCardPackScene {
                                     inPartyCards.remove(partyCards[frameIndex].getTemplateId());
                                     cardPack.revertCardToCardPack(movingCard);
                                     partyCards[frameIndex] = null;
-                                    calculatePartyHpAtk();
-                                    updatePartyHpAtk();
+                                    onGridCardsChange(frameIndex, GridChangeAction.Remove);
                                     activity.runOnUpdateThread(new Runnable() {
 
                                         @Override
                                         public void run() {
                                             inGridCardSprites[frameIndex].detachSelf();
                                             inGridCardSprites[frameIndex] = null;
-
                                         }
 
                                     });
@@ -232,10 +231,10 @@ public class PartyEditScene extends BaseCardPackScene {
         // Insert cards to card pack.
         final float initCardX = cardZoom.getX() - (cardPack.getX() - 0.5f * cardPack.getWidth());
         final GameUserSession session = GameUserSession.getInstance();
-        final List<Card> sessionCards = session.getCards();
+        final Collection<Card> sessionCards = session.getCards();
         float appendX = initCardX;
-        for (int i = 0; i < sessionCards.size(); i++) {
-            final Card sessionCard = sessionCards.get(i);
+        int i = 0;
+        for (final Card sessionCard : sessionCards) {
             final IEntity card = new CardFrame(appendX, CARD_Y, CARD_WIDTH, CARD_HEIGHT, sessionCard, activity);
             card.setTag(i);
             card.setWidth(CARD_WIDTH);
@@ -250,6 +249,7 @@ public class PartyEditScene extends BaseCardPackScene {
                 appendX += CARD_GAP + CARD_WIDTH;
             }
             this.registerUpdateHandler(new CardUpdateHandler(cardZoom, card));
+            i++;
         }
 
         final MoveFinishedListener moveFinishedListener = new MoveFinishedListener(cardPack, cardZoom, activity);
@@ -329,34 +329,8 @@ public class PartyEditScene extends BaseCardPackScene {
 
     @Override
     public void onGridCardsChange(final int changeIndex, final GridChangeAction changeAction) {
-        calculatePartyHpAtk();
+        PartyUtils.refreshPartyHpAtk();
         updatePartyHpAtk();
-    }
-
-    private void calculatePartyHpAtk() {
-        final PartyInfo partyInfo = GameUserSession.getInstance().getPartyInfo();
-        int partyInfoHp = 0;
-        int partyInfoAtk = 0;
-        for (final Party party : partyInfo.getParties()) {
-            if (party == null) {
-                continue;
-            }
-            int partyHp = 0;
-            int partyAtk = 0;
-            for (final Card card : party.getCards()) {
-                if (card == null) {
-                    continue;
-                }
-                partyHp += card.getHp();
-                partyAtk += card.getAtk();
-            }
-            party.setHp(partyHp);
-            party.setAtk(partyAtk);
-            partyInfoHp += partyHp;
-            partyInfoAtk += partyAtk;
-        }
-        partyInfo.setHp(partyInfoHp);
-        partyInfo.setAtk(partyInfoAtk);
     }
 
     private void updatePartyHpAtk() {

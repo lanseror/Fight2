@@ -64,6 +64,7 @@ public class ResourceManager {
         this.assetManager = activity.getAssets();
         this.fontManager = activity.getFontManager();
         FontFactory.setAssetBasePath("font/");
+
         // Start load resources
         TiledTextureFactory.getInstance().loadResource(textureManager, assetManager);
         final TextureFactory textureFactory = TextureFactory.getInstance();

@@ -7,6 +7,7 @@ import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -100,7 +101,7 @@ public class AccountUtils {
             final Set<Integer> inPartyCards = session.getInPartyCards();
 
             // Get cards.
-            final List<Card> cards = session.getCards();
+            final Collection<Card> cards = session.getCards();
             cards.clear();
             CardUtils.clearUserCard();
 
@@ -128,9 +129,8 @@ public class AccountUtils {
                 card.setTemplateId(cardTemplateJson.getInt("id"));
                 card.setRace(Race.valueOf(cardJson.getString("race")));
                 cards.add(card);
-                CardUtils.addUserCard(card);
             }
-            CardUtils.refreshEvoCards();
+            CardUtils.refreshUserCards();
             TextureFactory.getInstance().loadCardsResource(activity);
 
             final JSONObject partyInfoJson = HttpUtils.getJSONFromUrl(partyUrl);

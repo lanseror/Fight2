@@ -1,21 +1,21 @@
 package com.fight2.entity;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class GameUserSession {
     private final static GameUserSession INSTANCE = new GameUserSession();
     private int id;
     private String name;
-    private final List<Card> cards;
+    private final Collection<Card> cards;
     private PartyInfo partyInfo;
     private final Set<Integer> inPartyCards = new HashSet<Integer>();
     private int guildContribution;
 
     private GameUserSession() {
-        cards = new ArrayList<Card>();
+        cards = new LinkedHashSet<Card>();
     }
 
     public static GameUserSession getInstance() {
@@ -38,7 +38,7 @@ public class GameUserSession {
         this.name = name;
     }
 
-    public List<Card> getCards() {
+    public Collection<Card> getCards() {
         return cards;
     }
 

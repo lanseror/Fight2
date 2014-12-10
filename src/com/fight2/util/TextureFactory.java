@@ -2,8 +2,8 @@ package com.fight2.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.andengine.opengl.texture.ITexture;
@@ -73,7 +73,7 @@ public class TextureFactory {
 
     public void loadCardsResource(final GameActivity activity) throws IOException {
         final GameUserSession session = GameUserSession.getInstance();
-        final List<Card> cards = session.getCards();
+        final Collection<Card> cards = session.getCards();
         cardDatas.clear();
         for (final Card card : cards) {
             final String avatar = card.getAvatar();

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -36,7 +37,16 @@ public class CardUtils {
         userCards.clear();
     }
 
-    public static void addUserCard(final Card card) {
+    public static void refreshUserCards() {
+        userCards.clear();
+        final Collection<Card> cards = GameUserSession.getInstance().getCards();
+        for (final Card card : cards) {
+            addUserCard(card);
+        }
+        refreshEvoCards();
+    }
+
+    private static void addUserCard(final Card card) {
         final int templateId = card.getTemplateId();
         if (userCards.indexOfKey(templateId) < 0) {
             final Set<Card> cardSet = new LinkedHashSet<Card>();
@@ -46,7 +56,7 @@ public class CardUtils {
         cardSet.add(card);
     }
 
-    public static void refreshEvoCards() {
+    private static void refreshEvoCards() {
         evoCards.clear();
         for (int i = 0; i < userCards.size(); i++) {
             final Set<Card> cardSet = userCards.valueAt(i);
@@ -120,7 +130,7 @@ public class CardUtils {
     public static Card summon(final GameActivity activity) {
         final String url = HttpUtils.HOST_URL + "/card/summon";
         final GameUserSession session = GameUserSession.getInstance();
-        final List<Card> cards = session.getCards();
+        final Collection<Card> cards = session.getCards();
         try {
             final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
             final int status = responseJson.getInt("status");

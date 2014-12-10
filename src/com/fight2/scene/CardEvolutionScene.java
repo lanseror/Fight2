@@ -36,6 +36,7 @@ import com.fight2.entity.engine.cardpack.CardUpdateHandler;
 import com.fight2.entity.engine.cardpack.MoveFinishedListener;
 import com.fight2.input.touch.detector.F2ScrollDetector;
 import com.fight2.util.CardUtils;
+import com.fight2.util.PartyUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
 
@@ -134,7 +135,7 @@ public class CardEvolutionScene extends BaseCardPackScene {
 
         final F2ButtonSprite evolutionButton = createEvolutionButton();
         frameSprite.attachChild(evolutionButton);
-        // this.registerTouchArea(evolutionButton);
+        this.registerTouchArea(evolutionButton);
 
         this.scrollDetector = new F2ScrollDetector(new CardEvolutionScrollDetectorListener(this, cardPack, cardZoom, inGridCards));
 
@@ -256,12 +257,10 @@ public class CardEvolutionScene extends BaseCardPackScene {
                     cardIdsJson.put(card.getId());
                 }
 
-                final Card card1 = inGridCards[0];
-                final Card card2 = inGridCards[1];
-
                 final int result = CardUtils.evolution(cardIdsJson, inGridCards);
                 if (result == 0 || result == 1) {
-                    for (int i = 1; i < inGridCards.length; i++) {
+                    cardPack.revertCardToCardPack(inGridCardSprites[result]);
+                    for (int i = 0; i < inGridCards.length; i++) {
                         inGridCards[i] = null;
                         final IEntity inGridCardSprite = inGridCardSprites[i];
                         inGridCardSprites[i] = null;
@@ -276,8 +275,16 @@ public class CardEvolutionScene extends BaseCardPackScene {
 
                         }
                     }
-                    final CardFrame mainCardSprite = (CardFrame) inGridCardSprites[0];
-                    mainCardSprite.revertCardAttributes();
+                    hpText.setText("");
+                    atkText.setText("");
+                    cardPackCards.clear();
+                    CardUtils.refreshUserCards();
+                    final List<Card> userEvoCards = CardUtils.getEvocards();
+                    for (final Card userEvoCard : userEvoCards) {
+                        cardPackCards.add(userEvoCard);
+                    }
+                    updateCardPack();
+                    PartyUtils.refreshPartyHpAtk();
                 } else {
                     alert("出错了。");
                 }
