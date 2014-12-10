@@ -162,8 +162,8 @@ public class CardFrame extends Rectangle {
                 tierStickY = 0;
                 break;
             case Angel:
-                tierGridTexture1 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_COMMON);
-                tierGridTexture2 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_COMMON_2);
+                tierGridTexture1 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_ANGEL);
+                tierGridTexture2 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_ANGEL_2);
                 tierStickTexture1 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_ANGEL);
                 tierStickTexture2 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_ANGEL_2);
                 tierStickTexture3 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_ANGEL_3);
@@ -173,8 +173,8 @@ public class CardFrame extends Rectangle {
                 tierStickY = 5.5f;
                 break;
             case Elf:
-                tierGridTexture1 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_COMMON);
-                tierGridTexture2 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_COMMON_2);
+                tierGridTexture1 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_ELF);
+                tierGridTexture2 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_ELF_2);
                 tierStickTexture1 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_ELF);
                 tierStickTexture2 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_ELF_2);
                 tierStickTexture3 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_ELF_3);
@@ -184,8 +184,8 @@ public class CardFrame extends Rectangle {
                 tierStickY = 0;
                 break;
             case Devil:
-                tierGridTexture1 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_COMMON);
-                tierGridTexture2 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_COMMON_2);
+                tierGridTexture1 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_DEVIL);
+                tierGridTexture2 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_GRID_DEVIL_2);
                 tierStickTexture1 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_DEVIL);
                 tierStickTexture2 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_DEVIL_2);
                 tierStickTexture3 = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_FRAME_TIER_STICK_DEVIL_3);
@@ -196,7 +196,7 @@ public class CardFrame extends Rectangle {
                 break;
         }
 
-        final int tierGridAddAmount = CardUtils.getMaxEvoTier(card) - 1;
+        final int tierGridAddAmount = CardUtils.getMaxEvoTier(card) - 2;
         if (tierGridAddAmount == 1) {
             final float tierGridWidth = tierGridTexture1.getWidth() * scale;
             final float tierGridHeight = tierGridTexture1.getHeight() * scale;
