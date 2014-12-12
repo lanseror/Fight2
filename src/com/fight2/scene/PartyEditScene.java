@@ -118,7 +118,7 @@ public class PartyEditScene extends BaseCardPackScene {
         this.attachChild(topbarSprite);
 
         final Sprite rechargeSprite = createALBF2ButtonSprite(TextureEnum.PARTY_RECHARGE, TextureEnum.PARTY_RECHARGE_PRESSED, this.simulatedRightX
-                - TextureEnum.PARTY_RECHARGE.getWidth() + 20, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight());
+                - TextureEnum.PARTY_RECHARGE.getWidth() - 8, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight() - 4);
         this.attachChild(rechargeSprite);
         this.registerTouchArea(rechargeSprite);
 
@@ -228,6 +228,19 @@ public class PartyEditScene extends BaseCardPackScene {
             cardGrids[gridIndex].setZIndex(10);
         }
 
+        final MoveFinishedListener moveFinishedListener = new MoveFinishedListener(cardPack, cardZoom, activity);
+        physicsHandler = new CardPackPhysicsHandler(cardPack, cardZoom, moveFinishedListener);
+        this.registerUpdateHandler(physicsHandler);
+
+        final float touchAreaWidth = this.simulatedWidth - TextureEnum.COMMON_BACK_BUTTON_NORMAL.getWidth() - 80;
+        final float touchAreaX = this.simulatedLeftX + touchAreaWidth * 0.5f;
+        final Rectangle touchArea = new CardPackTouchArea(touchAreaX, 160, touchAreaWidth, 280, vbom, scrollDetector, physicsHandler, cardPack);
+        this.attachChild(touchArea);
+        // Add cover and buttons.
+        final Sprite leftCover = createCoverSprite(TextureEnum.PARTY_EDIT_COVER_LEFT, 0, 0);
+        final Sprite rightCover = createCoverSprite(TextureEnum.PARTY_EDIT_COVER_RIGHT, this.cameraWidth - TextureEnum.PARTY_EDIT_COVER_RIGHT.getWidth(), 0);
+        this.registerTouchArea(leftCover);
+        this.registerTouchArea(rightCover);
         // Insert cards to card pack.
         final float initCardX = cardZoom.getX() - (cardPack.getX() - 0.5f * cardPack.getWidth());
         final GameUserSession session = GameUserSession.getInstance();
@@ -235,38 +248,28 @@ public class PartyEditScene extends BaseCardPackScene {
         float appendX = initCardX;
         int i = 0;
         for (final Card sessionCard : sessionCards) {
-            final IEntity card = new CardFrame(appendX, CARD_Y, CARD_WIDTH, CARD_HEIGHT, sessionCard, activity);
-            card.setTag(i);
-            card.setWidth(CARD_WIDTH);
-            card.setHeight(CARD_HEIGHT);
-            card.setPosition(appendX, CARD_Y);
-            card.setUserData(sessionCard);
-            cardPack.attachChild(card);
+            final IEntity cardSprite = new CardFrame(appendX, CARD_Y, CARD_WIDTH, CARD_HEIGHT, sessionCard, activity);
+            cardSprite.setTag(i);
+            cardSprite.setWidth(CARD_WIDTH);
+            cardSprite.setHeight(CARD_HEIGHT);
+            cardSprite.setPosition(appendX, CARD_Y);
+            cardSprite.setUserData(sessionCard);
+            cardPack.attachChild(cardSprite);
             if (i == 0) {
                 appendX += 1.5 * (CARD_GAP + CARD_WIDTH);
-                cardZoom.setUserData(card);
+                cardZoom.setUserData(cardSprite);
             } else {
                 appendX += CARD_GAP + CARD_WIDTH;
             }
-            this.registerUpdateHandler(new CardUpdateHandler(cardZoom, card));
+            this.registerUpdateHandler(new CardUpdateHandler(cardZoom, cardSprite));
+            this.registerTouchArea(cardSprite);
             i++;
         }
 
-        final MoveFinishedListener moveFinishedListener = new MoveFinishedListener(cardPack, cardZoom, activity);
-        physicsHandler = new CardPackPhysicsHandler(cardPack, cardZoom, moveFinishedListener);
-        this.registerUpdateHandler(physicsHandler);
-
-        final float touchAreaWidth = this.simulatedWidth - TextureEnum.COMMON_BACK_BUTTON_NORMAL.getWidth() - 80;
-        final float touchAreaX = this.simulatedLeftX + touchAreaWidth * 0.5f;
-        final Rectangle touchArea = new CardPackTouchArea(touchAreaX, 160, touchAreaWidth, 280, vbom, scrollDetector, physicsHandler);
-        this.registerTouchArea(touchArea);
-        this.attachChild(touchArea);
         this.attachChild(cardPack);
         this.attachChild(cardZoom);
+        this.registerTouchArea(touchArea);
 
-        // Add cover and buttons.
-        final Sprite leftCover = createALBImageSprite(TextureEnum.PARTY_EDIT_COVER_LEFT, 0, 0);
-        final Sprite rightCover = createALBImageSprite(TextureEnum.PARTY_EDIT_COVER_RIGHT, this.cameraWidth - TextureEnum.PARTY_EDIT_COVER_RIGHT.getWidth(), 0);
         this.attachChild(leftCover);
         this.attachChild(rightCover);
 
@@ -286,6 +289,25 @@ public class PartyEditScene extends BaseCardPackScene {
     public void leaveScene() {
         // TODO Auto-generated method stub
 
+    }
+
+    private Sprite createCoverSprite(final TextureEnum textureEnum, final float x, final float y) {
+        final TextureFactory textureFactory = TextureFactory.getInstance();
+        final ITextureRegion texture = textureFactory.getAssetTextureRegion(textureEnum);
+        final float width = textureEnum.getWidth();
+        final float height = textureEnum.getHeight();
+        final float pX = x + width * 0.5f;
+        final float pY = y + height * 0.5f;
+        final Sprite sprite = new Sprite(pX, pY, width, height, texture, vbom) {
+            @Override
+            public boolean onAreaTouched(final TouchEvent sceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                if (!cardPack.isScrolling() && (sceneTouchEvent.isActionCancel() || sceneTouchEvent.isActionUp())) {
+                    return true;
+                }
+                return false;
+            }
+        };
+        return sprite;
     }
 
     private F2ButtonSprite createBackButton() {

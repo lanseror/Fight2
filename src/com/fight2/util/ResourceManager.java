@@ -68,6 +68,7 @@ public class ResourceManager {
         // Start load resources
         TiledTextureFactory.getInstance().loadResource(textureManager, assetManager);
         final TextureFactory textureFactory = TextureFactory.getInstance();
+        textureFactory.init();
         textureFactory.initImageData(activity);
         final String installUUID = AccountUtils.readInstallUUID(activity);
         AccountUtils.login(installUUID, activity);

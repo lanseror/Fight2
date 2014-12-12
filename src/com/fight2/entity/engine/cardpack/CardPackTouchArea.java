@@ -27,13 +27,15 @@ public class CardPackTouchArea extends Rectangle {
     private VelocityTracker velocityTracker;
     private final F2ScrollDetector scrollDetector;
     private final PhysicsHandler physicsHandler;
+    private final CardPack cardPack;
 
     public CardPackTouchArea(final float pX, final float pY, final float pWidth, final float pHeight, final VertexBufferObjectManager vbom,
-            final F2ScrollDetector scrollDetector, final PhysicsHandler physicsHandler) {
+            final F2ScrollDetector scrollDetector, final PhysicsHandler physicsHandler, final CardPack cardPack) {
         super(pX, pY, pWidth, pHeight, vbom);
         this.setColor(Color.TRANSPARENT);
         this.scrollDetector = scrollDetector;
         this.physicsHandler = physicsHandler;
+        this.cardPack = cardPack;
         final BigDecimal devicePX = BigDecimal.valueOf(ConfigHelper.getInstance().getFloat(ConfigEnum.X_DPI));
         final BigDecimal bdFactor = BigDecimal.valueOf(BASE_PX).divide(devicePX, 2, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(430));
         factor = bdFactor.intValue();
@@ -43,6 +45,9 @@ public class CardPackTouchArea extends Rectangle {
     public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
         scrollDetector.onTouchEvent(pSceneTouchEvent);
         scrollDetector.setSceneTouchEvent(pSceneTouchEvent);
+        if (!cardPack.isScrolling() && pSceneTouchEvent.isActionUp()) {
+            return false;
+        }
         final MotionEvent motionEvent = pSceneTouchEvent.getMotionEvent();
         final int action = motionEvent.getAction();
         if (velocityTracker == null) {
@@ -70,6 +75,7 @@ public class CardPackTouchArea extends Rectangle {
                     physicsHandler.setVelocityX(Math.abs(velocityX) > MAX_VELOCITY ? flag * MAX_VELOCITY : velocityX);
                 }
                 physicsHandler.setAccelerationX(velocityX > 0 ? -ACCELERATION : ACCELERATION);
+                cardPack.setScrolling(false);
                 break;
 
         }

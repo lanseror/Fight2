@@ -45,6 +45,7 @@ public class CardPackScrollDetectorListener implements IScrollDetectorListener {
 
     @Override
     public void onScrollStarted(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
+        cardPack.setScrolling(true);
         initPointerID = pPointerID;
         if (cardPack.getChildCount() != 0) {
             final F2ScrollDetector scrollDetector = (F2ScrollDetector) pScollDetector;

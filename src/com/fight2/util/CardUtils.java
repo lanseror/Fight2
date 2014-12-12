@@ -97,6 +97,7 @@ public class CardUtils {
             card.setHp(cardJson.getInt("hp"));
             card.setBaseExp(cardJson.getInt("baseExp"));
             card.setExp(cardJson.getInt("exp"));
+            card.setAmount(cardJson.getInt("amount"));
             if (cardJson.has("avatar")) {
                 card.setAvatar(cardJson.getString("avatar"));
             }

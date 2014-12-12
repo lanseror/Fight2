@@ -6,8 +6,10 @@ import java.math.RoundingMode;
 
 import org.andengine.entity.IEntity;
 import org.andengine.entity.primitive.Rectangle;
+import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
+import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
@@ -18,6 +20,7 @@ import com.fight2.constant.FontEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.Card.Race;
+import com.fight2.scene.CardInfoScene;
 import com.fight2.util.AsyncTaskLoader;
 import com.fight2.util.CardUtils;
 import com.fight2.util.IAsyncCallback;
@@ -231,6 +234,21 @@ public class CardFrame extends Rectangle {
             tierStickAdd.setZIndex(7);
         }
 
+    }
+
+    @Override
+    public boolean onAreaTouched(final TouchEvent sceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+        if (sceneTouchEvent.isActionCancel() || sceneTouchEvent.isActionUp()) {
+            try {
+                final Scene cardInfoScene = new CardInfoScene(activity, card);
+                activity.getEngine().getScene().setChildScene(cardInfoScene, false, false, true);
+            } catch (final IOException e) {
+                throw new RuntimeException(e);
+            }
+
+            return true;
+        }
+        return false;
     }
 
     public Card getCard() {

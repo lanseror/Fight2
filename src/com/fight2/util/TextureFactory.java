@@ -2,7 +2,6 @@ package com.fight2.util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,8 +19,6 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.TextureEnum;
-import com.fight2.entity.Card;
-import com.fight2.entity.GameUserSession;
 import com.fight2.entity.engine.ProgressBar;
 
 public class TextureFactory {
@@ -36,6 +33,12 @@ public class TextureFactory {
 
     public static TextureFactory getInstance() {
         return INSTANCE;
+    }
+
+    public void init() {
+        datas.clear();
+        cardDatas.clear();
+        imageDatas.clear();
     }
 
     public void loadResource(final TextureManager textureManager, final AssetManager assetManager, final ProgressBar progressBar) throws IOException {

@@ -117,8 +117,8 @@ public enum TextureEnum {
     PARTY_EDIT_SWITCH_BUTTON_PRESSED("images/party_edit_switch_button_fcs.png", 130, 132),
     PARTY_ENHANCE_BUTTON("images/party_enhance_button.png", 130, 132),
     PARTY_ENHANCE_BUTTON_PRESSED("images/party_enhance_button_fcs.png", 130, 132),
-    PARTY_RECHARGE("images/party_recharge.png", 224, 77),
-    PARTY_RECHARGE_PRESSED("images/party_recharge_fcs.png", 224, 77),
+    PARTY_RECHARGE("images/party_recharge.png", 182, 46),
+    PARTY_RECHARGE_PRESSED("images/party_recharge_fcs.png", 182, 46),
 
     // Card upgrade scene images.
     UPGRADE_FRAME("images/upgrade_frame.png", 746, 368),
@@ -137,6 +137,9 @@ public enum TextureEnum {
 
     // PlayerInfo scene images.
     PLAYERINFO_FRAME("images/playerinfo_frame.png", 491, 469),
+
+    // CardInfo scene images.
+    CARDINFO_FRAME("images/cardinfo_frame.png", 491, 469),
 
     // Guild scene images.
     GUILD_FRAME("images/guild_frame.png", 851, 495),
@@ -212,7 +215,13 @@ public enum TextureEnum {
     PREBATTLE_COMBO_SKILL_RIGHT("images/prebattle_combo_skill_right.png", 285, 122),
 
     // Quest images.
-    QUEST_TREASURE_BOX("images/quest_treasure_box.png", 95 * 0.4f, 84 * 0.4f);
+    QUEST_TOWN("images/quest_town.png", 56, 52),
+    QUEST_TREASURE_BOX("images/quest_treasure_box.png", 95 * 0.4f, 84 * 0.4f),
+    QUEST_PATH_TAG("images/quest_path_tag.png", 15, 15),
+    QUEST_PATH_TAG_LEFT_END("images/quest_path_tag_left_end.png", 30, 26),
+    QUEST_PATH_TAG_LEFT_TREASURE("images/quest_path_tag_left_treasure.png", 28, 31),
+    QUEST_PATH_TAG_RIGHT_END("images/quest_path_tag_right_end.png", 30, 26),
+    QUEST_PATH_TAG_RIGHT_TREASURE("images/quest_path_tag_right_treasure.png", 28, 31);
 
     private final String url;
     private final float width;

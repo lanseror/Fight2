@@ -124,7 +124,7 @@ public class CardEvolutionScene extends BaseCardPackScene {
         this.setBackground(background);
 
         final Sprite rechargeSprite = createALBF2ButtonSprite(TextureEnum.PARTY_RECHARGE, TextureEnum.PARTY_RECHARGE_PRESSED, this.simulatedRightX
-                - TextureEnum.PARTY_RECHARGE.getWidth() + 20, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight());
+                - TextureEnum.PARTY_RECHARGE.getWidth() - 8, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight() - 4);
         this.attachChild(rechargeSprite);
         this.registerTouchArea(rechargeSprite);
 
@@ -215,7 +215,7 @@ public class CardEvolutionScene extends BaseCardPackScene {
 
         final float touchAreaWidth = this.simulatedWidth - TextureEnum.COMMON_BACK_BUTTON_NORMAL.getWidth() - 80;
         final float touchAreaX = this.simulatedLeftX + touchAreaWidth * 0.5f;
-        final Rectangle touchArea = new CardPackTouchArea(touchAreaX, 160, touchAreaWidth, 280, vbom, scrollDetector, physicsHandler);
+        final Rectangle touchArea = new CardPackTouchArea(touchAreaX, 160, touchAreaWidth, 280, vbom, scrollDetector, physicsHandler, cardPack);
         this.registerTouchArea(touchArea);
         this.attachChild(touchArea);
         this.attachChild(cardPack);

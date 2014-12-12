@@ -27,11 +27,12 @@ import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
-import com.fight2.entity.engine.F2ButtonSprite;
-import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
+import com.fight2.entity.engine.CardAvatar;
+import com.fight2.entity.engine.F2ButtonSprite;
+import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.CardUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
@@ -83,7 +84,7 @@ public class PartyScene extends BaseScene {
         this.attachChild(atkText);
 
         final Sprite rechargeSprite = createALBF2ButtonSprite(TextureEnum.PARTY_RECHARGE, TextureEnum.PARTY_RECHARGE_PRESSED, this.simulatedRightX
-                - TextureEnum.PARTY_RECHARGE.getWidth() + 20, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight());
+                - TextureEnum.PARTY_RECHARGE.getWidth() - 8, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight() - 4);
         this.attachChild(rechargeSprite);
         this.registerTouchArea(rechargeSprite);
 
@@ -250,9 +251,8 @@ public class PartyScene extends BaseScene {
             for (int cardIndex = 0; cardIndex < cards.length; cardIndex++) {
                 final Card card = cards[cardIndex];
                 if (card != null) {
-                    final ITextureRegion cardTextureRegion = TextureFactory.getInstance().getTextureRegion(card.getAvatar());
-                    final Sprite cardSprite = new Sprite(83f + (gap + cardWidth) * cardIndex, cardY, cardWidth, cardHeight, cardTextureRegion, vbom);
-                    gridTouchArea.attachChild(cardSprite);
+                    final CardAvatar cardAvatar = new CardAvatar(83f + (gap + cardWidth) * cardIndex, cardY, cardWidth, cardHeight, card, activity);
+                    gridTouchArea.attachChild(cardAvatar);
                 }
 
             }

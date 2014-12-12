@@ -1,7 +1,8 @@
 package com.fight2.scene;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.andengine.entity.IEntity;
 import org.andengine.entity.primitive.Rectangle;
@@ -22,7 +23,6 @@ import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
-import com.fight2.entity.GameUserSession;
 import com.fight2.entity.engine.CardFrame;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
@@ -52,6 +52,8 @@ public class CardUpgradeScene extends BaseCardPackScene {
     private final Font hpatkFont;
     private final Text hpText;
     private final Text atkText;
+    private final List<CardUpdateHandler> cardUpdateHandlers = new ArrayList<CardUpdateHandler>();
+    private final List<Card> cardPackCards = new ArrayList<Card>(session.getCards());
 
     public CardUpgradeScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -73,29 +75,40 @@ public class CardUpgradeScene extends BaseCardPackScene {
     @Override
     public void updateScene() {
         activity.getGameHub().needSmallChatRoom(false);
+        updateCardPack();
+    }
+
+    public void updateCardPack() {
         // Insert cards to card pack.
+        for (int i = 0; i < cardPack.getChildCount(); i++) {
+            this.unregisterTouchArea(cardPack.getChildByIndex(i));
+        }
+        for (final CardUpdateHandler cardUpdateHandler : cardUpdateHandlers) {
+            this.unregisterUpdateHandler(cardUpdateHandler);
+        }
         cardPack.detachChildren();
+        cardUpdateHandlers.clear();
         final float initCardX = cardZoom.getX() - (cardPack.getX() - 0.5f * cardPack.getWidth());
-        final GameUserSession session = GameUserSession.getInstance();
-        final Collection<Card> sessionCards = session.getCards();
         float appendX = initCardX;
-        int i = 0;
-        for (final Card sessionCard : sessionCards) {
-            final IEntity card = new CardFrame(appendX, CARD_Y, CARD_WIDTH, CARD_HEIGHT, sessionCard, activity);
-            card.setTag(i);
-            card.setWidth(CARD_WIDTH);
-            card.setHeight(CARD_HEIGHT);
-            card.setPosition(appendX, CARD_Y);
-            card.setUserData(sessionCard);
-            cardPack.attachChild(card);
+        for (int i = 0; i < cardPackCards.size(); i++) {
+            final Card cardPackCard = cardPackCards.get(i);
+            final IEntity cardSprite = new CardFrame(appendX, CARD_Y, CARD_WIDTH, CARD_HEIGHT, cardPackCard, activity);
+            cardSprite.setTag(i);
+            cardSprite.setWidth(CARD_WIDTH);
+            cardSprite.setHeight(CARD_HEIGHT);
+            cardSprite.setPosition(appendX, CARD_Y);
+            cardSprite.setUserData(cardPackCard);
+            cardPack.attachChild(cardSprite);
             if (i == 0) {
                 appendX += 1.5 * (CARD_GAP + CARD_WIDTH);
-                cardZoom.setUserData(card);
+                cardZoom.setUserData(cardSprite);
             } else {
                 appendX += CARD_GAP + CARD_WIDTH;
             }
-            this.registerUpdateHandler(new CardUpdateHandler(cardZoom, card));
-            i++;
+            final CardUpdateHandler cardUpdateHandler = new CardUpdateHandler(cardZoom, cardSprite);
+            cardUpdateHandlers.add(cardUpdateHandler);
+            this.registerUpdateHandler(cardUpdateHandler);
+            this.registerTouchArea(cardSprite);
         }
     }
 
@@ -106,7 +119,7 @@ public class CardUpgradeScene extends BaseCardPackScene {
         this.setBackground(background);
 
         final Sprite rechargeSprite = createALBF2ButtonSprite(TextureEnum.PARTY_RECHARGE, TextureEnum.PARTY_RECHARGE_PRESSED, this.simulatedRightX
-                - TextureEnum.PARTY_RECHARGE.getWidth() + 20, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight());
+                - TextureEnum.PARTY_RECHARGE.getWidth() - 8, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight() - 4);
         this.attachChild(rechargeSprite);
         this.registerTouchArea(rechargeSprite);
 
@@ -209,17 +222,19 @@ public class CardUpgradeScene extends BaseCardPackScene {
 
         final float touchAreaWidth = this.simulatedWidth - TextureEnum.COMMON_BACK_BUTTON_NORMAL.getWidth() - 80;
         final float touchAreaX = this.simulatedLeftX + touchAreaWidth * 0.5f;
-        final Rectangle touchArea = new CardPackTouchArea(touchAreaX, 160, touchAreaWidth, 280, vbom, scrollDetector, physicsHandler);
+        final Rectangle touchArea = new CardPackTouchArea(touchAreaX, 160, touchAreaWidth, 280, vbom, scrollDetector, physicsHandler, cardPack);
         this.registerTouchArea(touchArea);
         this.attachChild(touchArea);
         this.attachChild(cardPack);
         this.attachChild(cardZoom);
 
         // Add cover and buttons.
-        final Sprite leftCover = createALBImageSprite(TextureEnum.PARTY_EDIT_COVER_LEFT, 0, 0);
-        final Sprite rightCover = createALBImageSprite(TextureEnum.PARTY_EDIT_COVER_RIGHT, this.cameraWidth - TextureEnum.PARTY_EDIT_COVER_RIGHT.getWidth(), 0);
+        final Sprite leftCover = createCoverSprite(TextureEnum.PARTY_EDIT_COVER_LEFT, 0, 0);
+        final Sprite rightCover = createCoverSprite(TextureEnum.PARTY_EDIT_COVER_RIGHT, this.cameraWidth - TextureEnum.PARTY_EDIT_COVER_RIGHT.getWidth(), 0);
         this.attachChild(leftCover);
         this.attachChild(rightCover);
+        this.registerTouchArea(leftCover);
+        this.registerTouchArea(rightCover);
 
         final F2ButtonSprite backButton = createBackButton();
         this.attachChild(backButton);
@@ -231,6 +246,25 @@ public class CardUpgradeScene extends BaseCardPackScene {
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
+    }
+    
+    private Sprite createCoverSprite(final TextureEnum textureEnum, final float x, final float y) {
+        final TextureFactory textureFactory = TextureFactory.getInstance();
+        final ITextureRegion texture = textureFactory.getAssetTextureRegion(textureEnum);
+        final float width = textureEnum.getWidth();
+        final float height = textureEnum.getHeight();
+        final float pX = x + width * 0.5f;
+        final float pY = y + height * 0.5f;
+        final Sprite sprite = new Sprite(pX, pY, width, height, texture, vbom) {
+            @Override
+            public boolean onAreaTouched(final TouchEvent sceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                if (!cardPack.isScrolling() && (sceneTouchEvent.isActionCancel() || sceneTouchEvent.isActionUp())) {
+                    return true;
+                }
+                return false;
+            }
+        };
+        return sprite;
     }
 
     @Override

@@ -69,6 +69,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     private final float SCALE = 1.5f;
     private final ITiledTextureRegion playerTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.HERO);
     private final float playerHeight = playerTextureRegion.getHeight();
+    private final Queue<Sprite> pathTags = new LinkedList<Sprite>();
 
     public QuestScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -147,6 +148,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                                 playerSceneCordinates[Constants.VERTEX_INDEX_Y]);
                         // Debug.e("Found currentTile:" + currentTile.getTileColumn() + "," + currentTile.getTileRow());
                         final Path path = findPath(currentTile, tmxTile, tmxLayer);
+                        showPathTags(path);
                         go(tmxTile);
                         final float[] xs = path.getCoordinatesX();
                         final float[] ys = path.getCoordinatesY();
@@ -180,6 +182,13 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                                     } else if (x1 < x2 && y1 > y2) {// down
                                         changeDirection(player, 7);
                                     }
+
+                                    activity.runOnUpdateThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            pathTags.poll().detachSelf();
+                                        }
+                                    });
                                 }
                             }
 
@@ -238,20 +247,95 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             }
         });
 
-        final F2ButtonSprite backButton = createALBF2ButtonSprite(TextureEnum.COMMON_BACK_BUTTON_NORMAL, TextureEnum.COMMON_BACK_BUTTON_PRESSED,
-                this.simulatedRightX - 135, 50);
-        backButton.setOnClickListener(new F2OnClickListener() {
+        final F2ButtonSprite townButton = createALBF2ButtonSprite(TextureEnum.QUEST_TOWN, TextureEnum.QUEST_TOWN, this.simulatedLeftX, this.cameraHeight
+                - TextureEnum.QUEST_TOWN.getHeight());
+        townButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 ResourceManager.getInstance().setCurrentScene(SceneEnum.Main);
             }
         });
-        this.attachChild(backButton);
-        this.registerTouchArea(backButton);
+        this.attachChild(townButton);
+        this.registerTouchArea(townButton);
+
+        final Sprite experienceBox = createALBImageSprite(TextureEnum.COMMON_EXPERIENCE_BOX, this.simulatedLeftX + 100, this.simulatedHeight
+                - TextureEnum.COMMON_EXPERIENCE_BOX.getHeight() + 7);
+        this.attachChild(experienceBox);
+        experienceBox.setScale(0.8f);
+        final Sprite experienceStick = createALBImageSprite(TextureEnum.COMMON_EXPERIENCE_STICK, 52, 0);
+        experienceBox.attachChild(experienceStick);
+        final Sprite experienceBoxStar = createALBImageSprite(TextureEnum.COMMON_EXPERIENCE_BOX_STAR, this.simulatedLeftX + 100, this.simulatedHeight
+                - TextureEnum.COMMON_EXPERIENCE_BOX.getHeight() + 7);
+        experienceBoxStar.setScale(0.8f);
+        this.attachChild(experienceBoxStar);
+
+        final Sprite staminaBox = createALBImageSprite(TextureEnum.COMMON_STAMINA_BOX, this.simulatedLeftX + 400, this.simulatedHeight
+                - TextureEnum.COMMON_STAMINA_BOX.getHeight() + 8);
+        staminaBox.setScale(0.8f);
+        this.attachChild(staminaBox);
+        final Sprite staminaStick = createALBImageSprite(TextureEnum.COMMON_STAMINA_STICK, 56, 11);
+        staminaBox.attachChild(staminaStick);
+
+        final Sprite rechargeSprite = createALBF2ButtonSprite(TextureEnum.PARTY_RECHARGE, TextureEnum.PARTY_RECHARGE_PRESSED, this.simulatedRightX
+                - TextureEnum.PARTY_RECHARGE.getWidth() - 8, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight() - 4);
+        this.attachChild(rechargeSprite);
+        this.registerTouchArea(rechargeSprite);
+    }
+
+    private void showPathTags(final Path path) {
+        activity.runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                final float[] xs = path.getCoordinatesX();
+                final float[] ys = path.getCoordinatesY();
+                final int pathSize = path.getSize();
+                for (int i = 1; i < path.getSize(); i++) {
+                    Sprite tag = null;
+                    if (i == pathSize - 1) {
+                        tag = createPathEndTag(path);
+                    } else {
+                        tag = createACImageSprite(TextureEnum.QUEST_PATH_TAG, xs[i], ys[i] - 20);
+                    }
+                    tmxTiledMap.attachChild(tag);
+                    pathTags.add(tag);
+                }
+            }
+        });
+    }
+
+    private Sprite createPathEndTag(final Path path) {
+        final float[] xs = path.getCoordinatesX();
+        final float[] ys = path.getCoordinatesY();
+        final int endIndex = path.getSize() - 1;
+        final float x1 = xs[endIndex - 1];
+        final float y1 = ys[endIndex - 1];
+        final float x2 = xs[endIndex];
+        final float y2 = ys[endIndex];
+        TextureEnum textureEnum = TextureEnum.QUEST_PATH_TAG_RIGHT_END;
+        if (x1 > x2 && y1 < y2) { // left up
+            textureEnum = TextureEnum.QUEST_PATH_TAG_LEFT_END;
+        } else if (x1 == x2 && y1 < y2) { // up
+            textureEnum = TextureEnum.QUEST_PATH_TAG_RIGHT_END;
+        } else if (x1 < x2 && y1 < y2) { // right up
+            textureEnum = TextureEnum.QUEST_PATH_TAG_RIGHT_END;
+        } else if (x1 > x2 && y1 == y2) {// left
+            textureEnum = TextureEnum.QUEST_PATH_TAG_LEFT_END;
+        } else if (x1 < x2 && y1 == y2) {// right
+            textureEnum = TextureEnum.QUEST_PATH_TAG_RIGHT_END;
+        } else if (x1 > x2 && y1 > y2) {// left down
+            textureEnum = TextureEnum.QUEST_PATH_TAG_LEFT_END;
+        } else if (x1 == x2 && y1 > y2) {// down
+            textureEnum = TextureEnum.QUEST_PATH_TAG_RIGHT_END;
+        } else if (x1 < x2 && y1 > y2) {// right down
+            textureEnum = TextureEnum.QUEST_PATH_TAG_RIGHT_END;
+        }
+        final Sprite tag = createACImageSprite(textureEnum, x2, y2 - 15);
+        return tag;
+
     }
 
     private synchronized void removeTreasureSprite() {
-        activity.runOnUiThread(new Runnable() {
+        activity.runOnUpdateThread(new Runnable() {
             @Override
             public void run() {
                 treasureSprites.get(questResult.getTreasureIndex()).detachSelf();
@@ -263,7 +347,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     private synchronized void refreshTreasureSprites(final QuestTreasureData newTreasureData) {
         final TMXLayer tmxLayer = this.tmxTiledMap.getTMXLayers().get(0);
         if (newTreasureData.getVersion() > questTreasureData.getVersion()) {
-            activity.runOnUiThread(new Runnable() {
+            activity.runOnUpdateThread(new Runnable() {
                 @Override
                 public void run() {
                     for (final Sprite treasureSprite : treasureSprites) {

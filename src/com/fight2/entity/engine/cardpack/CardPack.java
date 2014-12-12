@@ -21,6 +21,7 @@ public class CardPack extends Rectangle {
     private final IEntity cardZoom;
     private final GameActivity activity;
     private final List<CardFrame> unmatchFilterCards = new ArrayList<CardFrame>();
+    private boolean isScrolling;
 
     public CardPack(final float pX, final float pY, final float pWidth, final float pHeight, final GameActivity activity, final IEntity cardZoom) {
         super(pX, pY, pWidth, pHeight, activity.getVertexBufferObjectManager());
@@ -127,4 +128,13 @@ public class CardPack extends Rectangle {
         revertCard.setScale(1f);
         GameUserSession.getInstance().getCards().add(replaceCard);
     }
+
+    public boolean isScrolling() {
+        return isScrolling;
+    }
+
+    public void setScrolling(final boolean isScrolling) {
+        this.isScrolling = isScrolling;
+    }
+
 }
