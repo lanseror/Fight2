@@ -12,6 +12,7 @@ import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.engine.options.AudioOptions;
 import org.andengine.engine.options.EngineOptions;
 import org.andengine.engine.options.ScreenOrientation;
+import org.andengine.engine.options.WakeLockOptions;
 import org.andengine.engine.options.resolutionpolicy.CropResolutionPolicy;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
@@ -108,6 +109,7 @@ public class GameActivity extends LayoutGameActivity {
                 camera);
         final AudioOptions audioOptions = engineOptions.getAudioOptions().setNeedsSound(true);
         audioOptions.getMusicOptions().setNeedsMusic(true);
+//        engineOptions.setWakeLockOptions(WakeLockOptions.SCREEN_DIM);
         return engineOptions;
     }
 
