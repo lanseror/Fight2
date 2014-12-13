@@ -57,6 +57,8 @@ public enum TextureEnum {
     COMMON_CARD_FRAME_TIER_STICK_DEVIL("images/common_card_frame_tier_stick_devil.png", 34, 11),
     COMMON_CARD_FRAME_TIER_STICK_DEVIL_2("images/common_card_frame_tier_stick_devil_2.png", 71, 11),
     COMMON_CARD_FRAME_TIER_STICK_DEVIL_3("images/common_card_frame_tier_stick_devil_3.png", 107, 11),
+    COMMON_HP_ICON("images/common_hp_icon.png", 39, 33),
+    COMMON_ATK_ICON("images/common_atk_icon.png", 45, 35),
 
     // Chat room images.
     CHAT_INPUT_BG("images/chat_input_backgroud.png", 755, 75),
@@ -140,6 +142,8 @@ public enum TextureEnum {
 
     // CardInfo scene images.
     CARDINFO_FRAME("images/cardinfo_frame.png", 491, 469),
+    CARDINFO_TIER_GRID("images/cardinfo_tier_grid.png", 80, 25),
+    CARDINFO_TIER_STICK("images/cardinfo_tier_stick.png", 84, 29),
 
     // Guild scene images.
     GUILD_FRAME("images/guild_frame.png", 851, 495),

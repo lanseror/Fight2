@@ -104,6 +104,7 @@ public class CardUtils {
             card.setImage(cardJson.getString("image"));
             card.setName(cardJson.getString("name"));
             card.setSkill(cardJson.optString("skill"));
+            card.setSkillEffect(cardJson.optString("skillEffect"));
             if (cardJson.has("cardTemplate")) {
                 final JSONObject cardTemplateJson = cardJson.getJSONObject("cardTemplate");
                 card.setTemplateId(cardTemplateJson.getInt("id"));

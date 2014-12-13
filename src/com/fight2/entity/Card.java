@@ -13,6 +13,7 @@ public class Card {
     private int exp;
     private int baseExp;
     private String skill;
+    private String skillEffect;
     private int skillLevel;
     private int templateId;
     private int version;
@@ -142,6 +143,14 @@ public class Card {
 
     public void setSkill(final String skill) {
         this.skill = skill;
+    }
+
+    public String getSkillEffect() {
+        return skillEffect;
+    }
+
+    public void setSkillEffect(final String skillEffect) {
+        this.skillEffect = skillEffect;
     }
 
     public int getSkillLevel() {
