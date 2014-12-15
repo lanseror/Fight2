@@ -370,16 +370,6 @@ public class BattleScene extends BaseScene {
         return applyParties;
     }
 
-    private int getPartiesRemainHp(final BattlePartyFrame[] parties) {
-        int hp = 0;
-        for (final BattlePartyFrame party : parties) {
-            if (party != null) {
-                hp += party.getHp();
-            }
-        }
-        return hp;
-    }
-
     @Override
     public void updateScene() {
         activity.getGameHub().needSmallChatRoom(false);

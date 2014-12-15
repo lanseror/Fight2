@@ -248,7 +248,6 @@ public class CardFrame extends Rectangle {
                 } else {
                     childScene.setChildScene(cardInfoScene, false, false, true);
                 }
-
             } catch (final IOException e) {
                 throw new RuntimeException(e);
             }

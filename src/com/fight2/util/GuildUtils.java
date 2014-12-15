@@ -17,7 +17,6 @@ import com.fight2.GameActivity;
 import com.fight2.entity.Bid;
 import com.fight2.entity.Bid.BidItemType;
 import com.fight2.entity.Bid.BidStatus;
-import com.fight2.entity.Card.Race;
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Guild;

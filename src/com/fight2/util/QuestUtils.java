@@ -12,7 +12,6 @@ import org.json.JSONObject;
 import com.fight2.GameActivity;
 import com.fight2.entity.Card;
 import com.fight2.entity.QuestResult;
-import com.fight2.entity.Card.Race;
 import com.fight2.entity.QuestResult.TileItem;
 import com.fight2.entity.QuestTile;
 import com.fight2.entity.QuestTreasureData;
