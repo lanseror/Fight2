@@ -3,13 +3,11 @@ package com.fight2.scene;
 import java.io.IOException;
 
 import org.andengine.entity.IEntity;
-import org.andengine.entity.sprite.Sprite;
-import org.andengine.opengl.texture.region.ITextureRegion;
 
 import com.fight2.GameActivity;
 import com.fight2.entity.Card;
+import com.fight2.entity.engine.CardAvatar;
 import com.fight2.entity.engine.CardFrame;
-import com.fight2.util.TextureFactory;
 
 public abstract class BaseCardPackScene extends BaseScene {
     public final static int CARD_GAP = 20;
@@ -21,10 +19,8 @@ public abstract class BaseCardPackScene extends BaseScene {
         super(activity);
     }
 
-    public Sprite createCardAvatarSprite(final Card card, final float width, final float height) {
-        final TextureFactory textureFactory = TextureFactory.getInstance();
-        final ITextureRegion texture = textureFactory.getTextureRegion(card.getAvatar());
-        final Sprite sprite = new Sprite(0, 0, width, height, texture, vbom);
+    public IEntity createCardAvatarSprite(final Card card, final float width, final float height) {
+        final IEntity sprite = new CardAvatar(0, 0, width, height, card, activity);
         return sprite;
     }
 

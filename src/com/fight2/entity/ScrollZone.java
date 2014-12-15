@@ -17,6 +17,7 @@ public class ScrollZone extends ClipEntity implements IScrollDetectorListener {
     private final float containerInitY;
     private float rowHeight = 0;
     private float scrollBottomY = 0;
+    private boolean scrolling;
 
     public ScrollZone(final float x, final float y, final float width, final float height, final VertexBufferObjectManager vbom) {
         super(x, y, width, height);
@@ -34,6 +35,13 @@ public class ScrollZone extends ClipEntity implements IScrollDetectorListener {
             @Override
             public boolean onAreaTouched(final TouchEvent touchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 scrollDetector.onTouchEvent(touchEvent);
+                if (touchEvent.isActionUp()) {
+                    if (isScrolling()) {
+                        setScrolling(false);
+                    } else {
+                        return false;
+                    }
+                }
                 return true;
             }
         };
@@ -69,8 +77,17 @@ public class ScrollZone extends ClipEntity implements IScrollDetectorListener {
         }
     }
 
+    public boolean isScrolling() {
+        return scrolling;
+    }
+
+    public void setScrolling(final boolean scrolling) {
+        this.scrolling = scrolling;
+    }
+
     @Override
     public void onScrollStarted(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
+        setScrolling(true);
         handleScroll(pScollDetector, pPointerID, pDistanceX, pDistanceY);
     }
 

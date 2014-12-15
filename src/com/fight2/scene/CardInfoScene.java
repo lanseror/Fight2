@@ -5,7 +5,9 @@ import java.io.IOException;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.entity.text.AutoWrap;
 import org.andengine.entity.text.Text;
+import org.andengine.entity.text.TextOptions;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 
@@ -123,8 +125,10 @@ public class CardInfoScene extends BaseScene {
         this.leftAlignEntity(skillNameText, 25);
         infoFrame.attachChild(skillNameText);
 
-        final Text skillEffectText = new Text(80, 170, detailFont, card.getSkillEffect(), vbom);
+        final TextOptions textOptions = new TextOptions(AutoWrap.LETTERS, 420);
+        final Text skillEffectText = new Text(80, 170, detailFont, card.getSkillEffect(), textOptions, vbom);
         this.leftAlignEntity(skillEffectText, 25);
+        this.topAlignEntity(skillEffectText, 190);
         infoFrame.attachChild(skillEffectText);
 
         this.setTouchAreaBindingOnActionDownEnabled(true);

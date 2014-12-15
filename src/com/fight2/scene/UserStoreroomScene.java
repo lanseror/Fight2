@@ -129,6 +129,7 @@ public class UserStoreroomScene extends BaseScene {
             this.leftAlignEntity(cardAmountText, cardSprite.getX() + cardSprite.getWidth() * 0.5f + 5);
             cardRow.attachChild(cardSprite);
             cardRow.attachChild(cardAmountText);
+            this.registerTouchArea(cardSprite);
             // Receive button
             final F2ButtonSprite receiveButton = createACF2CommonButton(550, cardRowY, "提取");
             cardRow.attachChild(receiveButton);

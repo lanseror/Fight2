@@ -500,6 +500,7 @@ public class GuildScene extends BaseScene {
             this.leftAlignEntity(cardAmountText, cardSprite.getX() + cardSprite.getWidth() * 0.5f + 5);
             cardRow.attachChild(cardSprite);
             cardRow.attachChild(cardAmountText);
+            this.registerTouchArea(cardSprite);
             if (isAdmin) {
                 // Bid button
                 final F2ButtonSprite bidButton = createACF2CommonButton(625, cardRowY, "拍卖");
@@ -562,6 +563,7 @@ public class GuildScene extends BaseScene {
                 this.leftAlignEntity(cardAmountText, cardSprite.getX() + cardSprite.getWidth() * 0.5f + 5);
                 row.attachChild(cardSprite);
                 row.attachChild(cardAmountText);
+                this.registerTouchArea(cardSprite);
             } else if (itemType == BidItemType.ArenaTicket) {
                 // Ticket
                 final TextureEnum ticketEnum = TextureEnum.COMMON_ARENA_TICKET;

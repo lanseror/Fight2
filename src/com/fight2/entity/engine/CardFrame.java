@@ -241,7 +241,14 @@ public class CardFrame extends Rectangle {
         if (sceneTouchEvent.isActionCancel() || sceneTouchEvent.isActionUp()) {
             try {
                 final Scene cardInfoScene = new CardInfoScene(activity, card);
-                activity.getEngine().getScene().setChildScene(cardInfoScene, false, false, true);
+                final Scene scene = activity.getEngine().getScene();
+                final Scene childScene = scene.getChildScene();
+                if (childScene == null) {
+                    scene.setChildScene(cardInfoScene, false, false, true);
+                } else {
+                    childScene.setChildScene(cardInfoScene, false, false, true);
+                }
+
             } catch (final IOException e) {
                 throw new RuntimeException(e);
             }

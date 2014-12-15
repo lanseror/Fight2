@@ -58,6 +58,8 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
     private static String MIGHT_DESC = "在战斗中胜利可获得力量，从而赢得奖励。以下列表显示了你完成每个阶段时可以获得的奖励。达到力量要求后，系统会将奖励发送到你的宝库中。";
     private static String RANK_DESC = "只有最强大的英雄才配获得最丰厚的奖励！以下列表显示了你名列前茅时能够获得的奖励。完成赛季的战斗后，就会根据排名获得奖励。";
     private final UserArenaInfo userArenaInfo;
+    private boolean scrolling;
+    private ClipEntity rewardListTouchArea;
 
     public ArenaRewardScene(final GameActivity activity, final UserArenaInfo userArenaInfo) throws IOException {
         super(activity);
@@ -82,7 +84,6 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
         mightContainer.setAlpha(0);
         rankContainer = new Rectangle(frameCenter, CONTAINER_INIT_Y, frameWidth, CLIP_HEIGHT, vbom);
         rankContainer.setAlpha(0);
-        rankContainer.setVisible(false);
         init();
     }
 
@@ -139,13 +140,20 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
         rankDesc.attachChild(rankDescText);
         rankContainer.attachChild(rankDesc);
 
-        final ClipEntity rewardListTouchArea = new ClipEntity(frameCenter, 250, frameWidth, CLIP_HEIGHT) {
+        rewardListTouchArea = new ClipEntity(frameCenter, 250, frameWidth, CLIP_HEIGHT) {
             @Override
             public boolean onAreaTouched(final TouchEvent touchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 if (mightButton.contains(touchEvent.getX(), touchEvent.getY())) {
                     return false;
                 } else {
                     scrollDetector.onTouchEvent(touchEvent);
+                    if (touchEvent.isActionUp()) {
+                        if (scrolling) {
+                            scrolling = false;
+                        } else {
+                            return false;
+                        }
+                    }
                     return true;
                 }
             }
@@ -153,7 +161,6 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
         frameSprite.attachChild(rewardListTouchArea);
         this.registerTouchArea(rewardListTouchArea);
         rewardListTouchArea.attachChild(mightContainer);
-        rewardListTouchArea.attachChild(rankContainer);
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
@@ -166,13 +173,23 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
 
     }
 
-    private IEntity createMightTouchArea() {
+    private IEntity createRankTouchArea() {
         final IEntity touchArea = new Rectangle(140, 30, 250, 60, vbom) {
             @Override
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 if (pSceneTouchEvent.isActionUp()) {
-                    mightContainer.setVisible(true);
-                    rankContainer.setVisible(false);
+                    if (mightContainer.getParent() == null) {
+                        activity.runOnUpdateThread(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                rewardListTouchArea.attachChild(mightContainer);
+                                rankContainer.detachSelf();
+                            }
+
+                        });
+
+                    }
                     return true;
                 }
                 return false;
@@ -183,13 +200,23 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
         return touchArea;
     }
 
-    private IEntity createRankTouchArea() {
+    private IEntity createMightTouchArea() {
         final IEntity touchArea = new Rectangle(405, 30, 230, 60, vbom) {
             @Override
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 if (pSceneTouchEvent.isActionUp()) {
-                    mightContainer.setVisible(false);
-                    rankContainer.setVisible(true);
+                    if (rankContainer.getParent() == null) {
+                        activity.runOnUpdateThread(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                rewardListTouchArea.attachChild(rankContainer);
+                                mightContainer.detachSelf();
+                            }
+
+                        });
+
+                    }
                     return true;
                 }
                 return false;
@@ -304,6 +331,7 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
                 amountText.setX(cardSprite.getWidth() + amountText.getWidth() * 0.5f + 5);
                 cardSprite.attachChild(amountText);
                 rewardGrid.attachChild(cardSprite);
+                this.registerTouchArea(cardSprite);
             }
 
         }
@@ -357,6 +385,7 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
 
     @Override
     public void onScrollStarted(final ScrollDetector pScollDetector, final int pPointerID, final float pDistanceX, final float pDistanceY) {
+        scrolling = true;
         handleScroll(pScollDetector, pPointerID, pDistanceX, pDistanceY);
     }
 

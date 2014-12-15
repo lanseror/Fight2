@@ -101,6 +101,7 @@ public class PartyEditScene extends BaseCardPackScene {
                 removedCardSprite.setUserData(card);
                 cardPack.removedCard(card, removedCardSprite);
                 this.registerUpdateHandler(new CardUpdateHandler(cardZoom, removedCardSprite));
+                this.registerTouchArea(removedCardSprite);
             }
 
         }
