@@ -16,8 +16,8 @@ import android.widget.Toast;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
-import com.fight2.constant.MusicEnum;
 import com.fight2.constant.SceneEnum;
+import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.ScrollZone;
@@ -26,7 +26,7 @@ import com.fight2.entity.engine.CardFrame;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.AccountUtils;
-import com.fight2.util.F2MusicManager;
+import com.fight2.util.F2SoundManager;
 import com.fight2.util.ResourceManager;
 
 public class UserStoreroomScene extends BaseScene {
@@ -180,12 +180,12 @@ public class UserStoreroomScene extends BaseScene {
     public void updateScene() {
         activity.getGameHub().needSmallChatRoom(true);
         createBoards();
-        F2MusicManager.getInstance().playMusic(MusicEnum.DOOR);
+        F2SoundManager.getInstance().play(SoundEnum.DOOR);
     }
 
     @Override
     public void leaveScene() {
-        F2MusicManager.getInstance().playMusic(MusicEnum.DOOR);
+        F2SoundManager.getInstance().play(SoundEnum.DOOR);
     }
 
 }

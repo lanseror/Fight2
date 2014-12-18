@@ -16,14 +16,14 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
 
 import com.fight2.GameActivity;
-import com.fight2.constant.MusicEnum;
 import com.fight2.constant.SceneEnum;
+import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.QuestResult;
 import com.fight2.entity.QuestResult.TileItem;
 import com.fight2.entity.engine.CardFrame;
-import com.fight2.util.F2MusicManager;
+import com.fight2.util.F2SoundManager;
 import com.fight2.util.ResourceManager;
 
 public class QuestTreasureScene extends BaseScene {
@@ -86,7 +86,7 @@ public class QuestTreasureScene extends BaseScene {
 
     @Override
     protected void playAnimation() {
-        F2MusicManager.getInstance().playMusic(MusicEnum.SUMMON);
+        F2SoundManager.getInstance().play(SoundEnum.SUMMON);
         final IEntityModifier modifier = new ParallelEntityModifier(new ScaleModifier(0.3f, 0.33f, 1), new RotationByModifier(0.3f, 270));
         cardFrame.registerEntityModifier(modifier);
     }

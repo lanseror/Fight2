@@ -21,7 +21,7 @@ public class F2MusicManager {
     }
 
     public void prepare(final GameActivity activity) throws IOException {
-        MusicFactory.setAssetBasePath("sound/");
+        MusicFactory.setAssetBasePath("music/");
         final MusicManager musicManager = activity.getMusicManager();
 
         for (final MusicEnum musicEnum : MusicEnum.values()) {
@@ -47,6 +47,7 @@ public class F2MusicManager {
         if (oldMusic != null && !oldMusic.isReleased()) {
             oldMusic.pause();
             oldMusic.seekTo(0);
+            
         }
     }
 
@@ -56,10 +57,10 @@ public class F2MusicManager {
         }
         final Music oldMusic = currentMusic;
         currentMusic = datas.get(musicEnum);
-        if (oldMusic != null && !oldMusic.isReleased()) {
-            oldMusic.pause();
-            oldMusic.seekTo(0);
-        }
+        // if (oldMusic != null && !oldMusic.isReleased()) {
+        // oldMusic.pause();
+        // oldMusic.seekTo(0);
+        // }
         currentMusic.setLooping(looping);
         currentMusic.play();
 

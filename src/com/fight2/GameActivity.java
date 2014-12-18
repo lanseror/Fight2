@@ -33,12 +33,14 @@ import android.widget.EditText;
 import com.fight2.constant.ConfigEnum;
 import com.fight2.constant.MusicEnum;
 import com.fight2.constant.SceneEnum;
+import com.fight2.constant.SoundEnum;
 import com.fight2.entity.engine.GameHud;
 import com.fight2.entity.engine.ProgressBar;
 import com.fight2.util.AccountUtils;
 import com.fight2.util.ConfigHelper;
 import com.fight2.util.EntryFactory;
 import com.fight2.util.F2MusicManager;
+import com.fight2.util.F2SoundManager;
 import com.fight2.util.ImageOpenHelper;
 import com.fight2.util.LogUtils;
 import com.fight2.util.ResourceManager;
@@ -121,6 +123,7 @@ public class GameActivity extends LayoutGameActivity {
         this.splashTextureRegion = TextureRegionFactory.extractFromTexture(this.splashTexture);
         this.splashTexture.load();
         F2MusicManager.getInstance().prepare(this);
+        F2SoundManager.getInstance().prepare(this);
         pOnCreateResourcesCallback.onCreateResourcesFinished();
     }
 
@@ -198,6 +201,7 @@ public class GameActivity extends LayoutGameActivity {
                 final GameHud gameHud = new GameHud(GameActivity.this);
                 camera.setHUD(gameHud);
                 ResourceManager.getInstance().setCurrentScene(SceneEnum.Main);
+                F2SoundManager.getInstance().stop();
                 F2MusicManager.getInstance().playMusic(MusicEnum.MAIN_BG);
             }
 
@@ -216,7 +220,7 @@ public class GameActivity extends LayoutGameActivity {
     @Override
     public synchronized void onGameCreated() {
         super.onGameCreated();
-        F2MusicManager.getInstance().playMusic(MusicEnum.LOADING, true);
+        F2SoundManager.getInstance().play(SoundEnum.LOADING, true);
         loadAdditionResources();
     }
 

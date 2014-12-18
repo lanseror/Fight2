@@ -28,6 +28,7 @@ import org.andengine.util.modifier.IModifier;
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.MusicEnum;
+import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
@@ -42,6 +43,7 @@ import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.engine.HpBar;
 import com.fight2.util.ArenaUtils;
 import com.fight2.util.F2MusicManager;
+import com.fight2.util.F2SoundManager;
 import com.fight2.util.QuestUtils;
 import com.fight2.util.ResourceManager;
 
@@ -105,6 +107,11 @@ public class BattleScene extends BaseScene {
     }
 
     @Override
+    protected void playAnimation() {
+        // F2MusicManager.getInstance().playMusic(MusicEnum.QuestBattle, true);
+    }
+
+    @Override
     protected void init() throws IOException {
         final Sprite bgSprite = createALBImageSprite(TextureEnum.BATTLE_BG, 0, 0);
         final Background background = new SpriteBackground(bgSprite);
@@ -138,7 +145,8 @@ public class BattleScene extends BaseScene {
 
     private void showBattleResult() {
         skipSprite.setVisible(false);
-        F2MusicManager.getInstance().playMusic(isWinner ? MusicEnum.BATTLE_WIN : MusicEnum.BATTLE_LOSE);
+        F2MusicManager.getInstance().stopMusic();
+        F2SoundManager.getInstance().play(isWinner ? SoundEnum.BATTLE_WIN : SoundEnum.BATTLE_LOSE);
         final IEntityModifierListener hideFinishListener = new ModifierFinishedListener(new OnFinishedCallback() {
             @Override
             public void onFinished(final IEntity pItem) {
@@ -206,7 +214,7 @@ public class BattleScene extends BaseScene {
 
             @Override
             public void onFinished(final IEntity pItem) {
-                F2MusicManager.getInstance().playMusic(MusicEnum.BATTLE_HIT);
+                F2SoundManager.getInstance().play(SoundEnum.BATTLE_HIT);
                 final HpBar hpBar = defencePartyFrame.getHpBar();
                 final int hp = hpBar.getCurrentPoint();
                 final int defence = defencePartyFrame.getDefence();

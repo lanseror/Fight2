@@ -2,12 +2,9 @@ package com.fight2.scene;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.Set;
-import java.util.Stack;
 
 import org.andengine.engine.handler.timer.ITimerCallback;
 import org.andengine.engine.handler.timer.TimerHandler;
@@ -15,9 +12,9 @@ import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.PathModifier;
 import org.andengine.entity.modifier.PathModifier.IPathModifierListener;
 import org.andengine.entity.modifier.PathModifier.Path;
+import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
-import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.extension.tmx.TMXLayer;
 import org.andengine.extension.tmx.TMXLoader;
@@ -29,27 +26,26 @@ import org.andengine.input.touch.detector.ScrollDetector;
 import org.andengine.input.touch.detector.ScrollDetector.IScrollDetectorListener;
 import org.andengine.input.touch.detector.SurfaceScrollDetector;
 import org.andengine.opengl.texture.TextureOptions;
-import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.util.Constants;
 import org.andengine.util.adt.color.ColorUtils;
 import org.andengine.util.debug.Debug;
 
 import com.fight2.GameActivity;
-import com.fight2.constant.MusicEnum;
 import com.fight2.constant.SceneEnum;
+import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
-import com.fight2.constant.TiledTextureEnum;
+import com.fight2.entity.Hero;
 import com.fight2.entity.QuestResult;
 import com.fight2.entity.QuestTile;
 import com.fight2.entity.QuestTreasureData;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.AsyncTaskLoader;
-import com.fight2.util.F2MusicManager;
+import com.fight2.util.F2SoundManager;
 import com.fight2.util.IAsyncCallback;
 import com.fight2.util.QuestUtils;
 import com.fight2.util.ResourceManager;
-import com.fight2.util.TiledTextureFactory;
+import com.fight2.util.TmxUtils;
 
 public class QuestScene extends BaseScene implements IScrollDetectorListener {
     private final SurfaceScrollDetector mScrollDetector;
@@ -60,16 +56,17 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     private boolean isScroolling;
     private final TimerHandler timerHandler;
     private TMXTiledMap tmxTiledMap;
-    private int direction = -1;
     private QuestGoStatus goStatus = QuestGoStatus.Stopped;
     private QuestResult questResult;
     private final List<Sprite> treasureSprites = new ArrayList<Sprite>();
     private QuestTreasureData questTreasureData = new QuestTreasureData();
     private static int GID = 0;
     private final float SCALE = 1.5f;
-    private final ITiledTextureRegion playerTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.HERO);
-    private final float playerHeight = playerTextureRegion.getHeight();
     private final Queue<Sprite> pathTags = new LinkedList<Sprite>();
+    private final Hero hero = new Hero(0, 0, vbom);
+    private TMXTile destTile;
+    private Path path;
+    private final IEntity destTouchArea = new Rectangle(0, 0, 60, 60, vbom);
 
     public QuestScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -93,6 +90,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
 
     @Override
     protected void init() throws IOException {
+
         try {
             final TMXLoader tmxLoader = new TMXLoader(activity.getAssets(), activity.getTextureManager(), TextureOptions.BILINEAR_PREMULTIPLYALPHA, vbom);
             this.tmxTiledMap = tmxLoader.loadFromAsset("tmx/fight2.tmx");
@@ -108,21 +106,24 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         }
         // tmxTiledMap.setPosition(this.cameraCenterX - 300, this.cameraCenterY - 250);
         this.attachChild(this.tmxTiledMap);
+        tmxTiledMap.attachChild(destTouchArea);
+        destTouchArea.setAlpha(0);
         final TMXLayer tmxLayer = this.tmxTiledMap.getTMXLayers().get(0);
+        final TmxUtils tmxUtils = new TmxUtils(hero, tmxTiledMap);
         final QuestTreasureData newTreasureData = QuestUtils.getQuestTreasure(questTreasureData);
         refreshTreasureSprites(newTreasureData);
 
         final float playerX = tmxLayer.getTileX(32) + 0.5f * tmxTiledMap.getTileWidth();
-        final float playerY = tmxLayer.getTileY(22) + playerHeight * 0.5f;
-        final AnimatedSprite player = new AnimatedSprite(playerX, playerY, playerTextureRegion, vbom);
-        player.setCurrentTileIndex(53);
-        player.setZIndex(100);
+        final float playerY = tmxLayer.getTileY(22) + hero.getHeight() * 0.5f;
+        hero.setPosition(playerX, playerY);
+        hero.setCurrentTileIndex(53);
+        hero.setZIndex(100);
 
         final float playerSceneX = playerX - tmxTiledMap.getWidth() * 0.5f;
         final float playerSceneY = playerY - tmxTiledMap.getHeight() * 0.5f;
         offsetMap(this.simulatedWidth * 0.5f - playerSceneX * SCALE, playerSceneY * SCALE - this.simulatedHeight * 0.5f);
 
-        tmxTiledMap.attachChild(player);
+        tmxTiledMap.attachChild(hero);
         this.setOnSceneTouchListener(new IOnSceneTouchListener() {
             @Override
             public boolean onSceneTouchEvent(final Scene pScene, final TouchEvent pSceneTouchEvent) {
@@ -135,110 +136,23 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                         return true;
                     }
                 }
-                if (pSceneTouchEvent.isActionUp() && goStatus == QuestGoStatus.Stopped) {
-
+                if (pSceneTouchEvent.isActionUp()) {
                     final float sceneX = pSceneTouchEvent.getX();
                     final float sceneY = pSceneTouchEvent.getY();
-                    final TMXTile tmxTile = tmxLayer.getTMXTileAt(sceneX, sceneY);
-                    if (tmxTile != null && tmxTile.getGlobalTileID() == GID) {
-                        final float startX = player.getX();
-                        final float startY = player.getY();
-                        final float[] playerSceneCordinates = player.getSceneCenterCoordinates();
-                        final TMXTile currentTile = tmxLayer.getTMXTileAt(playerSceneCordinates[Constants.VERTEX_INDEX_X],
-                                playerSceneCordinates[Constants.VERTEX_INDEX_Y]);
-                        // Debug.e("Found currentTile:" + currentTile.getTileColumn() + "," + currentTile.getTileRow());
-                        final Path path = findPath(currentTile, tmxTile, tmxLayer);
-                        showPathTags(path);
-                        go(tmxTile);
-                        final float[] xs = path.getCoordinatesX();
-                        final float[] ys = path.getCoordinatesY();
-                        player.registerEntityModifier(new PathModifier(path.getSize() * 0.6f, path, null, new IPathModifierListener() {
-                            @Override
-                            public void onPathStarted(final PathModifier pPathModifier, final IEntity pEntity) {
-                                F2MusicManager.getInstance().playMusic(MusicEnum.HORSE, true);
-                            }
-
-                            @Override
-                            public void onPathWaypointStarted(final PathModifier pPathModifier, final IEntity pEntity, final int pWaypointIndex) {
-                                if (pWaypointIndex + 1 < xs.length) {
-                                    final float x1 = xs[pWaypointIndex];
-                                    final float y1 = ys[pWaypointIndex];
-                                    final float x2 = xs[pWaypointIndex + 1];
-                                    final float y2 = ys[pWaypointIndex + 1];
-                                    if (x1 > x2 && y1 < y2) { // left up
-                                        changeDirection(player, 0);
-                                    } else if (x1 == x2 && y1 < y2) { // up
-                                        changeDirection(player, 1);
-                                    } else if (x1 < x2 && y1 < y2) { // right up
-                                        changeDirection(player, 2);
-                                    } else if (x1 > x2 && y1 == y2) {// left
-                                        changeDirection(player, 3);
-                                    } else if (x1 < x2 && y1 == y2) {// right
-                                        changeDirection(player, 4);
-                                    } else if (x1 > x2 && y1 > y2) {// left down
-                                        changeDirection(player, 5);
-                                    } else if (x1 == x2 && y1 > y2) {// down
-                                        changeDirection(player, 6);
-                                    } else if (x1 < x2 && y1 > y2) {// down
-                                        changeDirection(player, 7);
-                                    }
-
-                                    activity.runOnUpdateThread(new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            pathTags.poll().detachSelf();
-                                        }
-                                    });
-                                }
-                            }
-
-                            @Override
-                            public void onPathWaypointFinished(final PathModifier pPathModifier, final IEntity pEntity, final int pWaypointIndex) {
-
-                            }
-
-                            @Override
-                            public void onPathFinished(final PathModifier pPathModifier, final IEntity pEntity) {
-                                player.stopAnimation();
-                                direction = -1;
-                                if (goStatus == QuestGoStatus.Failed) {
-                                    player.setPosition(startX, startY);
-                                    goStatus = QuestGoStatus.Stopped;
-                                } else if (goStatus == QuestGoStatus.Arrived) {
-                                    if (questResult.isTreasureUpdated()) {
-                                        refreshTreasureSprites(questResult.getQuestTreasureData());
-                                    }
-                                    goStatus = QuestGoStatus.Stopped;
-                                } else if (goStatus == QuestGoStatus.Treasure) {
-                                    if (questResult.isTreasureUpdated()) {
-                                        refreshTreasureSprites(questResult.getQuestTreasureData());
-                                    }
-                                    try {
-                                        final QuestTreasureScene treasureScene = new QuestTreasureScene(questResult, activity);
-                                        activity.getEngine().setScene(treasureScene);
-                                        treasureScene.updateScene();
-                                    } catch (final IOException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                    removeTreasureSprite();
-                                    goStatus = QuestGoStatus.Stopped;
-                                } else if (goStatus == QuestGoStatus.Enemy) {
-                                    if (questResult.isTreasureUpdated()) {
-                                        refreshTreasureSprites(questResult.getQuestTreasureData());
-                                    }
-                                    try {
-                                        final PreBattleScene preBattleScene = new PreBattleScene(activity, questResult.getEnemy(), false);
-                                        activity.getEngine().setScene(preBattleScene);
-                                        preBattleScene.updateScene();
-                                    } catch (final IOException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                    goStatus = QuestGoStatus.Stopped;
-                                }
-                                F2MusicManager.getInstance().stopMusic();
-                                F2MusicManager.getInstance().playMusic(MusicEnum.HORSE8);
-                            }
-                        }));
+                    if (goStatus == QuestGoStatus.Stopped) {
+                        destTile = tmxLayer.getTMXTileAt(sceneX, sceneY);
+                        if (destTile != null && destTile.getGlobalTileID() == GID) {
+                            final float[] playerSceneCordinates = hero.getSceneCenterCoordinates();
+                            final TMXTile currentTile = tmxLayer.getTMXTileAt(playerSceneCordinates[Constants.VERTEX_INDEX_X],
+                                    playerSceneCordinates[Constants.VERTEX_INDEX_Y]);
+                            // Debug.e("Found currentTile:" + currentTile.getTileColumn() + "," + currentTile.getTileRow());
+                            path = tmxUtils.findPath(currentTile, destTile, tmxLayer);
+                            showPathTags(path);
+                            goStatus = QuestGoStatus.Ready;
+                            return true;
+                        }
+                    } else if (goStatus == QuestGoStatus.Ready && destTouchArea.contains(sceneX, sceneY)) {
+                        go(destTile, path);
                         return true;
                     }
                 }
@@ -330,6 +244,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             textureEnum = TextureEnum.QUEST_PATH_TAG_RIGHT_END;
         }
         final Sprite tag = createACImageSprite(textureEnum, x2, y2 - 15);
+        destTouchArea.setPosition(tag);
         return tag;
 
     }
@@ -372,8 +287,76 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
 
     }
 
-    private void go(final TMXTile destTile) {
+    private void go(final TMXTile destTile, final Path path) {
         goStatus = QuestGoStatus.Started;
+        final float startX = hero.getX();
+        final float startY = hero.getY();
+        hero.registerEntityModifier(new PathModifier(path.getSize() * 0.6f, path, null, new IPathModifierListener() {
+            @Override
+            public void onPathStarted(final PathModifier pPathModifier, final IEntity pEntity) {
+                F2SoundManager.getInstance().play(SoundEnum.HORSE, true);
+            }
+
+            @Override
+            public void onPathWaypointStarted(final PathModifier pPathModifier, final IEntity pEntity, final int waypointIndex) {
+                if (waypointIndex + 1 < path.getSize()) {
+                    hero.onGoing(path, waypointIndex);
+                    activity.runOnUpdateThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            pathTags.poll().detachSelf();
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void onPathWaypointFinished(final PathModifier pPathModifier, final IEntity pEntity, final int pWaypointIndex) {
+
+            }
+
+            @Override
+            public void onPathFinished(final PathModifier pPathModifier, final IEntity pEntity) {
+                hero.stopAnimation();
+                if (goStatus == QuestGoStatus.Failed) {
+                    hero.setPosition(startX, startY);
+                    goStatus = QuestGoStatus.Stopped;
+                } else if (goStatus == QuestGoStatus.Arrived) {
+                    if (questResult.isTreasureUpdated()) {
+                        refreshTreasureSprites(questResult.getQuestTreasureData());
+                    }
+                    goStatus = QuestGoStatus.Stopped;
+                } else if (goStatus == QuestGoStatus.Treasure) {
+                    if (questResult.isTreasureUpdated()) {
+                        refreshTreasureSprites(questResult.getQuestTreasureData());
+                    }
+                    try {
+                        final QuestTreasureScene treasureScene = new QuestTreasureScene(questResult, activity);
+                        activity.getEngine().setScene(treasureScene);
+                        treasureScene.updateScene();
+                    } catch (final IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    removeTreasureSprite();
+                    goStatus = QuestGoStatus.Stopped;
+                } else if (goStatus == QuestGoStatus.Enemy) {
+                    if (questResult.isTreasureUpdated()) {
+                        refreshTreasureSprites(questResult.getQuestTreasureData());
+                    }
+                    try {
+                        final PreBattleScene preBattleScene = new PreBattleScene(activity, questResult.getEnemy(), false);
+                        activity.getEngine().setScene(preBattleScene);
+                        preBattleScene.updateScene();
+                    } catch (final IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    goStatus = QuestGoStatus.Stopped;
+                }
+                F2SoundManager.getInstance().stop();
+                F2SoundManager.getInstance().play(SoundEnum.HORSE8);
+            }
+        }));
+
         final IAsyncCallback callback = new IAsyncCallback() {
 
             @Override
@@ -405,6 +388,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     }
 
     public enum QuestGoStatus {
+        Ready,
         Started,
         Arrived,
         Treasure,
@@ -421,142 +405,6 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     @Override
     public void leaveScene() {
         // TODO Auto-generated method stub
-
-    }
-
-    private void changeDirection(final AnimatedSprite player, final int newDirection) {
-        if (this.direction != newDirection) {
-            this.direction = newDirection;
-            switch (newDirection) {
-                case 0:
-                    player.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 0, 7, true);
-                    break;
-                case 1:
-                    player.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 9, 16, true);
-                    break;
-                case 2:
-                    player.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 18, 25, true);
-                    break;
-                case 3:
-                    player.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 27, 34, true);
-                    break;
-                case 4:
-                    player.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 36, 43, true);
-                    break;
-                case 5:
-                    player.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 45, 52, true);
-                    break;
-                case 6:
-                    player.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 54, 61, true);
-                    break;
-                case 7:
-                    player.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 63, 70, true);
-                    break;
-            }
-        }
-    }
-
-    private Path findPath(final TMXTile startTile, final TMXTile desTile, final TMXLayer tmxLayer) {
-        TMXTilePoint currentPoint = new TMXTilePoint(startTile, null);
-        final Queue<TMXTilePoint> queue = new LinkedList<TMXTilePoint>();
-        queue.add(currentPoint);
-        final Set<TMXTile> visitedTiles = new HashSet<TMXTile>();
-        visitedTiles.add(startTile);
-        while (!queue.isEmpty()) {
-            currentPoint = queue.poll();
-            final TMXTile pointTMXTile = currentPoint.getTmxTile();
-            final int row = pointTMXTile.getTileRow();
-            final int col = pointTMXTile.getTileColumn();
-            if (pointTMXTile == desTile) {
-                break;
-            }
-
-            final TMXTile upTile = tmxLayer.getTMXTile(col, row - 1);
-            if (upTile != null && upTile.getGlobalTileID() == GID && !visitedTiles.contains(upTile)) {/* up */
-                visit(upTile, currentPoint, queue);
-                visitedTiles.add(upTile);
-            }
-            final TMXTile leftTile = tmxLayer.getTMXTile(col - 1, row);
-            if (leftTile != null && leftTile.getGlobalTileID() == GID && !visitedTiles.contains(leftTile)) {/* left */
-                visit(leftTile, currentPoint, queue);
-                visitedTiles.add(leftTile);
-            }
-            final TMXTile rightTile = tmxLayer.getTMXTile(col + 1, row);
-            if (rightTile != null && rightTile.getGlobalTileID() == GID && !visitedTiles.contains(rightTile)) { /* right */
-                visit(rightTile, currentPoint, queue);
-                visitedTiles.add(rightTile);
-            }
-            final TMXTile downTile = tmxLayer.getTMXTile(col, row + 1);
-            if (downTile != null && downTile.getGlobalTileID() == GID && !visitedTiles.contains(downTile)) { /* down */
-                visit(downTile, currentPoint, queue);
-                visitedTiles.add(downTile);
-            }
-            final TMXTile leftUpTile = tmxLayer.getTMXTile(col - 1, row - 1);
-            if (leftUpTile != null && leftUpTile.getGlobalTileID() == GID && !visitedTiles.contains(leftUpTile)) {/* left up */
-                visit(leftUpTile, currentPoint, queue);
-                visitedTiles.add(leftUpTile);
-            }
-            final TMXTile rightUpTile = tmxLayer.getTMXTile(col + 1, row - 1);
-            if (rightUpTile != null && rightUpTile.getGlobalTileID() == GID && !visitedTiles.contains(rightUpTile)) {/* right up */
-                visit(rightUpTile, currentPoint, queue);
-                visitedTiles.add(rightUpTile);
-            }
-
-            final TMXTile leftDownTile = tmxLayer.getTMXTile(col - 1, row + 1);
-            if (leftDownTile != null && leftDownTile.getGlobalTileID() == GID && !visitedTiles.contains(leftDownTile)) { /* left down */
-                visit(leftDownTile, currentPoint, queue);
-                visitedTiles.add(leftDownTile);
-            }
-
-            final TMXTile rightDownTile = tmxLayer.getTMXTile(col + 1, row + 1);
-            if (rightDownTile != null && rightDownTile.getGlobalTileID() == GID && !visitedTiles.contains(rightDownTile)) { /* right down */
-                visit(rightDownTile, currentPoint, queue);
-                visitedTiles.add(rightDownTile);
-            }
-
-        }
-
-        final Stack<TMXTile> stack = new Stack<TMXTile>();
-        stack.push(currentPoint.getTmxTile());
-        while (currentPoint.getPredecessor() != null) {
-            currentPoint = currentPoint.getPredecessor();
-            stack.push(currentPoint.getTmxTile());
-            if (currentPoint.getTmxTile() == startTile) {
-                break;
-            }
-        }
-
-        final Path path = new Path(stack.size());
-        while (!stack.isEmpty()) {
-            final TMXTile pathTMXTile = stack.pop();
-            path.to(tmxLayer.getTileX(pathTMXTile.getTileColumn()) + 0.5f * tmxTiledMap.getTileWidth(), tmxLayer.getTileY(pathTMXTile.getTileRow())
-                    + playerHeight * 0.5f);
-        }
-        return path;
-    }
-
-    private void visit(final TMXTile pointTmxTile, final TMXTilePoint predecessor, final Queue<TMXTilePoint> queue) {
-        final TMXTilePoint visitPoint = new TMXTilePoint(pointTmxTile, predecessor);
-        queue.add(visitPoint);
-    }
-
-    private static class TMXTilePoint {
-        private final TMXTile tmxTile;
-        private final TMXTilePoint predecessor;
-
-        public TMXTilePoint(final TMXTile tmxTile, final TMXTilePoint predecessor) {
-            super();
-            this.tmxTile = tmxTile;
-            this.predecessor = predecessor;
-        }
-
-        public TMXTile getTmxTile() {
-            return tmxTile;
-        }
-
-        public TMXTilePoint getPredecessor() {
-            return predecessor;
-        }
 
     }
 
