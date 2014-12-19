@@ -220,6 +220,8 @@ public enum TextureEnum {
 
     // Quest images.
     QUEST_TOWN("images/quest_town.png", 56, 52),
+    QUEST_CANCEL_BUTTON("images/quest_cancel_button.png", 130, 132),
+    QUEST_CANCEL_BUTTON_FCS("images/quest_cancel_button_fcs.png", 130, 132),
     QUEST_TREASURE_BOX("images/quest_treasure_box.png", 95 * 0.4f, 84 * 0.4f),
     QUEST_PATH_TAG("images/quest_path_tag.png", 15, 15),
     QUEST_PATH_TAG_LEFT_END("images/quest_path_tag_left_end.png", 30, 26),

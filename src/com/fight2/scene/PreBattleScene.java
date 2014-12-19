@@ -156,6 +156,7 @@ public class PreBattleScene extends BaseScene {
         retreatButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                F2MusicManager.getInstance().stopMusic();
                 ResourceManager.getInstance().sceneBack(false);
             }
         });

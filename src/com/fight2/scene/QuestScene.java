@@ -67,6 +67,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     private TMXTile destTile;
     private Path path;
     private final IEntity destTouchArea = new Rectangle(0, 0, 60, 60, vbom);
+    private final F2ButtonSprite cancelButton = createCancelButton();
 
     public QuestScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -194,6 +195,21 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                 - TextureEnum.PARTY_RECHARGE.getWidth() - 8, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight() - 4);
         this.attachChild(rechargeSprite);
         this.registerTouchArea(rechargeSprite);
+
+        cancelButton.setVisible(false);
+        this.attachChild(cancelButton);
+        this.registerTouchArea(cancelButton);
+    }
+
+    private F2ButtonSprite createCancelButton() {
+        final F2ButtonSprite cancelButton = createALBF2ButtonSprite(TextureEnum.QUEST_CANCEL_BUTTON, TextureEnum.QUEST_CANCEL_BUTTON_FCS,
+                this.simulatedRightX - 135, 220);
+        cancelButton.setOnClickListener(new F2OnClickListener() {
+            @Override
+            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+            }
+        });
+        return cancelButton;
     }
 
     private void showPathTags(final Path path) {
@@ -245,6 +261,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         }
         final Sprite tag = createACImageSprite(textureEnum, x2, y2 - 15);
         destTouchArea.setPosition(tag);
+        cancelButton.setVisible(true);
         return tag;
 
     }
@@ -354,6 +371,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                 }
                 F2SoundManager.getInstance().stop();
                 F2SoundManager.getInstance().play(SoundEnum.HORSE8);
+                cancelButton.setVisible(false);
             }
         }));
 
