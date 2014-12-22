@@ -119,6 +119,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         hero.setPosition(playerX, playerY);
         hero.setCurrentTileIndex(53);
         hero.setZIndex(100);
+        hero.setScale(0.6f);
 
         final float playerSceneX = playerX - tmxTiledMap.getWidth() * 0.5f;
         final float playerSceneY = playerY - tmxTiledMap.getHeight() * 0.5f;
@@ -306,9 +307,9 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
 
     private void go(final TMXTile destTile, final Path path) {
         goStatus = QuestGoStatus.Started;
-        final float startX = hero.getX();
-        final float startY = hero.getY();
-        hero.registerEntityModifier(new PathModifier(path.getSize() * 0.6f, path, null, new IPathModifierListener() {
+        final float[] xs = path.getCoordinatesX();
+        final float[] ys = path.getCoordinatesY();
+        hero.registerEntityModifier(new PathModifier(path.getSize() * 0.5f, path, null, new IPathModifierListener() {
             @Override
             public void onPathStarted(final PathModifier pPathModifier, final IEntity pEntity) {
                 F2SoundManager.getInstance().play(SoundEnum.HORSE, true);
@@ -316,6 +317,10 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
 
             @Override
             public void onPathWaypointStarted(final PathModifier pPathModifier, final IEntity pEntity, final int waypointIndex) {
+                if (waypointIndex % 5 == 0) {
+                    sendToServer();
+                }
+
                 if (waypointIndex + 1 < path.getSize()) {
                     hero.onGoing(path, waypointIndex);
                     activity.runOnUpdateThread(new Runnable() {
@@ -328,53 +333,64 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             }
 
             @Override
-            public void onPathWaypointFinished(final PathModifier pPathModifier, final IEntity pEntity, final int pWaypointIndex) {
+            public void onPathWaypointFinished(final PathModifier pPathModifier, final IEntity entity, final int waypointIndex) {
+                if ((waypointIndex + 1) % 5 == 0) {
+                    if (goStatus == QuestGoStatus.Failed) {
+                        final int backStep = waypointIndex > 4 ? waypointIndex - 4 : 0;
+                        goStatus = QuestGoStatus.Stopped;
+                        activity.runOnUpdateThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                entity.clearEntityModifiers();
+                                hero.setPosition(xs[backStep], ys[backStep]);
+                            }
 
+                        });
+                    } else if (goStatus == QuestGoStatus.Arrived) {
+                        if (questResult.isTreasureUpdated()) {
+                            refreshTreasureSprites(questResult.getQuestTreasureData());
+                        }
+                    } else if (goStatus == QuestGoStatus.Treasure) {
+                        if (questResult.isTreasureUpdated()) {
+                            refreshTreasureSprites(questResult.getQuestTreasureData());
+                        }
+                        try {
+                            final QuestTreasureScene treasureScene = new QuestTreasureScene(questResult, activity);
+                            activity.getEngine().setScene(treasureScene);
+                            treasureScene.updateScene();
+                        } catch (final IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        removeTreasureSprite();
+                    } else if (goStatus == QuestGoStatus.Enemy) {
+                        if (questResult.isTreasureUpdated()) {
+                            refreshTreasureSprites(questResult.getQuestTreasureData());
+                        }
+                        try {
+                            final PreBattleScene preBattleScene = new PreBattleScene(activity, questResult.getEnemy(), false);
+                            activity.getEngine().setScene(preBattleScene);
+                            preBattleScene.updateScene();
+                        } catch (final IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                        goStatus = QuestGoStatus.Stopped;
+                    }
+                }
             }
 
             @Override
             public void onPathFinished(final PathModifier pPathModifier, final IEntity pEntity) {
                 hero.stopAnimation();
-                if (goStatus == QuestGoStatus.Failed) {
-                    hero.setPosition(startX, startY);
-                    goStatus = QuestGoStatus.Stopped;
-                } else if (goStatus == QuestGoStatus.Arrived) {
-                    if (questResult.isTreasureUpdated()) {
-                        refreshTreasureSprites(questResult.getQuestTreasureData());
-                    }
-                    goStatus = QuestGoStatus.Stopped;
-                } else if (goStatus == QuestGoStatus.Treasure) {
-                    if (questResult.isTreasureUpdated()) {
-                        refreshTreasureSprites(questResult.getQuestTreasureData());
-                    }
-                    try {
-                        final QuestTreasureScene treasureScene = new QuestTreasureScene(questResult, activity);
-                        activity.getEngine().setScene(treasureScene);
-                        treasureScene.updateScene();
-                    } catch (final IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    removeTreasureSprite();
-                    goStatus = QuestGoStatus.Stopped;
-                } else if (goStatus == QuestGoStatus.Enemy) {
-                    if (questResult.isTreasureUpdated()) {
-                        refreshTreasureSprites(questResult.getQuestTreasureData());
-                    }
-                    try {
-                        final PreBattleScene preBattleScene = new PreBattleScene(activity, questResult.getEnemy(), false);
-                        activity.getEngine().setScene(preBattleScene);
-                        preBattleScene.updateScene();
-                    } catch (final IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                    goStatus = QuestGoStatus.Stopped;
-                }
+
                 F2SoundManager.getInstance().stop();
                 F2SoundManager.getInstance().play(SoundEnum.HORSE8);
                 cancelButton.setVisible(false);
             }
         }));
 
+    }
+
+    private void sendToServer() {
         final IAsyncCallback callback = new IAsyncCallback() {
 
             @Override

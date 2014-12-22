@@ -96,8 +96,7 @@ public class TmxUtils {
         final Path path = new Path(stack.size());
         while (!stack.isEmpty()) {
             final TMXTile pathTMXTile = stack.pop();
-            path.to(tmxLayer.getTileX(pathTMXTile.getTileColumn()) + 0.5f * tmxTiledMap.getTileWidth(),
-                    tmxLayer.getTileY(pathTMXTile.getTileRow()) + hero.getHeight() * 0.5f);
+            path.to(tmxLayer.getTileX(pathTMXTile.getTileColumn()) + 0.5f * tmxTiledMap.getTileWidth(), tmxLayer.getTileY(pathTMXTile.getTileRow()) + 40);
         }
         return path;
     }

@@ -8,9 +8,10 @@ import com.fight2.constant.TiledTextureEnum;
 import com.fight2.util.TiledTextureFactory;
 
 public class Hero extends AnimatedSprite {
+    private final long[] speed = { 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30 };
 
     public Hero(final float x, final float y, final VertexBufferObjectManager vbom) {
-        super(x, y, TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.HERO), vbom);
+        super(x, y, TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.HERO2), vbom);
     }
 
     public void onGoing(final Path path, final int waypointIndex) {
@@ -40,34 +41,34 @@ public class Hero extends AnimatedSprite {
     }
 
     private void leftUp() {
-        this.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 0, 7, true);
+        this.animate(speed, 0, 15, true);
     }
 
     private void up() {
-        this.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 9, 16, true);
+        this.animate(speed, 16, 31, true);
     }
 
     private void rightUp() {
-        this.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 18, 25, true);
+        this.animate(speed, 32, 47, true);
     }
 
     private void left() {
-        this.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 27, 34, true);
+        this.animate(speed, 48, 63, true);
     }
 
     private void right() {
-        this.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 36, 43, true);
+        this.animate(speed, 64, 79, true);
     }
 
     private void leftDown() {
-        this.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 45, 52, true);
+        this.animate(speed, 80, 95, true);
     }
 
     private void down() {
-        this.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 54, 61, true);
+        this.animate(speed, 96, 111, true);
     }
 
     private void rightDown() {
-        this.animate(new long[] { 100, 100, 100, 100, 100, 100, 100, 100 }, 63, 70, true);
+        this.animate(speed, 112, 127, true);
     }
 }
