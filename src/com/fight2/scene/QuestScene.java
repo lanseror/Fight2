@@ -312,7 +312,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         hero.registerEntityModifier(new PathModifier(path.getSize() * 0.5f, path, null, new IPathModifierListener() {
             @Override
             public void onPathStarted(final PathModifier pPathModifier, final IEntity pEntity) {
-                F2SoundManager.getInstance().play(SoundEnum.HORSE, true);
+                // F2SoundManager.getInstance().play(SoundEnum.HORSE, true);
             }
 
             @Override
@@ -334,10 +334,12 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
 
             @Override
             public void onPathWaypointFinished(final PathModifier pPathModifier, final IEntity entity, final int waypointIndex) {
-                if ((waypointIndex + 1) % 5 == 0) {
+                if ((waypointIndex + 1) % 5 == 0 || waypointIndex == path.getSize() - 2) {
+                    // F2SoundManager.getInstance().stop();
                     if (goStatus == QuestGoStatus.Failed) {
                         final int backStep = waypointIndex > 4 ? waypointIndex - 4 : 0;
                         goStatus = QuestGoStatus.Stopped;
+                        cancelButton.setVisible(false);
                         activity.runOnUpdateThread(new Runnable() {
                             @Override
                             public void run() {
@@ -373,18 +375,21 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                         } catch (final IOException e) {
                             throw new RuntimeException(e);
                         }
-                        goStatus = QuestGoStatus.Stopped;
                     }
+
+                }
+
+                if (waypointIndex == path.getSize() - 2) {
+                    goStatus = QuestGoStatus.Stopped;
+                    cancelButton.setVisible(false);
+                    hero.stopAnimation();
+                    F2SoundManager.getInstance().play(SoundEnum.HORSE8);
                 }
             }
 
             @Override
             public void onPathFinished(final PathModifier pPathModifier, final IEntity pEntity) {
-                hero.stopAnimation();
 
-                F2SoundManager.getInstance().stop();
-                F2SoundManager.getInstance().play(SoundEnum.HORSE8);
-                cancelButton.setVisible(false);
             }
         }));
 

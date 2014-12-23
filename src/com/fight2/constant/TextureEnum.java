@@ -5,6 +5,7 @@ public enum TextureEnum {
     SPLASH_BG("images/common_splash_screen.png", 1136, 640),
 
     // Common images.
+    COMMON_BG("images/common_backgroud.png", 1136, 640),
     COMMON_BACK_BUTTON_NORMAL("images/common_back_button.png", 130, 132),
     COMMON_BACK_BUTTON_PRESSED("images/common_back_button_fcs.png", 130, 132),
     COMMON_CONFIRM_BUTTON_NORMAL("images/common_confirm_button.png", 130, 132),
@@ -101,7 +102,6 @@ public enum TextureEnum {
     MAIN_PLAYER_INFO_STAMINA_BOX("images/main_player_info_stamina_box.png", 184, 35),
 
     // Party scene images.
-    PARTY_BG("images/party_backgroud.png", 1136, 640),
     PARTY_TOPBAR("images/party_topbar.png", 725, 73),
     PARTY_FRAME("images/party_frame.png", 783, 492),
     PARTY_FRAME_GRIDS("images/party_frame_grids.png", 618, 148),
@@ -134,8 +134,9 @@ public enum TextureEnum {
     EVOLUTION_ICON("images/evolution_icon.png", 92, 45),
 
     // Summon scene images.
-    SUMMON_BG("images/summon_backgroud.jpg", 1136, 640),
-    SUMMON_SUMMON_BUTTON("images/summon_summon_button.jpg", 300, 90),
+    SUMMON_FRAME("images/summon_frame.png", 800 * 0.9f, 381 * 0.9f),
+    SUMMON_BUTTON("images/summon_button.png", 297 * 0.9f, 69 * 0.9f),
+    SUMMON_BUTTON_FCS("images/summon_button_fcs.png", 297 * 0.9f, 69 * 0.9f),
 
     // PlayerInfo scene images.
     PLAYERINFO_FRAME("images/playerinfo_frame.png", 491, 469),
