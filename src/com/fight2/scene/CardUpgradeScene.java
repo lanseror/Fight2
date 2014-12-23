@@ -247,7 +247,7 @@ public class CardUpgradeScene extends BaseCardPackScene {
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
     }
-    
+
     private Sprite createCoverSprite(final TextureEnum textureEnum, final float x, final float y) {
         final TextureFactory textureFactory = TextureFactory.getInstance();
         final ITextureRegion texture = textureFactory.getAssetTextureRegion(textureEnum);
@@ -273,7 +273,7 @@ public class CardUpgradeScene extends BaseCardPackScene {
     }
 
     private F2ButtonSprite createUpgradeButton() {
-        final F2ButtonSprite upgradeButton = createALBF2ButtonSprite(TextureEnum.UPGRADE_FRAME_BUTTON, TextureEnum.UPGRADE_FRAME_BUTTON, 467, 40);
+        final F2ButtonSprite upgradeButton = createALBF2ButtonSprite(TextureEnum.UPGRADE_FRAME_BUTTON, TextureEnum.UPGRADE_FRAME_BUTTON_FCS, 467, 40);
         upgradeButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {

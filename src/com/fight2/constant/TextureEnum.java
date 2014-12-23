@@ -125,12 +125,14 @@ public enum TextureEnum {
     // Card upgrade scene images.
     UPGRADE_FRAME("images/upgrade_frame.png", 746, 368),
     UPGRADE_FRAME_BUTTON("images/upgrade_frame_button.png", 268, 69),
+    UPGRADE_FRAME_BUTTON_FCS("images/upgrade_frame_button_fcs.png", 268, 69),
     UPGRADE_EVO_BUTTON("images/upgrade_evo_button.png", 130, 132),
     UPGRADE_EVO_BUTTON_PRESSED("images/upgrade_evo_button_fcs.png", 130, 132),
 
     // Card evolution scene images.
     EVOLUTION_FRAME("images/evolution_frame.png", 746, 368),
     EVOLUTION_FRAME_BUTTON("images/evolution_frame_button.png", 268, 69),
+    EVOLUTION_FRAME_BUTTON_FCS("images/evolution_frame_button_fcs.png", 268, 69),
     EVOLUTION_ICON("images/evolution_icon.png", 92, 45),
 
     // Summon scene images.

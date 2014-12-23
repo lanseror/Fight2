@@ -245,7 +245,7 @@ public class CardEvolutionScene extends BaseCardPackScene {
     }
 
     private F2ButtonSprite createEvolutionButton() {
-        final F2ButtonSprite evolutionButton = createALBF2ButtonSprite(TextureEnum.EVOLUTION_FRAME_BUTTON, TextureEnum.EVOLUTION_FRAME_BUTTON, 467, 40);
+        final F2ButtonSprite evolutionButton = createALBF2ButtonSprite(TextureEnum.EVOLUTION_FRAME_BUTTON, TextureEnum.EVOLUTION_FRAME_BUTTON_FCS, 467, 40);
         evolutionButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
