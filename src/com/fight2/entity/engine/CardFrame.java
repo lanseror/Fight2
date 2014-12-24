@@ -242,12 +242,11 @@ public class CardFrame extends Rectangle {
             try {
                 final Scene cardInfoScene = new CardInfoScene(activity, card);
                 final Scene scene = activity.getEngine().getScene();
-                final Scene childScene = scene.getChildScene();
-                if (childScene == null) {
-                    scene.setChildScene(cardInfoScene, false, false, true);
-                } else {
-                    childScene.setChildScene(cardInfoScene, false, false, true);
+                Scene childScene = scene;
+                while (childScene.getChildScene() != null) {
+                    childScene = childScene.getChildScene();
                 }
+                childScene.setChildScene(cardInfoScene, false, false, true);
             } catch (final IOException e) {
                 throw new RuntimeException(e);
             }
@@ -310,7 +309,6 @@ public class CardFrame extends Rectangle {
                 try {
                     if (!card.isAvatarLoaded() && card.getAvatar() != null) {
                         avatar = ImageUtils.getLocalString(card.getAvatar(), activity);
-                        TEXTURE_FACTORY.addCardResource(activity, avatar);
                         card.setAvatar(avatar);
                         card.setAvatarLoaded(true);
                     } else {
@@ -319,7 +317,6 @@ public class CardFrame extends Rectangle {
 
                     if (!card.isImageLoaded()) {
                         image = ImageUtils.getLocalString(card.getImage(), activity);
-                        TEXTURE_FACTORY.addCardResource(activity, image);
                         card.setImage(image);
                         card.setImageLoaded(true);
                     } else {
@@ -335,7 +332,7 @@ public class CardFrame extends Rectangle {
             public void onComplete() {
 
                 if (image != null) {
-                    final ITextureRegion texture = TEXTURE_FACTORY.getTextureRegion(image);
+                    final ITextureRegion texture = TEXTURE_FACTORY.newTextureRegion(image);
                     final Sprite imageSprite = new Sprite(mWidth * 0.5f, mHeight * 0.5f, mWidth, mHeight, texture, vbom);
                     imageSprite.setZIndex(0);
                     final IEntity parent = cardCoverSprite.getParent();

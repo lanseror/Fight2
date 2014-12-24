@@ -44,6 +44,7 @@ import com.fight2.util.F2SoundManager;
 import com.fight2.util.ImageOpenHelper;
 import com.fight2.util.LogUtils;
 import com.fight2.util.ResourceManager;
+import com.fight2.util.TextureFactory;
 
 public class GameActivity extends LayoutGameActivity {
     public static final int CAMERA_WIDTH = 1136;
@@ -198,6 +199,8 @@ public class GameActivity extends LayoutGameActivity {
                 loadResources1();
                 splashScene.detachChildren();
                 splashScene.detachSelf();
+                splashTexture.unload();
+                splashTexture = null;
                 final GameHud gameHud = new GameHud(GameActivity.this);
                 camera.setHUD(gameHud);
                 ResourceManager.getInstance().setCurrentScene(SceneEnum.Main);
@@ -253,6 +256,12 @@ public class GameActivity extends LayoutGameActivity {
         } else {
             return super.onKeyDown(keyCode, event);
         }
+    }
+
+    @Override
+    protected void onPause() {
+        TextureFactory.getInstance().clear();
+        super.onPause();
     }
 
     public Camera getCamera() {

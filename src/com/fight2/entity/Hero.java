@@ -8,7 +8,8 @@ import com.fight2.constant.TiledTextureEnum;
 import com.fight2.util.TiledTextureFactory;
 
 public class Hero extends AnimatedSprite {
-    private final long[] speed = { 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30 };
+    private final static long SPD = 45;
+    private final long[] speed = { SPD, SPD, SPD, SPD, SPD, SPD, SPD, SPD, SPD, SPD, SPD, SPD, SPD, SPD, SPD, SPD };
 
     public Hero(final float x, final float y, final VertexBufferObjectManager vbom) {
         super(x, y, TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.HERO2), vbom);

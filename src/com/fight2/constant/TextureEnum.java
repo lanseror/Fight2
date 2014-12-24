@@ -60,6 +60,7 @@ public enum TextureEnum {
     COMMON_CARD_FRAME_TIER_STICK_DEVIL_3("images/common_card_frame_tier_stick_devil_3.png", 107, 11),
     COMMON_HP_ICON("images/common_hp_icon.png", 39, 33),
     COMMON_ATK_ICON("images/common_atk_icon.png", 45, 35),
+    COMMON_ALERT_FRAME("images/common_alert_frame.png", 500, 236),
 
     // Chat room images.
     CHAT_INPUT_BG("images/chat_input_backgroud.png", 755, 75),
@@ -136,9 +137,10 @@ public enum TextureEnum {
     EVOLUTION_ICON("images/evolution_icon.png", 92, 45),
 
     // Summon scene images.
-    SUMMON_FRAME("images/summon_frame.png", 800 * 0.9f, 381 * 0.9f),
-    SUMMON_BUTTON("images/summon_button.png", 297 * 0.9f, 69 * 0.9f),
-    SUMMON_BUTTON_FCS("images/summon_button_fcs.png", 297 * 0.9f, 69 * 0.9f),
+    SUMMON_TOPBAR("images/summon_topbar.png", 614, 77),
+    SUMMON_FRAME("images/summon_frame.png", 700, 333),
+    SUMMON_BUTTON("images/summon_button.png", 261, 61),
+    SUMMON_BUTTON_FCS("images/summon_button_fcs.png", 261, 61),
 
     // PlayerInfo scene images.
     PLAYERINFO_FRAME("images/playerinfo_frame.png", 491, 469),
@@ -225,7 +227,6 @@ public enum TextureEnum {
     QUEST_TOWN("images/quest_town.png", 56, 52),
     QUEST_CANCEL_BUTTON("images/quest_cancel_button.png", 130, 132),
     QUEST_CANCEL_BUTTON_FCS("images/quest_cancel_button_fcs.png", 130, 132),
-    QUEST_TREASURE_BOX("images/quest_treasure_box.png", 95 * 0.4f, 84 * 0.4f),
     QUEST_PATH_TAG("images/quest_path_tag.png", 15, 15),
     QUEST_PATH_TAG_LEFT_END("images/quest_path_tag_left_end.png", 30, 26),
     QUEST_PATH_TAG_LEFT_TREASURE("images/quest_path_tag_left_treasure.png", 28, 31),

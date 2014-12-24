@@ -129,7 +129,7 @@ public class PlayerInfoScene extends BaseScene {
     public void updateScene() {
         activity.getGameHub().needSmallChatRoom(false);
         final Card avatarCard = session.getPartyInfo().getParties()[0].getCards()[0];
-        final ITextureRegion texture = textureFactory.getTextureRegion(avatarCard.getImage());
+        final ITextureRegion texture = textureFactory.newTextureRegion(avatarCard.getImage());
         if (cardSprite != null) {
             cardSprite.detachSelf();
         }

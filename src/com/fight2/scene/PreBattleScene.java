@@ -198,7 +198,6 @@ public class PreBattleScene extends BaseScene {
                 try {
                     if (!card.isImageLoaded()) {
                         image = ImageUtils.getLocalString(card.getImage(), activity);
-                        textureFactory.addCardResource(activity, image);
                         card.setImage(image);
                         card.setImageLoaded(true);
                     } else {
@@ -214,7 +213,7 @@ public class PreBattleScene extends BaseScene {
             public void onComplete() {
 
                 if (image != null) {
-                    final ITextureRegion texture = textureFactory.getTextureRegion(image);
+                    final ITextureRegion texture = textureFactory.newTextureRegion(image);
                     final Sprite imageSprite = new Sprite(CARD_CENTER_X, CARD_CENTER_Y, CARD_WIDTH, CARD_HEIGHT, texture, vbom);
                     opponentCardSprite.attachChild(imageSprite);
                 }
@@ -241,7 +240,6 @@ public class PreBattleScene extends BaseScene {
                 try {
                     if (!card.isImageLoaded()) {
                         image = ImageUtils.getLocalString(card.getImage(), activity);
-                        textureFactory.addCardResource(activity, image);
                         card.setImage(image);
                         card.setImageLoaded(true);
                     } else {
@@ -257,7 +255,7 @@ public class PreBattleScene extends BaseScene {
             public void onComplete() {
 
                 if (image != null) {
-                    final ITextureRegion texture = textureFactory.getTextureRegion(image);
+                    final ITextureRegion texture = textureFactory.newTextureRegion(image);
                     final Sprite imageSprite = new Sprite(CARD_CENTER_X, CARD_CENTER_Y, CARD_WIDTH, CARD_HEIGHT, texture, vbom);
                     myCardSprite.attachChild(imageSprite);
                 }

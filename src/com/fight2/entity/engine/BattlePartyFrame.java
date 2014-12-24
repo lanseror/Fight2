@@ -117,7 +117,6 @@ public class BattlePartyFrame extends Rectangle {
                     try {
                         if (card.getAvatar() != null && !card.isAvatarLoaded()) {
                             avatar = ImageUtils.getLocalString(card.getAvatar(), activity);
-                            textureFactory.addCardResource(activity, avatar);
                             card.setAvatar(avatar);
                             card.setAvatarLoaded(true);
                         } else {
@@ -133,7 +132,7 @@ public class BattlePartyFrame extends Rectangle {
                 public void onComplete() {
 
                     if (avatar != null) {
-                        final ITextureRegion texture = textureFactory.getTextureRegion(avatar);
+                        final ITextureRegion texture = textureFactory.newTextureRegion(avatar);
                         final Sprite imageSprite = new Sprite(AVATAR_WIDTH * 0.5f, AVATAR_HEIGHT * 0.5f, AVATAR_WIDTH, AVATAR_HEIGHT, texture, vbom);
                         cardSprite.attachChild(imageSprite);
                     }

@@ -333,7 +333,7 @@ public class ArenaScene extends BaseScene {
             nameTexts[i] = nameText;
             final String avatar = competitor.getAvatar();
             final ITextureRegion avatarTexture = StringUtils.isEmpty(avatar) ? textureFactory.getAssetTextureRegion(TextureEnum.COMMON_DEFAULT_AVATAR)
-                    : textureFactory.getTextureRegion(avatar);
+                    : textureFactory.newTextureRegion(avatar);
             final Sprite competitorSprite = new Sprite(117, 209, 100, 100, avatarTexture, vbom);
             battleFrames[i].attachChild(competitorSprite);
             competitorSprites[i] = competitorSprite;

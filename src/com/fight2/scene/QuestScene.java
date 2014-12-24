@@ -2,6 +2,7 @@ package com.fight2.scene;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -15,6 +16,7 @@ import org.andengine.entity.modifier.PathModifier.Path;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
+import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.extension.tmx.TMXLayer;
 import org.andengine.extension.tmx.TMXLoader;
@@ -26,6 +28,7 @@ import org.andengine.input.touch.detector.ScrollDetector;
 import org.andengine.input.touch.detector.ScrollDetector.IScrollDetectorListener;
 import org.andengine.input.touch.detector.SurfaceScrollDetector;
 import org.andengine.opengl.texture.TextureOptions;
+import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.util.Constants;
 import org.andengine.util.adt.color.ColorUtils;
 import org.andengine.util.debug.Debug;
@@ -34,6 +37,7 @@ import com.fight2.GameActivity;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
+import com.fight2.constant.TiledTextureEnum;
 import com.fight2.entity.Hero;
 import com.fight2.entity.QuestResult;
 import com.fight2.entity.QuestTile;
@@ -45,6 +49,7 @@ import com.fight2.util.F2SoundManager;
 import com.fight2.util.IAsyncCallback;
 import com.fight2.util.QuestUtils;
 import com.fight2.util.ResourceManager;
+import com.fight2.util.TiledTextureFactory;
 import com.fight2.util.TmxUtils;
 
 public class QuestScene extends BaseScene implements IScrollDetectorListener {
@@ -208,6 +213,11 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         cancelButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                if (goStatus == QuestGoStatus.Ready) {
+                    clearPathTages();
+                    goStatus = QuestGoStatus.Stopped;
+                    cancelButton.setVisible(false);
+                }
             }
         });
         return cancelButton;
@@ -230,6 +240,19 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                     tmxTiledMap.attachChild(tag);
                     pathTags.add(tag);
                 }
+            }
+        });
+    }
+
+    private void clearPathTages() {
+        activity.runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                final Iterator<Sprite> it = pathTags.iterator();
+                while (it.hasNext()) {
+                    it.next().detachSelf();
+                }
+                pathTags.clear();
             }
         });
     }
@@ -291,7 +314,9 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                     for (final QuestTile treasure : questTreasureData.getQuestTiles()) {
                         final float treasureX = tmxLayer.getTileX(treasure.getCol()) + 0.5f * tmxTiledMap.getTileWidth();
                         final float treasureY = tmxLayer.getTileY(treasure.getRow()) + 0.5f * tmxTiledMap.getTileHeight();
-                        final Sprite treasureSprite = createACImageSprite(TextureEnum.QUEST_TREASURE_BOX, treasureX, treasureY);
+                        final ITiledTextureRegion tiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.TREASURE_BOX);
+                        final AnimatedSprite treasureSprite = new AnimatedSprite(treasureX, treasureY, tiledTextureRegion, vbom);
+                        treasureSprite.animate(500, true);
                         tmxTiledMap.attachChild(treasureSprite);
                         treasureSprites.add(treasureSprite);
                     }
@@ -309,7 +334,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         goStatus = QuestGoStatus.Started;
         final float[] xs = path.getCoordinatesX();
         final float[] ys = path.getCoordinatesY();
-        hero.registerEntityModifier(new PathModifier(path.getSize() * 0.5f, path, null, new IPathModifierListener() {
+        hero.registerEntityModifier(new PathModifier(path.getSize() * 0.55f, path, null, new IPathModifierListener() {
             @Override
             public void onPathStarted(final PathModifier pPathModifier, final IEntity pEntity) {
                 // F2SoundManager.getInstance().play(SoundEnum.HORSE, true);

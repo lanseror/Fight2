@@ -30,6 +30,9 @@ public class SummonScene extends BaseScene {
         final Background background = new SpriteBackground(bgSprite);
         this.setBackground(background);
 
+        final Sprite topBar = createALBImageSprite(TextureEnum.SUMMON_TOPBAR, this.simulatedLeftX, this.simulatedHeight - TextureEnum.SUMMON_TOPBAR.getHeight());
+        this.attachChild(topBar);
+
         final Sprite rechargeSprite = createALBF2ButtonSprite(TextureEnum.PARTY_RECHARGE, TextureEnum.PARTY_RECHARGE_PRESSED, this.simulatedRightX
                 - TextureEnum.PARTY_RECHARGE.getWidth() - 8, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight() - 4);
         this.attachChild(rechargeSprite);
@@ -58,7 +61,7 @@ public class SummonScene extends BaseScene {
     }
 
     private F2ButtonSprite createSummonSprite() {
-        final F2ButtonSprite summonButton = this.createACF2ButtonSprite(TextureEnum.SUMMON_BUTTON, TextureEnum.SUMMON_BUTTON_FCS, 620 * 0.9f, 60 * 0.9f);
+        final F2ButtonSprite summonButton = this.createACF2ButtonSprite(TextureEnum.SUMMON_BUTTON, TextureEnum.SUMMON_BUTTON_FCS, 540 , 55);
         summonButton.setOnClickListener(new F2OnClickListener() {
 
             @Override

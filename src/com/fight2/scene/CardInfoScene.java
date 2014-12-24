@@ -134,7 +134,7 @@ public class CardInfoScene extends BaseScene {
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
         activity.getGameHub().needSmallChatRoom(false);
-        final ITextureRegion texture = textureFactory.getTextureRegion(card.getImage());
+        final ITextureRegion texture = textureFactory.newTextureRegion(card.getImage());
         if (cardSprite != null) {
             cardSprite.detachSelf();
         }

@@ -410,7 +410,6 @@ public class MainScene extends BaseScene {
                     try {
                         if (!myLeader.isAvatarLoaded() && myLeader.getAvatar() != null) {
                             avatar = ImageUtils.getLocalString(myLeader.getAvatar(), activity);
-                            textureFactory.addCardResource(activity, avatar);
                             myLeader.setAvatar(avatar);
                             myLeader.setAvatarLoaded(true);
                         } else {
@@ -427,7 +426,7 @@ public class MainScene extends BaseScene {
                 public void onComplete() {
 
                     if (avatar != null) {
-                        final ITextureRegion texture = textureFactory.getTextureRegion(avatar);
+                        final ITextureRegion texture = textureFactory.newTextureRegion(avatar);
                         final Sprite avatarSprite = new Sprite(avatarHalfSize, avatarHalfSize, avatarSize, avatarSize, texture, vbom);
                         activity.runOnUpdateThread(new Runnable() {
                             @Override

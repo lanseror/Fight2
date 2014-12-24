@@ -76,7 +76,6 @@ public class ArenaUtils {
                 if (avatar != null && !"".equals(avatar)) {
                     final String localAvatar = ImageUtils.getLocalString(avatar, activity);
                     player.setAvatar(localAvatar);
-                    TextureFactory.getInstance().addCardResource(activity, localAvatar);
                 }
                 player.setName(arenaRecordsUserJson.getString("name"));
                 userArenaRecord.setUser(player);

@@ -68,7 +68,7 @@ public class ResourceManager {
         // Start load resources
         TiledTextureFactory.getInstance().loadResource(textureManager, assetManager);
         final TextureFactory textureFactory = TextureFactory.getInstance();
-        textureFactory.init();
+        textureFactory.clear();
         textureFactory.initImageData(activity);
         final String installUUID = AccountUtils.readInstallUUID(activity);
         AccountUtils.login(installUUID, activity);
@@ -99,14 +99,46 @@ public class ResourceManager {
     }
 
     public BaseScene getScene(final SceneEnum sceneEnum) {
-        return scenes.get(sceneEnum);
+        try {
+            switch (sceneEnum) {
+                case Chat:
+                    return new ChatScene(activity);
+                case Main:
+                    return new MainScene(activity);
+                case Party:
+                    return new PartyScene(activity);
+                case CardUpgrade:
+                    return new CardUpgradeScene(activity);
+                case CardEvolution:
+                    return new CardEvolutionScene(activity);
+                case Summon:
+                    return new SummonScene(activity);
+                case ArenaList:
+                    return new ArenaListScene(activity);
+                case PlayerInfo:
+                    return new PlayerInfoScene(activity);
+                case Guild:
+                    return new GuildScene(activity);
+                case Storeroom:
+                    return new UserStoreroomScene(activity);
+                case Arena:
+                    return new ArenaScene(activity);
+                case Quest:
+                    return scenes.get(SceneEnum.Quest);
+                default:
+                    throw new RuntimeException("No Scene");
+            }
+
+        } catch (final Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void setCurrentScene(final SceneEnum sceneEnum) {
         if (currentScene != null) {
             currentScene.leaveScene();
         }
-        final BaseScene scene = scenes.get(sceneEnum);
+        final BaseScene scene = getScene(sceneEnum);
         activity.getEngine().setScene(scene);
         scene.updateScene();
         currentScene = scene;
@@ -123,7 +155,7 @@ public class ResourceManager {
         }
         final SceneEnum sceneEnum = breadcrumbs.peek();
 
-        final BaseScene scene = scenes.get(sceneEnum);
+        final BaseScene scene = getScene(sceneEnum);
         activity.getEngine().setScene(scene);
         scene.updateScene();
         currentScene = scene;
@@ -207,34 +239,10 @@ public class ResourceManager {
 
     private void loadScenes() {
         try {
-            final BaseScene chatScene = new ChatScene(activity);
-            scenes.put(SceneEnum.Chat, chatScene);
-            final BaseScene mainScene = new MainScene(activity);
-            scenes.put(SceneEnum.Main, mainScene);
-            final BaseScene partyScene = new PartyScene(activity);
-            scenes.put(SceneEnum.Party, partyScene);
-            final BaseScene cardUpgradeScene = new CardUpgradeScene(activity);
-            scenes.put(SceneEnum.CardUpgrade, cardUpgradeScene);
-            final BaseScene cardEvolutionScene = new CardEvolutionScene(activity);
-            scenes.put(SceneEnum.CardEvolution, cardEvolutionScene);
-            final BaseScene summonScene = new SummonScene(activity);
-            scenes.put(SceneEnum.Summon, summonScene);
-            final BaseScene arenaListScene = new ArenaListScene(activity);
-            scenes.put(SceneEnum.ArenaList, arenaListScene);
-            final BaseScene questScene = new QuestScene(activity);
-            scenes.put(SceneEnum.Quest, questScene);
-            final BaseScene playerInfoScene = new PlayerInfoScene(activity);
-            scenes.put(SceneEnum.PlayerInfo, playerInfoScene);
-            final BaseScene guildScene = new GuildScene(activity);
-            scenes.put(SceneEnum.Guild, guildScene);
-            final BaseScene userStoreroomScene = new UserStoreroomScene(activity);
-            scenes.put(SceneEnum.Storeroom, userStoreroomScene);
-
-            final BaseScene arenaScene = new ArenaScene(activity);
-            scenes.put(SceneEnum.Arena, arenaScene);
-
+            final BaseScene scene = new QuestScene(activity);
+            scenes.put(SceneEnum.Quest, scene);
         } catch (final IOException e) {
-            LogUtils.e(e);
+            throw new RuntimeException(e);
         }
 
     }

@@ -70,7 +70,6 @@ public class CardAvatar extends Rectangle {
                 try {
                     if (!card.isAvatarLoaded() && card.getAvatar() != null) {
                         avatar = ImageUtils.getLocalString(card.getAvatar(), activity);
-                        TEXTURE_FACTORY.addCardResource(activity, avatar);
                         card.setAvatar(avatar);
                         card.setAvatarLoaded(true);
                     } else {
@@ -87,7 +86,7 @@ public class CardAvatar extends Rectangle {
             public void onComplete() {
 
                 if (avatar != null) {
-                    final ITextureRegion texture = TEXTURE_FACTORY.getTextureRegion(avatar);
+                    final ITextureRegion texture = TEXTURE_FACTORY.newTextureRegion(avatar);
                     final Sprite imageSprite = new Sprite(mWidth * 0.5f, mHeight * 0.5f, mWidth, mHeight, texture, vbom);
                     imageSprite.setZIndex(0);
                     final IEntity parent = cardCoverSprite.getParent();

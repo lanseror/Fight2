@@ -26,6 +26,9 @@ public class TextureFactory {
     private final Map<TextureEnum, ITextureRegion> datas = new HashMap<TextureEnum, ITextureRegion>();
     private final Map<String, ITextureRegion> cardDatas = new HashMap<String, ITextureRegion>();
     private final Map<String, String> imageDatas = new HashMap<String, String>();
+    private GameActivity activity;
+    private TextureManager textureManager;
+    private AssetManager assetManager;
 
     private TextureFactory() {
         // Private the constructor;
@@ -35,7 +38,7 @@ public class TextureFactory {
         return INSTANCE;
     }
 
-    public void init() {
+    public void clear() {
         datas.clear();
         cardDatas.clear();
         imageDatas.clear();
@@ -45,20 +48,15 @@ public class TextureFactory {
         final int initProgress = 50;
         final int total = 40;
         final int length = TextureEnum.values().length;
-        int i = 0;
-        for (final TextureEnum textureEnum : TextureEnum.values()) {
-            final ITexture texture = new AssetBitmapTexture(textureManager, assetManager, textureEnum.getUrl());
-            final ITextureRegion textureRegion = TextureRegionFactory.extractFromTexture(texture);
-            texture.load();
-            datas.put(textureEnum, textureRegion);
-            progressBar.increase(initProgress + total * ++i / length);
-        }
+        final int i = 0;
+        this.textureManager = textureManager;
+        this.assetManager = assetManager;
     }
 
     public void initImageData(final GameActivity activity) throws IOException {
         final ImageOpenHelper dbHelper = activity.getDbHelper();
         final String selectQuery = "SELECT * FROM " + ImageOpenHelper.TABLE_NAME;
-
+        this.activity = activity;
         final SQLiteDatabase db = dbHelper.getReadableDatabase();
         final Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
@@ -74,22 +72,35 @@ public class TextureFactory {
         return imageDatas;
     }
 
-    public void addCardResource(final GameActivity activity, final String image) throws IOException {
-        if (!cardDatas.containsKey(image)) {
-            final ITextureRegion textureRegion = createIextureRegion(activity, image);
-            cardDatas.put(image, textureRegion);
-        }
-    }
-
     public ITextureRegion getAssetTextureRegion(final TextureEnum textureEnum) {
-        return this.datas.get(textureEnum);
+        try {
+            if (datas.containsKey(textureEnum)) {
+                return datas.get(textureEnum);
+            } else {
+                final ITexture texture = new AssetBitmapTexture(textureManager, assetManager, textureEnum.getUrl());
+                final ITextureRegion textureRegion = TextureRegionFactory.extractFromTexture(texture);
+                texture.load();
+                datas.put(textureEnum, textureRegion);
+                return textureRegion;
+            }
+
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
-    public ITextureRegion getTextureRegion(final String imageString) {
-        if (cardDatas.containsKey(imageString)) {
-            return this.cardDatas.get(imageString);
-        } else {
-            return getAssetTextureRegion(TextureEnum.COMMON_CARD_COVER);
+    public ITextureRegion newTextureRegion(final String imageString) {
+        try {
+            if (cardDatas.containsKey(imageString)) {
+                return cardDatas.get(imageString);
+            } else {
+                final ITextureRegion textureRegion = createIextureRegion(activity, imageString);
+                cardDatas.put(imageString, textureRegion);
+                return textureRegion;
+            }
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
         }
 
     }
