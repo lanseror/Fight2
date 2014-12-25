@@ -67,9 +67,10 @@ public enum TextureEnum {
     COMMON_SUMMON_CHARM("images/common_summon_charm.png", 31, 33),
 
     // Chat room images.
-    CHAT_INPUT_BG("images/chat_input_backgroud.png", 755, 75),
+    CHAT_INPUT_BG("images/chat_input_backgroud.png", 850, 82),
     CHAT_INPUT_TEXT_BG("images/chat_input_text_bg.png", 487, 44),
-    CHAT_INPUT_OPEN("images/chat_input_open.png", 93, 75),
+    CHAT_INPUT_OPEN("images/chat_input_open.png", 84, 83),
+    CHAT_INPUT_OPEN_FCS("images/chat_input_open_fcs.png", 84, 83),
     CHAT_INPUT_CLOSE("images/chat_input_close.png", 40, 40),
     CHAT_INPUT_SEND("images/chat_input_send.png", 145, 52),
 

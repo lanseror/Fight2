@@ -135,7 +135,11 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
         final Background background = new EntityBackground(bgEntity);
         this.setBackground(background);
 
-        final IEntity leftCloseTouchArea = new Rectangle(this.simulatedLeftX + 60, 40, 120, 80, vbom) {
+        final Sprite chatInputSprite = createALBImageSprite(TextureEnum.CHAT_INPUT_BG, this.simulatedLeftX, 0);
+        this.attachChild(chatInputSprite);
+
+        final IEntity leftCloseTouchArea = new Rectangle(this.simulatedLeftX, TextureEnum.CHAT_INPUT_BG.getHeight() * 0.5f, 180,
+                TextureEnum.CHAT_INPUT_BG.getHeight(), vbom) {
             @Override
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 if (pSceneTouchEvent.isActionUp()) {
@@ -150,8 +154,6 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
         this.attachChild(leftCloseTouchArea);
         this.registerTouchArea(leftCloseTouchArea);
 
-        final Sprite chatInputSprite = createALBImageSprite(TextureEnum.CHAT_INPUT_BG, this.simulatedLeftX, 0);
-        this.attachChild(chatInputSprite);
         final TextureEnum sendTextureEnum = TextureEnum.CHAT_INPUT_SEND;
         final F2ButtonSprite sendSprite = createALBF2ButtonSprite(sendTextureEnum, sendTextureEnum, chatInputSprite.getWidth() - sendTextureEnum.getWidth()
                 - 20, 10);

@@ -54,7 +54,7 @@ public class SmallChatRoom extends Rectangle {
         chatTextHandler = new ChatTextHandler(CHAT_SIZE, vbom);
 
         final EntryFactory entryFactory = EntryFactory.getInstance();
-        openButton = entryFactory.createALBF2ButtonSprite(TextureEnum.CHAT_INPUT_OPEN, TextureEnum.CHAT_INPUT_OPEN, 0, 0);
+        openButton = entryFactory.createALBF2ButtonSprite(TextureEnum.CHAT_INPUT_OPEN, TextureEnum.CHAT_INPUT_OPEN_FCS, 0, 0);
         openButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
