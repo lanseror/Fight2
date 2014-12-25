@@ -157,8 +157,8 @@ public class CardUtils {
         return false;
     }
 
-    public static Card summon(final GameActivity activity) {
-        final String url = HttpUtils.HOST_URL + "/card/summon";
+    public static Card summon(final GameActivity activity, final int type) {
+        final String url = HttpUtils.HOST_URL + "/card/summon?type=" + type;
         final GameUserSession session = GameUserSession.getInstance();
         final Collection<Card> cards = session.getCards();
         try {

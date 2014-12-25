@@ -11,6 +11,7 @@ import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
+import org.andengine.util.debug.Debug;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -28,6 +29,9 @@ import com.fight2.entity.Card;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.AccountUtils;
+import com.fight2.util.AsyncTaskLoader;
+import com.fight2.util.IAsyncCallback;
+import com.fight2.util.ImageUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
 
@@ -122,13 +126,15 @@ public class PlayerInfoScene extends BaseScene {
     @Override
     public void updateScene() {
         activity.getGameHub().needSmallChatRoom(false);
-        final Card avatarCard = session.getPartyInfo().getParties()[0].getCards()[0];
-        final ITextureRegion texture = textureFactory.newTextureRegion(avatarCard.getImage());
         if (cardSprite != null) {
             cardSprite.detachSelf();
         }
-        cardSprite = new Sprite(this.simulatedLeftX + 30 + CARD_WIDTH * 0.5f, FRAME_BOTTOM + CARD_HEIGHT * 0.5f, CARD_WIDTH, CARD_HEIGHT, texture, vbom);
+
+        final ITextureRegion coverTexture = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_CARD_COVER);
+        cardSprite = new Sprite(this.simulatedLeftX + 30 + CARD_WIDTH * 0.5f, FRAME_BOTTOM + CARD_HEIGHT * 0.5f, CARD_WIDTH, CARD_HEIGHT, coverTexture, vbom);
         this.attachChild(cardSprite);
+        final Card avatarCard = session.getPartyInfo().getParties()[0].getCards()[0];
+        loadImageFromServer(avatarCard);
     }
 
     @Override
@@ -176,4 +182,47 @@ public class PlayerInfoScene extends BaseScene {
         });
     }
 
+    public void loadImageFromServer(final Card card) {
+        final IAsyncCallback callback = new IAsyncCallback() {
+            private String image;
+
+            @Override
+            public void workToDo() {
+                try {
+                    if (!card.isImageLoaded()) {
+                        image = ImageUtils.getLocalString(card.getImage(), activity);
+                        card.setImage(image);
+                        card.setImageLoaded(true);
+                    } else {
+                        image = card.getImage();
+                    }
+                } catch (final IOException e) {
+                    Debug.e(e);
+                }
+
+            }
+
+            @Override
+            public void onComplete() {
+
+                if (image != null) {
+                    final ITextureRegion texture = textureFactory.newTextureRegion(image);
+                    cardSprite.setWidth(100);
+                    cardSprite.setHeight(150);
+                    final Sprite imageSprite = new Sprite(cardSprite.getWidth() * 0.5f, cardSprite.getHeight() * 0.5f, CARD_WIDTH, CARD_HEIGHT, texture, vbom);
+                    cardSprite.attachChild(imageSprite);
+                }
+
+            }
+
+        };
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new AsyncTaskLoader().execute(callback);
+            }
+        });
+
+    }
 }
