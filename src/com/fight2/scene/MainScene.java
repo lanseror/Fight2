@@ -36,7 +36,6 @@ import com.fight2.entity.PartyInfo;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.AsyncTaskLoader;
-import com.fight2.util.BWShaderProgram;
 import com.fight2.util.ChatUtils;
 import com.fight2.util.IAsyncCallback;
 import com.fight2.util.ImageUtils;
@@ -80,65 +79,64 @@ public class MainScene extends BaseScene {
 
     public MainScene(final GameActivity activity) throws IOException {
         super(activity);
-        this.mFont = ResourceManager.getInstance().newFont(FontEnum.Main);
+        this.mFont = ResourceManager.getInstance().newFont(FontEnum.Bold, 20);
         final float tipTextX = TextureEnum.MAIN_TIPS.getWidth() * 0.5f;
         final float tipTextY = TextureEnum.MAIN_TIPS.getHeight() * 0.5f;
+        final float tipTextX2 = TextureEnum.MAIN_TIPS2.getWidth() * 0.5f;
+        final float tipTextY2 = TextureEnum.MAIN_TIPS2.getHeight() * 0.5f;
         final Text summonText = new Text(tipTextX, tipTextY, mFont, "召唤石", vbom);
-        summonText.setColor(0XFF8E2E11);
-        summonTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 510, 25);
+        summonText.setColor(0XFFDFDCD7);
+        summonTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 505, 25);
         summonTip.attachChild(summonText);
         tips.add(summonTip);
 
         final Text arenaText = new Text(tipTextX, tipTextY, mFont, "竞技场", vbom);
-        arenaText.setColor(0XFF8E2E11);
+        arenaText.setColor(0XFFDFDCD7);
         arenaTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 630, 365);
         arenaTip.attachChild(arenaText);
         tips.add(arenaTip);
 
         final Text campText = new Text(tipTextX, tipTextY, mFont, "训练营", vbom);
-        campText.setColor(0XFF8E2E11);
-        campTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 650, 210);
+        campText.setColor(0XFFDFDCD7);
+        campTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 652, 210);
         campTip.attachChild(campText);
         tips.add(campTip);
 
-        final Text gateText = new Text(tipTextX, tipTextY, mFont, "出城", vbom);
-        gateText.setColor(0XFF8E2E11);
-        gateTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 360, 438);
+        final Text gateText = new Text(tipTextX2, tipTextY2, mFont, "出城", vbom);
+        gateText.setColor(0XFFDFDCD7);
+        gateTip = createALBImageSprite(TextureEnum.MAIN_TIPS2, 362, 438);
         gateTip.attachChild(gateText);
         tips.add(gateTip);
 
-        final Text storeroomText = new Text(tipTextX, tipTextY, mFont, "仓库", vbom);
-        storeroomText.setColor(0XFF8E2E11);
-        storeroomTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 40, 230);
+        final Text storeroomText = new Text(tipTextX2, tipTextY2, mFont, "仓库", vbom);
+        storeroomText.setColor(0XFFDFDCD7);
+        storeroomTip = createALBImageSprite(TextureEnum.MAIN_TIPS2, 40, 230);
         storeroomTip.attachChild(storeroomText);
         tips.add(storeroomTip);
 
-        final Text guildText = new Text(tipTextX, tipTextY, mFont, "公会", vbom);
-        guildText.setColor(0XFF8E2E11);
-        guildTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 960, 300);
+        final Text guildText = new Text(tipTextX2, tipTextY2, mFont, "公会", vbom);
+        guildText.setColor(0XFFDFDCD7);
+        guildTip = createALBImageSprite(TextureEnum.MAIN_TIPS2, 960, 300);
         guildTip.attachChild(guildText);
         tips.add(guildTip);
 
-        final Text congressText = new Text(tipTextX, tipTextY, mFont, "国会", vbom);
+        final Text congressText = new Text(tipTextX2, tipTextY2, mFont, "国会", vbom);
         congressText.setColor(0XFF8E2E11);
-        congressTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 800, 500);
+        congressTip = createALBImageSprite(TextureEnum.MAIN_TIPS2, 800, 500);
         congressTip.attachChild(congressText);
         tips.add(congressTip);
-        congressTip.setShaderProgram(BWShaderProgram.getInstance());
 
-        final Text hotelText = new Text(tipTextX, tipTextY, mFont, "酒馆", vbom);
+        final Text hotelText = new Text(tipTextX2, tipTextY2, mFont, "酒馆", vbom);
         hotelText.setColor(0XFF8E2E11);
-        hotelTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 290, 285);
+        hotelTip = createALBImageSprite(TextureEnum.MAIN_TIPS2, 290, 285);
         hotelTip.attachChild(hotelText);
         tips.add(hotelTip);
-        hotelTip.setShaderProgram(BWShaderProgram.getInstance());
 
-        final Text mailBoxText = new Text(tipTextX, tipTextY, mFont, "信箱", vbom);
+        final Text mailBoxText = new Text(tipTextX2, tipTextY2, mFont, "信箱", vbom);
         mailBoxText.setColor(0XFF8E2E11);
-        mailBoxTip = createALBImageSprite(TextureEnum.MAIN_TIPS, 990, 130);
+        mailBoxTip = createALBImageSprite(TextureEnum.MAIN_TIPS2, 990, 130);
         mailBoxTip.attachChild(mailBoxText);
         tips.add(mailBoxTip);
-        mailBoxTip.setShaderProgram(BWShaderProgram.getInstance());
 
         init();
     }
@@ -274,7 +272,8 @@ public class MainScene extends BaseScene {
         playerInfoSprite.attachChild(playerInfoStaminaBoxSprite);
 
         for (final IEntity tip : tips) {
-            tip.setVisible(false);
+            // tip.setVisible(false);
+            tip.setAlpha(0.75f);
             this.attachChild(tip);
         }
 
@@ -285,9 +284,9 @@ public class MainScene extends BaseScene {
                 final float y = pSceneTouchEvent.getY();
                 resetButtons();
                 if (pSceneTouchEvent.isActionDown() || pSceneTouchEvent.isActionMove()) {
-                    for (final IEntity tip : tips) {
-                        tip.setVisible(true);
-                    }
+                    // for (final IEntity tip : tips) {
+                    // tip.setVisible(true);
+                    // }
                     if (checkContains(MAIL_VERTICES, x, y)) {
                         focusSprite(mailBoxSprite);
                     } else if (checkContains(SUMMON_VERTICES, x, y)) {
@@ -310,12 +309,13 @@ public class MainScene extends BaseScene {
                         focusSprite(storeroomSprite);
                     }
                 } else if (pSceneTouchEvent.isActionUp()) {
-                    for (final IEntity tip : tips) {
-                        tip.setVisible(false);
-                    }
+                    // for (final IEntity tip : tips) {
+                    // tip.setVisible(false);
+                    // }
 
                     if (checkContains(MAIL_VERTICES, x, y)) {
                         unfocusSprite(mailBoxSprite);
+                        alert("未开启！");
                     } else if (checkContains(SUMMON_VERTICES, x, y)) {
                         unfocusSprite(summonStoneSprite);
                         ResourceManager.getInstance().setCurrentScene(SceneEnum.Summon);
@@ -329,6 +329,7 @@ public class MainScene extends BaseScene {
                         ResourceManager.getInstance().setCurrentScene(SceneEnum.Party);
                     } else if (checkContains(HOTEL_VERTICES, x, y)) {
                         unfocusSprite(hotelSprite);
+                        alert("未开启！");
                     } else if (checkContains(ARENA_VERTICES, x, y)) {
                         unfocusSprite(arenaSprite);
                         final Card myLeader = myParties[0].getCards()[0];
@@ -339,6 +340,7 @@ public class MainScene extends BaseScene {
                         }
                     } else if (checkContains(CONGRESS_VERTICES, x, y)) {
                         unfocusSprite(congressSprite);
+                        alert("未开启！");
                     } else if (checkContains(GATE_VERTICES, x, y)) {
                         unfocusSprite(gateSprite);
                         ResourceManager.getInstance().setCurrentScene(SceneEnum.Quest);
