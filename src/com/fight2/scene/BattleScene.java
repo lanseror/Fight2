@@ -27,7 +27,6 @@ import org.andengine.util.modifier.IModifier;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
-import com.fight2.constant.MusicEnum;
 import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.GameUserSession;

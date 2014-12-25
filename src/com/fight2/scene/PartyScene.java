@@ -20,7 +20,6 @@ import org.andengine.util.algorithm.collision.EntityCollisionChecker;
 import org.andengine.util.debug.Debug;
 
 import android.util.SparseArray;
-import android.widget.Toast;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
@@ -125,12 +124,7 @@ public class PartyScene extends BaseScene {
                 if (isSaveOk) {
                     ResourceManager.getInstance().setCurrentScene(SceneEnum.Main);
                 } else {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(activity, "队伍保存失败！", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    alert("队伍保存失败！");
                 }
             }
         });

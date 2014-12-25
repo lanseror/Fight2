@@ -12,8 +12,6 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
 import org.andengine.opengl.font.Font;
 
-import android.widget.Toast;
-
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
@@ -139,12 +137,7 @@ public class UserStoreroomScene extends BaseScene {
                 public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                     final int size = AccountUtils.receiveCardFromUserStoreroom(activity, card.getId());
                     if (size == 0) {
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(activity, "你的卡组已满！", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        alert("你的卡组已满！");
                     } else if (size < card.getAmount()) {
                         card.setAmount(card.getAmount() - size);
                         cardAmountText.setText(String.format("×%s", card.getAmount()));

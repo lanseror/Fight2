@@ -19,7 +19,6 @@ import android.content.DialogInterface.OnShowListener;
 import android.view.Gravity;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
@@ -86,12 +85,7 @@ public class PlayerInfoScene extends BaseScene {
                     if (isSaveOk) {
                         ResourceManager.getInstance().setCurrentScene(SceneEnum.Main);
                     } else {
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(activity, "用户信息保存失败！", Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        alert("用户信息保存失败！");
                     }
                 } else {
                     ResourceManager.getInstance().setCurrentScene(SceneEnum.Main);

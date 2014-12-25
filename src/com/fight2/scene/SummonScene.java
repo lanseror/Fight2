@@ -6,8 +6,6 @@ import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
 
-import android.widget.Toast;
-
 import com.fight2.GameActivity;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
@@ -61,7 +59,7 @@ public class SummonScene extends BaseScene {
     }
 
     private F2ButtonSprite createSummonSprite() {
-        final F2ButtonSprite summonButton = this.createACF2ButtonSprite(TextureEnum.SUMMON_BUTTON, TextureEnum.SUMMON_BUTTON_FCS, 540 , 55);
+        final F2ButtonSprite summonButton = this.createACF2ButtonSprite(TextureEnum.SUMMON_BUTTON, TextureEnum.SUMMON_BUTTON_FCS, 540, 55);
         summonButton.setOnClickListener(new F2OnClickListener() {
 
             @Override
@@ -77,12 +75,7 @@ public class SummonScene extends BaseScene {
                         throw new RuntimeException(e);
                     }
                 } else {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(activity, "可能服务器出错或者你召唤的卡片已经超过100张！", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    alert("可能服务器出错或者你召唤的卡片已经超过100张！");
                 }
 
             }
