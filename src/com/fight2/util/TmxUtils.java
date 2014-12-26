@@ -14,6 +14,7 @@ import org.andengine.extension.tmx.TMXTiledMap;
 import com.fight2.entity.Hero;
 
 public class TmxUtils {
+    public static final float HERO_OFFSET_Y = 30;
     private static int GID = 0;
     private final Hero hero;
     private final TMXTiledMap tmxTiledMap;
@@ -96,7 +97,7 @@ public class TmxUtils {
         final Path path = new Path(stack.size());
         while (!stack.isEmpty()) {
             final TMXTile pathTMXTile = stack.pop();
-            path.to(tmxLayer.getTileX(pathTMXTile.getTileColumn()) + 0.5f * tmxTiledMap.getTileWidth(), tmxLayer.getTileY(pathTMXTile.getTileRow()) + 40);
+            path.to(tmxLayer.getTileX(pathTMXTile.getTileColumn()) + 0.5f * tmxTiledMap.getTileWidth(), tmxLayer.getTileY(pathTMXTile.getTileRow()) + HERO_OFFSET_Y);
         }
         return path;
     }

@@ -3,6 +3,7 @@ package com.fight2.entity.engine;
 import org.andengine.engine.handler.timer.ITimerCallback;
 import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.entity.primitive.Rectangle;
+import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
 import org.andengine.opengl.font.Font;
@@ -17,6 +18,7 @@ import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.ChatMessage;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
+import com.fight2.scene.BaseScene;
 import com.fight2.util.ChatTextHandler;
 import com.fight2.util.ChatUtils;
 import com.fight2.util.ChatUtils.DisplayChannel;
@@ -58,7 +60,14 @@ public class SmallChatRoom extends Rectangle {
         openButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                ResourceManager.getInstance().setCurrentScene(SceneEnum.Chat);
+                final BaseScene chatScene = ResourceManager.getInstance().getScene(SceneEnum.Chat);
+                final Scene scene = activity.getEngine().getScene();
+                Scene childScene = scene;
+                while (childScene.getChildScene() != null) {
+                    childScene = childScene.getChildScene();
+                }
+                childScene.setChildScene(chatScene, false, false, true);
+                chatScene.updateScene();
                 activity.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {

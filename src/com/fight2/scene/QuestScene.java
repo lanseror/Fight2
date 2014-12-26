@@ -120,7 +120,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         refreshTreasureSprites(newTreasureData);
 
         final float playerX = tmxLayer.getTileX(32) + 0.5f * tmxTiledMap.getTileWidth();
-        final float playerY = tmxLayer.getTileY(22) + hero.getHeight() * 0.5f;
+        final float playerY = tmxLayer.getTileY(22) + TmxUtils.HERO_OFFSET_Y;
         hero.setPosition(playerX, playerY);
         hero.setCurrentTileIndex(53);
         hero.setZIndex(100);
@@ -235,7 +235,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                     if (i == pathSize - 1) {
                         tag = createPathEndTag(path);
                     } else {
-                        tag = createACImageSprite(TextureEnum.QUEST_PATH_TAG, xs[i], ys[i] - 20);
+                        tag = createACImageSprite(TextureEnum.QUEST_PATH_TAG, xs[i], ys[i] - 10);
                     }
                     tmxTiledMap.attachChild(tag);
                     pathTags.add(tag);
@@ -283,7 +283,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         } else if (x1 < x2 && y1 > y2) {// right down
             textureEnum = TextureEnum.QUEST_PATH_TAG_RIGHT_END;
         }
-        final Sprite tag = createACImageSprite(textureEnum, x2, y2 - 15);
+        final Sprite tag = createACImageSprite(textureEnum, x2, y2 - 5);
         destTouchArea.setPosition(tag);
         cancelButton.setVisible(true);
         return tag;

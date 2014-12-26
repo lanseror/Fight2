@@ -115,7 +115,8 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
     private void goBack() {
         final InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
-        ResourceManager.getInstance().sceneBack(true);
+        back();
+        activity.getGameHub().needSmallChatRoom(true);
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {

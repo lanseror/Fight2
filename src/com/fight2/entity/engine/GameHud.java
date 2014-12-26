@@ -45,6 +45,10 @@ public class GameHud extends HUD {
     }
 
     public void needSmallChatRoom(final boolean needed) {
+        if (smallChatRoom.isNeeded() == needed) {
+            return;
+        }
+
         if (needed) {
             smallChatRoom.setVisible(true);
             this.registerTouchArea(smallChatRoom.getOpenButton());
