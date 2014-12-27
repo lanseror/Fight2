@@ -115,7 +115,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         tmxTiledMap.attachChild(destTouchArea);
         destTouchArea.setAlpha(0);
         final TMXLayer tmxLayer = this.tmxTiledMap.getTMXLayers().get(0);
-        final TmxUtils tmxUtils = new TmxUtils(hero, tmxTiledMap);
+        final TmxUtils tmxUtils = new TmxUtils(tmxTiledMap);
         final QuestTreasureData newTreasureData = QuestUtils.getQuestTreasure(questTreasureData);
         refreshTreasureSprites(newTreasureData);
 
@@ -159,7 +159,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                             return true;
                         }
                     } else if (goStatus == QuestGoStatus.Ready && destTouchArea.contains(sceneX, sceneY)) {
-                        go(destTile, path);
+                        go(tmxUtils.getPathTiles(), path);
                         return true;
                     }
                 }
@@ -330,7 +330,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
 
     }
 
-    private void go(final TMXTile destTile, final Path path) {
+    private void go(final List<TMXTile> pathTiles, final Path path) {
         goStatus = QuestGoStatus.Started;
         final float[] xs = path.getCoordinatesX();
         final float[] ys = path.getCoordinatesY();
@@ -343,7 +343,9 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             @Override
             public void onPathWaypointStarted(final PathModifier pPathModifier, final IEntity pEntity, final int waypointIndex) {
                 if (waypointIndex % 5 == 0) {
-                    sendToServer();
+                    final int targetTileIndex = waypointIndex + 5 >= pathTiles.size() ? pathTiles.size() - 1 : waypointIndex + 5;
+                    final int endTargetFlag = (targetTileIndex == pathTiles.size() - 1) ? 0 : 1;
+                    sendToServer(pathTiles.get(targetTileIndex), endTargetFlag);// server need to validate if target tile count >5 to avoid hack;
                 }
 
                 if (waypointIndex + 1 < path.getSize()) {
@@ -420,12 +422,12 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
 
     }
 
-    private void sendToServer() {
+    private void sendToServer(final TMXTile targetTile, final int endTargetFlag) {
         final IAsyncCallback callback = new IAsyncCallback() {
 
             @Override
             public void workToDo() {
-                questResult = QuestUtils.go(destTile.getTileRow(), destTile.getTileColumn(), questTreasureData);
+                questResult = QuestUtils.go(targetTile.getTileRow(), targetTile.getTileColumn(), questTreasureData, endTargetFlag);
 
             }
 

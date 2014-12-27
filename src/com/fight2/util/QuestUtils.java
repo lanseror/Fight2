@@ -20,8 +20,8 @@ import com.fight2.entity.battle.BattleResult;
 
 public class QuestUtils {
 
-    public static QuestResult go(final int row, final int column, final QuestTreasureData oldData) {
-        final String url = HttpUtils.HOST_URL + "/quest/go?row=" + row + "&col=" + column + "&version=" + oldData.getVersion();
+    public static QuestResult go(final int row, final int column, final QuestTreasureData oldData, final int endTargetFlag) {
+        final String url = HttpUtils.HOST_URL + "/quest/go?row=" + row + "&col=" + column + "&version=" + oldData.getVersion() + "&flag=" + endTargetFlag;
         try {
             final QuestResult result = new QuestResult();
             final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);

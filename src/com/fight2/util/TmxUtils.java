@@ -1,7 +1,9 @@
 package com.fight2.util;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
@@ -11,20 +13,18 @@ import org.andengine.extension.tmx.TMXLayer;
 import org.andengine.extension.tmx.TMXTile;
 import org.andengine.extension.tmx.TMXTiledMap;
 
-import com.fight2.entity.Hero;
-
 public class TmxUtils {
     public static final float HERO_OFFSET_Y = 30;
     private static int GID = 0;
-    private final Hero hero;
+    private final List<TMXTile> pathTiles = new ArrayList<TMXTile>();
     private final TMXTiledMap tmxTiledMap;
 
-    public TmxUtils(final Hero hero, final TMXTiledMap tmxTiledMap) {
-        this.hero = hero;
+    public TmxUtils(final TMXTiledMap tmxTiledMap) {
         this.tmxTiledMap = tmxTiledMap;
     }
 
     public Path findPath(final TMXTile startTile, final TMXTile desTile, final TMXLayer tmxLayer) {
+        pathTiles.clear();
         TMXTilePoint currentPoint = new TMXTilePoint(startTile, null);
         final Queue<TMXTilePoint> queue = new LinkedList<TMXTilePoint>();
         queue.add(currentPoint);
@@ -97,7 +97,9 @@ public class TmxUtils {
         final Path path = new Path(stack.size());
         while (!stack.isEmpty()) {
             final TMXTile pathTMXTile = stack.pop();
-            path.to(tmxLayer.getTileX(pathTMXTile.getTileColumn()) + 0.5f * tmxTiledMap.getTileWidth(), tmxLayer.getTileY(pathTMXTile.getTileRow()) + HERO_OFFSET_Y);
+            pathTiles.add(pathTMXTile);
+            path.to(tmxLayer.getTileX(pathTMXTile.getTileColumn()) + 0.5f * tmxTiledMap.getTileWidth(), tmxLayer.getTileY(pathTMXTile.getTileRow())
+                    + HERO_OFFSET_Y);
         }
         return path;
     }
@@ -105,6 +107,10 @@ public class TmxUtils {
     private void visit(final TMXTile pointTmxTile, final TMXTilePoint predecessor, final Queue<TMXTilePoint> queue) {
         final TMXTilePoint visitPoint = new TMXTilePoint(pointTmxTile, predecessor);
         queue.add(visitPoint);
+    }
+
+    public List<TMXTile> getPathTiles() {
+        return pathTiles;
     }
 
     private static class TMXTilePoint {
