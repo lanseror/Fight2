@@ -121,19 +121,19 @@ public class MainScene extends BaseScene {
         tips.add(guildTip);
 
         final Text congressText = new Text(tipTextX2, tipTextY2, mFont, "国会", vbom);
-        congressText.setColor(0XFF8E2E11);
+        congressText.setColor(0XFFDFDCD7);
         congressTip = createALBImageSprite(TextureEnum.MAIN_TIPS2, 800, 500);
         congressTip.attachChild(congressText);
         tips.add(congressTip);
 
         final Text hotelText = new Text(tipTextX2, tipTextY2, mFont, "酒馆", vbom);
-        hotelText.setColor(0XFF8E2E11);
+        hotelText.setColor(0XFFDFDCD7);
         hotelTip = createALBImageSprite(TextureEnum.MAIN_TIPS2, 290, 285);
         hotelTip.attachChild(hotelText);
         tips.add(hotelTip);
 
         final Text mailBoxText = new Text(tipTextX2, tipTextY2, mFont, "信箱", vbom);
-        mailBoxText.setColor(0XFF8E2E11);
+        mailBoxText.setColor(0XFFDFDCD7);
         mailBoxTip = createALBImageSprite(TextureEnum.MAIN_TIPS2, 990, 130);
         mailBoxTip.attachChild(mailBoxText);
         tips.add(mailBoxTip);
