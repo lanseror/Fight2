@@ -117,7 +117,6 @@ public enum TextureEnum {
     PARTY_NUMBER_3("images/party_number_3.png", 41, 42),
     PARTY_EDIT_BUTTON("images/party_edit_button.png", 130, 132),
     PARTY_EDIT_BUTTON_PRESSED("images/party_edit_button_fcs.png", 130, 132),
-    PARTY_EDIT_BG("images/party_edit_backgroud.png", 1136, 640),
     PARTY_EDIT_FRAME("images/party_edit_frame.png", 732, 247),
     PARTY_EDIT_FRAME_GRID("images/party_edit_frame_grid.png", 159, 148),
     PARTY_EDIT_COVER_LEFT("images/party_edit_cover_left.png", 180, 270),
