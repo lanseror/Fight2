@@ -227,21 +227,78 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         activity.runOnUpdateThread(new Runnable() {
             @Override
             public void run() {
-                final float[] xs = path.getCoordinatesX();
-                final float[] ys = path.getCoordinatesY();
                 final int pathSize = path.getSize();
                 for (int i = 1; i < path.getSize(); i++) {
                     Sprite tag = null;
                     if (i == pathSize - 1) {
                         tag = createPathEndTag(path);
                     } else {
-                        tag = createACImageSprite(TextureEnum.QUEST_PATH_TAG, xs[i], ys[i] - 10);
+                        tag = createPathTage(i, path);
                     }
                     tmxTiledMap.attachChild(tag);
                     pathTags.add(tag);
                 }
             }
         });
+    }
+
+    private Sprite createPathTage(final int index, final Path path) {
+        final float[] xs = path.getCoordinatesX();
+        final float[] ys = path.getCoordinatesY();
+        final float x1 = xs[index - 1];
+        final float y1 = ys[index - 1];
+        final float x2 = xs[index];
+        final float y2 = ys[index];
+        final float x3 = xs[index + 1];
+        final float y3 = ys[index + 1];
+        final StringBuilder sb = new StringBuilder(25);
+        sb.append("PATH_");
+        String previousDirection = "test";
+        if (x1 > x2 && y1 < y2) { // left up
+            previousDirection = "LEFTUP";
+        } else if (x1 == x2 && y1 < y2) { // up
+            previousDirection = "UP";
+        } else if (x1 < x2 && y1 < y2) { // right up
+            previousDirection = "RIGHTUP";
+        } else if (x1 > x2 && y1 == y2) {// left
+            previousDirection = "LEFT";
+        } else if (x1 < x2 && y1 == y2) {// right
+            previousDirection = "RIGHT";
+        } else if (x1 > x2 && y1 > y2) {// left down
+            previousDirection = "LEFTDOWN";
+        } else if (x1 == x2 && y1 > y2) {// down
+            previousDirection = "DOWN";
+        } else if (x1 < x2 && y1 > y2) {// right down
+            previousDirection = "RIGHTDOWN";
+        }
+        sb.append(previousDirection);
+        String nextDirection = "test";
+        if (x2 > x3 && y2 < y3) { // left up
+            nextDirection = "LEFTUP";
+        } else if (x2 == x3 && y2 < y3) { // up
+            nextDirection = "UP";
+        } else if (x2 < x3 && y2 < y3) { // right up
+            nextDirection = "RIGHTUP";
+        } else if (x2 > x3 && y2 == y3) {// left
+            nextDirection = "LEFT";
+        } else if (x2 < x3 && y2 == y3) {// right
+            nextDirection = "RIGHT";
+        } else if (x2 > x3 && y2 > y3) {// left down
+            nextDirection = "LEFTDOWN";
+        } else if (x2 == x3 && y2 > y3) {// down
+            nextDirection = "DOWN";
+        } else if (x2 < x3 && y2 > y3) {// right down
+            nextDirection = "RIGHTDOWN";
+        }
+
+        if (!nextDirection.equals(previousDirection)) {
+            sb.append(2);
+            sb.append(nextDirection);
+        }
+
+        final TextureEnum pathTextureEnum = TextureEnum.valueOf(sb.toString());
+        final Sprite tag = createACImageSprite(pathTextureEnum, xs[index], ys[index] - 10);
+        return tag;
     }
 
     private void clearPathTages() {

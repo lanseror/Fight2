@@ -8,7 +8,7 @@ import com.fight2.constant.TiledTextureEnum;
 import com.fight2.util.TiledTextureFactory;
 
 public class Hero extends AnimatedSprite {
-    private final static long SPD = 45;
+    private final static long SPD = 36;
     private final long[] speed = { SPD, SPD, SPD, SPD, SPD, SPD, SPD, SPD, SPD, SPD, SPD, SPD, SPD, SPD, SPD, SPD };
 
     public Hero(final float x, final float y, final VertexBufferObjectManager vbom) {
@@ -42,34 +42,34 @@ public class Hero extends AnimatedSprite {
     }
 
     private void leftUp() {
-        this.animate(speed, 0, 15, true);
+        this.animate(speed, 0, 16 - 1, true);
     }
 
     private void up() {
-        this.animate(speed, 16, 31, true);
+        this.animate(speed, 16, 16 * 2 - 1, true);
     }
 
     private void rightUp() {
-        this.animate(speed, 32, 47, true);
+        this.animate(speed, 16 * 2, 16 * 3 - 1, true);
     }
 
     private void left() {
-        this.animate(speed, 48, 63, true);
+        this.animate(speed, 16 * 3, 16 * 4 - 1, true);
     }
 
     private void right() {
-        this.animate(speed, 64, 79, true);
+        this.animate(speed, 16 * 4, 16 * 5 - 1, true);
     }
 
     private void leftDown() {
-        this.animate(speed, 80, 95, true);
+        this.animate(speed, 16 * 5, 16 * 6 - 1, true);
     }
 
     private void down() {
-        this.animate(speed, 96, 111, true);
+        this.animate(speed, 16 * 6, 16 * 7 - 1, true);
     }
 
     private void rightDown() {
-        this.animate(speed, 112, 127, true);
+        this.animate(speed, 16 * 7, 16 * 8 - 1, true);
     }
 }

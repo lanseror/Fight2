@@ -228,6 +228,33 @@ public enum TextureEnum {
     PREBATTLE_COMBO_SKILL_LEFT("images/prebattle_combo_skill_left.png", 285, 122),
     PREBATTLE_COMBO_SKILL_RIGHT("images/prebattle_combo_skill_right.png", 285, 122),
 
+    // Path images.
+    PATH_UP("images/path/up.png", 20, 26),
+    PATH_UP2RIGHTUP("images/path/up2rightup.png", 18, 26),
+    PATH_UP2LEFTUP("images/path/up2leftup.png", 19, 26),
+    PATH_RIGHTUP("images/path/rightup.png", 21, 23),
+    PATH_RIGHTUP2UP("images/path/rightup2up.png", 20, 26),
+    PATH_RIGHTUP2RIGHT("images/path/rightup2right.png", 24, 22),
+    PATH_RIGHTDOWN("images/path/rightdown.png", 21, 23),
+    PATH_RIGHTDOWN2RIGHT("images/path/rightdown2right.png", 24, 22),
+    PATH_RIGHTDOWN2DOWN("images/path/rightdown2down.png", 20, 26),
+    PATH_RIGHT("images/path/right.png", 24, 22),
+    PATH_RIGHT2RIGHTDOWN("images/path/right2rightdown.png", 24, 20),
+    PATH_RIGHT2RIGHTUP("images/path/right2rightup.png", 24, 20),
+    PATH_LEFTUP("images/path/leftup.png", 21, 23),
+    PATH_LEFTUP2UP("images/path/leftup2up.png", 20, 26),
+    PATH_LEFTUP2LEFT("images/path/leftup2left.png", 24, 22),
+    PATH_LEFTDOWN("images/path/leftdown.png", 21, 23),
+    PATH_LEFTDOWN2LEFT("images/path/leftdown2left.png", 24, 22),
+    PATH_LEFTDOWN2DOWN("images/path/leftdown2down.png", 20, 26),
+    PATH_LEFT("images/path/left.png", 24, 22),
+
+    PATH_LEFT2LEFTUP("images/path/left2leftup.png", 24, 20),
+    PATH_LEFT2LEFTDOWN("images/path/left2leftdown.png", 24, 20),
+    PATH_DOWN("images/path/down.png", 20, 26),
+    PATH_DOWN2RIGHTDOWN("images/path/down2rightdown.png", 18, 26),
+    PATH_DOWN2LEFTDOWN("images/path/down2leftdown.png", 18, 26),
+
     // Quest images.
     QUEST_TOWN("images/quest_town.png", 56, 52),
     QUEST_CANCEL_BUTTON("images/quest_cancel_button.png", 130, 132),
