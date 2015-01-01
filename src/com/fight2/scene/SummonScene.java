@@ -18,6 +18,7 @@ import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.ScrollZone;
+import com.fight2.entity.engine.DialogFrame;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.CardUtils;
@@ -70,6 +71,10 @@ public class SummonScene extends BaseScene {
         });
         this.attachChild(backButton);
         this.registerTouchArea(backButton);
+
+        final DialogFrame dialog = new DialogFrame(this.cameraCenterX, this.cameraCenterY, 700, 200, activity);
+        this.attachChild(dialog);
+
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
     }

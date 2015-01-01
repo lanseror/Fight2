@@ -22,7 +22,7 @@ import com.fight2.scene.BaseScene;
 import com.fight2.util.ChatTextHandler;
 import com.fight2.util.ChatUtils;
 import com.fight2.util.ChatUtils.DisplayChannel;
-import com.fight2.util.EntryFactory;
+import com.fight2.util.EntityFactory;
 import com.fight2.util.ResourceManager;
 
 public class SmallChatRoom extends Rectangle {
@@ -55,7 +55,7 @@ public class SmallChatRoom extends Rectangle {
 
         chatTextHandler = new ChatTextHandler(CHAT_SIZE, vbom);
 
-        final EntryFactory entryFactory = EntryFactory.getInstance();
+        final EntityFactory entryFactory = EntityFactory.getInstance();
         openButton = entryFactory.createALBF2ButtonSprite(TextureEnum.CHAT_INPUT_OPEN, TextureEnum.CHAT_INPUT_OPEN_FCS, 0, 0);
         openButton.setOnClickListener(new F2OnClickListener() {
             @Override

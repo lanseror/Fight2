@@ -9,15 +9,15 @@ import com.fight2.constant.TextureEnum;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 
-public class EntryFactory {
-    private static EntryFactory INSTANCE = new EntryFactory();
+public class EntityFactory {
+    private static EntityFactory INSTANCE = new EntityFactory();
     private VertexBufferObjectManager vbom;
 
-    private EntryFactory() {
+    private EntityFactory() {
         // Private the constructor;
     }
 
-    public static EntryFactory getInstance() {
+    public static EntityFactory getInstance() {
         return INSTANCE;
     }
 

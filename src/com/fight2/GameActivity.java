@@ -38,7 +38,7 @@ import com.fight2.entity.engine.GameHud;
 import com.fight2.entity.engine.ProgressBar;
 import com.fight2.util.AccountUtils;
 import com.fight2.util.ConfigHelper;
-import com.fight2.util.EntryFactory;
+import com.fight2.util.EntityFactory;
 import com.fight2.util.F2MusicManager;
 import com.fight2.util.F2SoundManager;
 import com.fight2.util.ImageOpenHelper;
@@ -229,7 +229,7 @@ public class GameActivity extends LayoutGameActivity {
 
     private void loadResources1() {
         try {
-            EntryFactory.getInstance().init(this.getVertexBufferObjectManager());
+            EntityFactory.getInstance().init(this.getVertexBufferObjectManager());
             final ResourceManager resourceManager = ResourceManager.getInstance();
             resourceManager.loadGameResources(this, progressBar);
 

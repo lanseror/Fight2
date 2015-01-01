@@ -248,7 +248,6 @@ public enum TextureEnum {
     PATH_LEFTDOWN2LEFT("images/path/leftdown2left.png", 24, 22),
     PATH_LEFTDOWN2DOWN("images/path/leftdown2down.png", 20, 26),
     PATH_LEFT("images/path/left.png", 24, 22),
-
     PATH_LEFT2LEFTUP("images/path/left2leftup.png", 24, 20),
     PATH_LEFT2LEFTDOWN("images/path/left2leftdown.png", 24, 20),
     PATH_DOWN("images/path/down.png", 20, 26),
@@ -263,7 +262,13 @@ public enum TextureEnum {
     QUEST_PATH_TAG_LEFT_END("images/quest_path_tag_left_end.png", 30, 26),
     QUEST_PATH_TAG_LEFT_TREASURE("images/quest_path_tag_left_treasure.png", 28, 31),
     QUEST_PATH_TAG_RIGHT_END("images/quest_path_tag_right_end.png", 30, 26),
-    QUEST_PATH_TAG_RIGHT_TREASURE("images/quest_path_tag_right_treasure.png", 28, 31);
+    QUEST_PATH_TAG_RIGHT_TREASURE("images/quest_path_tag_right_treasure.png", 28, 31),
+
+    // Dialog images.
+    DIALOG_FULL("images/dialog_full.png", 902, 602),
+    DIALOG_RIGHT("images/dialog_right.png", 52, 602),
+    DIALOG_BOTTOM("images/dialog_bottom.png", 902, 49),
+    DIALOG_RIGHT_BOTTOM("images/dialog_right_bottom.png", 52, 49);
 
     private final String url;
     private final float width;
