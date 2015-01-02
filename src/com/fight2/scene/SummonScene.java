@@ -18,7 +18,6 @@ import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.ScrollZone;
-import com.fight2.entity.engine.DialogFrame;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.CardUtils;
@@ -72,9 +71,6 @@ public class SummonScene extends BaseScene {
         this.attachChild(backButton);
         this.registerTouchArea(backButton);
 
-        final DialogFrame dialog = new DialogFrame(this.cameraCenterX, this.cameraCenterY, 700, 200, activity);
-        this.attachChild(dialog);
-
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
     }
@@ -82,7 +78,7 @@ public class SummonScene extends BaseScene {
     private Sprite createBasicSummonFrame() {
         final Sprite summonFrame = this.createALBImageSprite(TextureEnum.SUMMON_FRAME, this.simulatedLeftX + 100, 130);
 
-        final Font titleFont = ResourceManager.getInstance().getFont(FontEnum.Default, 30);
+        final Font titleFont = ResourceManager.getInstance().newFont(FontEnum.Default, 30);
         final Text titleText = new Text(95, summonFrame.getHeight() - 35, titleFont, "基本召唤", vbom);
         titleText.setColor(0XFFFAB103);
         summonFrame.attachChild(titleText);
@@ -93,7 +89,7 @@ public class SummonScene extends BaseScene {
         subTitleText.setColor(0XFFFAB103);
         summonFrame.attachChild(subTitleText);
 
-        final Font descFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
+        final Font descFont = ResourceManager.getInstance().newFont(FontEnum.Default, 26);
         final TextOptions textOptions = new TextOptions(AutoWrap.LETTERS, 265);
         final Text descText = new Text(540, 170, descFont, "使用200个召唤符，即可获得一张卡片。", textOptions, vbom);
         this.topAlignEntity(descText, summonFrame.getHeight() - 115);
@@ -113,7 +109,7 @@ public class SummonScene extends BaseScene {
     private Sprite createHeroSummonFrame() {
         final Sprite summonFrame = this.createALBImageSprite(TextureEnum.SUMMON_FRAME, this.simulatedLeftX + 100, 130);
 
-        final Font titleFont = ResourceManager.getInstance().getFont(FontEnum.Default, 30);
+        final Font titleFont = ResourceManager.getInstance().newFont(FontEnum.Default, 30);
         final Text titleText = new Text(95, summonFrame.getHeight() - 35, titleFont, "英雄召唤", vbom);
         titleText.setColor(0XFFFAB103);
         summonFrame.attachChild(titleText);
@@ -124,7 +120,7 @@ public class SummonScene extends BaseScene {
         subTitleText.setColor(0XFFFAB103);
         summonFrame.attachChild(subTitleText);
 
-        final Font descFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
+        final Font descFont = ResourceManager.getInstance().newFont(FontEnum.Default, 26);
         final TextOptions textOptions = new TextOptions(AutoWrap.LETTERS, 265);
         final Text descText = new Text(540, 170, descFont, "使用召唤石或钻石召唤一张卡片！钻石可在商店购买。", textOptions, vbom);
         this.topAlignEntity(descText, summonFrame.getHeight() - 100);

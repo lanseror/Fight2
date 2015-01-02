@@ -57,7 +57,7 @@ public class CardInfoScene extends BaseScene {
         final Sprite infoFrame = createALBImageSprite(TextureEnum.CARDINFO_FRAME, this.simulatedLeftX + 420, FRAME_BOTTOM);
         this.attachChild(infoFrame);
 
-        final Font titleFont = ResourceManager.getInstance().getFont(FontEnum.Default, 34);
+        final Font titleFont = ResourceManager.getInstance().newFont(FontEnum.Default, 34);
         final Text nameText = new Text(80, 426, titleFont, card.getName(), vbom);
         nameText.setColor(0XFFFAB103);
         this.leftAlignEntity(nameText, 30);
@@ -67,7 +67,7 @@ public class CardInfoScene extends BaseScene {
         this.leftAlignEntity(levelText, 370);
         infoFrame.attachChild(levelText);
 
-        final Font detailFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
+        final Font detailFont = ResourceManager.getInstance().newFont(FontEnum.Default, 28);
 
         final Sprite star = new Sprite(80, 373, getStarTexture(card), vbom);
         this.leftAlignEntity(star, 20);
@@ -120,7 +120,7 @@ public class CardInfoScene extends BaseScene {
         line2.setScale(0.65f);
         infoFrame.attachChild(line2);
 
-        final Font skillTitleFont = ResourceManager.getInstance().getFont(FontEnum.Default, 31);
+        final Font skillTitleFont = ResourceManager.getInstance().newFont(FontEnum.Default, 31);
         final Text skillNameText = new Text(80, 220, skillTitleFont, card.getSkill(), vbom);
         this.leftAlignEntity(skillNameText, 25);
         infoFrame.attachChild(skillNameText);

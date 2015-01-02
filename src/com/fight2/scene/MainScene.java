@@ -33,8 +33,10 @@ import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
+import com.fight2.entity.engine.DialogFrame;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
+import com.fight2.entity.engine.HeroDialogFrame;
 import com.fight2.util.AsyncTaskLoader;
 import com.fight2.util.ChatUtils;
 import com.fight2.util.IAsyncCallback;
@@ -315,7 +317,10 @@ public class MainScene extends BaseScene {
 
                     if (checkContains(MAIL_VERTICES, x, y)) {
                         unfocusSprite(mailBoxSprite);
-                        alert("未开启！");
+                        // alert("未开启！");
+                        final Card myLeader = myParties[0].getCards()[0];
+                        final DialogFrame dialog = new HeroDialogFrame(cameraCenterX, cameraCenterY, 700, 300, activity, myLeader, "小心！这个渡口危机四伏！");
+                        attachChild(dialog);
                     } else if (checkContains(SUMMON_VERTICES, x, y)) {
                         unfocusSprite(summonStoneSprite);
                         ResourceManager.getInstance().setCurrentScene(SceneEnum.Summon);
@@ -452,6 +457,7 @@ public class MainScene extends BaseScene {
                 }
             });
         }
+
     }
 
     @Override

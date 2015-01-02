@@ -38,7 +38,7 @@ public class AlertScene extends BaseScene {
         final Sprite frameSprite = createACImageSprite(TextureEnum.COMMON_ALERT_FRAME, cameraCenterX, cameraCenterY);
         this.attachChild(frameSprite);
 
-        final Font detailFont = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
+        final Font detailFont = ResourceManager.getInstance().newFont(FontEnum.Default, 28);
 
         final TextOptions textOptions = new TextOptions(AutoWrap.LETTERS, 420);
         final Text skillEffectText = new Text(frameSprite.getWidth() * 0.5f, 170, detailFont, msg, textOptions, vbom);

@@ -7,6 +7,7 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.engine.F2ButtonSprite;
+import com.fight2.entity.engine.F2CommonButton;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 
 public class EntityFactory {
@@ -109,4 +110,17 @@ public class EntityFactory {
         return sprite;
     }
 
+    public F2CommonButton createALBF2CommonButton(final float x, final float y, final String text) {
+        final float width = TextureEnum.COMMON_BUTTON.getWidth();
+        final float height = TextureEnum.COMMON_BUTTON.getHeight();
+        final float pX = x + width * 0.5f;
+        final float pY = y + height * 0.5f;
+        final F2CommonButton sprite = new F2CommonButton(pX, pY, text, vbom);
+        return sprite;
+    }
+
+    public F2CommonButton createACF2CommonButton(final float x, final float y, final String text) {
+        final F2CommonButton sprite = new F2CommonButton(x, y, text, vbom);
+        return sprite;
+    }
 }

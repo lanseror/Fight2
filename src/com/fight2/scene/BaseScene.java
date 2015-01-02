@@ -21,6 +21,7 @@ import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.engine.F2CommonButton;
 import com.fight2.util.ConfigHelper;
+import com.fight2.util.EntityUtils;
 import com.fight2.util.TextureFactory;
 
 public abstract class BaseScene extends Scene {
@@ -230,18 +231,18 @@ public abstract class BaseScene extends Scene {
     }
 
     public void topAlignEntity(final IEntity entity, final float y) {
-        entity.setY(y - entity.getHeight() * 0.5f);
+        EntityUtils.topAlignEntity(entity, y);
     }
 
     public void bottomAlignEntity(final IEntity entity, final float y) {
-        entity.setY(y + entity.getHeight() * 0.5f);
+        EntityUtils.bottomAlignEntity(entity, y);
     }
 
     public void leftAlignEntity(final IEntity entity, final float x) {
-        entity.setX(x + entity.getWidth() * 0.5f);
+        EntityUtils.leftAlignEntity(entity, x);
     }
 
     public void rightAlignEntity(final IEntity entity, final float x) {
-        entity.setX(x - entity.getWidth() * 0.5f);
+        EntityUtils.rightAlignEntity(entity, x);
     }
 }
