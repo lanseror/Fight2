@@ -68,9 +68,11 @@ public class BattleScene extends BaseScene {
     private final boolean isWinner;
     private final Sprite skipSprite;
     private final BattleResult battleResult;
+    private final boolean isArena;
 
     public BattleScene(final GameActivity activity, final int attackPlayerId, final Party[] opponentParties, final boolean isArena) throws IOException {
         super(activity);
+        this.isArena = isArena;
         this.skillText = new Text(this.cameraCenterX, this.cameraCenterY + 30, font, "技能：", 30, vbom);
         this.skillEffectText = new Text(this.cameraCenterX, this.cameraCenterY - 10, font, "效果：", 100, vbom);
         winImage = this.createACImageSprite(TextureEnum.BATTLE_WIN, this.cameraCenterX, this.cameraCenterY);
@@ -112,7 +114,8 @@ public class BattleScene extends BaseScene {
 
     @Override
     protected void init() throws IOException {
-        final Sprite bgSprite = createALBImageSprite(TextureEnum.BATTLE_BG, 0, 0);
+        final TextureEnum bgTextureEnum = isArena ? TextureEnum.BATTLE_QUEST_BG : TextureEnum.BATTLE_QUEST_BG;
+        final Sprite bgSprite = createALBImageSprite(bgTextureEnum, 0, 0);
         final Background background = new SpriteBackground(bgSprite);
         this.setBackground(background);
 

@@ -2,7 +2,7 @@ package com.fight2.constant;
 
 public enum TextureEnum {
     // Splash scene images.
-    SPLASH_BG("images/common_splash_screen.png", 1136, 640),
+    SPLASH_BG("images/common_splash_screen.png", 1138, 640),
 
     // Common images.
     COMMON_BG("images/common_backgroud.png", 1136, 640),
@@ -104,6 +104,8 @@ public enum TextureEnum {
     MAIN_STOREROOM_FCS("images/main_storeroom_fcs.png", 201, 441),
     MAIN_TIPS("images/main_tips_3.png", 150, 35),
     MAIN_TIPS2("images/main_tips_5.png", 115, 35),
+    MAIN_MSG_SMALL("images/main_msg_small.png", 100, 110),
+    MAIN_MSG_NEW_SMALL("images/main_msg_new_small.png", 100, 110),
     MAIN_PLAYER_INFO("images/main_player_info.png", 308, 138),
     MAIN_PLAYER_INFO_STAMINA("images/main_player_info_stamina.png", 160, 26),
     MAIN_PLAYER_INFO_STAMINA_BOX("images/main_player_info_stamina_box.png", 184, 35),
@@ -206,7 +208,7 @@ public enum TextureEnum {
     ARENA_RANKING_NUMBER_3("images/arena_ranking_number_3.png", 40, 50),
 
     // Battle scene images.
-    BATTLE_BG("images/battle_backgroud.jpg", 1136, 640),
+    BATTLE_QUEST_BG("images/battle_quest_backgroud.png", 1138, 640),
     BATTLE_PARTY_BOTTOM("images/battle_party_bottom.png", 312, 83),
     BATTLE_PARTY_TOP("images/battle_party_top.png", 312, 81),
     BATTLE_WIN("images/battle_win.png", 791, 254),

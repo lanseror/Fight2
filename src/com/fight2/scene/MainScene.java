@@ -34,8 +34,6 @@ import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
 import com.fight2.entity.engine.DialogFrame;
-import com.fight2.entity.engine.F2ButtonSprite;
-import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.engine.HeroDialogFrame;
 import com.fight2.util.AsyncTaskLoader;
 import com.fight2.util.ChatUtils;
@@ -47,7 +45,7 @@ import com.fight2.util.TiledTextureFactory;
 
 public class MainScene extends BaseScene {
     private final TextureFactory textureFactory = TextureFactory.getInstance();
-    private static final float[] GATE_VERTICES = { 20, 468, 548, 475, 506, 382, 451, 338, 60, 344 };
+    private static final float[] GATE_VERTICES = { 350, 468, 548, 475, 506, 382, 451, 338, 350, 344 };
     private static final float[] CONGRESS_VERTICES = { 559, 416, 862, 633, 997, 496, 1003, 451, 930, 380 };
     private static final float[] ARENA_VERTICES = { 518, 392, 863, 386, 861, 283, 534, 270 };
     private static final float[] CAMP_VERTICES = { 619, 154, 680, 220, 745, 231, 831, 158, 715, 112 };
@@ -245,6 +243,11 @@ public class MainScene extends BaseScene {
         final Sprite pigeonSprite = createALBImageSprite(TextureEnum.MAIN_PIGEON, 0, 0);
         this.attachChild(pigeonSprite);
 
+        final Sprite smallMsgSprite = createALBImageSprite(TextureEnum.MAIN_MSG_SMALL, 170, 475);
+        this.attachChild(smallMsgSprite);
+        final Sprite smallMsgNewSprite = createALBImageSprite(TextureEnum.MAIN_MSG_NEW_SMALL, 0, 0);
+        smallMsgSprite.attachChild(smallMsgNewSprite);
+
         final ITiledTextureRegion summonEffect = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.MAIN_SUMMON_STONE_EFFECT);
         final AnimatedSprite summonStoneEffect = new AnimatedSprite(560, 120, summonEffect, vbom);
         summonStoneEffect.animate(125);
@@ -256,17 +259,21 @@ public class MainScene extends BaseScene {
         this.registerTouchArea(rechargeSprite);
 
         final TextureEnum playerInfoEnum = TextureEnum.MAIN_PLAYER_INFO;
-        avatarBox = new Rectangle(this.simulatedLeftX + avatarHalfSize + 18, this.simulatedHeight - avatarHalfSize - 20, avatarSize, avatarSize, vbom);
-        this.attachChild(avatarBox);
-        final F2ButtonSprite playerInfoSprite = createALBF2ButtonSprite(playerInfoEnum, playerInfoEnum, this.simulatedLeftX, this.simulatedHeight
-                - playerInfoEnum.getHeight());
-        playerInfoSprite.setOnClickListener(new F2OnClickListener() {
+        avatarBox = new Rectangle(this.simulatedLeftX + avatarHalfSize + 18, this.simulatedHeight - avatarHalfSize - 20, avatarSize, avatarSize, vbom) {
             @Override
-            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                ResourceManager.getInstance().setCurrentScene(SceneEnum.PlayerInfo);
+            public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                if (pSceneTouchEvent.isActionUp()) {
+                    ResourceManager.getInstance().setCurrentScene(SceneEnum.PlayerInfo);
+                    return true;
+                } else {
+                    return false;
+                }
             }
-        });
-        this.registerTouchArea(playerInfoSprite);
+        };
+        this.attachChild(avatarBox);
+        this.registerTouchArea(avatarBox);
+        final Sprite playerInfoSprite = createALBImageSprite(playerInfoEnum, this.simulatedLeftX, this.simulatedHeight - playerInfoEnum.getHeight());
+
         this.attachChild(playerInfoSprite);
         final Sprite playerInfoStaminaSprite = createALBImageSprite(TextureEnum.MAIN_PLAYER_INFO_STAMINA, 114, 86);
         playerInfoSprite.attachChild(playerInfoStaminaSprite);
