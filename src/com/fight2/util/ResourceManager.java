@@ -70,14 +70,16 @@ public class ResourceManager {
         final TextureFactory textureFactory = TextureFactory.getInstance();
         textureFactory.clear();
         textureFactory.initImageData(activity);
+        progressBar.increase(10);
         final String installUUID = AccountUtils.readInstallUUID(activity);
         AccountUtils.login(installUUID, activity);
         textureFactory.loadResource(textureManager, assetManager, progressBar);
-        // progressBar.increase(90);
+        progressBar.increase(30);
 
         for (final FontEnum fontEnum : FontEnum.values()) {
             fontMap.put(fontEnum, new SparseArray<Font>());
         }
+        progressBar.increase(35);
 
         loadScenes();
         // Resources loaded

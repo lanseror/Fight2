@@ -197,6 +197,7 @@ public class GameActivity extends LayoutGameActivity {
             @Override
             public void run() {
                 loadResources1();
+                progressBar.increase(100);
                 splashScene.detachChildren();
                 splashScene.detachSelf();
                 splashTexture.unload();

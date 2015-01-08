@@ -45,10 +45,6 @@ public class TextureFactory {
     }
 
     public void loadResource(final TextureManager textureManager, final AssetManager assetManager, final ProgressBar progressBar) throws IOException {
-        final int initProgress = 50;
-        final int total = 40;
-        final int length = TextureEnum.values().length;
-        final int i = 0;
         this.textureManager = textureManager;
         this.assetManager = assetManager;
     }
