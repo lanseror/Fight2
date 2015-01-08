@@ -34,6 +34,7 @@ import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
 import com.fight2.entity.engine.DialogFrame;
+import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.HeroDialogFrame;
 import com.fight2.util.AsyncTaskLoader;
 import com.fight2.util.ChatUtils;
@@ -243,11 +244,6 @@ public class MainScene extends BaseScene {
         final Sprite pigeonSprite = createALBImageSprite(TextureEnum.MAIN_PIGEON, 0, 0);
         this.attachChild(pigeonSprite);
 
-        final Sprite smallMsgSprite = createALBImageSprite(TextureEnum.MAIN_MSG_SMALL, 170, 475);
-        this.attachChild(smallMsgSprite);
-        final Sprite smallMsgNewSprite = createALBImageSprite(TextureEnum.MAIN_MSG_NEW_SMALL, 0, 0);
-        smallMsgSprite.attachChild(smallMsgNewSprite);
-
         final ITiledTextureRegion summonEffect = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.MAIN_SUMMON_STONE_EFFECT);
         final AnimatedSprite summonStoneEffect = new AnimatedSprite(560, 120, summonEffect, vbom);
         summonStoneEffect.animate(125);
@@ -285,6 +281,8 @@ public class MainScene extends BaseScene {
             tip.setAlpha(0.75f);
             this.attachChild(tip);
         }
+
+        createMsgSprite();
 
         this.setOnSceneTouchListener(new IOnSceneTouchListener() {
             @Override
@@ -324,10 +322,7 @@ public class MainScene extends BaseScene {
 
                     if (checkContains(MAIL_VERTICES, x, y)) {
                         unfocusSprite(mailBoxSprite);
-                        // alert("未开启！");
-                        final Card myLeader = myParties[0].getCards()[0];
-                        final DialogFrame dialog = new HeroDialogFrame(cameraCenterX, cameraCenterY, 700, 300, activity, myLeader, "小心！这个渡口危机四伏！");
-                        attachChild(dialog);
+                        alert("未开启！");
                     } else if (checkContains(SUMMON_VERTICES, x, y)) {
                         unfocusSprite(summonStoneSprite);
                         ResourceManager.getInstance().setCurrentScene(SceneEnum.Summon);
@@ -379,6 +374,20 @@ public class MainScene extends BaseScene {
         });
 
         scheduleGetChatMessage();
+    }
+
+    private void createMsgSprite() {
+        final F2ButtonSprite smallMsgSprite = this.createACF2ButtonSprite(TextureEnum.MAIN_MSG_SMALL, TextureEnum.MAIN_MSG_SMALL, 170, 475);
+        this.attachChild(smallMsgSprite);
+        this.registerTouchArea(smallMsgSprite);
+        final Sprite smallMsgNewSprite = createALBImageSprite(TextureEnum.MAIN_MSG_NEW_SMALL, 0, 0);
+        smallMsgSprite.attachChild(smallMsgNewSprite);
+
+        final Sprite msgSprite = this.createALBImageSprite(TextureEnum.MAIN_MSG, 45, 0);
+        this.attachChild(msgSprite);
+        final Card myLeader = myParties[0].getCards()[0];
+        final DialogFrame dialog = new HeroDialogFrame(725, cameraCenterY - 45, 540, 400, activity, myLeader, "小心！这个渡口危机四伏！");
+        attachChild(dialog);
     }
 
     private void scheduleGetChatMessage() {

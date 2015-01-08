@@ -104,6 +104,7 @@ public enum TextureEnum {
     MAIN_STOREROOM_FCS("images/main_storeroom_fcs.png", 201, 441),
     MAIN_TIPS("images/main_tips_3.png", 150, 35),
     MAIN_TIPS2("images/main_tips_5.png", 115, 35),
+    MAIN_MSG("images/main_msg.png", 419, 600),
     MAIN_MSG_SMALL("images/main_msg_small.png", 100, 110),
     MAIN_MSG_NEW_SMALL("images/main_msg_new_small.png", 100, 110),
     MAIN_PLAYER_INFO("images/main_player_info.png", 308, 138),
