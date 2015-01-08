@@ -103,7 +103,7 @@ public class PreBattleScene extends BaseScene {
 
     @Override
     protected void init() throws IOException {
-        final TextureEnum bgTextureEnum = isArena ? TextureEnum.BATTLE_QUEST_BG : TextureEnum.BATTLE_QUEST_BG;
+        final TextureEnum bgTextureEnum = isArena ? TextureEnum.BATTLE_ARENA_BG : TextureEnum.BATTLE_QUEST_BG;
         final Sprite bgSprite = createALBImageSprite(bgTextureEnum, 0, 0);
         final Background background = new SpriteBackground(bgSprite);
         this.setBackground(background);

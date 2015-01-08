@@ -209,6 +209,7 @@ public enum TextureEnum {
 
     // Battle scene images.
     BATTLE_QUEST_BG("images/battle_quest_backgroud.png", 1138, 640),
+    BATTLE_ARENA_BG("images/battle_arena_backgroud.png", 1138, 640),
     BATTLE_PARTY_BOTTOM("images/battle_party_bottom.png", 312, 83),
     BATTLE_PARTY_TOP("images/battle_party_top.png", 312, 81),
     BATTLE_WIN("images/battle_win.png", 791, 254),
