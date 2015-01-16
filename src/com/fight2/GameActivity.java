@@ -150,7 +150,7 @@ public class GameActivity extends LayoutGameActivity {
      * @param vbom
      */
     private void initProgressBar(final VertexBufferObjectManager vbom) {
-        progressBar = new ProgressBar(camera, CAMERA_CENTER_X, 48, 823, 15, vbom);
+        progressBar = new ProgressBar(camera, CAMERA_CENTER_X, 58, 850, 18, vbom);
         progressBar.setFrameColor(0, 0, 0, 0.8f);
         progressBar.setProgressColor(1, 1, 0, 1);
         progressBar.setBackColor(0, 0, 0, 1);

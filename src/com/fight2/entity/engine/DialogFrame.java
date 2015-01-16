@@ -3,17 +3,21 @@ package com.fight2.entity.engine;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.clip.ClipEntity;
 import org.andengine.entity.primitive.Rectangle;
+import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.TextureEnum;
+import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.EntityFactory;
+import com.fight2.util.ICallback;
 
 public class DialogFrame extends Rectangle {
-    private static final EntityFactory ET_FACTORY = EntityFactory.getInstance();
-    private final GameActivity activity;
-    private final VertexBufferObjectManager vbom;
+    protected static final EntityFactory ET_FACTORY = EntityFactory.getInstance();
+    protected final GameActivity activity;
+    protected final VertexBufferObjectManager vbom;
+    private final F2ButtonSprite confirmButton;
 
     public DialogFrame(final float x, final float y, final float width, final float height, final GameActivity activity) {
         super(x, y, width, height, activity.getVertexBufferObjectManager());
@@ -49,5 +53,34 @@ public class DialogFrame extends Rectangle {
         final Sprite rightBottomSprite = ET_FACTORY.createALBImageSprite(rightBottomEnum, width - rightBottomEnum.getWidth(), 0);
         this.attachChild(rightBottomSprite);
 
+        confirmButton = ET_FACTORY.createACF2CommonButton(width * 0.5f, 50, "确定");
+        this.attachChild(confirmButton);
+
+    }
+
+    public void bind(final Scene scene, final ICallback iCallback) {
+        scene.attachChild(this);
+        scene.registerTouchArea(confirmButton);
+        confirmButton.setOnClickListener(new F2OnClickListener() {
+            @Override
+            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                iCallback.onCallback();
+            }
+        });
+    }
+
+    public void unbind(final Scene scene) {
+        confirmButton.setOnClickListener(new F2OnClickListener() {
+            @Override
+            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                activity.runOnUpdateThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        scene.unregisterTouchArea(confirmButton);
+                        scene.detachChild(DialogFrame.this);
+                    }
+                });
+            }
+        });
     }
 }

@@ -33,14 +33,17 @@ import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
-import com.fight2.entity.engine.DialogFrame;
+import com.fight2.entity.QuestTask;
+import com.fight2.entity.QuestTask.UserTaskStatus;
 import com.fight2.entity.engine.F2ButtonSprite;
-import com.fight2.entity.engine.HeroDialogFrame;
+import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.AsyncTaskLoader;
 import com.fight2.util.ChatUtils;
 import com.fight2.util.IAsyncCallback;
+import com.fight2.util.ICallback;
 import com.fight2.util.ImageUtils;
 import com.fight2.util.ResourceManager;
+import com.fight2.util.TaskUtils;
 import com.fight2.util.TextureFactory;
 import com.fight2.util.TiledTextureFactory;
 
@@ -374,20 +377,38 @@ public class MainScene extends BaseScene {
         });
 
         scheduleGetChatMessage();
+        this.setTouchAreaBindingOnActionDownEnabled(true);
+        this.setTouchAreaBindingOnActionMoveEnabled(true);
     }
 
     private void createMsgSprite() {
         final F2ButtonSprite smallMsgSprite = this.createACF2ButtonSprite(TextureEnum.MAIN_MSG_SMALL, TextureEnum.MAIN_MSG_SMALL, 170, 475);
         this.attachChild(smallMsgSprite);
         this.registerTouchArea(smallMsgSprite);
-        final Sprite smallMsgNewSprite = createALBImageSprite(TextureEnum.MAIN_MSG_NEW_SMALL, 0, 0);
-        smallMsgSprite.attachChild(smallMsgNewSprite);
+        final QuestTask task = TaskUtils.getTask();
+        if (task.getStatus() == UserTaskStatus.Ready) {
+            final Sprite smallMsgNewSprite = createALBImageSprite(TextureEnum.MAIN_MSG_NEW_SMALL, 0, 0);
+            smallMsgSprite.attachChild(smallMsgNewSprite);
+        }
+        smallMsgSprite.setOnClickListener(new F2OnClickListener() {
 
-        final Sprite msgSprite = this.createALBImageSprite(TextureEnum.MAIN_MSG, 45, 0);
-        this.attachChild(msgSprite);
-        final Card myLeader = myParties[0].getCards()[0];
-        final DialogFrame dialog = new HeroDialogFrame(725, cameraCenterY - 45, 540, 400, activity, myLeader, "小心！这个渡口危机四伏！");
-        attachChild(dialog);
+            @Override
+            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                try {
+                    smallMsgSprite.setVisible(false);
+                    final Scene taskGuideScene = new TaskGuideScene(activity, new ICallback() {
+                        @Override
+                        public void onCallback() {
+                            smallMsgSprite.setVisible(true);
+                        }
+                    });
+                    setChildScene(taskGuideScene, false, false, true);
+                } catch (final IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+        });
     }
 
     private void scheduleGetChatMessage() {
