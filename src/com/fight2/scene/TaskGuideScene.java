@@ -9,20 +9,15 @@ import org.andengine.util.adt.color.Color;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.TextureEnum;
-import com.fight2.entity.Card;
-import com.fight2.entity.GameUserSession;
-import com.fight2.entity.Party;
-import com.fight2.entity.PartyInfo;
 import com.fight2.entity.QuestTask;
-import com.fight2.entity.engine.HeroDialogFrame;
+import com.fight2.entity.QuestTask.UserTaskStatus;
+import com.fight2.entity.engine.CommonDialogFrame;
+import com.fight2.entity.engine.DialogFrame;
+import com.fight2.entity.engine.TextDialogFrame;
 import com.fight2.util.ICallback;
 import com.fight2.util.TaskUtils;
-import com.fight2.util.TextureFactory;
 
 public class TaskGuideScene extends BaseScene {
-    private static final TextureFactory TEXTURE_FACTORY = TextureFactory.getInstance();
-    private final PartyInfo myPartyInfo = GameUserSession.getInstance().getPartyInfo();
-    private final Party[] myParties = myPartyInfo.getParties();
     private final ICallback iLeaveCallback;
 
     public TaskGuideScene(final GameActivity activity, final ICallback iLeaveCallback) throws IOException {
@@ -41,18 +36,12 @@ public class TaskGuideScene extends BaseScene {
 
         final Sprite msgSprite = this.createALBImageSprite(TextureEnum.MAIN_MSG, 45, 0);
         this.attachChild(msgSprite);
-        final Card myLeader = myParties[0].getCards()[0];
         final QuestTask task = TaskUtils.getTask();
-        final HeroDialogFrame dialog = new HeroDialogFrame(715, cameraCenterY - 45, 540, 400, activity, myLeader, task.getDialog());
-        dialog.bind(this, new ICallback() {
-
-            @Override
-            public void onCallback() {
-                iLeaveCallback.onCallback();
-                back();
-            }
-
-        });
+        if (task.getStatus() == UserTaskStatus.Ready) {
+            createDialogFrame(task);
+        } else if (task.getStatus() == UserTaskStatus.Started) {
+            createTipsFrame(task);
+        }
 
     }
 
@@ -64,4 +53,32 @@ public class TaskGuideScene extends BaseScene {
     public void leaveScene() {
     }
 
+    private void createDialogFrame(final QuestTask task) {
+        final DialogFrame dialog = new TextDialogFrame(715, cameraCenterY - 45, 540, 360, activity, task.getDialog());
+        dialog.bind(this, new ICallback() {
+
+            @Override
+            public void onCallback() {
+                if (TaskUtils.accept()) {
+                    dialog.unbind(TaskGuideScene.this);
+                    task.setStatus(UserTaskStatus.Started);
+                    createTipsFrame(task);
+                }
+            }
+
+        });
+    }
+
+    private void createTipsFrame(final QuestTask task) {
+        final DialogFrame dialog = new CommonDialogFrame(715, cameraCenterY - 45, 540, 360, activity, "任务：" + task.getTitle(), task.getTips());
+        dialog.bind(this, new ICallback() {
+
+            @Override
+            public void onCallback() {
+                iLeaveCallback.onCallback();
+                back();
+            }
+
+        });
+    }
 }

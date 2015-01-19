@@ -3,7 +3,8 @@ package com.fight2.constant;
 public enum TextureEnum {
     // Splash scene images.
     SPLASH_BG("images/common_splash_screen.png", 1138, 640),
-
+    TEST("images/test.png", 40, 40),
+    TEST2("images/test2.jpg", 40, 40),
     // Common images.
     COMMON_BG("images/common_backgroud.png", 1136, 640),
     COMMON_BACK_BUTTON_NORMAL("images/common_back_button.png", 130, 132),

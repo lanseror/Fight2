@@ -131,6 +131,15 @@ public class PreBattleScene extends BaseScene {
         final Sprite comboSkillBoxSpriteLeft = createACImageSprite(TextureEnum.PREBATTLE_COMBO_SKILL_LEFT, this.cameraCenterX - CARD_CENTER_X - GAP,
                 this.cameraCenterY - CARD_CENTER_Y + 80);
         this.attachChild(comboSkillBoxSpriteLeft);
+
+        // final Sprite comboSkill1 = createACImageSprite(TextureEnum.TEST, 100, 100);
+        // comboSkillBoxSpriteLeft.attachChild(comboSkill1);
+        // final Sprite comboSkill2 = createACImageSprite(TextureEnum.TEST2, 160, 100);
+        // comboSkillBoxSpriteLeft.attachChild(comboSkill2);
+        // final Sprite comboSkill3 = createACImageSprite(TextureEnum.TEST, 80, 60);
+        // comboSkillBoxSpriteLeft.attachChild(comboSkill3);
+        
+        
         final Sprite comboSkillBoxSpriteRight = createACImageSprite(TextureEnum.PREBATTLE_COMBO_SKILL_RIGHT, this.cameraCenterX + CARD_CENTER_X + GAP,
                 this.cameraCenterY - CARD_CENTER_Y + 80);
         this.attachChild(comboSkillBoxSpriteRight);

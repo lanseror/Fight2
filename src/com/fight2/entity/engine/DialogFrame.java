@@ -70,16 +70,11 @@ public class DialogFrame extends Rectangle {
     }
 
     public void unbind(final Scene scene) {
-        confirmButton.setOnClickListener(new F2OnClickListener() {
+        activity.runOnUpdateThread(new Runnable() {
             @Override
-            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                activity.runOnUpdateThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        scene.unregisterTouchArea(confirmButton);
-                        scene.detachChild(DialogFrame.this);
-                    }
-                });
+            public void run() {
+                scene.unregisterTouchArea(confirmButton);
+                scene.detachChild(DialogFrame.this);
             }
         });
     }
