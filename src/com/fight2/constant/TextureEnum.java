@@ -171,7 +171,6 @@ public enum TextureEnum {
     GUILD_FRAME_BUTTON("images/guild_frame_button.png", 116, 39),
 
     // Arena scene images.
-    ARENA_BG("images/arena_backgroud.png", 1136, 640),
     ARENA_TOPBAR("images/arena_topbar.png", 751, 73),
     ARENA_BATTLE_FRAME("images/arena_battle_frame.png", 242, 311),
     ARENA_BATTLE_BUTTON("images/arena_battle_button.png", 229, 75),

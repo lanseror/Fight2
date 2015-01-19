@@ -56,7 +56,7 @@ public class UserStoreroomScene extends BaseScene {
 
     @Override
     protected void init() throws IOException {
-        final Sprite bgSprite = createALBImageSprite(TextureEnum.ARENA_BG, 0, 0);
+        final Sprite bgSprite = createALBImageSprite(TextureEnum.COMMON_BG, 0, 0);
         final Background background = new SpriteBackground(bgSprite);
         this.setBackground(background);
 
