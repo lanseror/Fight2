@@ -386,9 +386,12 @@ public class MainScene extends BaseScene {
         this.attachChild(smallMsgSprite);
         this.registerTouchArea(smallMsgSprite);
         final QuestTask task = TaskUtils.getTask();
+        final Sprite smallMsgNewSprite = createALBImageSprite(TextureEnum.MAIN_MSG_NEW_SMALL, 0, 0);
+        smallMsgSprite.attachChild(smallMsgNewSprite);
         if (task.getStatus() == UserTaskStatus.Ready) {
-            final Sprite smallMsgNewSprite = createALBImageSprite(TextureEnum.MAIN_MSG_NEW_SMALL, 0, 0);
-            smallMsgSprite.attachChild(smallMsgNewSprite);
+            smallMsgNewSprite.setVisible(true);
+        } else {
+            smallMsgNewSprite.setVisible(false);
         }
         smallMsgSprite.setOnClickListener(new F2OnClickListener() {
 
@@ -400,6 +403,7 @@ public class MainScene extends BaseScene {
                         @Override
                         public void onCallback() {
                             smallMsgSprite.setVisible(true);
+                            smallMsgNewSprite.setVisible(false);
                         }
                     });
                     setChildScene(taskGuideScene, false, false, true);

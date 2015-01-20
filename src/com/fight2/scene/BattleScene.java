@@ -19,9 +19,12 @@ import org.andengine.entity.modifier.SequenceEntityModifier;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
+import org.andengine.entity.sprite.AnimatedSprite;
+import org.andengine.entity.sprite.AnimatedSprite.IAnimationListener;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
 import org.andengine.opengl.font.Font;
+import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.util.debug.Debug;
 import org.andengine.util.modifier.IModifier;
 
@@ -29,6 +32,7 @@ import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
+import com.fight2.constant.TiledTextureEnum;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.battle.BattleRecord;
@@ -45,6 +49,7 @@ import com.fight2.util.F2MusicManager;
 import com.fight2.util.F2SoundManager;
 import com.fight2.util.QuestUtils;
 import com.fight2.util.ResourceManager;
+import com.fight2.util.TiledTextureFactory;
 
 public class BattleScene extends BaseScene {
     private final float TOP_PARTY_FRAME_Y = this.cameraHeight - TextureEnum.BATTLE_PARTY_TOP.getHeight();
@@ -228,7 +233,44 @@ public class BattleScene extends BaseScene {
                     final int changeHp = hp + changeDefence;
                     hpBar.setCurrentPoint(changeHp < 0 ? 0 : changeHp);
                 }
+                final ITiledTextureRegion attackTiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.ATTACK_EFFECT);
+                final AnimatedSprite attackEffectSprite = new AnimatedSprite(defencePartyFrame.getWidth() * 0.5f, defencePartyFrame.getHeight() * 0.5f,
+                        attackTiledTextureRegion, vbom);
+                attackEffectSprite.animate(150, false, new IAnimationListener() {
 
+                    @Override
+                    public void onAnimationStarted(final AnimatedSprite pAnimatedSprite, final int pInitialLoopCount) {
+                        // TODO Auto-generated method stub
+
+                    }
+
+                    @Override
+                    public void onAnimationFrameChanged(final AnimatedSprite pAnimatedSprite, final int pOldFrameIndex, final int pNewFrameIndex) {
+                        // TODO Auto-generated method stub
+
+                    }
+
+                    @Override
+                    public void onAnimationLoopFinished(final AnimatedSprite pAnimatedSprite, final int pRemainingLoopCount, final int pInitialLoopCount) {
+                        // TODO Auto-generated method stub
+
+                    }
+
+                    @Override
+                    public void onAnimationFinished(final AnimatedSprite pAnimatedSprite) {
+                        activity.runOnUpdateThread(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                pAnimatedSprite.detachSelf();
+                            }
+
+                        });
+
+                    }
+
+                });
+                defencePartyFrame.attachChild(attackEffectSprite);
             }
 
         };

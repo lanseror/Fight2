@@ -40,6 +40,8 @@ import com.fight2.constant.TextureEnum;
 import com.fight2.constant.TiledTextureEnum;
 import com.fight2.entity.Hero;
 import com.fight2.entity.QuestResult;
+import com.fight2.entity.QuestTask;
+import com.fight2.entity.QuestTask.UserTaskStatus;
 import com.fight2.entity.QuestTile;
 import com.fight2.entity.QuestTreasureData;
 import com.fight2.entity.engine.F2ButtonSprite;
@@ -49,6 +51,7 @@ import com.fight2.util.F2SoundManager;
 import com.fight2.util.IAsyncCallback;
 import com.fight2.util.QuestUtils;
 import com.fight2.util.ResourceManager;
+import com.fight2.util.TaskUtils;
 import com.fight2.util.TiledTextureFactory;
 import com.fight2.util.TmxUtils;
 
@@ -130,6 +133,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         final float playerSceneY = playerY - tmxTiledMap.getHeight() * 0.5f;
         offsetMap(this.simulatedWidth * 0.5f - playerSceneX * SCALE, playerSceneY * SCALE - this.simulatedHeight * 0.5f);
 
+        showTaskFlag();
         tmxTiledMap.attachChild(hero);
         this.setOnSceneTouchListener(new IOnSceneTouchListener() {
             @Override
@@ -205,6 +209,21 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         cancelButton.setVisible(false);
         this.attachChild(cancelButton);
         this.registerTouchArea(cancelButton);
+    }
+
+    private void showTaskFlag() {
+        final QuestTask task = TaskUtils.getTask();
+        if (task.getStatus() == UserTaskStatus.Started) {
+            final TMXLayer tmxLayer = this.tmxTiledMap.getTMXLayers().get(0);
+            final float flagX = tmxLayer.getTileX(task.getX()) + 0.5f * tmxTiledMap.getTileWidth();
+            final float flagY = tmxLayer.getTileY(task.getY()) + 0.5f * tmxTiledMap.getTileHeight();
+            final ITiledTextureRegion flagTiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.QUEST_FLAG);
+            final float flagHeight = flagTiledTextureRegion.getHeight();
+            final AnimatedSprite flagSprite = new AnimatedSprite(flagX + 5, flagY + flagHeight * 0.5f, flagTiledTextureRegion, vbom);
+            flagSprite.animate(500, true);
+            tmxTiledMap.attachChild(flagSprite);
+        }
+
     }
 
     private F2ButtonSprite createCancelButton() {
@@ -459,6 +478,17 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                         } catch (final IOException e) {
                             throw new RuntimeException(e);
                         }
+                    } else if (goStatus == QuestGoStatus.Task) {
+                        if (questResult.isTreasureUpdated()) {
+                            refreshTreasureSprites(questResult.getQuestTreasureData());
+                        }
+                        try {
+                            final PreBattleScene preBattleScene = new PreBattleScene(activity, questResult.getEnemy(), false);
+                            activity.getEngine().setScene(preBattleScene);
+                            preBattleScene.updateScene();
+                        } catch (final IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
 
                 }
@@ -496,6 +526,8 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                     goStatus = QuestGoStatus.Treasure;
                 } else if (questResult.getStatus() == 2) {
                     goStatus = QuestGoStatus.Enemy;
+                } else if (questResult.getStatus() == 3) {
+                    goStatus = QuestGoStatus.Task;
                 } else {
                     goStatus = QuestGoStatus.Failed;
                 }
@@ -516,6 +548,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         Arrived,
         Treasure,
         Enemy,
+        Task,
         Stopped,
         Failed
     }
