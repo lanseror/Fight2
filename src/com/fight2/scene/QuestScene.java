@@ -262,6 +262,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     }
 
     private Sprite createPathTage(final int index, final Path path) {
+        final String[] D = { "2", "UP", "RIGHT", "DOWN", "LEFT" };
         final float[] xs = path.getCoordinatesX();
         final float[] ys = path.getCoordinatesY();
         final float x1 = xs[index - 1];
@@ -270,52 +271,71 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         final float y2 = ys[index];
         final float x3 = xs[index + 1];
         final float y3 = ys[index + 1];
-        final StringBuilder sb = new StringBuilder(25);
-        sb.append("PATH_");
+        final StringBuilder sb = new StringBuilder(5);
         String previousDirection = "test";
         if (x1 > x2 && y1 < y2) { // left up
-            previousDirection = "LEFTUP";
+            previousDirection = "41";
         } else if (x1 == x2 && y1 < y2) { // up
-            previousDirection = "UP";
+            previousDirection = "1";
         } else if (x1 < x2 && y1 < y2) { // right up
-            previousDirection = "RIGHTUP";
+            previousDirection = "21";
         } else if (x1 > x2 && y1 == y2) {// left
-            previousDirection = "LEFT";
+            previousDirection = "4";
         } else if (x1 < x2 && y1 == y2) {// right
-            previousDirection = "RIGHT";
+            previousDirection = "2";
         } else if (x1 > x2 && y1 > y2) {// left down
-            previousDirection = "LEFTDOWN";
+            previousDirection = "43";
         } else if (x1 == x2 && y1 > y2) {// down
-            previousDirection = "DOWN";
+            previousDirection = "3";
         } else if (x1 < x2 && y1 > y2) {// right down
-            previousDirection = "RIGHTDOWN";
+            previousDirection = "23";
         }
-        sb.append(previousDirection);
         String nextDirection = "test";
         if (x2 > x3 && y2 < y3) { // left up
-            nextDirection = "LEFTUP";
+            nextDirection = "41";
         } else if (x2 == x3 && y2 < y3) { // up
-            nextDirection = "UP";
+            nextDirection = "1";
         } else if (x2 < x3 && y2 < y3) { // right up
-            nextDirection = "RIGHTUP";
+            nextDirection = "21";
         } else if (x2 > x3 && y2 == y3) {// left
-            nextDirection = "LEFT";
+            nextDirection = "4";
         } else if (x2 < x3 && y2 == y3) {// right
-            nextDirection = "RIGHT";
+            nextDirection = "2";
         } else if (x2 > x3 && y2 > y3) {// left down
-            nextDirection = "LEFTDOWN";
+            nextDirection = "43";
         } else if (x2 == x3 && y2 > y3) {// down
-            nextDirection = "DOWN";
+            nextDirection = "3";
         } else if (x2 < x3 && y2 > y3) {// right down
-            nextDirection = "RIGHTDOWN";
+            nextDirection = "23";
         }
 
         if (!nextDirection.equals(previousDirection)) {
-            sb.append(2);
-            sb.append(nextDirection);
+            if (previousDirection.length() == 2 && nextDirection.length() == 2) {
+                String testDirection = null;
+                for (int i = 0; i < previousDirection.length(); i++) {
+                    testDirection = previousDirection.substring(i, i + 1);
+                    if (nextDirection.indexOf(testDirection) >= 0) {
+                        previousDirection = testDirection;
+                        break;
+                    }
+                }
+                if (previousDirection.length() == 2) {
+                    throw new RuntimeException("Found unexpected direction:" + previousDirection + "to" + nextDirection);
+                }
+            }
+            sb.append(previousDirection);
+            sb.append(0);
+        }
+        sb.append(nextDirection);
+        final StringBuilder directionSb = new StringBuilder(25);
+        directionSb.append("PATH_");
+        for (int i = 0; i < sb.length(); i++) {
+            final String directionIndexString = sb.substring(i, i + 1);
+            final int directionIndex = Integer.parseInt(directionIndexString);
+            directionSb.append(D[directionIndex]);
         }
 
-        final TextureEnum pathTextureEnum = TextureEnum.valueOf(sb.toString());
+        final TextureEnum pathTextureEnum = TextureEnum.valueOf(directionSb.toString());
         final Sprite tag = createACImageSprite(pathTextureEnum, xs[index], ys[index] - 10);
         return tag;
     }
