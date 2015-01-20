@@ -56,6 +56,7 @@ import com.fight2.util.TiledTextureFactory;
 import com.fight2.util.TmxUtils;
 
 public class QuestScene extends BaseScene implements IScrollDetectorListener {
+    private final static String[] D = { "2", "UP", "RIGHT", "DOWN", "LEFT" };
     private final SurfaceScrollDetector mScrollDetector;
     private float minY;
     private float maxY;
@@ -262,7 +263,6 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     }
 
     private Sprite createPathTage(final int index, final Path path) {
-        final String[] D = { "2", "UP", "RIGHT", "DOWN", "LEFT" };
         final float[] xs = path.getCoordinatesX();
         final float[] ys = path.getCoordinatesY();
         final float x1 = xs[index - 1];
