@@ -78,6 +78,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     private Path path;
     private final IEntity destTouchArea = new Rectangle(0, 0, 60, 60, vbom);
     private final F2ButtonSprite cancelButton = createCancelButton();
+    private AnimatedSprite flagSprite;
 
     public QuestScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -214,18 +215,10 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     }
 
     private void showTaskFlag() {
-        final QuestTask task = TaskUtils.getTask();
-        if (task.getStatus() == UserTaskStatus.Started) {
-            final TMXLayer tmxLayer = this.tmxTiledMap.getTMXLayers().get(0);
-            final float flagX = tmxLayer.getTileX(task.getX()) + 0.5f * tmxTiledMap.getTileWidth();
-            final float flagY = tmxLayer.getTileY(task.getY()) + 0.5f * tmxTiledMap.getTileHeight();
-            final ITiledTextureRegion flagTiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.QUEST_FLAG);
-            final float flagHeight = flagTiledTextureRegion.getHeight();
-            final AnimatedSprite flagSprite = new AnimatedSprite(flagX + 5, flagY + flagHeight * 0.5f, flagTiledTextureRegion, vbom);
-            flagSprite.animate(500, true);
-            tmxTiledMap.attachChild(flagSprite);
-        }
-
+        final ITiledTextureRegion flagTiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.QUEST_FLAG);
+        flagSprite = new AnimatedSprite(0, 0, flagTiledTextureRegion, vbom);
+        flagSprite.setVisible(false);
+        tmxTiledMap.attachChild(flagSprite);
     }
 
     private F2ButtonSprite createCancelButton() {
@@ -577,6 +570,19 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     @Override
     public void updateScene() {
         activity.getGameHub().needSmallChatRoom(true);
+        final QuestTask task = TaskUtils.getTask();
+        if (task.getStatus() == UserTaskStatus.Started) {
+            final TMXLayer tmxLayer = this.tmxTiledMap.getTMXLayers().get(0);
+            final float flagX = tmxLayer.getTileX(task.getX()) + 0.5f * tmxTiledMap.getTileWidth();
+            final float flagY = tmxLayer.getTileY(task.getY()) + 0.5f * tmxTiledMap.getTileHeight();
+            final float flagHeight = flagSprite.getHeight();
+            flagSprite.setPosition(flagX + 5, flagY + flagHeight * 0.5f);
+            flagSprite.animate(500, true);
+            flagSprite.setVisible(true);
+        } else {
+            flagSprite.stopAnimation();
+            flagSprite.setVisible(false);
+        }
     }
 
     @Override

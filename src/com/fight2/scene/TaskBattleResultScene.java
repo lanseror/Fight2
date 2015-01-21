@@ -7,10 +7,14 @@ import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
+import com.fight2.entity.QuestTask;
+import com.fight2.entity.QuestTask.UserTaskStatus;
 import com.fight2.entity.battle.BattleResult;
 import com.fight2.entity.engine.DialogFrame;
 import com.fight2.entity.engine.HeroDialogFrame;
 import com.fight2.util.ICallback;
+import com.fight2.util.ResourceManager;
+import com.fight2.util.TaskUtils;
 
 public class TaskBattleResultScene extends BaseScene {
     private final PartyInfo myPartyInfo = GameUserSession.getInstance().getPartyInfo();
@@ -30,6 +34,8 @@ public class TaskBattleResultScene extends BaseScene {
         String dialog = null;
         if (battleResult.isWinner()) {
             dialog = "任务完成了！";
+            final QuestTask task = TaskUtils.getTask();
+            task.setStatus(UserTaskStatus.Finished);
         } else {
             dialog = "我们的力量还不够，加强卡牌再来试试吧！";
         }
@@ -38,6 +44,7 @@ public class TaskBattleResultScene extends BaseScene {
             @Override
             public void onCallback() {
                 back();
+                ResourceManager.getInstance().getCurrentScene().updateScene();
             }
         });
 
