@@ -44,6 +44,7 @@ import com.fight2.entity.QuestTask;
 import com.fight2.entity.QuestTask.UserTaskStatus;
 import com.fight2.entity.QuestTile;
 import com.fight2.entity.QuestTreasureData;
+import com.fight2.entity.battle.BattleType;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.AsyncTaskLoader;
@@ -492,7 +493,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                             refreshTreasureSprites(questResult.getQuestTreasureData());
                         }
                         try {
-                            final PreBattleScene preBattleScene = new PreBattleScene(activity, questResult.getEnemy(), false);
+                            final PreBattleScene preBattleScene = new PreBattleScene(activity, questResult.getEnemy(), BattleType.Quest);
                             activity.getEngine().setScene(preBattleScene);
                             preBattleScene.updateScene();
                         } catch (final IOException e) {
@@ -503,9 +504,9 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                             refreshTreasureSprites(questResult.getQuestTreasureData());
                         }
                         try {
-                            final PreBattleScene preBattleScene = new PreBattleScene(activity, questResult.getEnemy(), false);
-                            activity.getEngine().setScene(preBattleScene);
+                            final PreBattleScene preBattleScene = new PreBattleScene(activity, questResult.getEnemy(), BattleType.Task);
                             preBattleScene.updateScene();
+                            setChildScene(preBattleScene, false, false, true);
                         } catch (final IOException e) {
                             throw new RuntimeException(e);
                         }

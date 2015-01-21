@@ -28,6 +28,7 @@ import com.fight2.entity.PartyInfo;
 import com.fight2.entity.User;
 import com.fight2.entity.UserArenaInfo;
 import com.fight2.entity.UserArenaRecord;
+import com.fight2.entity.battle.BattleType;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.ArenaUtils;
@@ -292,7 +293,7 @@ public class ArenaScene extends BaseScene {
                     } else {
                         try {
                             final User player = players[index];
-                            final Scene preBattleScene = new PreBattleScene(activity, player, true);
+                            final Scene preBattleScene = new PreBattleScene(activity, player, BattleType.Arena);
                             activity.getEngine().setScene(preBattleScene);
                         } catch (final IOException e) {
                             Debug.e(e);

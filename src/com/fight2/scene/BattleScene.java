@@ -37,6 +37,7 @@ import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.battle.BattleRecord;
 import com.fight2.entity.battle.BattleResult;
+import com.fight2.entity.battle.BattleType;
 import com.fight2.entity.battle.SkillApplyParty;
 import com.fight2.entity.battle.SkillOperation;
 import com.fight2.entity.battle.SkillRecord;
@@ -49,6 +50,7 @@ import com.fight2.util.F2MusicManager;
 import com.fight2.util.F2SoundManager;
 import com.fight2.util.QuestUtils;
 import com.fight2.util.ResourceManager;
+import com.fight2.util.TaskUtils;
 import com.fight2.util.TiledTextureFactory;
 
 public class BattleScene extends BaseScene {
@@ -73,11 +75,11 @@ public class BattleScene extends BaseScene {
     private final boolean isWinner;
     private final Sprite skipSprite;
     private final BattleResult battleResult;
-    private final boolean isArena;
+    private final BattleType battleType;
 
-    public BattleScene(final GameActivity activity, final int attackPlayerId, final Party[] opponentParties, final boolean isArena) throws IOException {
+    public BattleScene(final GameActivity activity, final int attackPlayerId, final Party[] opponentParties, final BattleType battleType) throws IOException {
         super(activity);
-        this.isArena = isArena;
+        this.battleType = battleType;
         this.skillText = new Text(this.cameraCenterX, this.cameraCenterY + 30, font, "技能：", 30, vbom);
         this.skillEffectText = new Text(this.cameraCenterX, this.cameraCenterY - 10, font, "效果：", 100, vbom);
         winImage = this.createACImageSprite(TextureEnum.BATTLE_WIN, this.cameraCenterX, this.cameraCenterY);
@@ -91,7 +93,21 @@ public class BattleScene extends BaseScene {
         this.attachChild(winImage);
         this.attachChild(loseImage);
         this.opponentParties = opponentParties;
-        battleResult = isArena ? ArenaUtils.attack(attackPlayerId, activity) : QuestUtils.attack(attackPlayerId, activity);
+
+        switch (battleType) {
+            case Arena:
+                battleResult = ArenaUtils.attack(attackPlayerId, activity);
+                break;
+            case Quest:
+                battleResult = QuestUtils.attack(attackPlayerId, activity);
+                ;
+                break;
+            case Task:
+                battleResult = TaskUtils.attack(activity);
+                break;
+            default:
+                battleResult = ArenaUtils.attack(attackPlayerId, activity);
+        }
         isWinner = battleResult.isWinner();
         final List<BattleRecord> battleRecords = battleResult.getBattleRecord();
         for (final BattleRecord battleRecord : battleRecords) {
@@ -119,7 +135,7 @@ public class BattleScene extends BaseScene {
 
     @Override
     protected void init() throws IOException {
-        final TextureEnum bgTextureEnum = isArena ? TextureEnum.BATTLE_ARENA_BG : TextureEnum.BATTLE_QUEST_BG;
+        final TextureEnum bgTextureEnum = battleType == BattleType.Arena ? TextureEnum.BATTLE_ARENA_BG : TextureEnum.BATTLE_QUEST_BG;
         final Sprite bgSprite = createALBImageSprite(bgTextureEnum, 0, 0);
         final Background background = new SpriteBackground(bgSprite);
         this.setBackground(background);
@@ -158,8 +174,15 @@ public class BattleScene extends BaseScene {
             @Override
             public void onFinished(final IEntity pItem) {
                 try {
-                    final Scene battleResultScene = new BattleResultScene(battleResult, activity);
-                    activity.getEngine().setScene(battleResultScene);
+                    if (battleType == BattleType.Task) {
+                        final Scene scene = activity.getEngine().getScene();
+                        scene.clearChildScene();
+                        final Scene taskResultScene = new TaskBattleResultScene(battleResult, activity);
+                        scene.setChildScene(taskResultScene, false, false, true);
+                    } else {
+                        final Scene battleResultScene = new BattleResultScene(battleResult, activity);
+                        activity.getEngine().setScene(battleResultScene);
+                    }
                 } catch (final IOException e) {
                     Debug.e(e);
                 }
@@ -233,44 +256,6 @@ public class BattleScene extends BaseScene {
                     final int changeHp = hp + changeDefence;
                     hpBar.setCurrentPoint(changeHp < 0 ? 0 : changeHp);
                 }
-                final ITiledTextureRegion attackTiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.ATTACK_EFFECT);
-                final AnimatedSprite attackEffectSprite = new AnimatedSprite(defencePartyFrame.getWidth() * 0.5f, defencePartyFrame.getHeight() * 0.5f,
-                        attackTiledTextureRegion, vbom);
-                attackEffectSprite.animate(150, false, new IAnimationListener() {
-
-                    @Override
-                    public void onAnimationStarted(final AnimatedSprite pAnimatedSprite, final int pInitialLoopCount) {
-                        // TODO Auto-generated method stub
-
-                    }
-
-                    @Override
-                    public void onAnimationFrameChanged(final AnimatedSprite pAnimatedSprite, final int pOldFrameIndex, final int pNewFrameIndex) {
-                        // TODO Auto-generated method stub
-
-                    }
-
-                    @Override
-                    public void onAnimationLoopFinished(final AnimatedSprite pAnimatedSprite, final int pRemainingLoopCount, final int pInitialLoopCount) {
-                        // TODO Auto-generated method stub
-
-                    }
-
-                    @Override
-                    public void onAnimationFinished(final AnimatedSprite pAnimatedSprite) {
-                        activity.runOnUpdateThread(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                pAnimatedSprite.detachSelf();
-                            }
-
-                        });
-
-                    }
-
-                });
-                defencePartyFrame.attachChild(attackEffectSprite);
             }
 
         };
@@ -523,7 +508,56 @@ public class BattleScene extends BaseScene {
         this.sortChildren();
 
         final float adjustY = actionPartyFrame.isBottom() ? -140 : 137;
-        final IEntityModifier attackScaleModifier = new ScaleModifier(attackDuration, initScale, 1, new ModifierFinishedListener(onHitCallback));
+
+        final OnFinishedCallback workArroundCb = new OnFinishedCallback() {
+
+            @Override
+            public void onFinished(final IEntity pItem) {
+                final ITiledTextureRegion attackTiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.ATTACK_EFFECT);
+                final AnimatedSprite attackEffectSprite = new AnimatedSprite(defencePartyFrame.getWidth() * 0.5f, defencePartyFrame.getHeight() * 0.5f,
+                        attackTiledTextureRegion, vbom);
+                attackEffectSprite.animate(100, false, new IAnimationListener() {
+
+                    @Override
+                    public void onAnimationStarted(final AnimatedSprite pAnimatedSprite, final int pInitialLoopCount) {
+                        // TODO Auto-generated method stub
+
+                    }
+
+                    @Override
+                    public void onAnimationFrameChanged(final AnimatedSprite pAnimatedSprite, final int pOldFrameIndex, final int pNewFrameIndex) {
+                        // TODO Auto-generated method stub
+
+                    }
+
+                    @Override
+                    public void onAnimationLoopFinished(final AnimatedSprite pAnimatedSprite, final int pRemainingLoopCount, final int pInitialLoopCount) {
+                        // TODO Auto-generated method stub
+
+                    }
+
+                    @Override
+                    public void onAnimationFinished(final AnimatedSprite pAnimatedSprite) {
+                        activity.runOnUpdateThread(new Runnable() {
+
+                            @Override
+                            public void run() {
+                                pAnimatedSprite.detachSelf();
+                                onHitCallback.onFinished(pAnimatedSprite);
+                            }
+
+                        });
+
+                    }
+
+                });
+                defencePartyFrame.attachChild(attackEffectSprite);
+
+            }
+
+        };
+
+        final IEntityModifier attackScaleModifier = new ScaleModifier(attackDuration, initScale, 1, new ModifierFinishedListener(workArroundCb));
         final IEntityModifier attackMoveModifier = new MoveModifier(attackDuration, initX, initY, defencePartyFrame.getX(), defencePartyFrame.getY() + adjustY);
         final IEntityModifier attackModifier = new ParallelEntityModifier(attackScaleModifier, attackMoveModifier);
 

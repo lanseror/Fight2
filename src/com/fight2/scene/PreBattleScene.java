@@ -22,6 +22,7 @@ import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
 import com.fight2.entity.User;
+import com.fight2.entity.battle.BattleType;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.AsyncTaskLoader;
@@ -61,12 +62,12 @@ public class PreBattleScene extends BaseScene {
     private final Text atkTextRight;
     private final Text hpTextRight;
     private final User attackPlayer;
-    private final boolean isArena;
+    private final BattleType battleType;
 
-    public PreBattleScene(final GameActivity activity, final User attackPlayer, final boolean isArena) throws IOException {
+    public PreBattleScene(final GameActivity activity, final User attackPlayer, final BattleType battleType) throws IOException {
         super(activity);
         this.attackPlayer = attackPlayer;
-        this.isArena = isArena;
+        this.battleType = battleType;
         opponentPartyInfo = CardUtils.getPartyByUserId(activity, attackPlayer.getId());
         opponentParties = opponentPartyInfo.getParties();
         final Card myLeader = myParties[0].getCards()[0];
@@ -103,7 +104,7 @@ public class PreBattleScene extends BaseScene {
 
     @Override
     protected void init() throws IOException {
-        final TextureEnum bgTextureEnum = isArena ? TextureEnum.BATTLE_ARENA_BG : TextureEnum.BATTLE_QUEST_BG;
+        final TextureEnum bgTextureEnum = battleType == BattleType.Arena ? TextureEnum.BATTLE_ARENA_BG : TextureEnum.BATTLE_QUEST_BG;
         final Sprite bgSprite = createALBImageSprite(bgTextureEnum, 0, 0);
         final Background background = new SpriteBackground(bgSprite);
         this.setBackground(background);
@@ -138,8 +139,7 @@ public class PreBattleScene extends BaseScene {
         // comboSkillBoxSpriteLeft.attachChild(comboSkill2);
         // final Sprite comboSkill3 = createACImageSprite(TextureEnum.TEST, 80, 60);
         // comboSkillBoxSpriteLeft.attachChild(comboSkill3);
-        
-        
+
         final Sprite comboSkillBoxSpriteRight = createACImageSprite(TextureEnum.PREBATTLE_COMBO_SKILL_RIGHT, this.cameraCenterX + CARD_CENTER_X + GAP,
                 this.cameraCenterY - CARD_CENTER_Y + 80);
         this.attachChild(comboSkillBoxSpriteRight);
@@ -151,8 +151,13 @@ public class PreBattleScene extends BaseScene {
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 F2SoundManager.getInstance().play(SoundEnum.ARENA_ATTACK);
                 try {
-                    final Scene battleScene = new BattleScene(activity, attackPlayer.getId(), opponentParties, isArena);
-                    activity.getEngine().setScene(battleScene);
+                    final Scene battleScene = new BattleScene(activity, attackPlayer.getId(), opponentParties, battleType);
+                    if (battleType == BattleType.Task) {
+                        setChildScene(battleScene, false, false, true);
+                    } else {
+                        activity.getEngine().setScene(battleScene);
+                    }
+
                 } catch (final IOException e) {
                     Debug.e(e);
                 }
