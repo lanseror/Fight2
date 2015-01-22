@@ -20,7 +20,7 @@ public class TextDialogFrame extends DialogFrame {
 
         final Font detailFont = ResourceManager.getInstance().newFont(FontEnum.Default, 24);
         final Text contentText = new TickerText(width * 0.5f, height * 0.5f, detailFont, content, new TickerTextOptions(AutoWrap.LETTERS, width - 80,
-                HorizontalAlign.LEFT, 18), vbom);
+                HorizontalAlign.LEFT, 25), vbom);
         contentText.setColor(0XFF330504);
         this.attachChild(contentText);
         EntityUtils.leftAlignEntity(contentText, 40);

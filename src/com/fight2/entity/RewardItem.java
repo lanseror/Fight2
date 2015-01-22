@@ -1,8 +1,8 @@
 package com.fight2.entity;
 
-public class ArenaRewardItem {
+public class RewardItem {
     private int id;
-    private ArenaRewardItemType type;
+    private RewardItemType type;
     private int amount;
     private Card card;
 
@@ -14,11 +14,11 @@ public class ArenaRewardItem {
         this.id = id;
     }
 
-    public ArenaRewardItemType getType() {
+    public RewardItemType getType() {
         return type;
     }
 
-    public void setType(final ArenaRewardItemType type) {
+    public void setType(final RewardItemType type) {
         this.type = type;
     }
 
@@ -38,7 +38,7 @@ public class ArenaRewardItem {
         this.card = card;
     }
 
-    public static enum ArenaRewardItemType {
+    public static enum RewardItemType {
         ArenaTicket,
         Stamina,
         Card,

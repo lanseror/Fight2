@@ -21,10 +21,10 @@ import org.andengine.util.adt.color.Color;
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.TextureEnum;
-import com.fight2.entity.ArenaReward;
-import com.fight2.entity.ArenaReward.ArenaRewardType;
-import com.fight2.entity.ArenaRewardItem;
-import com.fight2.entity.ArenaRewardItem.ArenaRewardItemType;
+import com.fight2.entity.Reward;
+import com.fight2.entity.Reward.ArenaRewardType;
+import com.fight2.entity.RewardItem;
+import com.fight2.entity.RewardItem.RewardItemType;
 import com.fight2.entity.Card;
 import com.fight2.entity.UserArenaInfo;
 import com.fight2.entity.engine.CardFrame;
@@ -230,10 +230,10 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
     @Override
     public void updateScene() {
         activity.getGameHub().needSmallChatRoom(false);
-        final List<ArenaReward> arenaRewards = ArenaUtils.getArenaReward(activity);
-        final List<ArenaReward> mightRewards = new ArrayList<ArenaReward>();
-        final List<ArenaReward> rankRewards = new ArrayList<ArenaReward>();
-        for (final ArenaReward arenaReward : arenaRewards) {
+        final List<Reward> arenaRewards = ArenaUtils.getArenaReward(activity);
+        final List<Reward> mightRewards = new ArrayList<Reward>();
+        final List<Reward> rankRewards = new ArrayList<Reward>();
+        for (final Reward arenaReward : arenaRewards) {
             if (arenaReward.getType() == ArenaRewardType.Might) {
                 mightRewards.add(arenaReward);
             } else {
@@ -249,7 +249,7 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
         final float gridInitY = CLIP_HEIGHT - TextureEnum.ARENA_REWARD_MIGHT_BUTTON.getHeight() - descEnum.getHeight() - gridHeight * 0.5f + 2;
         float mightGridBottomY = 0;
         for (int i = 0; i < mightRewards.size(); i++) {
-            final ArenaReward mightReward = mightRewards.get(i);
+            final Reward mightReward = mightRewards.get(i);
             mightGridBottomY = gridInitY - gridHeight * i;
             final IEntity rewardGrid = createRewardGrid(frameCenter, mightGridBottomY);
             final TextureEnum mightPointEnum = TextureEnum.ARENA_REWARD_MIGHT_POINT;
@@ -266,7 +266,7 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
         // Rank elements
         float rankGridBottomY = 0;
         for (int i = 0; i < rankRewards.size(); i++) {
-            final ArenaReward rankReward = rankRewards.get(i);
+            final Reward rankReward = rankRewards.get(i);
             rankGridBottomY = gridInitY - gridHeight * i;
             final IEntity rewardGrid = createRewardGrid(frameCenter, rankGridBottomY);
             final Text rankText = new Text(gridWidth * 0.5f, gridHeight - 55, rankFont, String.format("排名: %s-%s", rankReward.getMin(), rankReward.getMax()),
@@ -280,7 +280,7 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
 
     }
 
-    private void insertRewardItems(final List<ArenaRewardItem> rewardItems, final IEntity rewardGrid) {
+    private void insertRewardItems(final List<RewardItem> rewardItems, final IEntity rewardGrid) {
         final TextureEnum itemGridEnum = TextureEnum.ARENA_REWARD_ITEM_GRID;
         final TextureEnum ticketEnum = TextureEnum.COMMON_ARENA_TICKET;
         final TextureEnum staminaEnum = TextureEnum.COMMON_STAMINA;
@@ -291,13 +291,13 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
         final float itemX = itemGridEnum.getWidth() * 0.5f;
         final float itemY = itemGridEnum.getHeight() * 0.5f;
         for (int itemIndex = 0; itemIndex < rewardItems.size(); itemIndex++) {
-            final ArenaRewardItem rewardItem = rewardItems.get(itemIndex);
-            final ArenaRewardItemType rewardItemType = rewardItem.getType();
+            final RewardItem rewardItem = rewardItems.get(itemIndex);
+            final RewardItemType rewardItemType = rewardItem.getType();
 
             final Text amountText = new Text(95, 25, amountFont, String.format("×%s", rewardItem.getAmount()), vbom);
             amountText.setColor(0XFFAECE01);
             amountText.setX(itemGridEnum.getWidth() - amountText.getWidth() * 0.5f - 10);
-            if (rewardItemType == ArenaRewardItemType.ArenaTicket) {
+            if (rewardItemType == RewardItemType.ArenaTicket) {
                 final IEntity ticketGrid = createACImageSprite(itemGridEnum, itemGridInitX + itemWidth * itemIndex, itemGridY);
                 final IEntity ticketImg = createACImageSprite(ticketEnum, itemX, itemY);
                 final Text itemText = new Text(itemX, itemGridEnum.getHeight() + 25, itemFont, "竞技场门票", vbom);
@@ -306,7 +306,7 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
                 ticketGrid.attachChild(ticketImg);
                 ticketGrid.attachChild(amountText);
                 rewardGrid.attachChild(ticketGrid);
-            } else if (rewardItemType == ArenaRewardItemType.Stamina) {
+            } else if (rewardItemType == RewardItemType.Stamina) {
                 final IEntity staminaGrid = createACImageSprite(itemGridEnum, itemGridInitX + itemWidth * itemIndex, itemGridY);
                 final IEntity staminaImg = createACImageSprite(staminaEnum, itemX - 10, itemY - 5);
                 final Text itemText = new Text(itemX, itemGridEnum.getHeight() + 25, itemFont, "精力药水", vbom);
@@ -315,7 +315,7 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
                 staminaGrid.attachChild(staminaImg);
                 staminaGrid.attachChild(amountText);
                 rewardGrid.attachChild(staminaGrid);
-            } else if (rewardItemType == ArenaRewardItemType.GuildContribution) {
+            } else if (rewardItemType == RewardItemType.GuildContribution) {
                 final IEntity guildContributionGrid = createACImageSprite(itemGridEnum, itemGridInitX + itemWidth * itemIndex, itemGridY);
                 final IEntity guildContributionImg = createACImageSprite(guildContributionEnum, itemX, itemY + 3);
                 final Text itemText = new Text(itemX, itemGridEnum.getHeight() + 25, itemFont, "公会贡献值", vbom);
@@ -324,7 +324,7 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
                 guildContributionGrid.attachChild(guildContributionImg);
                 guildContributionGrid.attachChild(amountText);
                 rewardGrid.attachChild(guildContributionGrid);
-            } else if (rewardItemType == ArenaRewardItemType.Card) {
+            } else if (rewardItemType == RewardItemType.Card) {
                 final Card card = rewardItem.getCard();
                 final float cardAdjustX = (itemIndex > 0 ? 15 : 0);
                 final CardFrame cardSprite = new CardFrame(itemGridInitX + (itemWidth - cardAdjustX) * itemIndex, itemGridY + 15, 110, 165, card, activity);

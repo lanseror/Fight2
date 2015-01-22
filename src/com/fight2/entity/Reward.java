@@ -2,12 +2,12 @@ package com.fight2.entity;
 
 import java.util.List;
 
-public class ArenaReward {
+public class Reward {
     private int id;
     private ArenaRewardType type;
     private int min;
     private int max;
-    private List<ArenaRewardItem> rewardItems;
+    private List<RewardItem> rewardItems;
 
     public int getId() {
         return id;
@@ -41,11 +41,11 @@ public class ArenaReward {
         this.max = max;
     }
 
-    public List<ArenaRewardItem> getRewardItems() {
+    public List<RewardItem> getRewardItems() {
         return rewardItems;
     }
 
-    public void setRewardItems(final List<ArenaRewardItem> rewardItems) {
+    public void setRewardItems(final List<RewardItem> rewardItems) {
         this.rewardItems = rewardItems;
     }
 

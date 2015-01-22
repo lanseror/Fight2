@@ -16,10 +16,10 @@ import com.fight2.GameActivity;
 import com.fight2.entity.Arena;
 import com.fight2.entity.ArenaContinuousWin;
 import com.fight2.entity.ArenaRanking;
-import com.fight2.entity.ArenaReward;
-import com.fight2.entity.ArenaReward.ArenaRewardType;
-import com.fight2.entity.ArenaRewardItem;
-import com.fight2.entity.ArenaRewardItem.ArenaRewardItemType;
+import com.fight2.entity.Reward;
+import com.fight2.entity.Reward.ArenaRewardType;
+import com.fight2.entity.RewardItem;
+import com.fight2.entity.RewardItem.RewardItemType;
 import com.fight2.entity.Card;
 import com.fight2.entity.Guild;
 import com.fight2.entity.User;
@@ -155,28 +155,28 @@ public class ArenaUtils {
         return arenaRankings;
     }
 
-    public static List<ArenaReward> getArenaReward(final GameActivity activity) {
-        final List<ArenaReward> arenaRewards = new ArrayList<ArenaReward>();
+    public static List<Reward> getArenaReward(final GameActivity activity) {
+        final List<Reward> arenaRewards = new ArrayList<Reward>();
         final String url = HttpUtils.HOST_URL + "/arena-reward/list-json?arenaId=" + selectedArenaId;
         try {
             final JSONArray responseJsonArray = HttpUtils.getJSONArrayFromUrl(url);
             for (int i = 0; i < responseJsonArray.length(); i++) {
                 final JSONObject responseJson = responseJsonArray.getJSONObject(i);
-                final ArenaReward arenaReward = new ArenaReward();
+                final Reward arenaReward = new Reward();
                 arenaReward.setId(responseJson.getInt("id"));
                 arenaReward.setMax(responseJson.getInt("max"));
                 arenaReward.setMin(responseJson.getInt("min"));
                 arenaReward.setType(ArenaRewardType.valueOf(responseJson.getString("type")));
                 final JSONArray rewardItemJsonArray = responseJson.getJSONArray("rewardItems");
-                final List<ArenaRewardItem> rewardItems = new ArrayList<ArenaRewardItem>();
+                final List<RewardItem> rewardItems = new ArrayList<RewardItem>();
                 for (int j = 0; j < rewardItemJsonArray.length(); j++) {
                     final JSONObject rewardItemJson = rewardItemJsonArray.getJSONObject(j);
-                    final ArenaRewardItem arenaRewardItem = new ArenaRewardItem();
+                    final RewardItem arenaRewardItem = new RewardItem();
                     arenaRewardItem.setId(rewardItemJson.getInt("id"));
                     arenaRewardItem.setAmount(rewardItemJson.getInt("amount"));
-                    final ArenaRewardItemType rewardItemType = ArenaRewardItemType.valueOf(rewardItemJson.getString("type"));
+                    final RewardItemType rewardItemType = RewardItemType.valueOf(rewardItemJson.getString("type"));
                     arenaRewardItem.setType(rewardItemType);
-                    if (rewardItemType == ArenaRewardItemType.Card) {
+                    if (rewardItemType == RewardItemType.Card) {
                         final JSONObject cardJson = rewardItemJson.getJSONObject("card");
                         final Card card = CardUtils.cardFromJson(cardJson);
                         arenaRewardItem.setCard(card);

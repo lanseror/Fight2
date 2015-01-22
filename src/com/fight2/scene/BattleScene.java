@@ -516,7 +516,7 @@ public class BattleScene extends BaseScene {
                 final ITiledTextureRegion attackTiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.ATTACK_EFFECT);
                 final AnimatedSprite attackEffectSprite = new AnimatedSprite(defencePartyFrame.getWidth() * 0.5f, defencePartyFrame.getHeight() * 0.5f,
                         attackTiledTextureRegion, vbom);
-                attackEffectSprite.animate(100, false, new IAnimationListener() {
+                attackEffectSprite.animate(140, false, new IAnimationListener() {
 
                     @Override
                     public void onAnimationStarted(final AnimatedSprite pAnimatedSprite, final int pInitialLoopCount) {

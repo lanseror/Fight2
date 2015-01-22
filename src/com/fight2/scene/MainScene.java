@@ -388,7 +388,7 @@ public class MainScene extends BaseScene {
         final QuestTask task = TaskUtils.getTask();
         final Sprite smallMsgNewSprite = createALBImageSprite(TextureEnum.MAIN_MSG_NEW_SMALL, 0, 0);
         smallMsgSprite.attachChild(smallMsgNewSprite);
-        if (task.getStatus() == UserTaskStatus.Ready) {
+        if (task.getStatus() == UserTaskStatus.Ready || task.getStatus() == UserTaskStatus.Finished) {
             smallMsgNewSprite.setVisible(true);
         } else {
             smallMsgNewSprite.setVisible(false);
