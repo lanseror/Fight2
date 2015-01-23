@@ -80,6 +80,7 @@ public class MainScene extends BaseScene {
     private int avatarCardId = -1;
     private final float avatarSize = 90;
     private final float avatarHalfSize = avatarSize * 0.5f;
+    private final Sprite smallMsgNewSprite = createALBImageSprite(TextureEnum.MAIN_MSG_NEW_SMALL, 0, 0);
 
     public MainScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -385,14 +386,9 @@ public class MainScene extends BaseScene {
         final F2ButtonSprite smallMsgSprite = this.createACF2ButtonSprite(TextureEnum.MAIN_MSG_SMALL, TextureEnum.MAIN_MSG_SMALL, 170, 475);
         this.attachChild(smallMsgSprite);
         this.registerTouchArea(smallMsgSprite);
-        final QuestTask task = TaskUtils.getTask();
-        final Sprite smallMsgNewSprite = createALBImageSprite(TextureEnum.MAIN_MSG_NEW_SMALL, 0, 0);
+
+        smallMsgNewSprite.setVisible(false);
         smallMsgSprite.attachChild(smallMsgNewSprite);
-        if (task.getStatus() == UserTaskStatus.Ready || task.getStatus() == UserTaskStatus.Finished) {
-            smallMsgNewSprite.setVisible(true);
-        } else {
-            smallMsgNewSprite.setVisible(false);
-        }
         smallMsgSprite.setOnClickListener(new F2OnClickListener() {
 
             @Override
@@ -403,7 +399,7 @@ public class MainScene extends BaseScene {
                         @Override
                         public void onCallback() {
                             smallMsgSprite.setVisible(true);
-                            smallMsgNewSprite.setVisible(false);
+                            updateScene();
                         }
                     });
                     setChildScene(taskGuideScene, false, false, true);
@@ -486,7 +482,6 @@ public class MainScene extends BaseScene {
                         });
 
                     }
-
                 }
 
             };
@@ -498,7 +493,12 @@ public class MainScene extends BaseScene {
                 }
             });
         }
-
+        final QuestTask task = TaskUtils.getTask();
+        if (task.getStatus() == UserTaskStatus.Ready || task.getStatus() == UserTaskStatus.Finished) {
+            smallMsgNewSprite.setVisible(true);
+        } else {
+            smallMsgNewSprite.setVisible(false);
+        }
     }
 
     @Override

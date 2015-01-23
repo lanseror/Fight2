@@ -79,7 +79,7 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
         this.attachChild(chatScrollArea);
         this.registerTouchArea(chatScrollArea);
         // Right-top close button.
-        closeButton = createCloseButton(TextureEnum.CHAT_INPUT_CLOSE, this.simulatedRightX - 50, this.cameraHeight - 50);
+        closeButton = createCloseButton(TextureEnum.COMMON_CLOSE_BUTTON, this.simulatedRightX - 50, this.cameraHeight - 50);
         final IEntity closeTouchArea = new Rectangle(this.simulatedRightX - 75, this.cameraHeight - 75, 150, 150, vbom) {
             @Override
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
@@ -156,8 +156,7 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
         this.registerTouchArea(leftCloseTouchArea);
 
         final TextureEnum sendTextureEnum = TextureEnum.CHAT_INPUT_SEND;
-        final F2ButtonSprite sendSprite = createALBF2ButtonSprite(sendTextureEnum, sendTextureEnum, chatInputSprite.getWidth() - sendTextureEnum.getWidth()
-                - 20, 10);
+        final F2ButtonSprite sendSprite = createALBF2ButtonSprite(sendTextureEnum, sendTextureEnum, chatInputSprite.getWidth() - sendTextureEnum.getWidth(), 0);
         chatInputSprite.attachChild(sendSprite);
         this.registerTouchArea(sendSprite);
         sendSprite.setOnClickListener(new F2OnClickListener() {

@@ -175,7 +175,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             }
         });
 
-        final F2ButtonSprite townButton = createALBF2ButtonSprite(TextureEnum.QUEST_TOWN, TextureEnum.QUEST_TOWN, this.simulatedLeftX, this.cameraHeight
+        final F2ButtonSprite townButton = createALBF2ButtonSprite(TextureEnum.QUEST_TOWN, TextureEnum.QUEST_TOWN, this.simulatedLeftX+2, this.cameraHeight
                 - TextureEnum.QUEST_TOWN.getHeight());
         townButton.setOnClickListener(new F2OnClickListener() {
             @Override

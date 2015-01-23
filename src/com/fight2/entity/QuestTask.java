@@ -13,7 +13,7 @@ public class QuestTask {
 
     private int y;
 
-    private UserTaskStatus status;
+    private UserTaskStatus status = UserTaskStatus.End;
 
     public int getId() {
         return id;

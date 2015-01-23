@@ -53,6 +53,8 @@ public class TaskGuideScene extends BaseScene {
             createTipsFrame(task);
         } else if (task.getStatus() == UserTaskStatus.Finished) {
             createRewardFrame(task);
+        } else if (task.getStatus() == UserTaskStatus.End) {
+            createEmptyFrame(task);
         }
 
     }
@@ -63,6 +65,19 @@ public class TaskGuideScene extends BaseScene {
 
     @Override
     public void leaveScene() {
+    }
+
+    private void createEmptyFrame(final QuestTask task) {
+        final DialogFrame dialog = new TextDialogFrame(715, cameraCenterY - 45, 540, 360, activity, "没有信息！");
+        dialog.bind(this, new ICallback() {
+
+            @Override
+            public void onCallback() {
+                iLeaveCallback.onCallback();
+                back();
+            }
+
+        });
     }
 
     private void createDialogFrame(final QuestTask task) {
@@ -109,8 +124,11 @@ public class TaskGuideScene extends BaseScene {
 
             @Override
             public void onCallback() {
-                iLeaveCallback.onCallback();
+                if (TaskUtils.complete()) {
+                    TaskUtils.refresh();
+                }
                 back();
+                iLeaveCallback.onCallback();
             }
 
         });

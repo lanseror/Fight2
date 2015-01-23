@@ -24,17 +24,24 @@ public class TaskUtils {
     public static void refresh() {
         final String url = HttpUtils.HOST_URL + "/msg/get";
         try {
-            final JSONObject userTaskJson = HttpUtils.getJSONFromUrl(url);
-            final JSONObject taskJson = userTaskJson.getJSONObject("task");
-            final QuestTask task = new QuestTask();
-            task.setId(taskJson.getInt("id"));
-            task.setTitle(taskJson.getString("title"));
-            task.setDialog(taskJson.getString("dialog"));
-            task.setTips(taskJson.getString("tips"));
-            task.setX(taskJson.getInt("x"));
-            task.setY(taskJson.getInt("y"));
-            task.setStatus(UserTaskStatus.valueOf(userTaskJson.getString("status")));
-            TASK = task;
+            final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
+            final int status = responseJson.getInt("status");
+            if (status == 0) {
+                final JSONObject userTaskJson = responseJson.getJSONObject("task");
+                final JSONObject taskJson = userTaskJson.getJSONObject("task");
+                final QuestTask task = new QuestTask();
+                task.setId(taskJson.getInt("id"));
+                task.setTitle(taskJson.getString("title"));
+                task.setDialog(taskJson.getString("dialog"));
+                task.setTips(taskJson.getString("tips"));
+                task.setX(taskJson.getInt("x"));
+                task.setY(taskJson.getInt("y"));
+                task.setStatus(UserTaskStatus.valueOf(userTaskJson.getString("status")));
+                TASK = task;
+            } else if (status == 1) {
+                TASK = new QuestTask();
+            }
+
         } catch (final JSONException e) {
             throw new RuntimeException(e);
         } catch (final ClientProtocolException e) {
@@ -116,5 +123,20 @@ public class TaskUtils {
             throw new RuntimeException(e);
         }
         return rewards;
+    }
+
+    public static boolean complete() {
+        final String url = HttpUtils.HOST_URL + "/task/complete";
+        try {
+            final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
+            final int status = responseJson.getInt("status");
+            return status == 0;
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

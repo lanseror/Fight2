@@ -66,14 +66,14 @@ public enum TextureEnum {
     COMMON_SUMMON_STONE("images/common_summon_stone.png", 25, 27),
     COMMON_SUMMON_STONE_BIG("images/common_summon_stone_big.png", 130, 139),
     COMMON_SUMMON_CHARM("images/common_summon_charm.png", 31, 33),
+    COMMON_CLOSE_BUTTON("images/common_close_button.png", 43, 43),
 
     // Chat room images.
     CHAT_INPUT_BG("images/chat_input_backgroud.png", 850, 82),
     CHAT_INPUT_TEXT_BG("images/chat_input_text_bg.png", 487, 44),
     CHAT_INPUT_OPEN("images/chat_input_open.png", 84, 83),
     CHAT_INPUT_OPEN_FCS("images/chat_input_open_fcs.png", 84, 83),
-    CHAT_INPUT_CLOSE("images/chat_input_close.png", 40, 40),
-    CHAT_INPUT_SEND("images/chat_input_send.png", 145, 52),
+    CHAT_INPUT_SEND("images/chat_input_send.png", 141, 82),
 
     // Main scene images.
     MAIN_BG("images/main_backgroud.png", 1136, 640),
@@ -259,7 +259,7 @@ public enum TextureEnum {
     PATH_DOWN2LEFTDOWN("images/path/down2leftdown.png", 18, 26),
 
     // Quest images.
-    QUEST_TOWN("images/quest_town.png", 56, 52),
+    QUEST_TOWN("images/quest_town.png", 80, 83),
     QUEST_CANCEL_BUTTON("images/quest_cancel_button.png", 130, 132),
     QUEST_CANCEL_BUTTON_FCS("images/quest_cancel_button_fcs.png", 130, 132),
     QUEST_PATH_TAG("images/quest_path_tag.png", 15, 15),
