@@ -14,9 +14,13 @@ import com.fight2.util.EntityUtils;
 import com.fight2.util.ResourceManager;
 
 public class HeroDialogFrame extends DialogFrame {
-
     public HeroDialogFrame(final float x, final float y, final float width, final float height, final GameActivity activity, final Card card,
             final String content) {
+        this(x, y, width, height, activity, card, card.getName(), content);
+    }
+
+    public HeroDialogFrame(final float x, final float y, final float width, final float height, final GameActivity activity, final Card card,
+            final String title, final String content) {
         super(x, y, width, height, activity);
         this.setAlpha(0);
 
@@ -24,7 +28,7 @@ public class HeroDialogFrame extends DialogFrame {
         this.attachChild(avatar);
 
         final Font titleFont = ResourceManager.getInstance().newFont(FontEnum.Default, 28);
-        final Text nameText = new Text(250, height - 80, titleFont, card.getName(), vbom);
+        final Text nameText = new Text(250, height - 80, titleFont, title, vbom);
         nameText.setColor(0XFF330504);
         EntityUtils.leftAlignEntity(nameText, 160);
         EntityUtils.topAlignEntity(nameText, height - 30);

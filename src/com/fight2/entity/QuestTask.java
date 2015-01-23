@@ -7,6 +7,8 @@ public class QuestTask {
 
     private String dialog;
 
+    private String bossDialog;
+
     private String tips;
 
     private int x;
@@ -37,6 +39,14 @@ public class QuestTask {
 
     public void setDialog(final String dialog) {
         this.dialog = dialog;
+    }
+
+    public String getBossDialog() {
+        return bossDialog;
+    }
+
+    public void setBossDialog(final String bossDialog) {
+        this.bossDialog = bossDialog;
     }
 
     public String getTips() {

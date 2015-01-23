@@ -33,6 +33,7 @@ public class TaskUtils {
                 task.setId(taskJson.getInt("id"));
                 task.setTitle(taskJson.getString("title"));
                 task.setDialog(taskJson.getString("dialog"));
+                task.setBossDialog(taskJson.getString("bossDialog"));
                 task.setTips(taskJson.getString("tips"));
                 task.setX(taskJson.getInt("x"));
                 task.setY(taskJson.getInt("y"));

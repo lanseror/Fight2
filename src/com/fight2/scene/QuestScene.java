@@ -38,18 +38,25 @@ import com.fight2.constant.SceneEnum;
 import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.constant.TiledTextureEnum;
+import com.fight2.entity.Card;
 import com.fight2.entity.Hero;
+import com.fight2.entity.PartyInfo;
 import com.fight2.entity.QuestResult;
 import com.fight2.entity.QuestTask;
 import com.fight2.entity.QuestTask.UserTaskStatus;
 import com.fight2.entity.QuestTile;
 import com.fight2.entity.QuestTreasureData;
+import com.fight2.entity.User;
 import com.fight2.entity.battle.BattleType;
+import com.fight2.entity.engine.DialogFrame;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
+import com.fight2.entity.engine.HeroDialogFrame;
 import com.fight2.util.AsyncTaskLoader;
+import com.fight2.util.CardUtils;
 import com.fight2.util.F2SoundManager;
 import com.fight2.util.IAsyncCallback;
+import com.fight2.util.ICallback;
 import com.fight2.util.QuestUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TaskUtils;
@@ -175,7 +182,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             }
         });
 
-        final F2ButtonSprite townButton = createALBF2ButtonSprite(TextureEnum.QUEST_TOWN, TextureEnum.QUEST_TOWN, this.simulatedLeftX+2, this.cameraHeight
+        final F2ButtonSprite townButton = createALBF2ButtonSprite(TextureEnum.QUEST_TOWN, TextureEnum.QUEST_TOWN, this.simulatedLeftX + 2, this.cameraHeight
                 - TextureEnum.QUEST_TOWN.getHeight());
         townButton.setOnClickListener(new F2OnClickListener() {
             @Override
@@ -496,13 +503,26 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                         if (questResult.isTreasureUpdated()) {
                             refreshTreasureSprites(questResult.getQuestTreasureData());
                         }
-                        try {
-                            final PreBattleScene preBattleScene = new PreBattleScene(activity, questResult.getEnemy(), BattleType.Task);
-                            preBattleScene.updateScene();
-                            setChildScene(preBattleScene, false, false, true);
-                        } catch (final IOException e) {
-                            throw new RuntimeException(e);
-                        }
+                        final QuestTask task = TaskUtils.getTask();
+                        final User boss = questResult.getEnemy();
+                        final PartyInfo bossPartyInfo = CardUtils.getPartyByUserId(activity, boss.getId());
+                        final Card bossLeader = bossPartyInfo.getParties()[0].getCards()[0];
+                        final DialogFrame dialogFrame = new HeroDialogFrame(cameraCenterX, cameraCenterY, 600, 350, activity, bossLeader, boss.getName(), task
+                                .getBossDialog());
+                        dialogFrame.bind(QuestScene.this, new ICallback() {
+                            @Override
+                            public void onCallback() {
+                                try {
+                                    dialogFrame.unbind(QuestScene.this);
+                                    final PreBattleScene preBattleScene = new PreBattleScene(activity, boss, BattleType.Task);
+                                    preBattleScene.updateScene();
+                                    setChildScene(preBattleScene, false, false, true);
+                                } catch (final IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        });
+
                     }
 
                 }
