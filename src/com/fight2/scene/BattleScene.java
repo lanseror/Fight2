@@ -100,7 +100,6 @@ public class BattleScene extends BaseScene {
                 break;
             case Quest:
                 battleResult = QuestUtils.attack(attackPlayerId, activity);
-                ;
                 break;
             case Task:
                 battleResult = TaskUtils.attack(activity);
