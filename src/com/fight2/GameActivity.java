@@ -204,6 +204,7 @@ public class GameActivity extends LayoutGameActivity {
                 splashTexture = null;
                 final GameHud gameHud = new GameHud(GameActivity.this);
                 camera.setHUD(gameHud);
+                gameHud.needSmallChatRoom(false);
                 ResourceManager.getInstance().setCurrentScene(SceneEnum.Main);
                 F2SoundManager.getInstance().stop();
                 F2MusicManager.getInstance().playMusic(MusicEnum.MAIN_BG);
