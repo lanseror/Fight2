@@ -4,6 +4,7 @@ public enum SceneEnum {
     Splash,
     Main,
     Party,
+    PartyEdit,
     CardUpgrade,
     CardEvolution,
     Summon,
@@ -13,6 +14,7 @@ public enum SceneEnum {
     BattleResult,
     Chat,
     Quest,
+    Loading,
     PlayerInfo,
     Guild,
     Storeroom;

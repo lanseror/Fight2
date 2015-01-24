@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 
+import org.andengine.entity.scene.Scene;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.font.FontFactory;
 import org.andengine.opengl.font.FontManager;
@@ -27,6 +28,7 @@ import com.fight2.scene.CardEvolutionScene;
 import com.fight2.scene.CardUpgradeScene;
 import com.fight2.scene.ChatScene;
 import com.fight2.scene.GuildScene;
+import com.fight2.scene.LoadingScene;
 import com.fight2.scene.MainScene;
 import com.fight2.scene.PartyScene;
 import com.fight2.scene.PlayerInfoScene;
@@ -126,7 +128,7 @@ public class ResourceManager {
                 case Arena:
                     return new ArenaScene(activity);
                 case Quest:
-                    return scenes.get(SceneEnum.Quest);
+                    return scenes.get(sceneEnum);
                 default:
                     throw new RuntimeException("No Scene");
             }
@@ -137,15 +139,55 @@ public class ResourceManager {
     }
 
     public void setCurrentScene(final SceneEnum sceneEnum) {
+        setCurrentScene(sceneEnum, new IRCallback<BaseScene>() {
+            @Override
+            public BaseScene onCallback() {
+                return getScene(sceneEnum);
+            }
+        });
+    }
+
+    public void setCurrentScene(final SceneEnum sceneEnum, final IRCallback<BaseScene> irCallback) {
         if (currentScene != null) {
-            currentScene.leaveScene();
+            try {
+                final LoadingScene loadingScene = new LoadingScene(activity);
+                Scene childScene = currentScene;
+                while (childScene.getChildScene() != null) {
+                    childScene = childScene.getChildScene();
+                }
+                childScene.setChildScene(loadingScene, false, false, true);
+                activity.getGameHub().setSmallChatRoomEnabled(false);
+                currentScene.leaveScene();
+            } catch (final IOException e) {
+                throw new RuntimeException(e);
+            }
         }
-        final BaseScene scene = getScene(sceneEnum);
-        activity.getEngine().setScene(scene);
-        scene.updateScene();
-        currentScene = scene;
-        currentSceneEnum = sceneEnum;
-        breadcrumbs.push(currentSceneEnum);
+        final IAsyncCallback callback = new IAsyncCallback() {
+            private BaseScene scene;
+
+            @Override
+            public void workToDo() {
+                scene = irCallback.onCallback();
+                scene.updateScene();
+            }
+
+            @Override
+            public void onComplete() {
+                activity.getEngine().setScene(scene);
+                currentScene = scene;
+                currentSceneEnum = sceneEnum;
+                breadcrumbs.push(currentSceneEnum);
+                activity.getGameHub().setSmallChatRoomEnabled(true);
+            }
+
+        };
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new AsyncTaskLoader().execute(callback);
+            }
+        });
+
     }
 
     public void sceneBack(final boolean isManaged) {

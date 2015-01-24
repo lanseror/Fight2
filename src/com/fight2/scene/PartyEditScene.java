@@ -7,7 +7,6 @@ import java.util.Set;
 import org.andengine.engine.handler.physics.PhysicsHandler;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.primitive.Rectangle;
-import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
@@ -16,7 +15,6 @@ import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.util.adt.color.Color;
-import org.andengine.util.debug.Debug;
 
 import android.view.MotionEvent;
 
@@ -39,6 +37,7 @@ import com.fight2.entity.engine.cardpack.CardUpdateHandler;
 import com.fight2.entity.engine.cardpack.MoveFinishedListener;
 import com.fight2.input.touch.detector.F2ScrollDetector;
 import com.fight2.util.CardUtils;
+import com.fight2.util.IRCallback;
 import com.fight2.util.PartyUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
@@ -339,12 +338,16 @@ public class PartyEditScene extends BaseCardPackScene {
         switchButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                try {
-                    final Scene editScene = new PartyEditScene(activity, partyNumber++ % 3 + 1);
-                    activity.getEngine().setScene(editScene);
-                } catch (final IOException e) {
-                    Debug.e(e);
-                }
+                ResourceManager.getInstance().setCurrentScene(SceneEnum.PartyEdit, new IRCallback<BaseScene>() {
+                    @Override
+                    public BaseScene onCallback() {
+                        try {
+                            return new PartyEditScene(activity, partyNumber++ % 3 + 1);
+                        } catch (final IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                });
             }
         });
         return switchButton;

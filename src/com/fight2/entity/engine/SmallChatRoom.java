@@ -26,6 +26,7 @@ import com.fight2.util.EntityFactory;
 import com.fight2.util.ResourceManager;
 
 public class SmallChatRoom extends Rectangle {
+    private boolean enabled = true;
     private boolean isNeeded = false;
     private final VertexBufferObjectManager vbom;
     private final F2ButtonSprite openButton;
@@ -60,21 +61,22 @@ public class SmallChatRoom extends Rectangle {
         openButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                final BaseScene chatScene = ResourceManager.getInstance().getScene(SceneEnum.Chat);
-                final Scene scene = activity.getEngine().getScene();
-                Scene childScene = scene;
-                while (childScene.getChildScene() != null) {
-                    childScene = childScene.getChildScene();
-                }
-                childScene.setChildScene(chatScene, false, false, true);
-                chatScene.updateScene();
-                activity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        activity.getChatText().setVisibility(View.VISIBLE);
+                if (isEnabled()) {
+                    final BaseScene chatScene = ResourceManager.getInstance().getScene(SceneEnum.Chat);
+                    final Scene scene = activity.getEngine().getScene();
+                    Scene childScene = scene;
+                    while (childScene.getChildScene() != null) {
+                        childScene = childScene.getChildScene();
                     }
-
-                });
+                    childScene.setChildScene(chatScene, false, false, true);
+                    chatScene.updateScene();
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            activity.getChatText().setVisibility(View.VISIBLE);
+                        }
+                    });
+                }
 
             }
         });
@@ -172,4 +174,13 @@ public class SmallChatRoom extends Rectangle {
         }
 
     }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(final boolean enabled) {
+        this.enabled = enabled;
+    }
+
 }

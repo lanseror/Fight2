@@ -67,6 +67,7 @@ public enum TextureEnum {
     COMMON_SUMMON_STONE_BIG("images/common_summon_stone_big.png", 130, 139),
     COMMON_SUMMON_CHARM("images/common_summon_charm.png", 31, 33),
     COMMON_CLOSE_BUTTON("images/common_close_button.png", 43, 43),
+    COMMON_LOADING("images/common_loading2.png", 100, 100),
 
     // Chat room images.
     CHAT_INPUT_BG("images/chat_input_backgroud.png", 850, 82),

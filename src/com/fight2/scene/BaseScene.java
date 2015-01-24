@@ -81,7 +81,6 @@ public abstract class BaseScene extends Scene {
     }
 
     protected void playAnimation() {
-
     }
 
     protected abstract void init() throws IOException;

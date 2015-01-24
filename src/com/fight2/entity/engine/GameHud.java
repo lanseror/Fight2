@@ -59,4 +59,7 @@ public class GameHud extends HUD {
         smallChatRoom.setNeeded(needed);
     }
 
+    public void setSmallChatRoomEnabled(final boolean isEnabled) {
+        smallChatRoom.setEnabled(isEnabled);
+    }
 }

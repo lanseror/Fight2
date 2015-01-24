@@ -8,7 +8,6 @@ import java.util.List;
 
 import org.andengine.entity.IEntity;
 import org.andengine.entity.primitive.Rectangle;
-import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
@@ -17,7 +16,6 @@ import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.util.algorithm.collision.EntityCollisionChecker;
-import org.andengine.util.debug.Debug;
 
 import android.util.SparseArray;
 
@@ -33,6 +31,7 @@ import com.fight2.entity.engine.CardAvatar;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.CardUtils;
+import com.fight2.util.IRCallback;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
 
@@ -100,12 +99,19 @@ public class PartyScene extends BaseScene {
         editSprite.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                try {
-                    final Scene editScene = new PartyEditScene(activity, 1);
-                    activity.getEngine().setScene(editScene);
-                } catch (final IOException e) {
-                    Debug.e(e);
-                }
+                ResourceManager.getInstance().setCurrentScene(SceneEnum.PartyEdit, new IRCallback<BaseScene>() {
+
+                    @Override
+                    public BaseScene onCallback() {
+                        try {
+                            return new PartyEditScene(activity, 1);
+                        } catch (final IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                });
+
             }
         });
         this.attachChild(editSprite);
