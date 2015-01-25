@@ -1,5 +1,7 @@
 package com.fight2.entity;
 
+import java.util.List;
+
 public class Party {
     private int id;
 
@@ -10,6 +12,8 @@ public class Party {
     private int atk;
 
     private Card[] cards;
+
+    private List<ComboSkill> comboSkills;
 
     public int getPartyNumber() {
         return partyNumber;
@@ -49,6 +53,14 @@ public class Party {
 
     public void setCards(final Card[] cards) {
         this.cards = cards;
+    }
+
+    public List<ComboSkill> getComboSkills() {
+        return comboSkills;
+    }
+
+    public void setComboSkills(final List<ComboSkill> comboSkills) {
+        this.comboSkills = comboSkills;
     }
 
 }

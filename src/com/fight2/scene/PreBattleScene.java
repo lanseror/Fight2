@@ -1,6 +1,7 @@
 package com.fight2.scene;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.scene.Scene;
@@ -18,6 +19,7 @@ import com.fight2.constant.MusicEnum;
 import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
+import com.fight2.entity.ComboSkill;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
@@ -143,6 +145,19 @@ public class PreBattleScene extends BaseScene {
         final Sprite comboSkillBoxSpriteRight = createACImageSprite(TextureEnum.PREBATTLE_COMBO_SKILL_RIGHT, this.cameraCenterX + CARD_CENTER_X + GAP,
                 this.cameraCenterY - CARD_CENTER_Y + 80);
         this.attachChild(comboSkillBoxSpriteRight);
+        int y = 100;
+        for (final Party party : opponentParties) {
+            final List<ComboSkill> comboSkills = party.getComboSkills();
+            int add = 65;
+            for (final ComboSkill comboSkill : comboSkills) {
+                final ITextureRegion texture = textureFactory.newTextureRegion(comboSkill.getIcon());
+                final Sprite iconSprite = new Sprite(add, y, 40, 40, texture, vbom);
+                comboSkillBoxSpriteRight.attachChild(iconSprite);
+                add += 50;
+            }
+            
+            y -= 45;
+        }
 
         final F2ButtonSprite battleButton = createALBF2ButtonSprite(TextureEnum.PREBATTLE_BATTLE_BUTTON, TextureEnum.PREBATTLE_BATTLE_BUTTON_FCS,
                 this.simulatedRightX - 135, 400);

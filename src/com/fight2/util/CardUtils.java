@@ -20,6 +20,7 @@ import com.fight2.GameActivity;
 import com.fight2.entity.Card;
 import com.fight2.entity.Card.Race;
 import com.fight2.entity.CardTemplate;
+import com.fight2.entity.ComboSkill;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
@@ -199,6 +200,20 @@ public class CardUtils {
                 party.setAtk(partyJson.getInt("atk"));
                 party.setHp(partyJson.getInt("hp"));
                 party.setPartyNumber(partyJson.getInt("partyNumber"));
+                final List<ComboSkill> comboSkills = new ArrayList<ComboSkill>();
+                if (partyJson.has("comboSkils")) {
+                    final JSONArray comboSkilJSONArray = partyJson.getJSONArray("comboSkils");
+                    for (int skillIndex = 0; skillIndex < comboSkilJSONArray.length(); skillIndex++) {
+                        final JSONObject comboSkilJson = comboSkilJSONArray.getJSONObject(skillIndex);
+                        final ComboSkill comboSkill = new ComboSkill();
+                        comboSkill.setId(comboSkilJson.getInt("id"));
+                        comboSkill.setName(comboSkilJson.getString("name"));
+                        final String icon = comboSkilJson.getString("icon");
+                        comboSkill.setIcon(ImageUtils.getLocalString(icon, activity));
+                        comboSkills.add(comboSkill);
+                    }
+                }
+                party.setComboSkills(comboSkills);
                 parties[partyIndex] = party;
                 final JSONArray partyGridJsonArray = partyJson.getJSONArray("partyGrids");
                 final Card[] partyCards = new Card[partyGridJsonArray.length()];
