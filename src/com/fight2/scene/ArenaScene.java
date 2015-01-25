@@ -35,6 +35,7 @@ import com.fight2.util.ArenaUtils;
 import com.fight2.util.BWShaderProgram;
 import com.fight2.util.DateUtils;
 import com.fight2.util.DialogUtils;
+import com.fight2.util.IRCallback;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.StringUtils;
 import com.fight2.util.TextureFactory;
@@ -260,23 +261,29 @@ public class ArenaScene extends BaseScene {
     }
 
     private void showArenaReward() {
-        try {
-            final BaseScene scene = new ArenaRewardScene(activity, userArenaInfo);
-            scene.updateScene();
-            this.setChildScene(scene, false, false, true);
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
+        ResourceManager.getInstance().setChildScene(this, new IRCallback<BaseScene>() {
+            @Override
+            public BaseScene onCallback() {
+                try {
+                    return new ArenaRewardScene(activity, userArenaInfo);
+                } catch (final IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     private void showArenaRanking() {
-        try {
-            final BaseScene scene = new ArenaRankingScene(activity, userArenaInfo);
-            scene.updateScene();
-            this.setChildScene(scene, false, false, true);
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
+        ResourceManager.getInstance().setChildScene(this, new IRCallback<BaseScene>() {
+            @Override
+            public BaseScene onCallback() {
+                try {
+                    return new ArenaRankingScene(activity, userArenaInfo);
+                } catch (final IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     private Sprite createBattleSprite(final TextureEnum textureEnum, final float x, final float y, final int index) {

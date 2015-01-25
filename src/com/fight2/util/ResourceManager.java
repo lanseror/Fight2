@@ -190,6 +190,40 @@ public class ResourceManager {
 
     }
 
+    public void setChildScene(final BaseScene scene, final IRCallback<BaseScene> irCallback) {
+        try {
+            final LoadingScene loadingScene = new LoadingScene(activity);
+            scene.setChildScene(loadingScene, false, false, true);
+            activity.getGameHub().setSmallChatRoomEnabled(false);
+
+            final IAsyncCallback callback = new IAsyncCallback() {
+                private BaseScene childScene;
+
+                @Override
+                public void workToDo() {
+                    childScene = irCallback.onCallback();
+                    childScene.updateScene();
+                }
+
+                @Override
+                public void onComplete() {
+                    loadingScene.back();
+                    scene.setChildScene(childScene, false, false, true);
+                    activity.getGameHub().setSmallChatRoomEnabled(true);
+                }
+
+            };
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    new AsyncTaskLoader().execute(callback);
+                }
+            });
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void sceneBack(final boolean isManaged) {
         if (currentScene != null && isManaged) {
             currentScene.leaveScene();
