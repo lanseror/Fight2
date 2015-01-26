@@ -174,10 +174,18 @@ public class ResourceManager {
             @Override
             public void onComplete() {
                 activity.getEngine().setScene(scene);
+                if (currentScene != null) {
+                    Scene childScene = currentScene;
+                    while (childScene.getChildScene() != null) {
+                        childScene = childScene.getChildScene();
+                    }
+                    childScene.back();
+                }
                 currentScene = scene;
                 currentSceneEnum = sceneEnum;
                 breadcrumbs.push(currentSceneEnum);
                 activity.getGameHub().setSmallChatRoomEnabled(true);
+
             }
 
         };
