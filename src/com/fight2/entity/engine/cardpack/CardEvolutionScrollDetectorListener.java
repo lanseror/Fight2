@@ -11,8 +11,8 @@ import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.engine.CardFrame;
 import com.fight2.input.touch.detector.F2ScrollDetector;
-import com.fight2.scene.CardEvolutionScene;
 import com.fight2.scene.BaseCardPackScene.GridChangeAction;
+import com.fight2.scene.CardEvolutionScene;
 import com.fight2.util.SpriteUtils;
 
 public class CardEvolutionScrollDetectorListener extends CardPackScrollDetectorListener {

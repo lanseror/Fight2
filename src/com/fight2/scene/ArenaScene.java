@@ -13,7 +13,6 @@ import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
-import org.andengine.util.debug.Debug;
 
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -303,7 +302,7 @@ public class ArenaScene extends BaseScene {
                             final Scene preBattleScene = new PreBattleScene(activity, player, BattleType.Arena);
                             activity.getEngine().setScene(preBattleScene);
                         } catch (final IOException e) {
-                            Debug.e(e);
+                            throw new RuntimeException(e);
                         }
                     }
                     return true;

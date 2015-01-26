@@ -9,7 +9,6 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
-import org.andengine.util.debug.Debug;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.TextureEnum;
@@ -77,7 +76,7 @@ public class CardAvatar extends Rectangle {
                     }
 
                 } catch (final IOException e) {
-                    Debug.e(e);
+                    throw new RuntimeException(e);
                 }
 
             }

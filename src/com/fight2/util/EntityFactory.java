@@ -7,8 +7,8 @@ import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.engine.F2ButtonSprite;
-import com.fight2.entity.engine.F2CommonButton;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
+import com.fight2.entity.engine.F2CommonButton;
 
 public class EntityFactory {
     private static EntityFactory INSTANCE = new EntityFactory();

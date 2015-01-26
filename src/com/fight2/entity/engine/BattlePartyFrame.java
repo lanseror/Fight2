@@ -14,7 +14,6 @@ import org.andengine.entity.text.Text;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
-import org.andengine.util.debug.Debug;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
@@ -123,7 +122,7 @@ public class BattlePartyFrame extends Rectangle {
                             avatar = card.getAvatar();
                         }
                     } catch (final IOException e) {
-                        Debug.e(e);
+                        throw new RuntimeException(e);
                     }
 
                 }

@@ -22,7 +22,6 @@ import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.util.algorithm.collision.BaseCollisionChecker;
-import org.andengine.util.debug.Debug;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
@@ -439,8 +438,12 @@ public class MainScene extends BaseScene {
     }
 
     @Override
-    public void updateScene() {
+    protected void playAnimation() {
         activity.getGameHub().needSmallChatRoom(true);
+    }
+
+    @Override
+    public void updateScene() {
         final Card myLeader = myParties[0].getCards()[0];
         if (myLeader != null && myLeader.getId() != this.avatarCardId) {
             final ITextureRegion avatarCoverTexture = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_CARD_COVER);
@@ -461,7 +464,7 @@ public class MainScene extends BaseScene {
                         }
 
                     } catch (final IOException e) {
-                        Debug.e(e);
+                        throw new RuntimeException(e);
                     }
 
                 }

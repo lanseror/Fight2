@@ -18,10 +18,10 @@ import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Arena;
-import com.fight2.entity.engine.F2ButtonSprite;
-import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.PartyInfo;
+import com.fight2.entity.engine.F2ButtonSprite;
+import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.ArenaUtils;
 import com.fight2.util.ResourceManager;
 

@@ -10,8 +10,8 @@ import org.andengine.util.modifier.IModifier;
 import com.fight2.entity.Card;
 import com.fight2.entity.engine.CardFrame;
 import com.fight2.input.touch.detector.F2ScrollDetector;
-import com.fight2.scene.CardUpgradeScene;
 import com.fight2.scene.BaseCardPackScene.GridChangeAction;
+import com.fight2.scene.CardUpgradeScene;
 import com.fight2.util.SpriteUtils;
 
 public class CardUpgradeScrollDetectorListener extends CardPackScrollDetectorListener {

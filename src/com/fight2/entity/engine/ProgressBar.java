@@ -5,7 +5,6 @@ import org.andengine.engine.camera.hud.HUD;
 import org.andengine.entity.primitive.Line;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
-import org.andengine.util.debug.Debug;
 
 /**
  * @author Jong - Yonatan
@@ -91,7 +90,7 @@ public class ProgressBar extends HUD {
             try {
                 Thread.sleep(2);
             } catch (final InterruptedException e) {
-                Debug.e(e);
+                throw new RuntimeException(e);
             }
         }
         this.progress = progressNum;

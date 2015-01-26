@@ -31,7 +31,6 @@ import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.util.Constants;
 import org.andengine.util.adt.color.ColorUtils;
-import org.andengine.util.debug.Debug;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.SceneEnum;
@@ -121,7 +120,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             minX = this.simulatedWidth - mapWidth * 0.5f;
             maxX = mapWidth * 0.5f;
         } catch (final TMXLoadException e) {
-            Debug.e(e);
+            throw new RuntimeException(e);
         }
         // tmxTiledMap.setPosition(this.cameraCenterX - 300, this.cameraCenterY - 250);
         this.attachChild(this.tmxTiledMap);

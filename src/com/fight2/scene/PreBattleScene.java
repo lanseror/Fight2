@@ -11,7 +11,6 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
-import org.andengine.util.debug.Debug;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
@@ -155,7 +154,7 @@ public class PreBattleScene extends BaseScene {
                 comboSkillBoxSpriteRight.attachChild(iconSprite);
                 add += 50;
             }
-            
+
             y -= 45;
         }
 
@@ -174,7 +173,7 @@ public class PreBattleScene extends BaseScene {
                     }
 
                 } catch (final IOException e) {
-                    Debug.e(e);
+                    throw new RuntimeException(e);
                 }
             }
         });
@@ -234,7 +233,7 @@ public class PreBattleScene extends BaseScene {
                         image = card.getImage();
                     }
                 } catch (final IOException e) {
-                    Debug.e(e);
+                    throw new RuntimeException(e);
                 }
 
             }
@@ -276,7 +275,7 @@ public class PreBattleScene extends BaseScene {
                         image = card.getImage();
                     }
                 } catch (final IOException e) {
-                    Debug.e(e);
+                    throw new RuntimeException(e);
                 }
 
             }

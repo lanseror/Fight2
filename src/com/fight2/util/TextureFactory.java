@@ -91,6 +91,7 @@ public class TextureFactory {
             if (cardDatas.containsKey(imageString)) {
                 return cardDatas.get(imageString);
             } else {
+                // Debug.e("Image:"+imageString);
                 final ITextureRegion textureRegion = createIextureRegion(activity, imageString);
                 cardDatas.put(imageString, textureRegion);
                 return textureRegion;

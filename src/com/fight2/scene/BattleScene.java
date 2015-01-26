@@ -25,7 +25,6 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITiledTextureRegion;
-import org.andengine.util.debug.Debug;
 import org.andengine.util.modifier.IModifier;
 
 import com.fight2.GameActivity;
@@ -183,7 +182,7 @@ public class BattleScene extends BaseScene {
                         activity.getEngine().setScene(battleResultScene);
                     }
                 } catch (final IOException e) {
-                    Debug.e(e);
+                    throw new RuntimeException(e);
                 }
 
             }
