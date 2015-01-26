@@ -3,7 +3,6 @@ package com.fight2.entity.engine;
 import java.io.IOException;
 
 import org.andengine.entity.IEntity;
-import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.input.touch.TouchEvent;
@@ -19,26 +18,45 @@ import com.fight2.util.IAsyncCallback;
 import com.fight2.util.ImageUtils;
 import com.fight2.util.TextureFactory;
 
-public class CardAvatar extends Rectangle {
+public class CardAvatar extends Sprite {
     private static final TextureFactory TEXTURE_FACTORY = TextureFactory.getInstance();
-    private final IEntity cardCoverSprite;
+    private IEntity cardCoverSprite;
     private final GameActivity activity;
     private final VertexBufferObjectManager vbom;
     private final Card card;
+    private final float width;
+    private final float height;
 
     public CardAvatar(final float x, final float y, final float width, final float height, final Card card, final GameActivity activity) {
-        super(x, y, width, height, activity.getVertexBufferObjectManager());
+        super(x, y, width + 2, height + 2, TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_AVATAR_FRAME), activity.getVertexBufferObjectManager());
+        this.width = width;
+        this.height = height;
         this.activity = activity;
         this.vbom = activity.getVertexBufferObjectManager();
-        this.setAlpha(0);
-        final ITextureRegion coverTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_COVER);
-        cardCoverSprite = new Sprite(width * 0.5f, height * 0.5f, width, height, coverTexture, vbom);
-        cardCoverSprite.setZIndex(0);
-        this.attachChild(cardCoverSprite);
+
         this.card = card;
 
-        loadImageFromServer(card);
+        if (ImageUtils.isCached(card.getAvatar()) && !card.isAvatarLoaded()) {
+            try {
+                card.setAvatar(ImageUtils.getLocalString(card.getAvatar(), activity));
+                card.setAvatarLoaded(true);
+            } catch (final IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
+        if (card.isAvatarLoaded()) {
+            final ITextureRegion texture = TEXTURE_FACTORY.newTextureRegion(card.getAvatar());
+            final Sprite imageSprite = new Sprite(mWidth * 0.5f, mHeight * 0.5f, width, height, texture, vbom);
+            imageSprite.setZIndex(-1);
+            this.attachChild(imageSprite);
+        } else {
+            final ITextureRegion coverTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_COVER);
+            cardCoverSprite = new Sprite(mWidth * 0.5f, mHeight * 0.5f, width, height, coverTexture, vbom);
+            cardCoverSprite.setZIndex(-1);
+            this.attachChild(cardCoverSprite);
+            loadImageFromServer(card);
+        }
     }
 
     public Card getCard() {
@@ -86,15 +104,14 @@ public class CardAvatar extends Rectangle {
 
                 if (avatar != null) {
                     final ITextureRegion texture = TEXTURE_FACTORY.newTextureRegion(avatar);
-                    final Sprite imageSprite = new Sprite(mWidth * 0.5f, mHeight * 0.5f, mWidth, mHeight, texture, vbom);
-                    imageSprite.setZIndex(0);
+                    final Sprite imageSprite = new Sprite(mWidth * 0.5f, mHeight * 0.5f, width, height, texture, vbom);
+                    imageSprite.setZIndex(-1);
                     final IEntity parent = cardCoverSprite.getParent();
                     activity.runOnUpdateThread(new Runnable() {
                         @Override
                         public void run() {
                             cardCoverSprite.detachSelf();
                             parent.attachChild(imageSprite);
-                            parent.sortChildren();
                         }
                     });
 

@@ -34,6 +34,10 @@ public class ImageUtils {
         return localString;
     }
 
+    public static boolean isCached(final String webUrl) {
+        final Map<String, String> imageDatas = TextureFactory.getInstance().getImageDatas();
+        return imageDatas.containsKey(webUrl);
+    }
 
     public static String downloadAndSave(final String webUrl, final Context context) throws IOException {
         final URL url = new URL(HttpUtils.HOST_URL + webUrl);

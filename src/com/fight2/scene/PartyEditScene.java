@@ -320,7 +320,7 @@ public class PartyEditScene extends BaseCardPackScene {
                 if (cards[0] == null) {
                     alert("你必须要有一个领军人物！");
                 } else {
-                    final boolean isSaveOk = CardUtils.saveParties();
+                    final boolean isSaveOk = CardUtils.saveParties(activity);
                     if (isSaveOk) {
                         ResourceManager.getInstance().setCurrentScene(SceneEnum.Party);
                     } else {

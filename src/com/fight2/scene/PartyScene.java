@@ -126,7 +126,7 @@ public class PartyScene extends BaseScene {
         backButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                final boolean isSaveOk = CardUtils.saveParties();
+                final boolean isSaveOk = CardUtils.saveParties(activity);
                 if (isSaveOk) {
                     ResourceManager.getInstance().setCurrentScene(SceneEnum.Main);
                 } else {

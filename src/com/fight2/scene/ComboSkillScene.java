@@ -24,11 +24,6 @@ import com.fight2.util.TextureFactory;
 
 public class ComboSkillScene extends BaseScene {
     private static final TextureFactory TEXTURE_FACTORY = TextureFactory.getInstance();
-    private final static int CARD_WIDTH = 310;
-    private final static int CARD_HEIGHT = 465;
-    private final static int FRAME_BOTTOM = 100;
-
-    private Sprite cardSprite;
     private final ComboSkill combo;
 
     public ComboSkillScene(final GameActivity activity, final ComboSkill combo) throws IOException {

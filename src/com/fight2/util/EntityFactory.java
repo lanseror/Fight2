@@ -102,10 +102,22 @@ public class EntityFactory {
      * @return
      */
     public Sprite createACImageSprite(final TextureEnum textureEnum, final float x, final float y) {
-        final TextureFactory textureFactory = TextureFactory.getInstance();
-        final ITextureRegion texture = textureFactory.getAssetTextureRegion(textureEnum);
         final float width = textureEnum.getWidth();
         final float height = textureEnum.getHeight();
+        return createACImageSprite(textureEnum, x, y, width, height);
+    }
+
+    /**
+     * Anchor center sprite
+     * 
+     * @param textureEnum
+     * @param x
+     * @param y
+     * @return
+     */
+    public Sprite createACImageSprite(final TextureEnum textureEnum, final float x, final float y, final float width, final float height) {
+        final TextureFactory textureFactory = TextureFactory.getInstance();
+        final ITextureRegion texture = textureFactory.getAssetTextureRegion(textureEnum);
         final Sprite sprite = new Sprite(x, y, width, height, texture, vbom);
         return sprite;
     }

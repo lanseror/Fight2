@@ -30,7 +30,7 @@ import com.fight2.util.TextureFactory;
 public class CardFrame extends Rectangle {
     private final static float CARD_WIDTH = 289.5f;
     private static final TextureFactory TEXTURE_FACTORY = TextureFactory.getInstance();
-    private final IEntity cardCoverSprite;
+    private IEntity cardCoverSprite;
     private final GameActivity activity;
     private final VertexBufferObjectManager vbom;
     private final Text hpText;
@@ -46,13 +46,29 @@ public class CardFrame extends Rectangle {
         final BigDecimal decWidth = BigDecimal.valueOf(width);
         final BigDecimal decBaseWidth = BigDecimal.valueOf(CARD_WIDTH);
         final float scale = decWidth.divide(decBaseWidth, 6, RoundingMode.HALF_UP).floatValue();
-        final ITextureRegion coverTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_COVER);
-        cardCoverSprite = new Sprite(width * 0.5f, height * 0.5f, width + 3 * scale, height + 3 * scale, coverTexture, vbom);
-        cardCoverSprite.setZIndex(0);
-        this.attachChild(cardCoverSprite);
         this.card = card;
 
-        loadImageFromServer(card);
+        if (ImageUtils.isCached(card.getImage()) && !card.isImageLoaded()) {
+            try {
+                card.setImage(ImageUtils.getLocalString(card.getImage(), activity));
+                card.setImageLoaded(true);
+            } catch (final IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        if (card.isImageLoaded()) {
+            final ITextureRegion texture = TEXTURE_FACTORY.newTextureRegion(card.getImage());
+            final Sprite imageSprite = new Sprite(mWidth * 0.5f, mHeight * 0.5f, width, height, texture, vbom);
+            imageSprite.setZIndex(0);
+            this.attachChild(imageSprite);
+        } else {
+            final ITextureRegion coverTexture = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_CARD_COVER);
+            cardCoverSprite = new Sprite(width * 0.5f, height * 0.5f, width + 3 * scale, height + 3 * scale, coverTexture, vbom);
+            cardCoverSprite.setZIndex(0);
+            this.attachChild(cardCoverSprite);
+            loadImageFromServer(card);
+        }
 
         final Race race = card.getRace();
         final ITextureRegion cardFrameTexture = getTexture(race);
@@ -300,20 +316,11 @@ public class CardFrame extends Rectangle {
 
     private void loadImageFromServer(final Card card) {
         final IAsyncCallback callback = new IAsyncCallback() {
-            private String avatar;
             private String image;
 
             @Override
             public void workToDo() {
                 try {
-                    if (!card.isAvatarLoaded() && card.getAvatar() != null) {
-                        avatar = ImageUtils.getLocalString(card.getAvatar(), activity);
-                        card.setAvatar(avatar);
-                        card.setAvatarLoaded(true);
-                    } else {
-                        avatar = card.getAvatar();
-                    }
-
                     if (!card.isImageLoaded()) {
                         image = ImageUtils.getLocalString(card.getImage(), activity);
                         card.setImage(image);

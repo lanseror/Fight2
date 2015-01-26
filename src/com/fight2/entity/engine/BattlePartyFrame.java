@@ -1,7 +1,5 @@
 package com.fight2.entity.engine;
 
-import java.io.IOException;
-
 import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.DelayModifier;
 import org.andengine.entity.modifier.IEntityModifier;
@@ -22,13 +20,11 @@ import com.fight2.entity.Card;
 import com.fight2.entity.Party;
 import com.fight2.scene.BattleScene.ModifierFinishedListener;
 import com.fight2.scene.BattleScene.OnFinishedCallback;
-import com.fight2.util.AsyncTaskLoader;
-import com.fight2.util.IAsyncCallback;
-import com.fight2.util.ImageUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
 
 public class BattlePartyFrame extends Rectangle {
+    final TextureFactory TEXTURE_FACTORY = TextureFactory.getInstance();
     public final static int WIDTH = 312;
     public final static int HEIGHT = 165;
     public final static int CARD_WIDTH = 100;
@@ -45,6 +41,7 @@ public class BattlePartyFrame extends Rectangle {
     private int defence;
     private final Party party;
     private final IEntity[] cardSprites = new IEntity[4];
+    private final IEntity fcsSprite;
     private final boolean isBottom;
     private final GameActivity activity;
 
@@ -59,6 +56,8 @@ public class BattlePartyFrame extends Rectangle {
             this.createBottomCard(party);
             this.createBottomFrame(party);
             atkText = new Text(91, 26, font, "0123456789", vbom);
+            final ITextureRegion textureFcs = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.BATTLE_CARD_SKILL_FCS);
+            fcsSprite = new Sprite(CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f, textureFcs, vbom);
         } else {
             final float height = 81 + AVATAR_HEIGHT - 5;
             this.setHeight(height);
@@ -66,7 +65,11 @@ public class BattlePartyFrame extends Rectangle {
             this.createTopCard(party);
             this.createTopFrame(party);
             atkText = new Text(91, 125, font, "0123456789", vbom);
+            final ITextureRegion textureFcs = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.BATTLE_AVATAR_SKILL_FCS);
+            fcsSprite = new Sprite(AVATAR_WIDTH * 0.5f, AVATAR_HEIGHT * 0.5f, textureFcs, vbom);
         }
+        fcsSprite.setVisible(false);
+        this.attachChild(fcsSprite);
         this.initX = this.getX();
         this.initY = this.getY();
         atkText.setText(String.valueOf(party.getAtk()));
@@ -75,7 +78,6 @@ public class BattlePartyFrame extends Rectangle {
     }
 
     private void createBottomCard(final Party party) {
-        final TextureFactory textureFactory = TextureFactory.getInstance();
         final float startX = 60;
         final Card[] cards = party.getCards();
         for (int i = 0; i < cards.length; i++) {
@@ -86,17 +88,11 @@ public class BattlePartyFrame extends Rectangle {
 
             final CardFrame cardSprite = new CardFrame(startX + 65 * i, 80, CARD_WIDTH, CARD_HEIGHT, card, activity);
             cardSprites[i] = cardSprite;
-            final ITextureRegion textureFcs = textureFactory.getAssetTextureRegion(TextureEnum.BATTLE_CARD_SKILL_FCS);
-            final Sprite cardSpriteFcs = new Sprite(CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f, textureFcs, vbom);
-            cardSpriteFcs.setVisible(false);
-            cardSprite.attachChild(cardSpriteFcs);
             this.attachChild(cardSprite);
         }
     }
 
     private void createTopCard(final Party party) {
-        final TextureFactory textureFactory = TextureFactory.getInstance();
-
         final float avatarGap = 1;
         final float startX = 10 + AVATAR_WIDTH * 0.5f;
         final Card[] cards = party.getCards();
@@ -105,55 +101,10 @@ public class BattlePartyFrame extends Rectangle {
             if (card == null) {
                 continue;
             }
-            final ITextureRegion texture = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_CARD_COVER);
-            final Sprite cardSprite = new Sprite(startX + (AVATAR_WIDTH + avatarGap) * i, AVATAR_HEIGHT * 0.5f, AVATAR_WIDTH, AVATAR_HEIGHT, texture, vbom);
-            cardSprites[i] = cardSprite;
-            final IAsyncCallback callback = new IAsyncCallback() {
-                private String avatar;
-
-                @Override
-                public void workToDo() {
-                    try {
-                        if (card.getAvatar() != null && !card.isAvatarLoaded()) {
-                            avatar = ImageUtils.getLocalString(card.getAvatar(), activity);
-                            card.setAvatar(avatar);
-                            card.setAvatarLoaded(true);
-                        } else {
-                            avatar = card.getAvatar();
-                        }
-                    } catch (final IOException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                }
-
-                @Override
-                public void onComplete() {
-
-                    if (avatar != null) {
-                        final ITextureRegion texture = textureFactory.newTextureRegion(avatar);
-                        final Sprite imageSprite = new Sprite(AVATAR_WIDTH * 0.5f, AVATAR_HEIGHT * 0.5f, AVATAR_WIDTH, AVATAR_HEIGHT, texture, vbom);
-                        cardSprite.attachChild(imageSprite);
-                    }
-
-                }
-
-            };
-
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    new AsyncTaskLoader().execute(callback);
-                }
-            });
-
-            final ITextureRegion textureFcs = textureFactory.getAssetTextureRegion(TextureEnum.BATTLE_AVATAR_SKILL_FCS);
-            final Sprite cardSpriteFcs = new Sprite(AVATAR_WIDTH * 0.5f, AVATAR_HEIGHT * 0.5f, textureFcs, vbom);
-            cardSpriteFcs.setVisible(false);
-            cardSprite.attachChild(cardSpriteFcs);
-            this.attachChild(cardSprite);
+            final CardAvatar avatar = new CardAvatar(startX + (AVATAR_WIDTH + avatarGap) * i, AVATAR_HEIGHT * 0.5f, AVATAR_WIDTH, AVATAR_HEIGHT, card, activity);
+            cardSprites[i] = avatar;
+            this.attachChild(avatar);
         }
-
     }
 
     private void createTopFrame(final Party party) {
@@ -187,8 +138,14 @@ public class BattlePartyFrame extends Rectangle {
         final float fromY = cardSprite.getY();
         final float toY = (isBottom ? fromY + 40 : fromY - 30);
 
-        final IEntity cardSpriteFcs = cardSprite.getChildByIndex(0);
-        cardSpriteFcs.setVisible(true);
+        activity.runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                fcsSprite.detachSelf();
+                cardSprite.attachChild(fcsSprite);
+                fcsSprite.setVisible(true);
+            }
+        });
 
         final IEntityModifier firstStepModifier = new MoveModifier(0.2f, x, fromY, x, toY);
         final IEntityModifier secondStepModifier = new MoveModifier(0.2f, x, toY, x, fromY);
@@ -196,7 +153,7 @@ public class BattlePartyFrame extends Rectangle {
         secondStepModifier.addModifierListener(new ModifierFinishedListener(new OnFinishedCallback() {
             @Override
             public void onFinished(final IEntity pItem) {
-                cardSpriteFcs.setVisible(false);
+                fcsSprite.setVisible(false);
                 onFinishedCallback.onFinished(pItem);
             }
         }));

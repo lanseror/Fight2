@@ -117,7 +117,7 @@ public class CardUtils {
         return card;
     }
 
-    public static boolean saveParties() {
+    public static boolean saveParties(final GameActivity activity) {
         final String url = HttpUtils.HOST_URL + "/party/edit";
         final GameUserSession session = GameUserSession.getInstance();
         final PartyInfo partyInfo = session.getPartyInfo();
@@ -148,6 +148,7 @@ public class CardUtils {
                 party.setAtk(responsePartyJson.getInt("atk"));
                 party.setHp(responsePartyJson.getInt("hp"));
             }
+            updateUserPartyCombo(activity);
             return true;
 
         } catch (final ClientProtocolException e) {
@@ -156,6 +157,40 @@ public class CardUtils {
             LogUtils.e(e);
         }
         return false;
+    }
+
+    public static void updateUserPartyCombo(final GameActivity activity) {
+        final GameUserSession session = GameUserSession.getInstance();
+        final Party[] parties = session.getPartyInfo().getParties();
+        final String partyUrl = HttpUtils.HOST_URL + "/party/user-parties.action?id=" + session.getId();
+        try {
+            final JSONObject partyInfoJson = HttpUtils.getJSONFromUrl(partyUrl);
+            final JSONArray partyJsonArray = partyInfoJson.getJSONArray("parties");
+            for (int partyIndex = 0; partyIndex < partyJsonArray.length(); partyIndex++) {
+                final JSONObject partyJson = partyJsonArray.getJSONObject(partyIndex);
+                final List<ComboSkill> comboSkills = new ArrayList<ComboSkill>();
+                if (partyJson.has("comboSkils")) {
+                    final JSONArray comboSkilJSONArray = partyJson.getJSONArray("comboSkils");
+                    for (int skillIndex = 0; skillIndex < comboSkilJSONArray.length(); skillIndex++) {
+                        final JSONObject comboSkilJson = comboSkilJSONArray.getJSONObject(skillIndex);
+                        final ComboSkill comboSkill = new ComboSkill();
+                        comboSkill.setId(comboSkilJson.getInt("id"));
+                        comboSkill.setName(comboSkilJson.getString("name"));
+                        final String icon = comboSkilJson.getString("icon");
+                        comboSkill.setIcon(ImageUtils.getLocalString(icon, activity));
+                        comboSkills.add(comboSkill);
+                    }
+                }
+                parties[partyIndex].setComboSkills(comboSkills);
+            }
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public static Card summon(final GameActivity activity, final int type) {
