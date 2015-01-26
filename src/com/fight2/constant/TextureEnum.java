@@ -159,6 +159,10 @@ public enum TextureEnum {
     CARDINFO_FRAME("images/cardinfo_frame.png", 491, 469),
     CARDINFO_TIER_GRID("images/cardinfo_tier_grid.png", 80, 25),
     CARDINFO_TIER_STICK("images/cardinfo_tier_stick.png", 84, 29),
+    CARDINFO_COMBO_FRAME("images/cardinfo_combo_frame.png", 810, 52),
+
+    // Combo scene images.
+    COMBO_FRAME("images/combo_frame.png", 758, 296),
 
     // Guild scene images.
     GUILD_FRAME("images/guild_frame.png", 851, 495),

@@ -1,13 +1,16 @@
 package com.fight2.scene;
 
 import java.io.IOException;
+import java.util.List;
 
+import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.AutoWrap;
 import org.andengine.entity.text.Text;
 import org.andengine.entity.text.TextOptions;
+import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 
@@ -15,6 +18,7 @@ import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
+import com.fight2.entity.ComboSkill;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.CardUtils;
@@ -25,9 +29,8 @@ public class CardInfoScene extends BaseScene {
     private static final TextureFactory TEXTURE_FACTORY = TextureFactory.getInstance();
     private final static int CARD_WIDTH = 310;
     private final static int CARD_HEIGHT = 465;
-    private final static int FRAME_BOTTOM = 80;
+    private final static int FRAME_BOTTOM = 100;
 
-    private final TextureFactory textureFactory = TextureFactory.getInstance();
     private Sprite cardSprite;
     private final Card card;
 
@@ -131,10 +134,36 @@ public class CardInfoScene extends BaseScene {
         this.topAlignEntity(skillEffectText, 190);
         infoFrame.attachChild(skillEffectText);
 
+        final float comboFrameHeight = TextureEnum.CARDINFO_COMBO_FRAME.getHeight();
+        final Sprite comboFrame = createALBImageSprite(TextureEnum.CARDINFO_COMBO_FRAME, this.simulatedLeftX + 105, FRAME_BOTTOM - comboFrameHeight);
+        this.attachChild(comboFrame);
+        final List<ComboSkill> combos = CardUtils.getCardComboSkills(card, activity);
+        float comboX = 40;
+        for (final ComboSkill combo : combos) {
+            final ITextureRegion texture = TEXTURE_FACTORY.newTextureRegion(combo.getIcon());
+            final Sprite iconSprite = new Sprite(comboX, comboFrameHeight * 0.5f, 60, 60, texture, vbom) {
+                @Override
+                public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                    if (pSceneTouchEvent.isActionDown()) {
+                        try {
+                            final Scene comboSkillScene = new ComboSkillScene(activity, combo);
+                            CardInfoScene.this.setChildScene(comboSkillScene, false, false, true);
+                        } catch (final IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+                    return true;
+                }
+            };
+            this.registerTouchArea(iconSprite);
+            comboFrame.attachChild(iconSprite);
+            comboX += 70;
+        }
+
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
         activity.getGameHub().needSmallChatRoom(false);
-        final ITextureRegion texture = textureFactory.newTextureRegion(card.getImage());
+        final ITextureRegion texture = TEXTURE_FACTORY.newTextureRegion(card.getImage());
         if (cardSprite != null) {
             cardSprite.detachSelf();
         }

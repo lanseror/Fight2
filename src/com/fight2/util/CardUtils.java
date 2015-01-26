@@ -337,6 +337,41 @@ public class CardUtils {
         } catch (IOException | JSONException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static List<ComboSkill> getCardComboSkills(final Card card, final GameActivity activity) {
+        final String url = HttpUtils.HOST_URL + "/card/combos?id=" + card.getTemplateId();
+        final List<ComboSkill> skills = new ArrayList<ComboSkill>();
+        try {
+            final JSONArray comboSkilJSONArray = HttpUtils.getJSONArrayFromUrl(url);
+            for (int skillIndex = 0; skillIndex < comboSkilJSONArray.length(); skillIndex++) {
+                final JSONObject comboSkilJson = comboSkilJSONArray.getJSONObject(skillIndex);
+                final ComboSkill comboSkill = new ComboSkill();
+                comboSkill.setId(comboSkilJson.getInt("id"));
+                comboSkill.setName(comboSkilJson.getString("name"));
+                final String icon = comboSkilJson.getString("icon");
+                comboSkill.setIcon(ImageUtils.getLocalString(icon, activity));
+                final JSONArray comboCardJSONArray = comboSkilJson.getJSONArray("cards");
+                final List<Card> comboCards = new ArrayList<Card>(4);
+                for (int cardIndex = 0; cardIndex < comboCardJSONArray.length(); cardIndex++) {
+                    final JSONObject comboCardJson = comboCardJSONArray.getJSONObject(cardIndex);
+                    final Card comboCard = new Card();
+                    comboCard.setId(comboCardJson.getInt("id"));
+                    comboCard.setAvatar(comboCardJson.getString("avatar"));
+                    comboCards.add(comboCard);
+                }
+                comboSkill.setCards(comboCards);
+
+                skills.add(comboSkill);
+            }
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        }
+        return skills;
 
     }
 
