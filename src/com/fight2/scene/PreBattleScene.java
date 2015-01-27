@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 
 import org.andengine.engine.handler.IUpdateHandler;
-import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
@@ -31,6 +30,7 @@ import com.fight2.util.CardUtils;
 import com.fight2.util.F2MusicManager;
 import com.fight2.util.F2SoundManager;
 import com.fight2.util.IAsyncCallback;
+import com.fight2.util.IRCallback;
 import com.fight2.util.ImageUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
@@ -170,16 +170,20 @@ public class PreBattleScene extends BaseScene {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 F2SoundManager.getInstance().play(SoundEnum.ARENA_ATTACK);
-                try {
-                    final Scene battleScene = new BattleScene(activity, attackPlayer.getId(), opponentParties, battleType);
-                    if (battleType == BattleType.Task) {
-                        setChildScene(battleScene, false, false, true);
-                    } else {
-                        activity.getEngine().setScene(battleScene);
+                final IRCallback<BaseScene> irCallback = new IRCallback<BaseScene>() {
+                    @Override
+                    public BaseScene onCallback() {
+                        try {
+                            return new BattleScene(activity, attackPlayer.getId(), opponentParties, battleType);
+                        } catch (final IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
-
-                } catch (final IOException e) {
-                    throw new RuntimeException(e);
+                };
+                if (battleType == BattleType.Task) {
+                    ResourceManager.getInstance().setChildScene(PreBattleScene.this, irCallback);
+                } else {
+                    ResourceManager.getInstance().setCurrentScene(null, irCallback);
                 }
             }
         });

@@ -182,8 +182,10 @@ public class ResourceManager {
                     childScene.back();
                 }
                 currentScene = scene;
-                currentSceneEnum = sceneEnum;
-                breadcrumbs.push(currentSceneEnum);
+                if (sceneEnum != null) {
+                    currentSceneEnum = sceneEnum;
+                    breadcrumbs.push(currentSceneEnum);
+                }
                 activity.getGameHub().setSmallChatRoomEnabled(true);
 
             }
@@ -241,11 +243,7 @@ public class ResourceManager {
         }
         final SceneEnum sceneEnum = breadcrumbs.peek();
 
-        final BaseScene scene = getScene(sceneEnum);
-        activity.getEngine().setScene(scene);
-        scene.updateScene();
-        currentScene = scene;
-        currentSceneEnum = sceneEnum;
+        setCurrentScene(sceneEnum);
     }
 
     public SceneEnum getCurrentSceneEnum() {

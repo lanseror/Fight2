@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.andengine.engine.handler.timer.ITimerCallback;
 import org.andengine.engine.handler.timer.TimerHandler;
-import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.Sprite;
@@ -297,13 +296,18 @@ public class ArenaScene extends BaseScene {
                     if (ArenaUtils.getSelectedArena().isGuildArena() && !ArenaUtils.checkAttack()) {
                         alert("你需要公会授权才能战斗！");
                     } else {
-                        try {
-                            final User player = players[index];
-                            final Scene preBattleScene = new PreBattleScene(activity, player, BattleType.Arena);
-                            activity.getEngine().setScene(preBattleScene);
-                        } catch (final IOException e) {
-                            throw new RuntimeException(e);
-                        }
+                        final User player = players[index];
+                        ResourceManager.getInstance().setCurrentScene(null, new IRCallback<BaseScene>() {
+                            @Override
+                            public BaseScene onCallback() {
+                                try {
+                                    return new PreBattleScene(activity, player, BattleType.Arena);
+                                } catch (final IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+
+                        });
                     }
                     return true;
                 }
