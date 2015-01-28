@@ -40,6 +40,7 @@ import com.fight2.util.AsyncTaskLoader;
 import com.fight2.util.ChatUtils;
 import com.fight2.util.IAsyncCallback;
 import com.fight2.util.ICallback;
+import com.fight2.util.IRCallback;
 import com.fight2.util.ImageUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TaskUtils;
@@ -392,19 +393,27 @@ public class MainScene extends BaseScene {
 
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                try {
-                    smallMsgSprite.setVisible(false);
-                    final Scene taskGuideScene = new TaskGuideScene(activity, new ICallback() {
-                        @Override
-                        public void onCallback() {
-                            smallMsgSprite.setVisible(true);
-                            updateScene();
+                smallMsgSprite.setVisible(false);
+                ResourceManager.getInstance().setChildScene(MainScene.this, new IRCallback<BaseScene>() {
+
+                    @Override
+                    public BaseScene onCallback() {
+                        try {
+                            final BaseScene taskGuideScene = new TaskGuideScene(activity, new ICallback() {
+                                @Override
+                                public void onCallback() {
+                                    smallMsgSprite.setVisible(true);
+                                    MainScene.this.updateScene();
+                                }
+                            });
+                            return taskGuideScene;
+                        } catch (final IOException e) {
+                            throw new RuntimeException(e);
                         }
-                    });
-                    setChildScene(taskGuideScene, false, false, true);
-                } catch (final IOException e) {
-                    throw new RuntimeException(e);
-                }
+
+                    }
+
+                });
             }
 
         });

@@ -16,7 +16,6 @@ import org.andengine.entity.modifier.MoveModifier;
 import org.andengine.entity.modifier.ParallelEntityModifier;
 import org.andengine.entity.modifier.ScaleModifier;
 import org.andengine.entity.modifier.SequenceEntityModifier;
-import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
 import org.andengine.entity.sprite.AnimatedSprite;
@@ -47,6 +46,7 @@ import com.fight2.entity.engine.HpBar;
 import com.fight2.util.ArenaUtils;
 import com.fight2.util.F2MusicManager;
 import com.fight2.util.F2SoundManager;
+import com.fight2.util.IRCallback;
 import com.fight2.util.QuestUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TaskUtils;
@@ -171,20 +171,31 @@ public class BattleScene extends BaseScene {
         final IEntityModifierListener hideFinishListener = new ModifierFinishedListener(new OnFinishedCallback() {
             @Override
             public void onFinished(final IEntity pItem) {
-                try {
-                    if (battleType == BattleType.Task) {
-                        final Scene scene = activity.getEngine().getScene();
-                        scene.clearChildScene();
-                        final Scene taskResultScene = new TaskBattleResultScene(battleResult, activity);
-                        scene.setChildScene(taskResultScene, false, false, true);
-                    } else {
-                        final Scene battleResultScene = new BattleResultScene(battleResult, activity);
-                        activity.getEngine().setScene(battleResultScene);
-                    }
-                } catch (final IOException e) {
-                    throw new RuntimeException(e);
+                if (battleType == BattleType.Task) {
+                    final BaseScene scene = ResourceManager.getInstance().getCurrentScene();
+                    scene.clearChildScene();
+                    ResourceManager.getInstance().setChildScene(scene, new IRCallback<BaseScene>() {
+                        @Override
+                        public BaseScene onCallback() {
+                            try {
+                                return new TaskBattleResultScene(battleResult, activity);
+                            } catch (final IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    });
+                } else {
+                    ResourceManager.getInstance().setCurrentScene(null, new IRCallback<BaseScene>() {
+                        @Override
+                        public BaseScene onCallback() {
+                            try {
+                                return new BattleResultScene(battleResult, activity);
+                            } catch (final IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    });
                 }
-
             }
         });
 

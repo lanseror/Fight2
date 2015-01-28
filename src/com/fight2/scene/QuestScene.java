@@ -56,6 +56,7 @@ import com.fight2.util.CardUtils;
 import com.fight2.util.F2SoundManager;
 import com.fight2.util.IAsyncCallback;
 import com.fight2.util.ICallback;
+import com.fight2.util.IRCallback;
 import com.fight2.util.QuestUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TaskUtils;
@@ -511,14 +512,17 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                         dialogFrame.bind(QuestScene.this, new ICallback() {
                             @Override
                             public void onCallback() {
-                                try {
-                                    dialogFrame.unbind(QuestScene.this);
-                                    final PreBattleScene preBattleScene = new PreBattleScene(activity, boss, BattleType.Task);
-                                    preBattleScene.updateScene();
-                                    setChildScene(preBattleScene, false, false, true);
-                                } catch (final IOException e) {
-                                    throw new RuntimeException(e);
-                                }
+                                dialogFrame.unbind(QuestScene.this);
+                                ResourceManager.getInstance().setChildScene(QuestScene.this, new IRCallback<BaseScene>() {
+                                    @Override
+                                    public BaseScene onCallback() {
+                                        try {
+                                            return new PreBattleScene(activity, boss, BattleType.Task);
+                                        } catch (final IOException e) {
+                                            throw new RuntimeException(e);
+                                        }
+                                    }
+                                });
                             }
                         });
 

@@ -19,10 +19,12 @@ import com.fight2.constant.FontEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.Card.Race;
+import com.fight2.scene.BaseScene;
 import com.fight2.scene.CardInfoScene;
 import com.fight2.util.AsyncTaskLoader;
 import com.fight2.util.CardUtils;
 import com.fight2.util.IAsyncCallback;
+import com.fight2.util.IRCallback;
 import com.fight2.util.ImageUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
@@ -254,17 +256,22 @@ public class CardFrame extends Rectangle {
     @Override
     public boolean onAreaTouched(final TouchEvent sceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
         if (sceneTouchEvent.isActionCancel() || sceneTouchEvent.isActionUp()) {
-            try {
-                final Scene cardInfoScene = new CardInfoScene(activity, card);
-                final Scene scene = activity.getEngine().getScene();
-                Scene childScene = scene;
-                while (childScene.getChildScene() != null) {
-                    childScene = childScene.getChildScene();
-                }
-                childScene.setChildScene(cardInfoScene, false, false, true);
-            } catch (final IOException e) {
-                throw new RuntimeException(e);
+            final Scene scene = activity.getEngine().getScene();
+            Scene childScene = scene;
+            while (childScene.getChildScene() != null) {
+                childScene = childScene.getChildScene();
             }
+            final BaseScene currentChildScene = (BaseScene) childScene;
+            ResourceManager.getInstance().setChildScene(currentChildScene, new IRCallback<BaseScene>() {
+                @Override
+                public BaseScene onCallback() {
+                    try {
+                        return new CardInfoScene(activity, card);
+                    } catch (final IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            });
 
             return true;
         }
