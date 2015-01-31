@@ -78,7 +78,6 @@ public class PartyEditScene extends BaseCardPackScene {
         partyHpText = new Text(this.simulatedLeftX + 165, frameY + 63, hpatkFont, "0123456789", vbom);
         partyAtkText = new Text(this.simulatedLeftX + 310, frameY + 63, hpatkFont, "0123456789", vbom);
         init();
-        updateScene();
     }
 
     @Override

@@ -226,7 +226,6 @@ public abstract class BaseScene extends Scene {
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     public void topAlignEntity(final IEntity entity, final float y) {

@@ -7,6 +7,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.fight2.GameActivity;
+import com.fight2.entity.Party;
 import com.fight2.entity.battle.BattleRecord;
 import com.fight2.entity.battle.BattleResult;
 import com.fight2.entity.battle.SkillApplyParty;
@@ -16,7 +18,7 @@ import com.fight2.entity.battle.SkillType;
 
 public class BattleUtils {
 
-    public static BattleResult attack(final JSONObject responseJson) {
+    public static BattleResult attack(final GameActivity activity, final JSONObject responseJson) {
         final BattleResult battleResult = new BattleResult();
         final List<BattleRecord> battleRecords = new ArrayList<BattleRecord>();
         battleResult.setBattleRecord(battleRecords);
@@ -27,6 +29,20 @@ public class BattleUtils {
             battleResult.setCwMight(responseJson.getInt("cwMight"));
             battleResult.setTotalMight(responseJson.getInt("totalMight"));
             battleResult.setCwRate(responseJson.getInt("cwRate"));
+            final JSONArray attackerPartyJsonArray = responseJson.getJSONArray("attackerParties");
+            final Party[] attackerParties = new Party[attackerPartyJsonArray.length()];
+            for (int partyIndex = 0; partyIndex < attackerPartyJsonArray.length(); partyIndex++) {
+                final JSONObject partyJson = attackerPartyJsonArray.getJSONObject(partyIndex);
+                attackerParties[partyIndex] = CardUtils.getPartyFromJson(activity, partyJson);
+            }
+            battleResult.setAttackerParties(attackerParties);
+            final JSONArray defenderPartyJsonArray = responseJson.getJSONArray("defenderParties");
+            final Party[] defenderParties = new Party[defenderPartyJsonArray.length()];
+            for (int partyIndex = 0; partyIndex < defenderPartyJsonArray.length(); partyIndex++) {
+                final JSONObject partyJson = defenderPartyJsonArray.getJSONObject(partyIndex);
+                defenderParties[partyIndex] = CardUtils.getPartyFromJson(activity, partyJson);
+            }
+            battleResult.setDefenderParties(defenderParties);
             final JSONArray battleRecordJsonArray = responseJson.getJSONArray("battleRecord");
             for (int i = 0; i < battleRecordJsonArray.length(); i++) {
                 final JSONObject battleRecordJson = battleRecordJsonArray.getJSONObject(i);

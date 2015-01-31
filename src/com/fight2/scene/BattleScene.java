@@ -6,7 +6,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import org.andengine.engine.handler.IUpdateHandler;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.AlphaModifier;
 import org.andengine.entity.modifier.DelayModifier;
@@ -31,6 +30,7 @@ import com.fight2.constant.FontEnum;
 import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.constant.TiledTextureEnum;
+import com.fight2.entity.ComboSkill;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.battle.BattleRecord;
@@ -59,12 +59,15 @@ public class BattleScene extends BaseScene {
     public final static float FRAME_WIDTH = TextureEnum.BATTLE_PARTY_TOP.getWidth();
     public final static float FRAME_START_X = 90;
     public final static float PARTY_GAP = 10;
-    private final Party[] myParties = GameUserSession.getInstance().getPartyInfo().getParties();
-    private final Party[] opponentParties;
+    public final static float SKILL_FRAME_CENTER_X = TextureEnum.BATTLE_SKILL_FRAME.getWidth() * 0.5f;
+    private final Party[] attackerParties;
+    private final Party[] defenderParties;
 
     private final BattlePartyFrame[] myPartyFrames = new BattlePartyFrame[3];
     private final BattlePartyFrame[] opponentPartyFrames = new BattlePartyFrame[3];
-    private final Font font = ResourceManager.getInstance().newFont(FontEnum.Battle);
+    private final Font font = ResourceManager.getInstance().newFont(FontEnum.Default, 32, 256);
+    private final Text skillTextTitle;
+    private final Text skillEffectTextTitle;
     private final Text skillText;
     private final Text skillEffectText;
     private final Queue<BattleRecord> battleRecordQueue = new LinkedList<BattleRecord>();
@@ -75,23 +78,37 @@ public class BattleScene extends BaseScene {
     private final Sprite skipSprite;
     private final BattleResult battleResult;
     private final BattleType battleType;
+    private final AnimatedSprite attackEffectSprite;
+    private final Sprite battleSkillFrame;
 
     public BattleScene(final GameActivity activity, final int attackPlayerId, final Party[] opponentParties, final BattleType battleType) throws IOException {
         super(activity);
         this.battleType = battleType;
-        this.skillText = new Text(this.cameraCenterX, this.cameraCenterY + 30, font, "技能：", 30, vbom);
-        this.skillEffectText = new Text(this.cameraCenterX, this.cameraCenterY - 10, font, "效果：", 100, vbom);
-        winImage = this.createACImageSprite(TextureEnum.BATTLE_WIN, this.cameraCenterX, this.cameraCenterY);
-        loseImage = this.createACImageSprite(TextureEnum.BATTLE_LOSE, this.cameraCenterX, this.cameraCenterY);
+        this.battleSkillFrame = this.createACImageSprite(TextureEnum.BATTLE_SKILL_FRAME, this.cameraCenterX, this.cameraCenterY + 15);
+        battleSkillFrame.setAlpha(0);
+        battleSkillFrame.setZIndex(500);
+        final float skillFrameYCenter = battleSkillFrame.getHeight() * 0.5f;
+        this.skillTextTitle = new Text(SKILL_FRAME_CENTER_X - 120, skillFrameYCenter + 37, font, "技能：", vbom);
+        skillTextTitle.setColor(0XFFFACC62);
+        skillTextTitle.setAlpha(0);
+        this.skillEffectTextTitle = new Text(SKILL_FRAME_CENTER_X - 300, skillFrameYCenter - 25, font, "效果：", vbom);
+        skillEffectTextTitle.setColor(0XFFFACC62);
+        skillEffectTextTitle.setAlpha(0);
+        this.skillText = new Text(SKILL_FRAME_CENTER_X, skillFrameYCenter + 37, font, "", 30, vbom);
+        this.skillEffectText = new Text(SKILL_FRAME_CENTER_X, skillFrameYCenter - 25, font, "", 100, vbom);
         skillText.setAlpha(0);
         skillEffectText.setAlpha(0);
+        battleSkillFrame.attachChild(skillTextTitle);
+        battleSkillFrame.attachChild(skillEffectTextTitle);
+        battleSkillFrame.attachChild(skillText);
+        battleSkillFrame.attachChild(skillEffectText);
+        this.attachChild(battleSkillFrame);
+        winImage = this.createACImageSprite(TextureEnum.BATTLE_WIN, this.cameraCenterX, this.cameraCenterY);
+        loseImage = this.createACImageSprite(TextureEnum.BATTLE_LOSE, this.cameraCenterX, this.cameraCenterY);
         winImage.setAlpha(0);
         loseImage.setAlpha(0);
-        this.attachChild(skillText);
-        this.attachChild(skillEffectText);
         this.attachChild(winImage);
         this.attachChild(loseImage);
-        this.opponentParties = opponentParties;
 
         switch (battleType) {
             case Arena:
@@ -106,6 +123,24 @@ public class BattleScene extends BaseScene {
             default:
                 battleResult = ArenaUtils.attack(attackPlayerId, activity);
         }
+
+        final Party[] myParties = GameUserSession.getInstance().getPartyInfo().getParties();
+        final Party[] attackerParties = battleResult.getAttackerParties();
+        final Party[] defenderParties = battleResult.getDefenderParties();
+        for (int i = 0; i < 3; i++) {
+            final Party myParty = myParties[i];
+            final Party attackerParty = attackerParties[i];
+            attackerParty.setCards(myParty.getCards());
+            attackerParty.setComboSkills(new ArrayList<ComboSkill>(myParty.getComboSkills()));
+
+            final Party opponentParty = opponentParties[i];
+            final Party defenderParty = defenderParties[i];
+            defenderParty.setCards(opponentParty.getCards());
+            defenderParty.setComboSkills(new ArrayList<ComboSkill>(opponentParty.getComboSkills()));
+        }
+        this.attackerParties = attackerParties;
+        this.defenderParties = defenderParties;
+
         isWinner = battleResult.isWinner();
         final List<BattleRecord> battleRecords = battleResult.getBattleRecord();
         for (final BattleRecord battleRecord : battleRecords) {
@@ -124,11 +159,20 @@ public class BattleScene extends BaseScene {
         });
         this.attachChild(skipSprite);
         this.registerTouchArea(skipSprite);
+
+        final ITiledTextureRegion attackTiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.ATTACK_EFFECT);
+        this.attackEffectSprite = new AnimatedSprite(0, 0, attackTiledTextureRegion, vbom);
+        attackEffectSprite.setVisible(false);
+        attackEffectSprite.setZIndex(1000);
+
     }
 
     @Override
     protected void playAnimation() {
         // F2MusicManager.getInstance().playMusic(MusicEnum.QuestBattle, true);
+        if (!battleRecordQueue.isEmpty()) {
+            handleBattleRecord(battleRecordQueue.poll(), battleFinishedCallbackQueue.poll());
+        }
     }
 
     @Override
@@ -140,28 +184,33 @@ public class BattleScene extends BaseScene {
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
-        updateScene();
-        registerUpdateHandler(new IUpdateHandler() {
+    }
 
-            private int updates = 0;
+    @Override
+    public void updateScene() {
+        activity.getGameHub().needSmallChatRoom(false);
+        final float width = TextureEnum.BATTLE_PARTY_BOTTOM.getWidth();
 
-            @Override
-            public void reset() {
+        for (int i = 0; i < attackerParties.length; i++) {
+            final Party party = attackerParties[i];
+            if (party.getHp() <= 0) {
+                continue;
             }
+            final BattlePartyFrame partyContainer = createPartyContainer(party, FRAME_START_X + (width + PARTY_GAP) * i, 0, true);
+            this.attachChild(partyContainer);
+            myPartyFrames[i] = partyContainer;
+        }
 
-            @Override
-            public void onUpdate(final float pSecondsElapsed) {
-                ++updates;
-                if (updates > 10) {
-                    unregisterUpdateHandler(this);
-
-                    if (!battleRecordQueue.isEmpty()) {
-                        // F2MusicManager.getInstance().playMusic(MusicEnum.BATTLE_BG);
-                        handleBattleRecord(battleRecordQueue.poll(), battleFinishedCallbackQueue.poll());
-                    }
-                }
+        for (int i = 0; i < defenderParties.length; i++) {
+            final Party party = defenderParties[i];
+            if (party.getHp() <= 0) {
+                continue;
             }
-        });
+            final BattlePartyFrame partyContainer = createOpponentPartyContainer(party, FRAME_START_X + (width + PARTY_GAP) * i, TOP_PARTY_FRAME_Y - 67, false);
+            this.attachChild(partyContainer);
+            opponentPartyFrames[i] = partyContainer;
+        }
+        this.attachChild(attackEffectSprite);
     }
 
     private void showBattleResult() {
@@ -265,6 +314,34 @@ public class BattleScene extends BaseScene {
                     final int changeHp = hp + changeDefence;
                     hpBar.setCurrentPoint(changeHp < 0 ? 0 : changeHp);
                 }
+
+                // attack140, cure 160.
+                attackEffectSprite.setVisible(true);
+                final float attackEffectOffsetY = isMyAction ? -65 : 5;
+                attackEffectSprite.setPosition(defencePartyFrame.getX(), defencePartyFrame.getY() + attackEffectOffsetY);
+                attackEffectSprite.animate(125, false, new IAnimationListener() {
+
+                    @Override
+                    public void onAnimationStarted(final AnimatedSprite pAnimatedSprite, final int pInitialLoopCount) {
+
+                    }
+
+                    @Override
+                    public void onAnimationFrameChanged(final AnimatedSprite pAnimatedSprite, final int pOldFrameIndex, final int pNewFrameIndex) {
+
+                    }
+
+                    @Override
+                    public void onAnimationLoopFinished(final AnimatedSprite pAnimatedSprite, final int pRemainingLoopCount, final int pInitialLoopCount) {
+
+                    }
+
+                    @Override
+                    public void onAnimationFinished(final AnimatedSprite pAnimatedSprite) {
+                        attackEffectSprite.setVisible(false);
+                    }
+
+                });
             }
 
         };
@@ -278,19 +355,27 @@ public class BattleScene extends BaseScene {
 
                         @Override
                         public void onFinished(final IEntity pItem) {
-                            skillText.setText("技能：" + skill.getName());
-                            skillEffectText.setText("效果：" + skill.getEffect());
-                            final IEntityModifier showModifier = new AlphaModifier(0.5f, 0, 1);
-                            final IEntityModifier hideModifier = new AlphaModifier(0.5f, 1, 0);
+                            skillText.setText(skill.getName());
+                            skillEffectText.setText(skill.getEffect());
+                            leftAlignEntity(skillText, SKILL_FRAME_CENTER_X - 35);
+                            rightAlignEntity(skillEffectTextTitle, skillEffectText.getX() - skillEffectText.getWidth() * 0.5f - 20);
+                            final IEntityModifier showModifier = new AlphaModifier(0.6f, 0, 1);
+                            final IEntityModifier hideModifier = new AlphaModifier(0.6f, 1, 0);
                             final IEntityModifier delayModifier = new DelayModifier(2f);
                             activity.runOnUpdateThread(new Runnable() {
 
                                 @Override
                                 public void run() {
                                     skillText.clearEntityModifiers();
-                                    skillEffectText.clearEntityModifiers();
                                     skillText.registerEntityModifier(new SequenceEntityModifier(showModifier, delayModifier, hideModifier));
+                                    skillTextTitle.clearEntityModifiers();
+                                    skillTextTitle.registerEntityModifier(new SequenceEntityModifier(showModifier, delayModifier, hideModifier));
+                                    skillEffectText.clearEntityModifiers();
                                     skillEffectText.registerEntityModifier(new SequenceEntityModifier(showModifier, delayModifier, hideModifier));
+                                    skillEffectTextTitle.clearEntityModifiers();
+                                    skillEffectTextTitle.registerEntityModifier(new SequenceEntityModifier(showModifier, delayModifier, hideModifier));
+                                    battleSkillFrame.clearEntityModifiers();
+                                    battleSkillFrame.registerEntityModifier(new SequenceEntityModifier(showModifier, delayModifier, hideModifier));
                                 }
 
                             });
@@ -416,32 +501,6 @@ public class BattleScene extends BaseScene {
         return applyParties;
     }
 
-    @Override
-    public void updateScene() {
-        activity.getGameHub().needSmallChatRoom(false);
-        final float width = TextureEnum.BATTLE_PARTY_BOTTOM.getWidth();
-
-        for (int i = 0; i < myParties.length; i++) {
-            final Party party = myParties[i];
-            if (party.getHp() <= 0) {
-                continue;
-            }
-            final BattlePartyFrame partyContainer = createPartyContainer(party, FRAME_START_X + (width + PARTY_GAP) * i, 0, true);
-            this.attachChild(partyContainer);
-            myPartyFrames[i] = partyContainer;
-        }
-
-        for (int i = 0; i < opponentParties.length; i++) {
-            final Party party = opponentParties[i];
-            if (party.getHp() <= 0) {
-                continue;
-            }
-            final BattlePartyFrame partyContainer = createOpponentPartyContainer(party, FRAME_START_X + (width + PARTY_GAP) * i, TOP_PARTY_FRAME_Y - 67, false);
-            this.attachChild(partyContainer);
-            opponentPartyFrames[i] = partyContainer;
-        }
-    }
-
     public void prepareAttack(final BattlePartyFrame[] actionPartyFrames, final int actionPartyFrameIndex, final int defencePartyFrameIndex,
             final OnFinishedCallback onFinishedCallback) {
         final float frameHeight = actionPartyFrames[actionPartyFrameIndex].getHeight();
@@ -518,55 +577,7 @@ public class BattleScene extends BaseScene {
 
         final float adjustY = actionPartyFrame.isBottom() ? -140 : 137;
 
-        final OnFinishedCallback workArroundCb = new OnFinishedCallback() {
-
-            @Override
-            public void onFinished(final IEntity pItem) {
-                final ITiledTextureRegion attackTiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.ATTACK_EFFECT);
-                final AnimatedSprite attackEffectSprite = new AnimatedSprite(defencePartyFrame.getWidth() * 0.5f, defencePartyFrame.getHeight() * 0.5f,
-                        attackTiledTextureRegion, vbom);
-                attackEffectSprite.animate(140, false, new IAnimationListener() {
-
-                    @Override
-                    public void onAnimationStarted(final AnimatedSprite pAnimatedSprite, final int pInitialLoopCount) {
-                        // TODO Auto-generated method stub
-
-                    }
-
-                    @Override
-                    public void onAnimationFrameChanged(final AnimatedSprite pAnimatedSprite, final int pOldFrameIndex, final int pNewFrameIndex) {
-                        // TODO Auto-generated method stub
-
-                    }
-
-                    @Override
-                    public void onAnimationLoopFinished(final AnimatedSprite pAnimatedSprite, final int pRemainingLoopCount, final int pInitialLoopCount) {
-                        // TODO Auto-generated method stub
-
-                    }
-
-                    @Override
-                    public void onAnimationFinished(final AnimatedSprite pAnimatedSprite) {
-                        activity.runOnUpdateThread(new Runnable() {
-
-                            @Override
-                            public void run() {
-                                pAnimatedSprite.detachSelf();
-                                onHitCallback.onFinished(pAnimatedSprite);
-                            }
-
-                        });
-
-                    }
-
-                });
-                defencePartyFrame.attachChild(attackEffectSprite);
-
-            }
-
-        };
-
-        final IEntityModifier attackScaleModifier = new ScaleModifier(attackDuration, initScale, 1, new ModifierFinishedListener(workArroundCb));
+        final IEntityModifier attackScaleModifier = new ScaleModifier(attackDuration, initScale, 1, new ModifierFinishedListener(onHitCallback));
         final IEntityModifier attackMoveModifier = new MoveModifier(attackDuration, initX, initY, defencePartyFrame.getX(), defencePartyFrame.getY() + adjustY);
         final IEntityModifier attackModifier = new ParallelEntityModifier(attackScaleModifier, attackMoveModifier);
 

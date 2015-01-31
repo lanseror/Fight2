@@ -1,5 +1,7 @@
 package com.fight2.entity.engine;
 
+import java.util.List;
+
 import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.DelayModifier;
 import org.andengine.entity.modifier.IEntityModifier;
@@ -13,10 +15,13 @@ import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
+import android.util.SparseArray;
+
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
+import com.fight2.entity.ComboSkill;
 import com.fight2.entity.Party;
 import com.fight2.scene.BattleScene.ModifierFinishedListener;
 import com.fight2.scene.BattleScene.OnFinishedCallback;
@@ -44,6 +49,7 @@ public class BattlePartyFrame extends Rectangle {
     private final IEntity fcsSprite;
     private final boolean isBottom;
     private final GameActivity activity;
+    private final SparseArray<Sprite> comboSpriteMap = new SparseArray<Sprite>();
 
     public BattlePartyFrame(final float pX, final float pY, final Party party, final GameActivity activity, final boolean isBottom) {
         super(pX + WIDTH * 0.5f, pY + HEIGHT * 0.5f, WIDTH, HEIGHT, activity.getVertexBufferObjectManager());
@@ -112,6 +118,15 @@ public class BattlePartyFrame extends Rectangle {
         hpBar = new HpBar(156, 22, activity, party.getHp(), false);
         battlePartyFrame.attachChild(hpBar);
         this.attachChild(battlePartyFrame);
+        final List<ComboSkill> comboSkills = party.getComboSkills();
+        int iconX = 166;
+        for (final ComboSkill comboSkill : comboSkills) {
+            final ITextureRegion texture = TEXTURE_FACTORY.newTextureRegion(comboSkill.getIcon());
+            final Sprite iconSprite = new Sprite(iconX, 58.5f, 30, 30, texture, vbom);
+            battlePartyFrame.attachChild(iconSprite);
+            iconX += 37;
+            comboSpriteMap.put(comboSkill.getId(), iconSprite);
+        }
     }
 
     private void createBottomFrame(final Party party) {
@@ -119,6 +134,15 @@ public class BattlePartyFrame extends Rectangle {
         hpBar = new HpBar(158, 61, activity, party.getHp(), true);
         battlePartyFrame.attachChild(hpBar);
         this.attachChild(battlePartyFrame);
+        final List<ComboSkill> comboSkills = party.getComboSkills();
+        int iconX = 167;
+        for (final ComboSkill comboSkill : comboSkills) {
+            final ITextureRegion texture = TEXTURE_FACTORY.newTextureRegion(comboSkill.getIcon());
+            final Sprite iconSprite = new Sprite(iconX, 26.5f, 31, 31, texture, vbom);
+            battlePartyFrame.attachChild(iconSprite);
+            iconX += 39;
+            comboSpriteMap.put(comboSkill.getId(), iconSprite);
+        }
     }
 
     private Sprite createPartyFrame(final TextureEnum textureEnum, final float x, final float y, final boolean isBottom) {
@@ -130,6 +154,15 @@ public class BattlePartyFrame extends Rectangle {
         final float pY = y + height * 0.5f;
         final Sprite partyFrame = new Sprite(pX, pY, texture, vbom);
         return partyFrame;
+    }
+
+    public void removeComboSprite(final int comboId) {
+        activity.runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                comboSpriteMap.get(comboId).detachSelf();
+            }
+        });
     }
 
     public void useSkill(final int cardIndex, final OnFinishedCallback onFirstStepFinishedCallback, final OnFinishedCallback onFinishedCallback) {

@@ -204,7 +204,6 @@ public class PreBattleScene extends BaseScene {
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
-        updateScene();
         registerUpdateHandler(new IUpdateHandler() {
 
             private int updates = 0;

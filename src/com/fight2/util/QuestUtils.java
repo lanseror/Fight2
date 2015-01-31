@@ -107,7 +107,7 @@ public class QuestUtils {
         final String url = HttpUtils.HOST_URL + "/quest/attack?id=" + attackPlayerId;
         try {
             final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
-            return BattleUtils.attack(responseJson);
+            return BattleUtils.attack(activity, responseJson);
         } catch (final JSONException e) {
             throw new RuntimeException(e);
         } catch (final ClientProtocolException e) {

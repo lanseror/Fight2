@@ -1,11 +1,15 @@
 package com.fight2.entity.battle;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class BattleRecord {
     private String actionPlayer;
     private int atkParty;
     private int defenceParty;
     private int atk;
     private SkillRecord skill;
+    private final List<ComboSkillRecord> comboRecords = new ArrayList<ComboSkillRecord>();
 
     public String getActionPlayer() {
         return actionPlayer;
@@ -45,6 +49,10 @@ public class BattleRecord {
 
     public void setSkill(final SkillRecord skill) {
         this.skill = skill;
+    }
+
+    public List<ComboSkillRecord> getComboRecords() {
+        return comboRecords;
     }
 
 }

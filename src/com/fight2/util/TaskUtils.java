@@ -78,7 +78,7 @@ public class TaskUtils {
         final String url = HttpUtils.HOST_URL + "/task/attack";
         try {
             final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
-            return BattleUtils.attack(responseJson);
+            return BattleUtils.attack(activity, responseJson);
         } catch (final JSONException e) {
             throw new RuntimeException(e);
         } catch (final ClientProtocolException e) {

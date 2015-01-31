@@ -239,7 +239,7 @@ public class ArenaUtils {
         final String url = HttpUtils.HOST_URL + "/arena/attack.action?id=" + selectedArenaId + "&attackId=" + attackPlayerId;
         try {
             final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
-            return BattleUtils.attack(responseJson);
+            return BattleUtils.attack(activity, responseJson);
         } catch (final JSONException e) {
             throw new RuntimeException(e);
         } catch (final ClientProtocolException e) {

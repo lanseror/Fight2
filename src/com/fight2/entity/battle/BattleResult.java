@@ -2,6 +2,8 @@ package com.fight2.entity.battle;
 
 import java.util.List;
 
+import com.fight2.entity.Party;
+
 public class BattleResult {
     private boolean isWinner;
     private int baseMight;
@@ -9,6 +11,8 @@ public class BattleResult {
     private int cwMight;
     private int totalMight;
     private int cwRate;
+    private Party[] attackerParties;
+    private Party[] defenderParties;
     private List<BattleRecord> battleRecord;
 
     public boolean isWinner() {
@@ -65,6 +69,22 @@ public class BattleResult {
 
     public void setCwRate(final int cwRate) {
         this.cwRate = cwRate;
+    }
+
+    public Party[] getAttackerParties() {
+        return attackerParties;
+    }
+
+    public void setAttackerParties(final Party[] attackerParties) {
+        this.attackerParties = attackerParties;
+    }
+
+    public Party[] getDefenderParties() {
+        return defenderParties;
+    }
+
+    public void setDefenderParties(final Party[] defenderParties) {
+        this.defenderParties = defenderParties;
     }
 
 }
