@@ -285,4 +285,8 @@ public class BattlePartyFrame extends Rectangle {
         return isBottom;
     }
 
+    public Party getParty() {
+        return party;
+    }
+
 }

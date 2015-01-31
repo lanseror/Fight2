@@ -79,6 +79,8 @@ public class BattleScene extends BaseScene {
     private final BattleResult battleResult;
     private final BattleType battleType;
     private final AnimatedSprite attackEffectSprite;
+    private final AnimatedSprite[] cureEffectSprites = new AnimatedSprite[3];
+    private final AnimatedSprite[] confuseEffectSprites = new AnimatedSprite[3];
     private final Sprite battleSkillFrame;
 
     public BattleScene(final GameActivity activity, final int attackPlayerId, final Party[] opponentParties, final BattleType battleType) throws IOException {
@@ -165,6 +167,21 @@ public class BattleScene extends BaseScene {
         attackEffectSprite.setVisible(false);
         attackEffectSprite.setZIndex(1000);
 
+        final ITiledTextureRegion cureTiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.CURE_EFFECT);
+        for (int i = 0; i < cureEffectSprites.length; i++) {
+            final AnimatedSprite cureEffectSprite = new AnimatedSprite(0, 0, cureTiledTextureRegion, vbom);
+            cureEffectSprite.setVisible(false);
+            cureEffectSprite.setZIndex(1000);
+            cureEffectSprites[i] = cureEffectSprite;
+        }
+        final ITiledTextureRegion confuseTiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.CONFUSE_EFFECT);
+        for (int i = 0; i < confuseEffectSprites.length; i++) {
+            final AnimatedSprite confuseEffectSprite = new AnimatedSprite(0, 0, confuseTiledTextureRegion, vbom);
+            confuseEffectSprite.setVisible(false);
+            confuseEffectSprite.setZIndex(1000);
+            confuseEffectSprites[i] = confuseEffectSprite;
+        }
+
     }
 
     @Override
@@ -211,6 +228,12 @@ public class BattleScene extends BaseScene {
             opponentPartyFrames[i] = partyContainer;
         }
         this.attachChild(attackEffectSprite);
+        for (int i = 0; i < cureEffectSprites.length; i++) {
+            this.attachChild(cureEffectSprites[i]);
+        }
+        for (int i = 0; i < confuseEffectSprites.length; i++) {
+            this.attachChild(confuseEffectSprites[i]);
+        }
     }
 
     private void showBattleResult() {
@@ -379,6 +402,7 @@ public class BattleScene extends BaseScene {
                                 }
 
                             });
+
                         }
 
                     };
@@ -427,10 +451,14 @@ public class BattleScene extends BaseScene {
 
                         } else {
                             applyParty.setHp(applyParty.getHp() + changePoint);
+                            useSkillCure(applyParty, isMyAction);
                         }
                         break;
                     case ATK:
                         applyParty.setAtk(applyParty.getAtk() + changePoint);
+                        if (changePoint < 0) {
+                            useSkillConfuse(applyParty, isMyAction);
+                        }
                         break;
                     case Defence:
                         applyParty.setDefence(applyParty.getDefence() + changePoint);
@@ -440,8 +468,69 @@ public class BattleScene extends BaseScene {
                         break;
                 }
             }
+
         }
 
+    }
+
+    private void useSkillCure(final BattlePartyFrame applyParty, final boolean isMyAction) {
+        final AnimatedSprite cureEffectSprite = cureEffectSprites[applyParty.getParty().getPartyNumber() - 1];
+        cureEffectSprite.setVisible(true);
+        final float attackEffectOffsetY = isMyAction ? 50 : -55;
+        cureEffectSprite.setPosition(applyParty.getX(), applyParty.getY() + attackEffectOffsetY);
+        cureEffectSprite.animate(90, false, new IAnimationListener() {
+
+            @Override
+            public void onAnimationStarted(final AnimatedSprite pAnimatedSprite, final int pInitialLoopCount) {
+
+            }
+
+            @Override
+            public void onAnimationFrameChanged(final AnimatedSprite pAnimatedSprite, final int pOldFrameIndex, final int pNewFrameIndex) {
+
+            }
+
+            @Override
+            public void onAnimationLoopFinished(final AnimatedSprite pAnimatedSprite, final int pRemainingLoopCount, final int pInitialLoopCount) {
+
+            }
+
+            @Override
+            public void onAnimationFinished(final AnimatedSprite pAnimatedSprite) {
+                cureEffectSprite.setVisible(false);
+            }
+
+        });
+    }
+
+    private void useSkillConfuse(final BattlePartyFrame applyParty, final boolean isMyAction) {
+        final AnimatedSprite confuseEffectSprite = confuseEffectSprites[applyParty.getParty().getPartyNumber() - 1];
+        confuseEffectSprite.setVisible(true);
+        final float attackEffectOffsetY = isMyAction ? -55 : 45;
+        confuseEffectSprite.setPosition(applyParty.getX(), applyParty.getY() + attackEffectOffsetY);
+        confuseEffectSprite.animate(100, false, new IAnimationListener() {
+
+            @Override
+            public void onAnimationStarted(final AnimatedSprite pAnimatedSprite, final int pInitialLoopCount) {
+
+            }
+
+            @Override
+            public void onAnimationFrameChanged(final AnimatedSprite pAnimatedSprite, final int pOldFrameIndex, final int pNewFrameIndex) {
+
+            }
+
+            @Override
+            public void onAnimationLoopFinished(final AnimatedSprite pAnimatedSprite, final int pRemainingLoopCount, final int pInitialLoopCount) {
+
+            }
+
+            @Override
+            public void onAnimationFinished(final AnimatedSprite pAnimatedSprite) {
+                confuseEffectSprite.setVisible(false);
+            }
+
+        });
     }
 
     private List<BattlePartyFrame> getApplyParties(final BattlePartyFrame selfParty, final SkillApplyParty skillApplyParty, final boolean isMyAction) {
