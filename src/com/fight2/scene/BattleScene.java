@@ -2,9 +2,11 @@ package com.fight2.scene;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 
 import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.AlphaModifier;
@@ -36,6 +38,8 @@ import com.fight2.entity.Party;
 import com.fight2.entity.battle.BattleRecord;
 import com.fight2.entity.battle.BattleResult;
 import com.fight2.entity.battle.BattleType;
+import com.fight2.entity.battle.RevivalRecord;
+import com.fight2.entity.battle.RevivalRecord.RevivalType;
 import com.fight2.entity.battle.SkillApplyParty;
 import com.fight2.entity.battle.SkillOperation;
 import com.fight2.entity.battle.SkillRecord;
@@ -54,6 +58,7 @@ import com.fight2.util.TiledTextureFactory;
 
 public class BattleScene extends BaseScene {
     private final float TOP_PARTY_FRAME_Y = this.cameraHeight - TextureEnum.BATTLE_PARTY_TOP.getHeight();
+    public final static String REVIVAL_STR = "团队死亡时有机会以%s%%的生命值复活。";
     public final static int CARD_WIDTH = 100;
     public final static int CARD_HEIGHT = 150;
     public final static float FRAME_WIDTH = TextureEnum.BATTLE_PARTY_TOP.getWidth();
@@ -82,6 +87,8 @@ public class BattleScene extends BaseScene {
     private final AnimatedSprite[] cureEffectSprites = new AnimatedSprite[3];
     private final AnimatedSprite[] confuseEffectSprites = new AnimatedSprite[3];
     private final Sprite battleSkillFrame;
+    private final Sprite revivalSkillFrame;
+    private final Text revivalText;
 
     public BattleScene(final GameActivity activity, final int attackPlayerId, final Party[] opponentParties, final BattleType battleType) throws IOException {
         super(activity);
@@ -105,6 +112,15 @@ public class BattleScene extends BaseScene {
         battleSkillFrame.attachChild(skillText);
         battleSkillFrame.attachChild(skillEffectText);
         this.attachChild(battleSkillFrame);
+        this.revivalSkillFrame = this.createACImageSprite(TextureEnum.BATTLE_SKILL_REVIVAL, 0, 0);
+        revivalSkillFrame.setAlpha(0);
+        revivalSkillFrame.setZIndex(500);
+        this.attachChild(revivalSkillFrame);
+        this.revivalText = new Text(revivalSkillFrame.getWidth() * 0.5f, revivalSkillFrame.getHeight() * 0.5f, font, REVIVAL_STR, vbom);
+        revivalText.setColor(0XFFFACC62);
+        revivalText.setAlpha(0);
+        revivalSkillFrame.attachChild(revivalSkillFrame);
+
         winImage = this.createACImageSprite(TextureEnum.BATTLE_WIN, this.cameraCenterX, this.cameraCenterY);
         loseImage = this.createACImageSprite(TextureEnum.BATTLE_LOSE, this.cameraCenterX, this.cameraCenterY);
         winImage.setAlpha(0);
@@ -186,7 +202,6 @@ public class BattleScene extends BaseScene {
 
     @Override
     protected void playAnimation() {
-        // F2MusicManager.getInstance().playMusic(MusicEnum.QuestBattle, true);
         if (!battleRecordQueue.isEmpty()) {
             handleBattleRecord(battleRecordQueue.poll(), battleFinishedCallbackQueue.poll());
         }
@@ -321,6 +336,8 @@ public class BattleScene extends BaseScene {
             }
 
         };
+        
+        
         final OnFinishedCallback attackHitCallback = new OnFinishedCallback() {
 
             @Override
@@ -406,16 +423,22 @@ public class BattleScene extends BaseScene {
                         }
 
                     };
-                    final OnFinishedCallback onFinishedCallback = new OnFinishedCallback() {
+                    final OnFinishedCallback skillOpFinishedCallback = new OnFinishedCallback() {
 
                         @Override
                         public void onFinished(final IEntity pItem) {
-                            handleSkillOperations(actionPartyFrame, skill, isMyAction);
                             attack(actionPartyFrame, defencePartyFrame, attackHitCallback, attackFinishedCallback);
                         }
 
                     };
-                    actionPartyFrame.useSkill(cardIndex - 1, onUpCallback, onFinishedCallback);
+                    final OnFinishedCallback useSkillFinishedCallback = new OnFinishedCallback() {
+
+                        @Override
+                        public void onFinished(final IEntity pItem) {
+                            handleSkillOperations(actionPartyFrame, skill, isMyAction, skillOpFinishedCallback, battleRecord);
+                        }
+                    };
+                    actionPartyFrame.useSkill(cardIndex - 1, onUpCallback, useSkillFinishedCallback);
                 } else {
                     attack(actionPartyFrame, defencePartyFrame, attackHitCallback, attackFinishedCallback);
                 }
@@ -428,7 +451,8 @@ public class BattleScene extends BaseScene {
         // opponentPartyFrames[0].setAtk(3544);
     }
 
-    private void handleSkillOperations(final BattlePartyFrame actionParty, final SkillRecord skill, final boolean isMyAction) {
+    private void handleSkillOperations(final BattlePartyFrame actionParty, final SkillRecord skill, final boolean isMyAction,
+            final OnFinishedCallback onFinishedCallback, final BattleRecord battleRecord) {
         final List<SkillOperation> operations = skill.getOperations();
         for (final SkillOperation operation : operations) {
             final SkillType skillType = operation.getSkillType();
@@ -470,6 +494,77 @@ public class BattleScene extends BaseScene {
             }
 
         }
+        final List<RevivalRecord> revivalRecords = battleRecord.getRevivalRecords();
+        final BattlePartyFrame[] defencePartyFrames = isMyAction ? opponentPartyFrames : myPartyFrames;
+        if (revivalRecords.size() > 0) {
+
+            for (int i = 0; i < revivalRecords.size(); i++) {
+                final RevivalRecord revivalRecord = revivalRecords.get(i);
+                if (revivalRecord.getType() != RevivalType.AfterSkill) {
+                    continue;
+                }
+
+                final BattlePartyFrame reviveParty = defencePartyFrames[revivalRecord.getPartyNumber() - 1];
+                if (i == 0) {
+                    handleRevival(reviveParty, revivalRecord, isMyAction, onFinishedCallback);
+                } else {
+                    handleRevival(reviveParty, revivalRecord, isMyAction, new OnFinishedCallback() {
+
+                        @Override
+                        public void onFinished(final IEntity pItem) {
+                            // Empty callback.
+                        }
+
+                    });
+                }
+
+            }
+        } else {
+            onFinishedCallback.onFinished(actionParty);
+        }
+
+    }
+
+    private void handleRevival(final BattlePartyFrame applyParty, final RevivalRecord skill, final boolean isMyAction,
+            final OnFinishedCallback onFinishedCallback) {
+        final int point = skill.getPoint();
+        final int changePoint = point * applyParty.getHpBar().getFullHp() / 100;
+        final IEntityModifier hpDelayModifier = new DelayModifier(2f, new IEntityModifierListener() {
+
+            @Override
+            public void onModifierStarted(final IModifier<IEntity> pModifier, final IEntity pItem) {
+            }
+
+            @Override
+            public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
+                applyParty.setHp(changePoint);
+            }
+
+        });
+
+        revivalText.setText(String.format(REVIVAL_STR, point));
+        final IEntityModifier showModifier = new AlphaModifier(0.6f, 0, 1);
+        final IEntityModifier hideModifier = new AlphaModifier(0.6f, 1, 0, new IEntityModifierListener() {
+            @Override
+            public void onModifierStarted(final IModifier<IEntity> pModifier, final IEntity pItem) {
+            }
+
+            @Override
+            public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
+                onFinishedCallback.onFinished(pItem);
+            }
+        });
+        final IEntityModifier delayModifier = new DelayModifier(2f);
+        activity.runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                revivalText.clearEntityModifiers();
+                revivalText.registerEntityModifier(new SequenceEntityModifier(showModifier, delayModifier, new AlphaModifier(0.6f, 1, 0)));
+                revivalSkillFrame.clearEntityModifiers();
+                revivalSkillFrame.registerEntityModifier(new SequenceEntityModifier(showModifier, delayModifier, hideModifier));
+                applyParty.registerEntityModifier(hpDelayModifier);
+            }
+        });
 
     }
 

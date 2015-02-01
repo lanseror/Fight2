@@ -66,7 +66,7 @@ public enum TextureEnum {
     COMMON_SUMMON_CHARM("images/common_summon_charm.png", 31, 33),
     COMMON_CLOSE_BUTTON("images/common_close_button.png", 43, 43),
     COMMON_LOADING("images/common_loading2.png", 100, 100),
-    COMMON_AVATAR_FRAME("images/common_avatar_frame.png", 135, 135),
+    COMMON_AVATAR_FRAME("images/common_avatar_frame.png", 178, 178),
 
     // Chat room images.
     CHAT_INPUT_BG("images/chat_input_backgroud.png", 850, 82),
@@ -224,6 +224,7 @@ public enum TextureEnum {
     BATTLE_CARD_SKILL_FCS("images/battle_card_skill_fcs.png", 146, 202),
     BATTLE_AVATAR_SKILL_FCS("images/battle_avatar_skill_fcs.png", 74, 74),
     BATTLE_RESULT("images/battle_result.png", 730, 551),
+    BATTLE_SKILL_REVIVAL("images/battle_skill_revival.png", 400, 78),
 
     // PreBattle scene images.
     PREBATTLE_RETREAT_BUTTON("images/prebattle_retreat_button.png", 130, 132),

@@ -31,7 +31,7 @@ public class CardAvatar extends Sprite {
     private final float height;
 
     public CardAvatar(final float x, final float y, final float width, final float height, final Card card, final GameActivity activity) {
-        super(x, y, width + 2, height + 2, TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_AVATAR_FRAME), activity.getVertexBufferObjectManager());
+        super(x, y, width + 5, height + 5, TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_AVATAR_FRAME), activity.getVertexBufferObjectManager());
         this.width = width;
         this.height = height;
         this.activity = activity;

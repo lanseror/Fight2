@@ -11,6 +11,8 @@ import com.fight2.GameActivity;
 import com.fight2.entity.Party;
 import com.fight2.entity.battle.BattleRecord;
 import com.fight2.entity.battle.BattleResult;
+import com.fight2.entity.battle.RevivalRecord;
+import com.fight2.entity.battle.RevivalRecord.RevivalType;
 import com.fight2.entity.battle.SkillApplyParty;
 import com.fight2.entity.battle.SkillOperation;
 import com.fight2.entity.battle.SkillRecord;
@@ -71,6 +73,21 @@ public class BattleUtils {
                         operations.add(operation);
                     }
                 }
+                if (battleRecordJson.has("revivalRecords")) {
+                    final List<RevivalRecord> revivalRecords = battleRecord.getRevivalRecords();
+                    final JSONArray revivalRecordJsonArray = battleRecordJson.getJSONArray("comboRecords");
+                    for (int comboIndex = 0; comboIndex < revivalRecordJsonArray.length(); comboIndex++) {
+                        final JSONObject revivalRecordJson = revivalRecordJsonArray.getJSONObject(comboIndex);
+                        final RevivalRecord revivalRecord = new RevivalRecord();
+                        revivalRecord.setComboId(revivalRecordJson.getInt("comboId"));
+                        revivalRecord.setPartyNumber(revivalRecordJson.getInt("partyNumber"));
+                        revivalRecord.setPoint(revivalRecordJson.getInt("point"));
+                        revivalRecord.setType(RevivalType.valueOf(revivalRecordJson.getString("type")));
+                        revivalRecords.add(revivalRecord);
+                    }
+
+                }
+
                 battleRecords.add(battleRecord);
             }
 
