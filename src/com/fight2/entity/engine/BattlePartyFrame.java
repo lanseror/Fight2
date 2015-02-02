@@ -3,9 +3,11 @@ package com.fight2.entity.engine;
 import java.util.List;
 
 import org.andengine.entity.IEntity;
+import org.andengine.entity.modifier.AlphaModifier;
 import org.andengine.entity.modifier.DelayModifier;
 import org.andengine.entity.modifier.IEntityModifier;
 import org.andengine.entity.modifier.MoveModifier;
+import org.andengine.entity.modifier.ScaleModifier;
 import org.andengine.entity.modifier.SequenceEntityModifier;
 import org.andengine.entity.modifier.SingleValueSpanEntityModifier;
 import org.andengine.entity.primitive.Rectangle;
@@ -200,6 +202,18 @@ public class BattlePartyFrame extends Rectangle {
             }
         });
 
+    }
+
+    public void useCombo(final int comboId) {
+        final IEntityModifier scaleModifier = new ScaleModifier(1f, 1, 1.8f);
+        final IEntityModifier alphaModifier = new AlphaModifier(1f, 1, 0f);
+        final IEntityModifier modifier = new SequenceEntityModifier(scaleModifier, alphaModifier);
+        activity.runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                comboSpriteMap.get(comboId).registerEntityModifier(modifier);
+            }
+        });
     }
 
     public int getAtk() {

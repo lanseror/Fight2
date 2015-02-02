@@ -75,7 +75,7 @@ public class BattleUtils {
                 }
                 if (battleRecordJson.has("revivalRecords")) {
                     final List<RevivalRecord> revivalRecords = battleRecord.getRevivalRecords();
-                    final JSONArray revivalRecordJsonArray = battleRecordJson.getJSONArray("comboRecords");
+                    final JSONArray revivalRecordJsonArray = battleRecordJson.getJSONArray("revivalRecords");
                     for (int comboIndex = 0; comboIndex < revivalRecordJsonArray.length(); comboIndex++) {
                         final JSONObject revivalRecordJson = revivalRecordJsonArray.getJSONObject(comboIndex);
                         final RevivalRecord revivalRecord = new RevivalRecord();
