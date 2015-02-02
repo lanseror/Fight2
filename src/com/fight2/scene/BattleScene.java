@@ -366,6 +366,8 @@ public class BattleScene extends BaseScene {
                     hpBar.setCurrentPoint(changeHp < 0 ? 0 : changeHp);
                 }
 
+                defencePartyFrame.beenHit();
+
                 // attack140, cure 160.
                 attackEffectSprite.setVisible(true);
                 final float attackEffectOffsetY = isMyAction ? -65 : 5;
@@ -540,7 +542,7 @@ public class BattleScene extends BaseScene {
             final OnFinishedCallback onFinishedCallback) {
         final int point = skill.getPoint();
         final int changePoint = point * applyParty.getHpBar().getFullHp() / 100;
-        final IEntityModifier hpDelayModifier = new DelayModifier(0.5f, new IEntityModifierListener() {
+        final IEntityModifier hpDelayModifier = new DelayModifier(2.5f, new IEntityModifierListener() {
 
             @Override
             public void onModifierStarted(final IModifier<IEntity> pModifier, final IEntity pItem) {
@@ -559,7 +561,7 @@ public class BattleScene extends BaseScene {
         final IEntityModifier showModifier = new AlphaModifier(0.6f, 0, 1);
         final IEntityModifier hideModifier = new AlphaModifier(0.6f, 1, 0);
         final IEntityModifier delayModifier = new DelayModifier(2f);
-        final IEntityModifier finishDelayModifier = new DelayModifier(0.6f, new IEntityModifierListener() {
+        final IEntityModifier finishDelayModifier = new DelayModifier(2f, new IEntityModifierListener() {
             @Override
             public void onModifierStarted(final IModifier<IEntity> pModifier, final IEntity pItem) {
             }
@@ -767,45 +769,50 @@ public class BattleScene extends BaseScene {
 
     private void attack(final BattlePartyFrame actionPartyFrame, final BattlePartyFrame defencePartyFrame, final OnFinishedCallback onHitCallback,
             final OnFinishedCallback onFinishedCallback, final boolean isMyAction, final List<RevivalRecord> afterAttackRevivalRecords) {
-        final float initScale = actionPartyFrame.getScaleX();
-        final float initX = actionPartyFrame.getX();
-        final float initY = actionPartyFrame.getY();
-        final float attackDuration = 0.05f;
-        final float backDuration = 0.5f;
-        actionPartyFrame.setZIndex(10);
-        this.sortChildren();
-
-        final float adjustY = actionPartyFrame.isBottom() ? -140 : 137;
-
-        final IEntityModifier attackScaleModifier = new ScaleModifier(attackDuration, initScale, 1, new ModifierFinishedListener(onHitCallback));
-        final IEntityModifier attackMoveModifier = new MoveModifier(attackDuration, initX, initY, defencePartyFrame.getX(), defencePartyFrame.getY() + adjustY);
-        final IEntityModifier attackModifier = new ParallelEntityModifier(attackScaleModifier, attackMoveModifier);
+        // final float initScale = actionPartyFrame.getScaleX();
+        // final float initX = actionPartyFrame.getX();
+        // final float initY = actionPartyFrame.getY();
+        // final float attackDuration = 0.05f;
+        // final float backDuration = 0.5f;
+        // actionPartyFrame.setZIndex(10);
+        // this.sortChildren();
+        //
+        // final float adjustY = actionPartyFrame.isBottom() ? -140 : 137;
+        //
+        // //
+        //
+        // final IEntityModifier attackScaleModifier = new ScaleModifier(attackDuration, initScale, 1, new ModifierFinishedListener(onHitCallback));
+        // final IEntityModifier attackMoveModifier = new MoveModifier(attackDuration, initX, initY, defencePartyFrame.getX(), defencePartyFrame.getY() +
+        // adjustY);
+        // final IEntityModifier attackModifier = new ParallelEntityModifier(attackScaleModifier, attackMoveModifier);
 
         final OnFinishedCallback attackFinishCallback = createPreReviveCallback(actionPartyFrame, isMyAction, onFinishedCallback, afterAttackRevivalRecords);
 
-        final IEntityModifierListener backFinishListener = new ModifierFinishedListener(new OnFinishedCallback() {
-            @Override
-            public void onFinished(final IEntity pItem) {
-                pItem.setZIndex(IEntity.ZINDEX_DEFAULT);
-                BattleScene.this.sortChildren();
-                attackFinishCallback.onFinished(pItem);
-            }
+        actionPartyFrame.attack(onHitCallback, attackFinishCallback);
 
-        });
-
-        final IEntityModifier backScaleModifier = new ScaleModifier(backDuration, 1, initScale, backFinishListener);
-        final IEntityModifier backMoveModifier = new MoveModifier(backDuration, defencePartyFrame.getX(), defencePartyFrame.getY() + adjustY, initX, initY);
-
-        final IEntityModifier backModifier = new ParallelEntityModifier(backScaleModifier, backMoveModifier);
-
-        final IEntityModifier actionModifier = new SequenceEntityModifier(new DelayModifier(0.8f), attackModifier, new DelayModifier(0.1f), backModifier);
-        activity.runOnUpdateThread(new Runnable() {
-            @Override
-            public void run() {
-                actionPartyFrame.clearEntityModifiers();
-                actionPartyFrame.registerEntityModifier(actionModifier);
-            }
-        });
+        // final IEntityModifierListener backFinishListener = new ModifierFinishedListener(new OnFinishedCallback() {
+        // @Override
+        // public void onFinished(final IEntity pItem) {
+        // pItem.setZIndex(IEntity.ZINDEX_DEFAULT);
+        // BattleScene.this.sortChildren();
+        // attackFinishCallback.onFinished(pItem);
+        // }
+        //
+        // });
+        //
+        // final IEntityModifier backScaleModifier = new ScaleModifier(backDuration, 1, initScale, backFinishListener);
+        // final IEntityModifier backMoveModifier = new MoveModifier(backDuration, defencePartyFrame.getX(), defencePartyFrame.getY() + adjustY, initX, initY);
+        //
+        // final IEntityModifier backModifier = new ParallelEntityModifier(backScaleModifier, backMoveModifier);
+        //
+        // final IEntityModifier actionModifier = new SequenceEntityModifier(new DelayModifier(0.8f), attackModifier, new DelayModifier(0.1f), backModifier);
+        // activity.runOnUpdateThread(new Runnable() {
+        // @Override
+        // public void run() {
+        // actionPartyFrame.clearEntityModifiers();
+        // actionPartyFrame.registerEntityModifier(actionModifier);
+        // }
+        // });
 
     }
 
@@ -816,9 +823,10 @@ public class BattleScene extends BaseScene {
             if (partyFrame == null) {
                 continue;
             }
+            final IEntityModifier delayModifier = new DelayModifier(1f);
             final IEntityModifier scaleModifier = new ScaleModifier(duration, partyFrame.getScaleX(), 1);
             final IEntityModifier moveModifier = new MoveModifier(duration, partyFrame.getX(), partyFrame.getY(), partyFrame.getInitX(), partyFrame.getInitY());
-            final IEntityModifier modifier = new ParallelEntityModifier(scaleModifier, moveModifier);
+            final IEntityModifier modifier = new SequenceEntityModifier(delayModifier, new ParallelEntityModifier(scaleModifier, moveModifier));
             if (i == actionPartyIndex) {
                 moveModifier.addModifierListener(new ModifierFinishedListener(onFinishedCallback));
             }

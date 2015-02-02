@@ -6,7 +6,10 @@ import org.andengine.entity.IEntity;
 import org.andengine.entity.modifier.AlphaModifier;
 import org.andengine.entity.modifier.DelayModifier;
 import org.andengine.entity.modifier.IEntityModifier;
+import org.andengine.entity.modifier.IEntityModifier.IEntityModifierListener;
 import org.andengine.entity.modifier.MoveModifier;
+import org.andengine.entity.modifier.PathModifier;
+import org.andengine.entity.modifier.PathModifier.Path;
 import org.andengine.entity.modifier.ScaleModifier;
 import org.andengine.entity.modifier.SequenceEntityModifier;
 import org.andengine.entity.modifier.SingleValueSpanEntityModifier;
@@ -16,6 +19,7 @@ import org.andengine.entity.text.Text;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
+import org.andengine.util.modifier.IModifier;
 
 import android.util.SparseArray;
 
@@ -52,6 +56,9 @@ public class BattlePartyFrame extends Rectangle {
     private final boolean isBottom;
     private final GameActivity activity;
     private final SparseArray<Sprite> comboSpriteMap = new SparseArray<Sprite>();
+    private final IEntity cardContainer;
+    private static final SimplePoint[] POINTS = { point(0, 0), point(-2, 2), point(0, 4), point(1, 4), point(2, 3), point(2, -3), point(1, -3), point(-2, 0),
+            point(-2, 1), point(0, 1), point(1, 0), point(0, -1), point(-1, 0), point(0, 2), point(0, 0) };
 
     public BattlePartyFrame(final float pX, final float pY, final Party party, final GameActivity activity, final boolean isBottom) {
         super(pX + WIDTH * 0.5f, pY + HEIGHT * 0.5f, WIDTH, HEIGHT, activity.getVertexBufferObjectManager());
@@ -60,6 +67,9 @@ public class BattlePartyFrame extends Rectangle {
         this.vbom = activity.getVertexBufferObjectManager();
         this.party = party;
         this.isBottom = isBottom;
+        this.cardContainer = new Rectangle(WIDTH * 0.5f, HEIGHT * 0.5f, WIDTH, HEIGHT, vbom);
+        cardContainer.setAlpha(0);
+        this.attachChild(cardContainer);
         if (isBottom) {
             this.createBottomCard(party);
             this.createBottomFrame(party);
@@ -96,7 +106,7 @@ public class BattlePartyFrame extends Rectangle {
 
             final CardFrame cardSprite = new CardFrame(startX + 65 * i, 80, CARD_WIDTH, CARD_HEIGHT, card, activity);
             cardSprites[i] = cardSprite;
-            this.attachChild(cardSprite);
+            cardContainer.attachChild(cardSprite);
         }
     }
 
@@ -111,7 +121,7 @@ public class BattlePartyFrame extends Rectangle {
             }
             final CardAvatar avatar = new CardAvatar(startX + (AVATAR_WIDTH + avatarGap) * i, AVATAR_HEIGHT * 0.5f, AVATAR_WIDTH, AVATAR_HEIGHT, card, activity);
             cardSprites[i] = avatar;
-            this.attachChild(avatar);
+            cardContainer.attachChild(avatar);
         }
     }
 
@@ -202,6 +212,60 @@ public class BattlePartyFrame extends Rectangle {
             }
         });
 
+    }
+
+    public void attack(final OnFinishedCallback upFinishedCallback, final OnFinishedCallback downFinishedCallback) {
+        final float initX = cardContainer.getX();
+        final float initY = cardContainer.getY();
+        final float toY = isBottom ? 105 : -80;
+        final float returnY = isBottom ? initY - 20 : initY + 15;
+        final IEntityModifier upModifier = new MoveModifier(0.08f, initX, initY, initX, initY + toY, new IEntityModifierListener() {
+            @Override
+            public void onModifierStarted(final IModifier<IEntity> pModifier, final IEntity pItem) {
+
+            }
+
+            @Override
+            public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
+                upFinishedCallback.onFinished(pItem);
+            }
+        });
+        final IEntityModifier downModifier = new MoveModifier(0.11f, initX, initY + toY, initX, returnY);
+        final IEntityModifier returnModifier = new MoveModifier(0.11f, initX, returnY, initX, initY, new IEntityModifierListener() {
+            @Override
+            public void onModifierStarted(final IModifier<IEntity> pModifier, final IEntity pItem) {
+            }
+
+            @Override
+            public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
+                downFinishedCallback.onFinished(pItem);
+            }
+        });
+        final IEntityModifier modifier = new SequenceEntityModifier(new DelayModifier(0.3f), upModifier, downModifier, returnModifier);
+        activity.runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                cardContainer.clearEntityModifiers();
+                cardContainer.registerEntityModifier(modifier);
+            }
+        });
+    }
+
+    public void beenHit() {
+        final Path path = new Path(POINTS.length);
+        final float initX = cardContainer.getX();
+        final float initY = cardContainer.getY();
+        final float offset = 2f;
+        for (final SimplePoint point : POINTS) {
+            path.to(initX + point.getX() * offset, initY + point.getY() * offset);
+        }
+        activity.runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                cardContainer.clearEntityModifiers();
+                cardContainer.registerEntityModifier(new PathModifier(0.4f, path));
+            }
+        });
     }
 
     public void useCombo(final int comboId) {
@@ -301,6 +365,10 @@ public class BattlePartyFrame extends Rectangle {
 
     public Party getParty() {
         return party;
+    }
+
+    private static SimplePoint point(final float x, final float y) {
+        return new SimplePoint(x, y);
     }
 
 }
