@@ -72,16 +72,15 @@ public class ResourceManager {
         final TextureFactory textureFactory = TextureFactory.getInstance();
         textureFactory.clear();
         textureFactory.initImageData(activity);
-        progressBar.increase(10);
+        progressBar.setPercent(10);
         final String installUUID = AccountUtils.readInstallUUID(activity);
         AccountUtils.login(installUUID, activity);
-        textureFactory.loadResource(textureManager, assetManager, progressBar);
-        progressBar.increase(30);
+        progressBar.setPercent(30);
 
         for (final FontEnum fontEnum : FontEnum.values()) {
             fontMap.put(fontEnum, new SparseArray<Font>());
         }
-        progressBar.increase(35);
+        progressBar.setPercent(35);
 
         loadScenes();
         // Resources loaded
@@ -182,7 +181,7 @@ public class ResourceManager {
                     childScene.back();
                 }
                 currentScene = scene;
-                if (sceneEnum != null) {
+                if (sceneEnum != null && currentSceneEnum != sceneEnum) {
                     currentSceneEnum = sceneEnum;
                     breadcrumbs.push(currentSceneEnum);
                 }

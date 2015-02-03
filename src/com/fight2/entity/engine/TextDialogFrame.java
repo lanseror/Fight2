@@ -18,7 +18,7 @@ public class TextDialogFrame extends DialogFrame {
         super(x, y, width, height, activity);
         this.setAlpha(0);
 
-        final Font detailFont = ResourceManager.getInstance().newFont(FontEnum.Default, 24);
+        final Font detailFont = ResourceManager.getInstance().newFont(FontEnum.Default, 24, 512);
         final Text contentText = new TickerText(width * 0.5f, height * 0.5f, detailFont, content, new TickerTextOptions(AutoWrap.LETTERS, width - 80,
                 HorizontalAlign.LEFT, 25), vbom);
         contentText.setColor(0XFF330504);

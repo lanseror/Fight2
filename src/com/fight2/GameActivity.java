@@ -138,7 +138,6 @@ public class GameActivity extends LayoutGameActivity {
     public void onCreateScene(final OnCreateSceneCallback pOnCreateSceneCallback) throws IOException {
         // this.mEngine.registerUpdateHandler(new FPSLogger());
         final VertexBufferObjectManager vbom = this.getVertexBufferObjectManager();
-        initProgressBar(vbom);
         initSplashScene(vbom);
         pOnCreateSceneCallback.onCreateSceneFinished(splashScene);
         // F2MusicManager.getInstance().playMusic(MusicEnum.COMMON_LOADING, true);
@@ -150,10 +149,7 @@ public class GameActivity extends LayoutGameActivity {
      * @param vbom
      */
     private void initProgressBar(final VertexBufferObjectManager vbom) {
-        progressBar = new ProgressBar(camera, CAMERA_CENTER_X, 58, 850, 18, vbom);
-        progressBar.setFrameColor(0, 0, 0, 0.8f);
-        progressBar.setProgressColor(1, 1, 0, 1);
-        progressBar.setBackColor(0, 0, 0, 1);
+        progressBar = new ProgressBar(CAMERA_CENTER_X, 58, this);
         this.camera.setHUD(progressBar);
     }
 
@@ -197,7 +193,7 @@ public class GameActivity extends LayoutGameActivity {
             @Override
             public void run() {
                 loadResources1();
-                progressBar.increase(100);
+                progressBar.setPercent(100);
                 splashScene.detachChildren();
                 splashScene.detachSelf();
                 splashTexture.unload();
@@ -225,6 +221,13 @@ public class GameActivity extends LayoutGameActivity {
     @Override
     public synchronized void onGameCreated() {
         super.onGameCreated();
+        EntityFactory.getInstance().init(this.getVertexBufferObjectManager());
+        try {
+            TextureFactory.getInstance().init(this.getTextureManager(), this.getAssets());
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+        initProgressBar(this.getVertexBufferObjectManager());
         F2SoundManager.getInstance().play(SoundEnum.LOADING, true);
         loadAdditionResources();
     }

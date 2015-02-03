@@ -224,8 +224,13 @@ public class ArenaScene extends BaseScene {
         refleshButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                ArenaUtils.refresh();
-                updateScene();
+                ResourceManager.getInstance().setCurrentScene(SceneEnum.Arena, new IRCallback<BaseScene>() {
+                    @Override
+                    public BaseScene onCallback() {
+                        ArenaUtils.refresh();
+                        return ResourceManager.getInstance().getScene(SceneEnum.Arena);
+                    }
+                });
             }
         });
         this.attachChild(refleshButton);

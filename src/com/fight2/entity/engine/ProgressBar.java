@@ -1,110 +1,110 @@
 package com.fight2.entity.engine;
 
-import org.andengine.engine.camera.Camera;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import org.andengine.engine.camera.hud.HUD;
-import org.andengine.entity.primitive.Line;
+import org.andengine.entity.IEntity;
+import org.andengine.entity.clip.ClipEntity;
+import org.andengine.entity.modifier.SingleValueSpanEntityModifier;
 import org.andengine.entity.primitive.Rectangle;
-import org.andengine.opengl.vbo.VertexBufferObjectManager;
+import org.andengine.entity.sprite.Sprite;
 
-/**
- * @author Jong - Yonatan
- * 
- */
+import com.fight2.GameActivity;
+import com.fight2.constant.TextureEnum;
+import com.fight2.util.EntityFactory;
+
 public class ProgressBar extends HUD {
-    // ===========================================================
-    // Constants
-    // ===========================================================
-    private static final float FRAME_LINE_WIDTH = 5f;
-    // ===========================================================
-    // Fields
-    // ===========================================================
-    private final Line[] mFrameLines = new Line[4];
-    private final Rectangle mBackgroundRectangle;
-    private final Rectangle mProgressRectangle;
+    private static final float WIDTH = TextureEnum.COMMON_PROGRESS_BAR.getWidth();
+    private static final float HEIGHT = TextureEnum.COMMON_PROGRESS_BAR.getHeight();
+    private static final float EDGE_WIDTH = TextureEnum.COMMON_PROGRESS_BAR_RIGHT.getWidth();
+    private final TextureEnum textureEnum = TextureEnum.COMMON_PROGRESS_BAR;
+    private final TextureEnum textureEnumRight = TextureEnum.COMMON_PROGRESS_BAR_RIGHT;
 
-    private final float mPixelsPerPercentRatio;
+    private final GameActivity activity;
+    private final ClipEntity mainClipEntity;
+    private final ClipEntity rightClipEntity;
+    private final Sprite rightHpSprite;
 
-    private final float initX;
-    private final float initY;
-    private int progress = 0;
+    private int currentPercent;
 
-    // ===========================================================
-    // Constructors
-    // ===========================================================
-    public ProgressBar(final Camera pCamera, final float pX, final float pY, final float pWidth, final float pHeight, final VertexBufferObjectManager vbo) {
+    public ProgressBar(final float pX, final float pY, final GameActivity activity) {
         super();
-        super.setCamera(pCamera);
-        initX = pX - pWidth * 0.5f;
-        initY = pY;
+        super.setCamera(activity.getCamera());
+        this.activity = activity;
 
-        this.mBackgroundRectangle = new Rectangle(pX, pY, pWidth, pHeight, vbo);
+        final Sprite initHpSprite = EntityFactory.getInstance().createALBImageSprite(textureEnum, 0, 0);
+        mainClipEntity = new ClipEntity(WIDTH * 0.5f, HEIGHT * 0.5f, 1, HEIGHT);
+        mainClipEntity.attachChild(initHpSprite);
+        rightHpSprite = EntityFactory.getInstance().createALBImageSprite(textureEnumRight, 0, 0);
+        rightClipEntity = new ClipEntity(WIDTH - EDGE_WIDTH * 0.5f, HEIGHT * 0.5f, 1, HEIGHT);
+        rightClipEntity.attachChild(rightHpSprite);
 
-        this.mFrameLines[0] = new Line(pX - pWidth * 0.5f, pY - pHeight * 0.5f, pX + pWidth * 0.5f, pY - pHeight * 0.5f, FRAME_LINE_WIDTH, vbo); // Bottom line.
-        this.mFrameLines[1] = new Line(pX + pWidth * 0.5f, pY - pHeight * 0.5f, pX + pWidth * 0.5f, pY + pHeight * 0.5f, FRAME_LINE_WIDTH, vbo); // Right line.
-        this.mFrameLines[2] = new Line(pX - pWidth * 0.5f, pY + pHeight * 0.5f, pX + pWidth * 0.5f, pY + pHeight * 0.5f, FRAME_LINE_WIDTH, vbo); // Top line.
-        this.mFrameLines[3] = new Line(pX - pWidth * 0.5f, pY - pHeight * 0.5f, pX - pWidth * 0.5f, pY + pHeight * 0.5f, FRAME_LINE_WIDTH, vbo); // Left line.
-
-        this.mProgressRectangle = new Rectangle(pX, pY, 0.0001f, pHeight, vbo);
-
-        super.attachChild(this.mBackgroundRectangle); // This one is drawn first.
-        super.attachChild(this.mProgressRectangle); // The progress is drawn afterwards.
-        for (int i = 0; i < this.mFrameLines.length; i++)
-            super.attachChild(this.mFrameLines[i]); // Lines are drawn last, so they'll override everything.
-
-        this.mPixelsPerPercentRatio = pWidth / 100;
+        final Rectangle container = new Rectangle(pX, pY, WIDTH, HEIGHT, activity.getVertexBufferObjectManager());
+        container.setAlpha(0);
+        this.attachChild(container);
+        container.attachChild(mainClipEntity);
+        container.attachChild(rightClipEntity);
     }
 
-    // ===========================================================
-    // Getter & Setter
-    // ===========================================================
-    public void setBackColor(final float pRed, final float pGreen, final float pBlue, final float pAlpha) {
-        this.mBackgroundRectangle.setColor(pRed, pGreen, pBlue, pAlpha);
-    }
-
-    public void setFrameColor(final float pRed, final float pGreen, final float pBlue, final float pAlpha) {
-        for (int i = 0; i < this.mFrameLines.length; i++)
-            this.mFrameLines[i].setColor(pRed, pGreen, pBlue, pAlpha);
-    }
-
-    public void setProgressColor(final float pRed, final float pGreen, final float pBlue, final float pAlpha) {
-        this.mProgressRectangle.setColor(pRed, pGreen, pBlue, pAlpha);
-    }
-
-    /**
-     * Set the current progress of this progress bar.
-     * 
-     * @param pProgress
-     *            is <b> BETWEEN </b> 0 - 100.
-     */
-    private void setProgress(final float pProgress) {
-        if (pProgress < 0)
-            this.mProgressRectangle.setWidth(0); // This is an internal check for my specific game, you can remove it.
-        final float width = this.mPixelsPerPercentRatio * pProgress;
-        this.mProgressRectangle.setPosition(initX + width * 0.5f, initY);
-        this.mProgressRectangle.setWidth(width);
-    }
-
-    public void increase(final int progressNum) {
-        for (int i = this.progress * 10; i < progressNum * 10; i++) {
-            this.setProgress(i * 0.1f);
+    public void setPercent(final int percentage) {
+        for (int i = this.currentPercent * 10; i < percentage * 10; i++) {
+            this.changePercent(i * 0.1f);
             try {
                 Thread.sleep(2);
             } catch (final InterruptedException e) {
                 throw new RuntimeException(e);
             }
         }
-        this.progress = progressNum;
+        this.currentPercent = percentage;
     }
-    // ===========================================================
-    // Methods for/from SuperClass/Interfaces
-    // ===========================================================
 
-    // ===========================================================
-    // Methods
-    // ===========================================================
+    private void changePercent(final float percentage) {
+        final int toPoint = (int) percentage;
+        final float currentWidth = BigDecimal.valueOf(WIDTH).multiply(BigDecimal.valueOf(toPoint)).divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP)
+                .floatValue();
 
-    // ===========================================================
-    // Inner and Anonymous Classes
-    // ===========================================================
+        if (currentWidth < EDGE_WIDTH * 2f) {
+            final float hpEdgeWidth = currentWidth * 0.5f;
+            mainClipEntity.setWidth(hpEdgeWidth);
+            mainClipEntity.setX(hpEdgeWidth * 0.5f);
+            rightClipEntity.setWidth(hpEdgeWidth);
+            rightClipEntity.setX(hpEdgeWidth * 1.5f);
+            rightHpSprite.setX(hpEdgeWidth - EDGE_WIDTH + EDGE_WIDTH * 0.5f);
+        } else {
+            mainClipEntity.setWidth(currentWidth - EDGE_WIDTH);
+            mainClipEntity.setX(mainClipEntity.getWidth() * 0.5f);
+            rightClipEntity.setWidth(EDGE_WIDTH);
+            rightClipEntity.setX(currentWidth - EDGE_WIDTH * 0.5f);
+        }
+    }
 
+    private class ProgressBarModifier extends SingleValueSpanEntityModifier {
+
+        public ProgressBarModifier(final float pDuration, final float pFromValue, final float pToValue) {
+            super(pDuration, pFromValue, pToValue);
+        }
+
+        @Override
+        protected void onSetInitialValue(final IEntity pItem, final float pValue) {
+            final ProgressBar progressBar = (ProgressBar) pItem;
+            progressBar.changePercent(pValue);
+        }
+
+        @Override
+        protected void onSetValue(final IEntity pItem, final float pPercentageDone, final float pValue) {
+            final ProgressBar progressBar = (ProgressBar) pItem;
+            progressBar.changePercent(pValue);
+        }
+
+        protected ProgressBarModifier(final ProgressBarModifier modifier) {
+            super(modifier);
+        }
+
+        @Override
+        public ProgressBarModifier deepCopy() throws org.andengine.util.modifier.IModifier.DeepCopyNotSupportedException {
+            return new ProgressBarModifier(this);
+        }
+
+    }
 }

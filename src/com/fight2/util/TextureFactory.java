@@ -19,7 +19,6 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.TextureEnum;
-import com.fight2.entity.engine.ProgressBar;
 
 public class TextureFactory {
     private static TextureFactory INSTANCE = new TextureFactory();
@@ -44,7 +43,7 @@ public class TextureFactory {
         imageDatas.clear();
     }
 
-    public void loadResource(final TextureManager textureManager, final AssetManager assetManager, final ProgressBar progressBar) throws IOException {
+    public void init(final TextureManager textureManager, final AssetManager assetManager) throws IOException {
         this.textureManager = textureManager;
         this.assetManager = assetManager;
     }
