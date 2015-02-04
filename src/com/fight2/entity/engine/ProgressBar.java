@@ -4,9 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 import org.andengine.engine.camera.hud.HUD;
-import org.andengine.entity.IEntity;
 import org.andengine.entity.clip.ClipEntity;
-import org.andengine.entity.modifier.SingleValueSpanEntityModifier;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.sprite.Sprite;
 
@@ -21,7 +19,6 @@ public class ProgressBar extends HUD {
     private final TextureEnum textureEnum = TextureEnum.COMMON_PROGRESS_BAR;
     private final TextureEnum textureEnumRight = TextureEnum.COMMON_PROGRESS_BAR_RIGHT;
 
-    private final GameActivity activity;
     private final ClipEntity mainClipEntity;
     private final ClipEntity rightClipEntity;
     private final Sprite rightHpSprite;
@@ -31,7 +28,6 @@ public class ProgressBar extends HUD {
     public ProgressBar(final float pX, final float pY, final GameActivity activity) {
         super();
         super.setCamera(activity.getCamera());
-        this.activity = activity;
 
         final Sprite initHpSprite = EntityFactory.getInstance().createALBImageSprite(textureEnum, 0, 0);
         mainClipEntity = new ClipEntity(WIDTH * 0.5f, HEIGHT * 0.5f, 1, HEIGHT);
@@ -79,32 +75,4 @@ public class ProgressBar extends HUD {
         }
     }
 
-    private class ProgressBarModifier extends SingleValueSpanEntityModifier {
-
-        public ProgressBarModifier(final float pDuration, final float pFromValue, final float pToValue) {
-            super(pDuration, pFromValue, pToValue);
-        }
-
-        @Override
-        protected void onSetInitialValue(final IEntity pItem, final float pValue) {
-            final ProgressBar progressBar = (ProgressBar) pItem;
-            progressBar.changePercent(pValue);
-        }
-
-        @Override
-        protected void onSetValue(final IEntity pItem, final float pPercentageDone, final float pValue) {
-            final ProgressBar progressBar = (ProgressBar) pItem;
-            progressBar.changePercent(pValue);
-        }
-
-        protected ProgressBarModifier(final ProgressBarModifier modifier) {
-            super(modifier);
-        }
-
-        @Override
-        public ProgressBarModifier deepCopy() throws org.andengine.util.modifier.IModifier.DeepCopyNotSupportedException {
-            return new ProgressBarModifier(this);
-        }
-
-    }
 }

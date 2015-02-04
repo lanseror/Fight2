@@ -1,6 +1,8 @@
 package com.fight2.entity.engine;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 import org.andengine.entity.IEntity;
 import org.andengine.entity.scene.Scene;
@@ -29,11 +31,14 @@ public class CardAvatar extends Sprite {
     private final Card card;
     private final float width;
     private final float height;
+    private static BigDecimal FACTOR_BASE = BigDecimal.valueOf(135);
 
-    public CardAvatar(final float x, final float y, final float width, final float height, final Card card, final GameActivity activity) {
-        super(x, y, width + 5, height + 5, TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_AVATAR_FRAME), activity.getVertexBufferObjectManager());
-        this.width = width;
-        this.height = height;
+    public CardAvatar(final float x, final float y, final float fWidth, final float fHeight, final Card card, final GameActivity activity) {
+        super(x, y, fWidth, fHeight, TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.COMMON_AVATAR_FRAME), activity.getVertexBufferObjectManager());
+        final BigDecimal factor = BigDecimal.valueOf(fWidth).divide(FACTOR_BASE, 4, RoundingMode.HALF_UP);
+        final float offSet = factor.multiply(BigDecimal.valueOf(8)).floatValue();
+        this.width = fWidth - offSet;
+        this.height = fHeight - offSet;
         this.activity = activity;
         this.vbom = activity.getVertexBufferObjectManager();
 

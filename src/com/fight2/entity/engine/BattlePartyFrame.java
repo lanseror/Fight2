@@ -40,8 +40,8 @@ public class BattlePartyFrame extends Rectangle {
     public final static int HEIGHT = 165;
     public final static int CARD_WIDTH = 100;
     public final static int CARD_HEIGHT = 150;
-    public final static int AVATAR_WIDTH = 72;
-    public final static int AVATAR_HEIGHT = 72;
+    public final static int AVATAR_WIDTH = 73;
+    public final static int AVATAR_HEIGHT = 73;
     private final float initX;
     private final float initY;
     private final VertexBufferObjectManager vbom;
@@ -111,7 +111,7 @@ public class BattlePartyFrame extends Rectangle {
     }
 
     private void createTopCard(final Party party) {
-        final float avatarGap = 1;
+        final float avatarGap = 0;
         final float startX = 10 + AVATAR_WIDTH * 0.5f;
         final Card[] cards = party.getCards();
         for (int i = 0; i < cards.length; i++) {
