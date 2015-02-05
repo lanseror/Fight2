@@ -134,9 +134,9 @@ public class BattlePartyFrame extends Rectangle {
         int iconX = 166;
         for (final ComboSkill comboSkill : comboSkills) {
             final ITextureRegion texture = TEXTURE_FACTORY.newTextureRegion(comboSkill.getIcon());
-            final Sprite iconSprite = new Sprite(iconX, 58.5f, 30, 30, texture, vbom);
+            final Sprite iconSprite = new Sprite(iconX, 58.5f, 38, 38, texture, vbom);
             battlePartyFrame.attachChild(iconSprite);
-            iconX += 37;
+            iconX += 42;
             comboSpriteMap.put(comboSkill.getId(), iconSprite);
         }
     }
@@ -150,9 +150,9 @@ public class BattlePartyFrame extends Rectangle {
         int iconX = 167;
         for (final ComboSkill comboSkill : comboSkills) {
             final ITextureRegion texture = TEXTURE_FACTORY.newTextureRegion(comboSkill.getIcon());
-            final Sprite iconSprite = new Sprite(iconX, 26.5f, 31, 31, texture, vbom);
+            final Sprite iconSprite = new Sprite(iconX, 26.5f, 38, 38, texture, vbom);
             battlePartyFrame.attachChild(iconSprite);
-            iconX += 39;
+            iconX += 42;
             comboSpriteMap.put(comboSkill.getId(), iconSprite);
         }
     }

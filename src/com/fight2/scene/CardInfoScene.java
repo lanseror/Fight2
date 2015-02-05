@@ -134,14 +134,24 @@ public class CardInfoScene extends BaseScene {
         this.topAlignEntity(skillEffectText, 190);
         infoFrame.attachChild(skillEffectText);
 
+        this.setTouchAreaBindingOnActionDownEnabled(true);
+        this.setTouchAreaBindingOnActionMoveEnabled(true);
+        activity.getGameHub().needSmallChatRoom(false);
+        final ITextureRegion texture = TEXTURE_FACTORY.newTextureRegion(card.getImage());
+        if (cardSprite != null) {
+            cardSprite.detachSelf();
+        }
+        cardSprite = new Sprite(this.simulatedLeftX + 108 + CARD_WIDTH * 0.5f, FRAME_BOTTOM + CARD_HEIGHT * 0.5f, CARD_WIDTH, CARD_HEIGHT, texture, vbom);
+        this.attachChild(cardSprite);
+
         final float comboFrameHeight = TextureEnum.CARDINFO_COMBO_FRAME.getHeight();
         final Sprite comboFrame = createALBImageSprite(TextureEnum.CARDINFO_COMBO_FRAME, this.simulatedLeftX + 105, FRAME_BOTTOM - comboFrameHeight);
         this.attachChild(comboFrame);
         final List<ComboSkill> combos = CardUtils.getCardComboSkills(card, activity);
         float comboX = 40;
         for (final ComboSkill combo : combos) {
-            final ITextureRegion texture = TEXTURE_FACTORY.newTextureRegion(combo.getIcon());
-            final Sprite iconSprite = new Sprite(comboX, comboFrameHeight * 0.5f, 60, 60, texture, vbom) {
+            final ITextureRegion iconTexture = TEXTURE_FACTORY.newTextureRegion(combo.getIcon());
+            final Sprite iconSprite = new Sprite(comboX, comboFrameHeight * 0.5f, 90, 90, iconTexture, vbom) {
                 @Override
                 public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                     if (pSceneTouchEvent.isActionDown()) {
@@ -157,18 +167,8 @@ public class CardInfoScene extends BaseScene {
             };
             this.registerTouchArea(iconSprite);
             comboFrame.attachChild(iconSprite);
-            comboX += 70;
+            comboX += 100;
         }
-
-        this.setTouchAreaBindingOnActionDownEnabled(true);
-        this.setTouchAreaBindingOnActionMoveEnabled(true);
-        activity.getGameHub().needSmallChatRoom(false);
-        final ITextureRegion texture = TEXTURE_FACTORY.newTextureRegion(card.getImage());
-        if (cardSprite != null) {
-            cardSprite.detachSelf();
-        }
-        cardSprite = new Sprite(this.simulatedLeftX + 108 + CARD_WIDTH * 0.5f, FRAME_BOTTOM + CARD_HEIGHT * 0.5f, CARD_WIDTH, CARD_HEIGHT, texture, vbom);
-        this.attachChild(cardSprite);
     }
 
     private ITextureRegion getStarTexture(final Card card) {
