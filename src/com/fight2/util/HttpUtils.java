@@ -35,7 +35,17 @@ public class HttpUtils {
         return jsonObj;
     }
 
+    public static JSONObject asyncGetJSONFromUrl(final String url) throws ClientProtocolException, IOException, JSONException {
+        final String jsonString = asyncGetJSONString(url);
+        final JSONObject jsonObj = new JSONObject(jsonString);
+        return jsonObj;
+    }
+
     private static synchronized String getJSONString(final String url) throws ClientProtocolException, IOException {
+        return asyncGetJSONString(url);
+    }
+
+    private static String asyncGetJSONString(final String url) throws ClientProtocolException, IOException {
         // Making HTTP request
         final StringBuilder jsonString = new StringBuilder();
         try {

@@ -39,7 +39,7 @@ public class ChatUtils {
         return false;
     }
 
-    public static synchronized List<ChatMessage> get(final GameActivity activity) {
+    public static List<ChatMessage> get(final GameActivity activity) {
         final String url = HttpUtils.HOST_URL + "/chat/get.action?index=" + msgIndex;
         final List<ChatMessage> messages = new ArrayList<ChatMessage>();
         try {
@@ -67,7 +67,11 @@ public class ChatUtils {
         return messages;
     }
 
-    public static synchronized ChatMessage getDisplayMessage(final DisplayChannel displayChannel) {
+    public static synchronized void updateFullChatMessage() {
+        displayedFullMsg = displayedMiniMsg > 10 ? displayedMiniMsg - 10 : 0;
+    }
+
+    public static ChatMessage getDisplayMessage(final DisplayChannel displayChannel) {
         final int displayedMsg = (displayChannel == DisplayChannel.MiniChatRoom ? displayedMiniMsg : displayedFullMsg);
         final int tempDisplayedMsg = displayedMsg + 1;
         final ChatMessage message = CHAT_MESSAGES.get(tempDisplayedMsg);

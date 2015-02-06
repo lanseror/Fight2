@@ -198,6 +198,7 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
             @Override
             public void run() {
                 closeButton.toggle();
+                ChatUtils.updateFullChatMessage();
                 final int diff = ChatUtils.displayedMiniMsg - ChatUtils.displayedFullMsg;
                 if (chatContainer.getChildCount() > 30 && diff > 15) {
                     chatContainer.detachChildren();

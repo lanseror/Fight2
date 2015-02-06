@@ -166,12 +166,13 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                             final float[] playerSceneCordinates = hero.getSceneCenterCoordinates();
                             final TMXTile currentTile = tmxLayer.getTMXTileAt(playerSceneCordinates[Constants.VERTEX_INDEX_X],
                                     playerSceneCordinates[Constants.VERTEX_INDEX_Y]);
-                            // Debug.e("Found currentTile:" + currentTile.getTileColumn() + "," + currentTile.getTileRow());
-                            path = tmxUtils.findPath(currentTile, destTile, tmxLayer);
-                            showPathTags(path);
-                            goStatus = QuestGoStatus.Ready;
-                            return true;
-                        }
+                            if (destTile != currentTile) {
+                                path = tmxUtils.findPath(currentTile, destTile, tmxLayer);
+                                showPathTags(path);
+                                goStatus = QuestGoStatus.Ready;
+                                return true;
+                            }
+                             }
                     } else if (goStatus == QuestGoStatus.Ready && destTouchArea.contains(sceneX, sceneY)) {
                         go(tmxUtils.getPathTiles(), path);
                         return true;
