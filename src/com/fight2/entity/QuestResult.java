@@ -68,6 +68,7 @@ public class QuestResult {
     public enum TileItem {
         Ticket,
         Stamina,
+        CoinBag,
         Card
     }
 }

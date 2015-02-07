@@ -52,6 +52,10 @@ public class QuestTreasureScene extends BaseScene {
             final TextureEnum ticketEnum = TextureEnum.COMMON_ARENA_TICKET;
             final IEntity ticketImg = createACImageSprite(ticketEnum, CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f);
             cardFrame.attachChild(ticketImg);
+        } else if (tileItem == TileItem.CoinBag) {
+            final TextureEnum coinBagEnum = TextureEnum.COMMON_COIN_BAG;
+            final IEntity coinBagImg = createACImageSprite(coinBagEnum, CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f);
+            cardFrame.attachChild(coinBagImg);
         }
 
         init();

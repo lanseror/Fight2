@@ -23,6 +23,8 @@ public enum TextureEnum {
     COMMON_STAR_6("images/common_star_6.png", 164, 30),
     COMMON_ARENA_TICKET("images/common_arena_ticket.png", 109, 76),
     COMMON_STAMINA("images/common_stamina.png", 120, 138),
+    COMMON_COIN("images/common_coin.png", 45, 42),
+    COMMON_COIN_BAG("images/common_coin_bag.png", 120, 114),
     COMMON_MIGHT_ICON("images/common_might_icon.png", 44, 44),
     COMMON_GUILD_CONTRIBUTION("images/common_guild_contribution.png", 36, 36),
     COMMON_STAMINA_BOX("images/common_stamina_box.png", 262, 65),
