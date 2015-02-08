@@ -23,22 +23,18 @@ import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
 import com.fight2.entity.User;
 import com.fight2.entity.battle.BattleType;
+import com.fight2.entity.engine.CardOutFrame;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
-import com.fight2.util.AsyncTaskLoader;
 import com.fight2.util.CardUtils;
 import com.fight2.util.F2MusicManager;
 import com.fight2.util.F2SoundManager;
-import com.fight2.util.IAsyncCallback;
 import com.fight2.util.IRCallback;
-import com.fight2.util.ImageUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
 
 public class PreBattleScene extends BaseScene {
     private final TextureFactory textureFactory = TextureFactory.getInstance();
-    private final Sprite myCardSprite;
-    private final Sprite opponentCardSprite;
     public final static int GAP = 25;
     public final static int CARD_WIDTH = 340;
     public final static int CARD_HEIGHT = 510;
@@ -73,15 +69,14 @@ public class PreBattleScene extends BaseScene {
         opponentParties = opponentPartyInfo.getParties();
         final Card myLeader = myParties[0].getCards()[0];
         final Card opponentLeader = opponentParties[0].getCards()[0];
-        final ITextureRegion coverTexture = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_CARD_COVER);
 
-        myCardSprite = new Sprite(this.cameraCenterX - CARD_CENTER_X - GAP, this.cameraCenterY, CARD_WIDTH, CARD_HEIGHT, coverTexture, vbom);
+        final CardOutFrame myCardSprite = new CardOutFrame(this.cameraCenterX - CARD_CENTER_X - GAP, this.cameraCenterY, CARD_WIDTH, CARD_HEIGHT, myLeader,
+                activity);
         this.attachChild(myCardSprite);
-        loadMyImageFromServer(myLeader);
 
-        this.opponentCardSprite = new Sprite(this.cameraCenterX + CARD_CENTER_X + GAP, this.cameraCenterY, CARD_WIDTH, CARD_HEIGHT, coverTexture, vbom);
+        final CardOutFrame opponentCardSprite = new CardOutFrame(this.cameraCenterX + CARD_CENTER_X + GAP, this.cameraCenterY, CARD_WIDTH, CARD_HEIGHT,
+                opponentLeader, activity);
         this.attachChild(opponentCardSprite);
-        loadImageFromServer(opponentLeader);
 
         final Sprite vsSprite = createACImageSprite(TextureEnum.PREBATTLE_VS_ICON, this.cameraCenterX + 15, this.cameraCenterY);
         this.attachChild(vsSprite);
@@ -225,90 +220,6 @@ public class PreBattleScene extends BaseScene {
                 }
             }
         });
-    }
-
-    public void loadImageFromServer(final Card card) {
-        final IAsyncCallback callback = new IAsyncCallback() {
-            private String image;
-
-            @Override
-            public void workToDo() {
-                try {
-                    if (!card.isImageLoaded()) {
-                        image = ImageUtils.getLocalString(card.getImage(), activity);
-                        card.setImage(image);
-                        card.setImageLoaded(true);
-                    } else {
-                        image = card.getImage();
-                    }
-                } catch (final IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-            }
-
-            @Override
-            public void onComplete() {
-
-                if (image != null) {
-                    final ITextureRegion texture = textureFactory.newTextureRegion(image);
-                    final Sprite imageSprite = new Sprite(CARD_CENTER_X, CARD_CENTER_Y, CARD_WIDTH, CARD_HEIGHT, texture, vbom);
-                    opponentCardSprite.attachChild(imageSprite);
-                }
-
-            }
-
-        };
-
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                new AsyncTaskLoader().execute(callback);
-            }
-        });
-
-    }
-
-    public void loadMyImageFromServer(final Card card) {
-        final IAsyncCallback callback = new IAsyncCallback() {
-            private String image;
-
-            @Override
-            public void workToDo() {
-                try {
-                    if (!card.isImageLoaded()) {
-                        image = ImageUtils.getLocalString(card.getImage(), activity);
-                        card.setImage(image);
-                        card.setImageLoaded(true);
-                    } else {
-                        image = card.getImage();
-                    }
-                } catch (final IOException e) {
-                    throw new RuntimeException(e);
-                }
-
-            }
-
-            @Override
-            public void onComplete() {
-
-                if (image != null) {
-                    final ITextureRegion texture = textureFactory.newTextureRegion(image);
-                    final Sprite imageSprite = new Sprite(CARD_CENTER_X, CARD_CENTER_Y, CARD_WIDTH, CARD_HEIGHT, texture, vbom);
-                    myCardSprite.attachChild(imageSprite);
-                }
-
-            }
-
-        };
-
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                new AsyncTaskLoader().execute(callback);
-            }
-        });
-
     }
 
     @Override

@@ -69,6 +69,7 @@ public enum TextureEnum {
     COMMON_CLOSE_BUTTON("images/common_close_button.png", 43, 43),
     COMMON_LOADING("images/common_loading2.png", 100, 100),
     COMMON_AVATAR_FRAME("images/common_avatar_frame.png", 208, 208),
+    COMMON_CARD_FRAME("images/common_card_frame.png", 400, 600),
     COMMON_PROGRESS_BAR("images/common_progress_bar.png", 868, 22),
     COMMON_PROGRESS_BAR_RIGHT("images/common_progress_bar_right.png", 9, 22),
 

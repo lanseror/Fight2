@@ -19,7 +19,6 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
-import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.util.algorithm.collision.BaseCollisionChecker;
 
@@ -34,21 +33,17 @@ import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
 import com.fight2.entity.QuestTask;
 import com.fight2.entity.QuestTask.UserTaskStatus;
+import com.fight2.entity.engine.CardAvatar;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
-import com.fight2.util.AsyncTaskLoader;
 import com.fight2.util.ChatUtils;
-import com.fight2.util.IAsyncCallback;
 import com.fight2.util.ICallback;
 import com.fight2.util.IRCallback;
-import com.fight2.util.ImageUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TaskUtils;
-import com.fight2.util.TextureFactory;
 import com.fight2.util.TiledTextureFactory;
 
 public class MainScene extends BaseScene {
-    private final TextureFactory textureFactory = TextureFactory.getInstance();
     private static final float[] GATE_VERTICES = { 350, 468, 548, 475, 506, 382, 451, 338, 350, 344 };
     private static final float[] CONGRESS_VERTICES = { 559, 416, 862, 633, 997, 496, 1003, 451, 930, 380 };
     private static final float[] ARENA_VERTICES = { 518, 392, 863, 386, 861, 283, 534, 270 };
@@ -77,7 +72,7 @@ public class MainScene extends BaseScene {
     private final PartyInfo myPartyInfo = GameUserSession.getInstance().getPartyInfo();
     private final Party[] myParties = myPartyInfo.getParties();
     private IEntity avatarBox;
-    private int avatarCardId = -1;
+    private final int avatarCardId = -1;
     private final float avatarSize = 90;
     private final float avatarHalfSize = avatarSize * 0.5f;
     private final Sprite smallMsgNewSprite = createALBImageSprite(TextureEnum.MAIN_MSG_NEW_SMALL, 0, 0);
@@ -455,55 +450,8 @@ public class MainScene extends BaseScene {
     public void updateScene() {
         final Card myLeader = myParties[0].getCards()[0];
         if (myLeader != null && myLeader.getId() != this.avatarCardId) {
-            final ITextureRegion avatarCoverTexture = textureFactory.getAssetTextureRegion(TextureEnum.COMMON_CARD_COVER);
-            final Sprite avatarCoverSprite = new Sprite(avatarHalfSize, avatarHalfSize, avatarSize, avatarSize, avatarCoverTexture, vbom);
+            final Sprite avatarCoverSprite = new CardAvatar(avatarHalfSize, avatarHalfSize, avatarSize, avatarSize, myLeader, activity);
             avatarBox.attachChild(avatarCoverSprite);
-            final IAsyncCallback callback = new IAsyncCallback() {
-                private String avatar;
-
-                @Override
-                public void workToDo() {
-                    try {
-                        if (!myLeader.isAvatarLoaded() && myLeader.getAvatar() != null) {
-                            avatar = ImageUtils.getLocalString(myLeader.getAvatar(), activity);
-                            myLeader.setAvatar(avatar);
-                            myLeader.setAvatarLoaded(true);
-                        } else {
-                            avatar = myLeader.getAvatar();
-                        }
-
-                    } catch (final IOException e) {
-                        throw new RuntimeException(e);
-                    }
-
-                }
-
-                @Override
-                public void onComplete() {
-
-                    if (avatar != null) {
-                        final ITextureRegion texture = textureFactory.newTextureRegion(avatar);
-                        final Sprite avatarSprite = new Sprite(avatarHalfSize, avatarHalfSize, avatarSize, avatarSize, texture, vbom);
-                        activity.runOnUpdateThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                avatarCoverSprite.detachSelf();
-                                avatarBox.attachChild(avatarSprite);
-                                avatarCardId = myLeader.getId();
-                            }
-                        });
-
-                    }
-                }
-
-            };
-
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    new AsyncTaskLoader().execute(callback);
-                }
-            });
         }
         final QuestTask task = TaskUtils.getTask();
         if (task.getStatus() == UserTaskStatus.Ready || task.getStatus() == UserTaskStatus.Finished) {

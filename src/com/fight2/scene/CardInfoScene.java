@@ -19,6 +19,7 @@ import com.fight2.constant.FontEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.ComboSkill;
+import com.fight2.entity.engine.CardOutFrame;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.CardUtils;
@@ -27,11 +28,10 @@ import com.fight2.util.TextureFactory;
 
 public class CardInfoScene extends BaseScene {
     private static final TextureFactory TEXTURE_FACTORY = TextureFactory.getInstance();
-    private final static int CARD_WIDTH = 310;
-    private final static int CARD_HEIGHT = 465;
+    private final static int CARD_WIDTH = 314;
+    private final static int CARD_HEIGHT = 471;
     private final static int FRAME_BOTTOM = 100;
 
-    private Sprite cardSprite;
     private final Card card;
 
     public CardInfoScene(final GameActivity activity, final Card card) throws IOException {
@@ -137,11 +137,8 @@ public class CardInfoScene extends BaseScene {
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
         activity.getGameHub().needSmallChatRoom(false);
-        final ITextureRegion texture = TEXTURE_FACTORY.newTextureRegion(card.getImage());
-        if (cardSprite != null) {
-            cardSprite.detachSelf();
-        }
-        cardSprite = new Sprite(this.simulatedLeftX + 108 + CARD_WIDTH * 0.5f, FRAME_BOTTOM + CARD_HEIGHT * 0.5f, CARD_WIDTH, CARD_HEIGHT, texture, vbom);
+        final CardOutFrame cardSprite = new CardOutFrame(this.simulatedLeftX + 108 + CARD_WIDTH * 0.5f, FRAME_BOTTOM + CARD_HEIGHT * 0.5f, CARD_WIDTH,
+                CARD_HEIGHT, card, activity);
         this.attachChild(cardSprite);
 
         final float comboFrameHeight = TextureEnum.CARDINFO_COMBO_FRAME.getHeight();
