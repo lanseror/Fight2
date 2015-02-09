@@ -20,6 +20,7 @@ import com.fight2.entity.engine.CardAvatar;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.ResourceManager;
+import com.fight2.util.SkillUtils;
 import com.fight2.util.TextureFactory;
 
 public class ComboSkillScene extends BaseScene {
@@ -65,7 +66,7 @@ public class ComboSkillScene extends BaseScene {
         this.attachChild(iconSprite);
 
         final Font detailFont = ResourceManager.getInstance().newFont(FontEnum.Default, 28);
-        final Text descText = new Text(this.cameraCenterX, 350, detailFont, "团队死亡时有可能以100%的生命值复活。", vbom);
+        final Text descText = new Text(this.cameraCenterX, 350, detailFont, SkillUtils.getEffect(combo.getOperations()), vbom);
         descText.setColor(0XFFFBDE92);
         this.attachChild(descText);
 

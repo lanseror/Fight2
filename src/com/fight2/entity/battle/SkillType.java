@@ -4,6 +4,7 @@ public enum SkillType {
     HP,
     ATK,
     Defence,
-    Skip;
+    Skip,
+    Revival;
 
 }

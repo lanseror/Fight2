@@ -149,7 +149,7 @@ public class GameActivity extends LayoutGameActivity {
      * @param vbom
      */
     private void initProgressBar(final VertexBufferObjectManager vbom) {
-        progressBar = new ProgressBar(CAMERA_CENTER_X, 58, this);
+        progressBar = new ProgressBar(CAMERA_CENTER_X+5, 58, this);
         this.camera.setHUD(progressBar);
     }
 

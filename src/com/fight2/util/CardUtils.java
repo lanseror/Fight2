@@ -19,6 +19,7 @@ import android.util.SparseArray;
 import com.fight2.GameActivity;
 import com.fight2.entity.Card;
 import com.fight2.entity.Card.Race;
+import com.fight2.entity.battle.SkillOperation;
 import com.fight2.entity.CardTemplate;
 import com.fight2.entity.ComboSkill;
 import com.fight2.entity.GameUserSession;
@@ -409,7 +410,8 @@ public class CardUtils {
                     comboCards.add(comboCard);
                 }
                 comboSkill.setCards(comboCards);
-
+                final List<SkillOperation> operations = SkillUtils.opsFromJson(comboSkilJson);
+                comboSkill.setOperations(operations);
                 skills.add(comboSkill);
             }
         } catch (final ClientProtocolException e) {
