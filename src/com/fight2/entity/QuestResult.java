@@ -8,6 +8,7 @@ public class QuestResult {
     private boolean treasureUpdated;
     private QuestTreasureData questTreasureData;
     private User enemy;
+    private int stamina;
 
     public int getStatus() {
         return status;
@@ -63,6 +64,14 @@ public class QuestResult {
 
     public void setEnemy(final User enemy) {
         this.enemy = enemy;
+    }
+
+    public int getStamina() {
+        return stamina;
+    }
+
+    public void setStamina(final int stamina) {
+        this.stamina = stamina;
     }
 
     public enum TileItem {

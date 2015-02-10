@@ -27,8 +27,9 @@ public enum TextureEnum {
     COMMON_COIN_BAG("images/common_coin_bag.png", 120, 114),
     COMMON_MIGHT_ICON("images/common_might_icon.png", 44, 44),
     COMMON_GUILD_CONTRIBUTION("images/common_guild_contribution.png", 36, 36),
-    COMMON_STAMINA_BOX("images/common_stamina_box.png", 262, 65),
-    COMMON_STAMINA_STICK("images/common_stamina_stick.png", 203, 37),
+    COMMON_STAMINA_BOX("images/common_stamina_box.png", 262 * 0.8f, 65 * 0.8f),
+    COMMON_STAMINA_STICK("images/common_stamina_stick.png", 203 * 0.8f, 37 * 0.8f),
+    COMMON_STAMINA_STICK_RIGHT("images/common_stamina_stick_right.png", 7 * 0.8f, 37 * 0.8f),
     COMMON_EXPERIENCE_BOX("images/common_experience_box.png", 267, 67),
     COMMON_EXPERIENCE_BOX_STAR("images/common_experience_box_star.png", 267, 67),
     COMMON_EXPERIENCE_STICK("images/common_experience_stick.png", 205, 67),
@@ -72,6 +73,7 @@ public enum TextureEnum {
     COMMON_CARD_FRAME("images/common_card_frame.png", 400, 600),
     COMMON_PROGRESS_BAR("images/common_progress_bar.png", 868, 22),
     COMMON_PROGRESS_BAR_RIGHT("images/common_progress_bar_right.png", 9, 22),
+    COMMON_GUILD_CONTRIB_BAR("images/common_guild_contrib_bar.png", 129, 48),
 
     // Chat room images.
     CHAT_INPUT_BG("images/chat_input_backgroud.png", 850, 82),

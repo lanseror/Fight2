@@ -44,7 +44,7 @@ public class ProgressBar extends HUD {
     }
 
     public void setPercent(final int percentage) {
-        for (int i = this.currentPercent * 10; i < percentage * 10; i++) {
+        for (int i = this.currentPercent * 10; i <= percentage * 10; i++) {
             this.changePercent(i * 0.1f);
             try {
                 Thread.sleep(2);

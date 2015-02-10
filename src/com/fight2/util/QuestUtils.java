@@ -16,6 +16,7 @@ import com.fight2.entity.QuestResult.TileItem;
 import com.fight2.entity.QuestTile;
 import com.fight2.entity.QuestTreasureData;
 import com.fight2.entity.User;
+import com.fight2.entity.UserProperties;
 import com.fight2.entity.battle.BattleResult;
 
 public class QuestUtils {
@@ -48,6 +49,7 @@ public class QuestUtils {
                 enemy.setName(enymyJson.getString("name"));
                 result.setEnemy(enemy);
             }
+            result.setStamina(responseJson.getInt("stamina"));
             final boolean treasureUpdated = responseJson.getBoolean("treasureUpdate");
             result.setTreasureUpdated(treasureUpdated);
             if (treasureUpdated) {
@@ -108,6 +110,24 @@ public class QuestUtils {
         try {
             final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
             return BattleUtils.attack(activity, responseJson);
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static UserProperties getUserProperties(final GameActivity activity) {
+        final String url = HttpUtils.HOST_URL + "/quest/user-props";
+        try {
+            final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
+            final UserProperties userProperties = new UserProperties();
+            userProperties.setCoin(responseJson.getInt("coin"));
+            userProperties.setStamina(responseJson.getInt("stamina"));
+            userProperties.setTicket(responseJson.getInt("ticket"));
+            return userProperties;
         } catch (final JSONException e) {
             throw new RuntimeException(e);
         } catch (final ClientProtocolException e) {
