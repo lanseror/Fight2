@@ -90,6 +90,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     private final F2ButtonSprite cancelButton = createCancelButton();
     private AnimatedSprite flagSprite;
     private CommonStick staminaStick;
+    private boolean handlingFailure;
 
     public QuestScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -426,7 +427,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     }
 
     private void go(final List<TMXTile> pathTiles, final Path path) {
-        goStatus = QuestGoStatus.Started;
+        handlingFailure = false;
         final float[] xs = path.getCoordinatesX();
         final float[] ys = path.getCoordinatesY();
         hero.registerEntityModifier(new PathModifier(path.getSize() * 0.55f, path, null, new IPathModifierListener() {
@@ -437,7 +438,8 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
 
             @Override
             public void onPathWaypointStarted(final PathModifier pPathModifier, final IEntity pEntity, final int waypointIndex) {
-                if (waypointIndex % 5 == 0) {
+                if (waypointIndex % 5 == 0 && !handlingFailure) {
+                    goStatus = QuestGoStatus.Started;
                     final int startTileIndex = waypointIndex;
                     final int targetTileIndex = waypointIndex + 5 >= pathTiles.size() ? pathTiles.size() - 1 : waypointIndex + 5;
                     final int endTargetFlag = (targetTileIndex == pathTiles.size() - 1) ? 0 : 1;
@@ -445,7 +447,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                                                                                                                // >5 to avoid hack;
                 }
 
-                if (waypointIndex + 1 < path.getSize()) {
+                if (waypointIndex + 1 < path.getSize()&& !handlingFailure) {
                     hero.onGoing(path, waypointIndex);
                     activity.runOnUpdateThread(new Runnable() {
                         @Override
@@ -566,6 +568,9 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         if (goStatus == QuestGoStatus.Failed) {
             goStatus = QuestGoStatus.Stopped;
             cancelButton.setVisible(false);
+            handlingFailure = true;
+            hero.stopAnimation();
+            clearPathTages();
             activity.runOnUpdateThread(new Runnable() {
                 @Override
                 public void run() {
