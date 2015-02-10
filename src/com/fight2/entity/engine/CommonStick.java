@@ -50,28 +50,35 @@ public class CommonStick extends Entity {
         this.attachChild(rightClipEntity);
         this.text = new Text(width * 0.5f, height * 0.5f, font, String.format(TEXT_FORMAT, fullValue, fullValue), activity.getVertexBufferObjectManager());
         this.attachChild(text);
-        this.currentValue=fullValue;
+        this.currentValue = fullValue;
     }
 
     public void setValue(final int value) {
+        setValue(value, false);
+    }
+
+    public void setValue(final int value, final boolean immediately) {
         final int toValue = value > fullValue ? fullValue : value;
         final int fromValue = this.currentValue;
         final float duration = fromValue > toValue ? 0.2f : 0.2f;
-        final CommonStickModifier modifier = new CommonStickModifier(duration, fromValue, toValue);
-        activity.runOnUpdateThread(new Runnable() {
-            @Override
-            public void run() {
-                CommonStick.this.clearEntityModifiers();
-                CommonStick.this.registerEntityModifier(modifier);
-            }
-        });
-
+        if (!immediately) {
+            final CommonStickModifier modifier = new CommonStickModifier(duration, fromValue, toValue);
+            activity.runOnUpdateThread(new Runnable() {
+                @Override
+                public void run() {
+                    CommonStick.this.clearEntityModifiers();
+                    CommonStick.this.registerEntityModifier(modifier);
+                }
+            });
+        } else {
+            changeValue(toValue);
+        }
         this.currentValue = toValue;
         text.setText(String.format(TEXT_FORMAT, currentValue, fullValue));
     }
 
-    private void changeValue(final float percentage) {
-        final int toPoint = (int) percentage;
+    private void changeValue(final float value) {
+        final int toPoint = (int) value;
         final float currentWidth = BigDecimal.valueOf(width).multiply(BigDecimal.valueOf(toPoint)).divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP)
                 .floatValue();
 

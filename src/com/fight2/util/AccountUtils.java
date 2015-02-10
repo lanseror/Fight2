@@ -226,9 +226,15 @@ public class AccountUtils {
     public static int receiveCardFromUserStoreroom(final GameActivity activity, final int cardTemplateId) {
         final String url = HttpUtils.HOST_URL + "/user-storeroom/receive-card?id=" + cardTemplateId;
         try {
-            final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
-            final int size = responseJson.getInt("size");
-            return size;
+            final Collection<Card> sessionCards = GameUserSession.getInstance().getCards();
+            final JSONArray responseJsonArray = HttpUtils.getJSONArrayFromUrl(url);
+            int i = 0;
+            for (; i < responseJsonArray.length(); i++) {
+                final JSONObject cardJson = responseJsonArray.getJSONObject(i);
+                final Card card = CardUtils.cardFromJson(cardJson);
+                sessionCards.add(card);
+            }
+            return i;
         } catch (final ClientProtocolException e) {
             throw new RuntimeException(e);
         } catch (final IOException e) {

@@ -462,16 +462,15 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                     // F2SoundManager.getInstance().stop();
 
                     if (goStatus == QuestGoStatus.Started) {
-                        goStatus = QuestGoStatus.Waitting;
+                        handleWait();
                     } else {
-                        Debug.e("Normal!");
                         final int backStep = waypointIndex > 4 ? waypointIndex - 4 : 0;
                         handleResult(xs[backStep], ys[backStep], questResult);
                     }
 
                 }
 
-                if (waypointIndex == path.getSize() - 2) {
+                if (waypointIndex == path.getSize() - 2 && goStatus != QuestGoStatus.Waitting) {
                     goStatus = QuestGoStatus.Stopped;
                     cancelButton.setVisible(false);
                     hero.stopAnimation();
@@ -487,6 +486,33 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
 
     }
 
+    private void handleWait() {
+        goStatus = QuestGoStatus.Waitting;
+        cancelButton.setVisible(false);
+        try {
+            final LoadingScene loadingScene = new LoadingScene(activity);
+            this.setChildScene(loadingScene, false, false, true);
+            activity.getGameHub().setSmallChatRoomEnabled(false);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+        activity.runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                hero.clearEntityModifiers();
+            }
+
+        });
+    }
+
+    private void handleCatchUp() {
+        cancelButton.setVisible(false);
+        hero.stopAnimation();
+        F2SoundManager.getInstance().play(SoundEnum.HORSE8);
+        this.getChildScene().back();
+        activity.getGameHub().setSmallChatRoomEnabled(true);
+    }
+
     private void sendToServer(final TMXTile startTile, final TMXTile targetTile, final int endTargetFlag) {
         final IAsyncCallback callback = new IAsyncCallback() {
 
@@ -499,23 +525,16 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             @Override
             public void onComplete() {
                 if (goStatus == QuestGoStatus.Started) {
-                    if (questResult.getStatus() == 0) {
-                        goStatus = QuestGoStatus.Arrived;
-                    } else if (questResult.getStatus() == 1) {
-                        goStatus = QuestGoStatus.Treasure;
-                    } else if (questResult.getStatus() == 2) {
-                        goStatus = QuestGoStatus.Enemy;
-                    } else if (questResult.getStatus() == 3) {
-                        goStatus = QuestGoStatus.Task;
-                    } else {
-                        goStatus = QuestGoStatus.Failed;
-                    }
+                    changeQuestStatus(questResult);
                 } else if (goStatus == QuestGoStatus.Waitting) {
+                    handleCatchUp();
+                    changeQuestStatus(questResult);
                     final TMXLayer tmxLayer = tmxTiledMap.getTMXLayers().get(0);
                     final float playerBackX = tmxLayer.getTileX(startTile.getTileColumn()) + 0.5f * tmxTiledMap.getTileWidth();
                     final float playerBackY = tmxLayer.getTileY(startTile.getTileRow()) + TmxUtils.HERO_OFFSET_Y;
                     Debug.e("Waitting!");
                     handleResult(playerBackX, playerBackY, questResult);
+                    goStatus = QuestGoStatus.Stopped;
                 }
 
             }
@@ -526,6 +545,20 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                 new AsyncTaskLoader().execute(callback);
             }
         });
+    }
+
+    private void changeQuestStatus(final QuestResult questResult) {
+        if (questResult.getStatus() == 0) {
+            goStatus = QuestGoStatus.Arrived;
+        } else if (questResult.getStatus() == 1) {
+            goStatus = QuestGoStatus.Treasure;
+        } else if (questResult.getStatus() == 2) {
+            goStatus = QuestGoStatus.Enemy;
+        } else if (questResult.getStatus() == 3) {
+            goStatus = QuestGoStatus.Task;
+        } else {
+            goStatus = QuestGoStatus.Failed;
+        }
     }
 
     private void handleResult(final float playerBackX, final float playerBackY, final QuestResult questResult) {
@@ -602,6 +635,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         Ready,
         Started,
         Waitting,
+        Timeout,
         Arrived,
         Treasure,
         Enemy,
@@ -627,7 +661,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             flagSprite.setVisible(false);
         }
         final UserProperties userProps = QuestUtils.getUserProperties(activity);
-        staminaStick.setValue(userProps.getStamina());
+        staminaStick.setValue(userProps.getStamina(), true);
     }
 
     @Override

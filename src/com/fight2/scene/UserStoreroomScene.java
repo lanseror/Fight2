@@ -24,6 +24,7 @@ import com.fight2.entity.engine.CardFrame;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.AccountUtils;
+import com.fight2.util.CardUtils;
 import com.fight2.util.F2SoundManager;
 import com.fight2.util.ResourceManager;
 
@@ -139,9 +140,11 @@ public class UserStoreroomScene extends BaseScene {
                     if (size == 0) {
                         alert("你的卡组已满！");
                     } else if (size < card.getAmount()) {
-                        card.setAmount(card.getAmount() - size);
+                        card.setAmount(card.getAmount() - cards.size());
                         cardAmountText.setText(String.format("×%s", card.getAmount()));
+                        CardUtils.refreshUserCards();
                     } else {
+                        CardUtils.refreshUserCards();
                         updateScene();
                     }
                 }
