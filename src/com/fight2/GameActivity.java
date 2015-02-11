@@ -37,6 +37,7 @@ import com.fight2.constant.SoundEnum;
 import com.fight2.entity.engine.GameHud;
 import com.fight2.entity.engine.ProgressBar;
 import com.fight2.util.AccountUtils;
+import com.fight2.util.BWShaderProgram;
 import com.fight2.util.ConfigHelper;
 import com.fight2.util.EntityFactory;
 import com.fight2.util.F2MusicManager;
@@ -117,6 +118,7 @@ public class GameActivity extends LayoutGameActivity {
 
     @Override
     public void onCreateResources(final OnCreateResourcesCallback pOnCreateResourcesCallback) throws IOException {
+        this.getShaderProgramManager().loadShaderProgram(BWShaderProgram.getInstance());
         checkInstallation();
         final TextureManager textureManager = this.getTextureManager();
         final AssetManager assetManager = this.getAssets();
