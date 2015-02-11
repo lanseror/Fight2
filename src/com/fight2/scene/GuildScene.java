@@ -23,7 +23,6 @@ import android.util.SparseArray;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
-import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Bid;
 import com.fight2.entity.Bid.BidItemType;
