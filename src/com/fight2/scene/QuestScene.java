@@ -46,12 +46,14 @@ import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Hero;
 import com.fight2.entity.PartyInfo;
 import com.fight2.entity.QuestResult;
+import com.fight2.entity.QuestResult.TileItem;
 import com.fight2.entity.QuestTask;
 import com.fight2.entity.QuestTask.UserTaskStatus;
 import com.fight2.entity.QuestTile;
 import com.fight2.entity.QuestTreasureData;
 import com.fight2.entity.User;
 import com.fight2.entity.UserProperties;
+import com.fight2.entity.UserStoreroom;
 import com.fight2.entity.battle.BattleType;
 import com.fight2.entity.engine.CommonStick;
 import com.fight2.entity.engine.DialogFrame;
@@ -631,6 +633,8 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             if (questResult.isTreasureUpdated()) {
                 refreshTreasureSprites(questResult.getQuestTreasureData());
             }
+            receiveQuestTreasure(questResult);
+            updateQuestPropsBar();
             ResourceManager.getInstance().setCurrentScene(SceneEnum.QuestTreasure, new IRCallback<BaseScene>() {
 
                 @Override
@@ -725,6 +729,28 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     public void leaveScene() {
         // TODO Auto-generated method stub
 
+    }
+
+    private void updateQuestPropsBar() {
+        final UserProperties userProps = QuestUtils.getUserProperties(activity);
+        cointText.setText(String.valueOf(userProps.getCoin()));
+        guildContribText.setText(String.valueOf(userProps.getGuildContrib()));
+    }
+
+    private void receiveQuestTreasure(final QuestResult questResult) {
+        final TileItem tileItem = questResult.getItem();
+        final UserStoreroom storeroom = GameUserSession.getInstance().getStoreroom();
+        final UserProperties userProps = GameUserSession.getInstance().getUserProps();
+
+        if (tileItem == TileItem.Card) {
+            // Noting to do.
+        } else if (tileItem == TileItem.Stamina) {
+            storeroom.setStamina(storeroom.getStamina() + 1);
+        } else if (tileItem == TileItem.Ticket) {
+            storeroom.setTicket(storeroom.getTicket() + 1);
+        } else if (tileItem == TileItem.CoinBag) {
+            userProps.setCoin(userProps.getCoin() + 500);
+        }
     }
 
     private void offsetMap(final float pDistanceX, final float pDistanceY) {

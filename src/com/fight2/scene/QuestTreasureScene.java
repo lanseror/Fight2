@@ -19,10 +19,8 @@ import com.fight2.GameActivity;
 import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
-import com.fight2.entity.GameUserSession;
 import com.fight2.entity.QuestResult;
 import com.fight2.entity.QuestResult.TileItem;
-import com.fight2.entity.UserStoreroom;
 import com.fight2.entity.engine.CardFrame;
 import com.fight2.util.F2SoundManager;
 import com.fight2.util.ResourceManager;
@@ -39,7 +37,6 @@ public class QuestTreasureScene extends BaseScene {
         cardFrame.setAlpha(0);
         cardFrame.setScale(0.33f);
         final TileItem tileItem = questResult.getItem();
-        final UserStoreroom storeroom = GameUserSession.getInstance().getStoreroom();
 
         this.attachChild(cardFrame);
         if (tileItem == TileItem.Card) {
@@ -50,12 +47,10 @@ public class QuestTreasureScene extends BaseScene {
             final TextureEnum staminaEnum = TextureEnum.COMMON_STAMINA;
             final IEntity staminaImg = createACImageSprite(staminaEnum, CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f);
             cardFrame.attachChild(staminaImg);
-            storeroom.setStamina(storeroom.getStamina() + 1);
         } else if (tileItem == TileItem.Ticket) {
             final TextureEnum ticketEnum = TextureEnum.COMMON_ARENA_TICKET;
             final IEntity ticketImg = createACImageSprite(ticketEnum, CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f);
             cardFrame.attachChild(ticketImg);
-            storeroom.setTicket(storeroom.getTicket() + 1);
         } else if (tileItem == TileItem.CoinBag) {
             final TextureEnum coinBagEnum = TextureEnum.COMMON_COIN_BAG;
             final IEntity coinBagImg = createACImageSprite(coinBagEnum, CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f);

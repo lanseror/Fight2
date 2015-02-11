@@ -272,12 +272,21 @@ public class GameActivity extends LayoutGameActivity {
     @Override
     protected void onPause() {
         TextureFactory.getInstance().clear();
+        F2SoundManager.getInstance().destroy();
+        F2MusicManager.getInstance().pause();
         super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        F2MusicManager.getInstance().resume();
     }
 
     @Override
     public void onGameDestroyed() {
         ResourceManager.destroy();
+        F2MusicManager.getInstance().destroy();
         super.onGameDestroyed();
     }
 

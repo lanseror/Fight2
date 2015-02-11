@@ -6,7 +6,6 @@ import java.util.Map;
 
 import org.andengine.audio.music.Music;
 import org.andengine.audio.music.MusicFactory;
-import org.andengine.audio.music.MusicManager;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.SoundEnum;
@@ -16,19 +15,23 @@ public class F2SoundManager {
     private static F2SoundManager INSTANCE = new F2SoundManager();
     private final Map<SoundEnum, Music> datas = new HashMap<SoundEnum, Music>();
     private Music currentSound;
+    private GameActivity activity;
 
     private F2SoundManager() {
     }
 
     public void prepare(final GameActivity activity) throws IOException {
-        MusicFactory.setAssetBasePath("sound/");
-        final MusicManager musicManager = activity.getMusicManager();
+        this.activity = activity;
+    }
 
-        for (final SoundEnum soundEnum : SoundEnum.values()) {
-            final Music music = MusicFactory.createMusicFromAsset(musicManager, activity, soundEnum.getUrl());
-            datas.put(soundEnum, music);
+    public void destroy() {
+        for (final Music music : datas.values()) {
+            if (music != null && !music.isReleased()) {
+                music.stop();
+                music.release();
+            }
         }
-
+        datas.clear();
     }
 
     public static F2SoundManager getInstance() {
@@ -47,7 +50,6 @@ public class F2SoundManager {
         if (oldMusic != null && !oldMusic.isReleased()) {
             oldMusic.pause();
             oldMusic.seekTo(0);
-
         }
     }
 
@@ -56,8 +58,16 @@ public class F2SoundManager {
             return;
         }
         currentSound = datas.get(soundEnum);
+        if (currentSound == null) {
+            MusicFactory.setAssetBasePath("sound/");
+            try {
+                currentSound = MusicFactory.createMusicFromAsset(activity.getMusicManager(), activity, soundEnum.getUrl());
+            } catch (final IOException e) {
+                throw new RuntimeException(e);
+            }
+            datas.put(soundEnum, currentSound);
+        }
         currentSound.setLooping(looping);
         currentSound.play();
-
     }
 }

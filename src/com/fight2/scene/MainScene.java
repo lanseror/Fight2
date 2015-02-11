@@ -372,7 +372,6 @@ public class MainScene extends BaseScene {
             }
         });
 
-        scheduleGetChatMessage();
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
     }
@@ -412,17 +411,6 @@ public class MainScene extends BaseScene {
             }
 
         });
-    }
-
-    private void scheduleGetChatMessage() {
-        final TimerHandler timerHandler = new TimerHandler(0.75f, new ITimerCallback() {
-            @Override
-            public void onTimePassed(final TimerHandler pTimerHandler) {
-                ChatUtils.get(activity);
-//                pTimerHandler.reset();
-            }
-        });
-        activity.getEngine().registerUpdateHandler(timerHandler);
     }
 
     private void focusSprite(final Sprite sprite) {
