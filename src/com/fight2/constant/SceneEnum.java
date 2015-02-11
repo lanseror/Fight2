@@ -14,6 +14,7 @@ public enum SceneEnum {
     BattleResult,
     Chat,
     Quest,
+    QuestTreasure,
     Loading,
     PlayerInfo,
     Guild,

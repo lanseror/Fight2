@@ -24,6 +24,7 @@ import com.fight2.entity.engine.CommonDialogFrame;
 import com.fight2.entity.engine.DialogFrame;
 import com.fight2.entity.engine.TextDialogFrame;
 import com.fight2.util.ICallback;
+import com.fight2.util.IParamCallback;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TaskUtils;
 
@@ -69,10 +70,10 @@ public class TaskGuideScene extends BaseScene {
 
     private void createEmptyFrame(final QuestTask task) {
         final DialogFrame dialog = new TextDialogFrame(715, cameraCenterY - 45, 540, 360, activity, "没有信息！");
-        dialog.bind(this, new ICallback() {
+        dialog.bind(this, new IParamCallback() {
 
             @Override
-            public void onCallback() {
+            public void onCallback(final Object param) {
                 iLeaveCallback.onCallback();
                 back();
             }
@@ -82,10 +83,10 @@ public class TaskGuideScene extends BaseScene {
 
     private void createDialogFrame(final QuestTask task) {
         final DialogFrame dialog = new TextDialogFrame(715, cameraCenterY - 45, 540, 360, activity, task.getDialog());
-        dialog.bind(this, new ICallback() {
+        dialog.bind(this, new IParamCallback() {
 
             @Override
-            public void onCallback() {
+            public void onCallback(final Object param) {
                 if (TaskUtils.accept()) {
                     dialog.unbind(TaskGuideScene.this);
                     task.setStatus(UserTaskStatus.Started);
@@ -98,10 +99,10 @@ public class TaskGuideScene extends BaseScene {
 
     private void createTipsFrame(final QuestTask task) {
         final DialogFrame dialog = new CommonDialogFrame(715, cameraCenterY - 45, 540, 360, activity, "任务：" + task.getTitle(), task.getTips());
-        dialog.bind(this, new ICallback() {
+        dialog.bind(this, new IParamCallback() {
 
             @Override
-            public void onCallback() {
+            public void onCallback(final Object param) {
                 iLeaveCallback.onCallback();
                 back();
             }
@@ -120,10 +121,10 @@ public class TaskGuideScene extends BaseScene {
             dialog.attachChild(rewardGrid);
         }
 
-        dialog.bind(this, new ICallback() {
+        dialog.bind(this, new IParamCallback() {
 
             @Override
-            public void onCallback() {
+            public void onCallback(final Object param) {
                 if (TaskUtils.complete()) {
                     TaskUtils.refresh();
                 }

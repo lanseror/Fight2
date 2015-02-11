@@ -18,6 +18,7 @@ import com.fight2.util.EntityFactory;
 import com.fight2.util.ResourceManager;
 
 public class CommonStick extends Entity {
+    public static final String TEXT_FORMAT = "%s/%s";
     private final float width;
     private final float height;
     private final float edgeWidth;
@@ -27,7 +28,6 @@ public class CommonStick extends Entity {
     private final GameActivity activity;
     private final Font font = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
     private final Text text;
-    private static final String TEXT_FORMAT = "%s/%s";
 
     private final int fullValue;
     private int currentValue;

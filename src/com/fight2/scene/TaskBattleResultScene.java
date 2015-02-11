@@ -12,7 +12,7 @@ import com.fight2.entity.QuestTask.UserTaskStatus;
 import com.fight2.entity.battle.BattleResult;
 import com.fight2.entity.engine.DialogFrame;
 import com.fight2.entity.engine.HeroDialogFrame;
-import com.fight2.util.ICallback;
+import com.fight2.util.IParamCallback;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TaskUtils;
 
@@ -40,9 +40,9 @@ public class TaskBattleResultScene extends BaseScene {
             dialog = "我们的力量还不够，加强卡牌再来试试吧！";
         }
         final DialogFrame dialogFrame = new HeroDialogFrame(cameraCenterX, cameraCenterY, 600, 350, activity, myLeader, dialog);
-        dialogFrame.bind(this, new ICallback() {
+        dialogFrame.bind(this, new IParamCallback() {
             @Override
-            public void onCallback() {
+            public void onCallback(final Object param) {
                 back();
                 ResourceManager.getInstance().getCurrentScene().updateScene();
             }

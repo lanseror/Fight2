@@ -105,6 +105,8 @@ public class AccountUtils {
             cards.clear();
             CardUtils.clearUserCard();
 
+            getUserStoreroom(activity);// re-factory later.
+
             final JSONArray cardJsonArray = HttpUtils.getJSONArrayFromUrl(cardUrl);
             for (int cardIndex = 0; cardIndex < cardJsonArray.length(); cardIndex++) {
                 final JSONObject cardJson = cardJsonArray.getJSONObject(cardIndex);
@@ -220,6 +222,7 @@ public class AccountUtils {
         } catch (final JSONException e) {
             throw new RuntimeException(e);
         }
+        GameUserSession.getInstance().setStoreroom(userStoreroom);
         return userStoreroom;
     }
 

@@ -18,6 +18,7 @@ import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.entity.sprite.Sprite;
+import org.andengine.entity.text.Text;
 import org.andengine.extension.tmx.TMXLayer;
 import org.andengine.extension.tmx.TMXLoader;
 import org.andengine.extension.tmx.TMXTile;
@@ -27,6 +28,7 @@ import org.andengine.input.touch.TouchEvent;
 import org.andengine.input.touch.detector.ScrollDetector;
 import org.andengine.input.touch.detector.ScrollDetector.IScrollDetectorListener;
 import org.andengine.input.touch.detector.SurfaceScrollDetector;
+import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.TextureOptions;
 import org.andengine.opengl.texture.region.ITiledTextureRegion;
 import org.andengine.util.Constants;
@@ -34,11 +36,13 @@ import org.andengine.util.adt.color.ColorUtils;
 import org.andengine.util.debug.Debug;
 
 import com.fight2.GameActivity;
+import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.constant.TiledTextureEnum;
 import com.fight2.entity.Card;
+import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Hero;
 import com.fight2.entity.PartyInfo;
 import com.fight2.entity.QuestResult;
@@ -58,7 +62,7 @@ import com.fight2.util.AsyncTaskLoader;
 import com.fight2.util.CardUtils;
 import com.fight2.util.F2SoundManager;
 import com.fight2.util.IAsyncCallback;
-import com.fight2.util.ICallback;
+import com.fight2.util.IParamCallback;
 import com.fight2.util.IRCallback;
 import com.fight2.util.QuestUtils;
 import com.fight2.util.ResourceManager;
@@ -90,12 +94,17 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     private final F2ButtonSprite cancelButton = createCancelButton();
     private AnimatedSprite flagSprite;
     private CommonStick staminaStick;
+    private final Font font = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
+    private final Text cointText;
+    private final Text guildContribText;
     private boolean handlingFailure;
 
     public QuestScene(final GameActivity activity) throws IOException {
         super(activity);
         this.mScrollDetector = new SurfaceScrollDetector(this);
         this.getBackground().setColor(ColorUtils.convertABGRPackedIntToColor(0XFF205218));
+        cointText = new Text(123, 24, font, "", 8, vbom);
+        guildContribText = new Text(123, 24, font, "", 8, vbom);
         init();
         timerHandler = new TimerHandler(10, new ITimerCallback() {
             @Override
@@ -179,7 +188,30 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                             }
                         }
                     } else if (goStatus == QuestGoStatus.Ready && destTouchArea.contains(sceneX, sceneY)) {
-                        go(tmxUtils.getPathTiles(), path);
+                        if (staminaEnough(path)) {
+                            go(tmxUtils.getPathTiles(), path);
+                        } else {
+                            if (GameUserSession.getInstance().getStoreroom().getStamina() > 0) {
+                                try {
+                                    activity.getGameHub().setSmallChatRoomEnabled(false);
+                                    final BaseScene useStaminaScene = new UseStaminaScene(activity, new IParamCallback() {
+                                        @Override
+                                        public void onCallback(final Object param) {
+                                            final Boolean isOk = (Boolean) param;
+                                            if (isOk) {
+                                                staminaStick.setValue(UserProperties.MAX_STAMINA);
+                                                go(tmxUtils.getPathTiles(), path);
+                                            }
+                                            activity.getGameHub().setSmallChatRoomEnabled(true);
+                                        }
+                                    });
+                                    setChildScene(useStaminaScene, false, false, true);
+                                } catch (final IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+
+                        }
                         return true;
                     }
                 }
@@ -199,16 +231,22 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         this.attachChild(townButton);
         this.registerTouchArea(townButton);
 
-        final Sprite staminaBox = createALBImageSprite(TextureEnum.COMMON_STAMINA_BOX, this.simulatedLeftX + 100, this.simulatedHeight
+        final Sprite guildContribBox = createALBImageSprite(TextureEnum.COMMON_GUILD_CONTRIB_BAR, this.simulatedLeftX + 150, this.simulatedHeight
+                - TextureEnum.COMMON_GUILD_CONTRIB_BAR.getHeight());
+        this.attachChild(guildContribBox);
+        guildContribBox.attachChild(guildContribText);
+
+        final Sprite staminaBox = createALBImageSprite(TextureEnum.COMMON_STAMINA_BOX, this.simulatedLeftX + 425, this.simulatedHeight
                 - TextureEnum.COMMON_STAMINA_BOX.getHeight());
         this.attachChild(staminaBox);
         staminaStick = new CommonStick(127, 24, TextureEnum.COMMON_STAMINA_STICK, TextureEnum.COMMON_STAMINA_STICK_RIGHT, activity, 100);
         // final Sprite staminaStick = createALBImageSprite(TextureEnum.COMMON_STAMINA_STICK, 56, 11);
         staminaBox.attachChild(staminaStick);
 
-        final Sprite guildContribBox = createALBImageSprite(TextureEnum.COMMON_GUILD_CONTRIB_BAR, this.simulatedLeftX + 400, this.simulatedHeight
-                - TextureEnum.COMMON_GUILD_CONTRIB_BAR.getHeight());
-        this.attachChild(guildContribBox);
+        final Sprite coinBox = createALBImageSprite(TextureEnum.COMMON_COIN_BOX, this.simulatedLeftX + 700,
+                this.simulatedHeight - TextureEnum.COMMON_COIN_BOX.getHeight());
+        this.attachChild(coinBox);
+        coinBox.attachChild(cointText);
 
         final Sprite rechargeSprite = createALBF2ButtonSprite(TextureEnum.PARTY_RECHARGE, TextureEnum.PARTY_RECHARGE_PRESSED, this.simulatedRightX
                 - TextureEnum.PARTY_RECHARGE.getWidth() - 8, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight() - 4);
@@ -426,6 +464,11 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
 
     }
 
+    private boolean staminaEnough(final Path path) {
+        final int availStamina = GameUserSession.getInstance().getUserProps().getStamina();
+        return path.getSize() - 1 <= availStamina;
+    }
+
     private void go(final List<TMXTile> pathTiles, final Path path) {
         handlingFailure = false;
         final float[] xs = path.getCoordinatesX();
@@ -447,7 +490,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                                                                                                                // >5 to avoid hack;
                 }
 
-                if (waypointIndex + 1 < path.getSize()&& !handlingFailure) {
+                if (waypointIndex + 1 < path.getSize() && !handlingFailure) {
                     hero.onGoing(path, waypointIndex);
                     activity.runOnUpdateThread(new Runnable() {
                         @Override
@@ -565,6 +608,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
 
     private void handleResult(final float playerBackX, final float playerBackY, final QuestResult questResult) {
         staminaStick.setValue(questResult.getStamina());
+        GameUserSession.getInstance().getUserProps().setStamina(questResult.getStamina());
         if (goStatus == QuestGoStatus.Failed) {
             goStatus = QuestGoStatus.Stopped;
             cancelButton.setVisible(false);
@@ -587,13 +631,18 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             if (questResult.isTreasureUpdated()) {
                 refreshTreasureSprites(questResult.getQuestTreasureData());
             }
-            try {
-                final QuestTreasureScene treasureScene = new QuestTreasureScene(questResult, activity);
-                activity.getEngine().setScene(treasureScene);
-                treasureScene.updateScene();
-            } catch (final IOException e) {
-                throw new RuntimeException(e);
-            }
+            ResourceManager.getInstance().setCurrentScene(SceneEnum.QuestTreasure, new IRCallback<BaseScene>() {
+
+                @Override
+                public BaseScene onCallback() {
+                    try {
+                        return new QuestTreasureScene(questResult, activity);
+                    } catch (final IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+            });
             removeTreasureSprite();
         } else if (goStatus == QuestGoStatus.Enemy) {
             if (questResult.isTreasureUpdated()) {
@@ -616,9 +665,9 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             final Card bossLeader = bossPartyInfo.getParties()[0].getCards()[0];
             final DialogFrame dialogFrame = new HeroDialogFrame(cameraCenterX, cameraCenterY, 600, 350, activity, bossLeader, boss.getName(),
                     task.getBossDialog());
-            dialogFrame.bind(QuestScene.this, new ICallback() {
+            dialogFrame.bind(QuestScene.this, new IParamCallback() {
                 @Override
-                public void onCallback() {
+                public void onCallback(final Object param) {
                     dialogFrame.unbind(QuestScene.this);
                     ResourceManager.getInstance().setChildScene(QuestScene.this, new IRCallback<BaseScene>() {
                         @Override
@@ -666,7 +715,10 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             flagSprite.setVisible(false);
         }
         final UserProperties userProps = QuestUtils.getUserProperties(activity);
+        GameUserSession.getInstance().setUserProps(userProps);
         staminaStick.setValue(userProps.getStamina(), true);
+        cointText.setText(String.valueOf(userProps.getCoin()));
+        guildContribText.setText(String.valueOf(userProps.getGuildContrib()));
     }
 
     @Override

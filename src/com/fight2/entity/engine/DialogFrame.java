@@ -11,13 +11,14 @@ import com.fight2.GameActivity;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.EntityFactory;
-import com.fight2.util.ICallback;
+import com.fight2.util.IParamCallback;
 
 public class DialogFrame extends Rectangle {
     protected static final EntityFactory ET_FACTORY = EntityFactory.getInstance();
     protected final GameActivity activity;
     protected final VertexBufferObjectManager vbom;
-    private final F2ButtonSprite confirmButton;
+    private final F2CommonButton confirmButton;
+    private final F2ButtonSprite closeButton;
 
     public DialogFrame(final float x, final float y, final float width, final float height, final GameActivity activity) {
         super(x, y, width, height, activity.getVertexBufferObjectManager());
@@ -56,17 +57,31 @@ public class DialogFrame extends Rectangle {
         confirmButton = ET_FACTORY.createACF2CommonButton(width * 0.5f, 50, "确定");
         this.attachChild(confirmButton);
 
+        final TextureEnum closeEnum = TextureEnum.COMMON_CLOSE_BUTTON;
+        closeButton = ET_FACTORY.createALBF2ButtonSprite(closeEnum, closeEnum, width - closeEnum.getWidth(), height - closeEnum.getHeight());
+        this.attachChild(closeButton);
     }
 
-    public void bind(final Scene scene, final ICallback iCallback) {
+    public void bind(final Scene scene, final IParamCallback iCallback) {
         scene.attachChild(this);
         scene.registerTouchArea(confirmButton);
+        scene.registerTouchArea(closeButton);
         confirmButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                iCallback.onCallback();
+                iCallback.onCallback(true);
             }
         });
+        closeButton.setOnClickListener(new F2OnClickListener() {
+            @Override
+            public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                iCallback.onCallback(false);
+            }
+        });
+    }
+
+    public void setConfirmButtonText(final String text) {
+        this.confirmButton.setButtonText(text);
     }
 
     public void unbind(final Scene scene) {

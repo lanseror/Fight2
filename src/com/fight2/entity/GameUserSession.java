@@ -13,6 +13,8 @@ public class GameUserSession {
     private PartyInfo partyInfo;
     private final Set<Integer> inPartyCards = new HashSet<Integer>();
     private int guildContribution;
+    private UserProperties userProps;
+    private UserStoreroom storeroom;
 
     private GameUserSession() {
         cards = new LinkedHashSet<Card>();
@@ -60,6 +62,22 @@ public class GameUserSession {
 
     public void setGuildContribution(final int guildContribution) {
         this.guildContribution = guildContribution;
+    }
+
+    public UserProperties getUserProps() {
+        return userProps;
+    }
+
+    public void setUserProps(final UserProperties userProps) {
+        this.userProps = userProps;
+    }
+
+    public UserStoreroom getStoreroom() {
+        return storeroom;
+    }
+
+    public void setStoreroom(final UserStoreroom storeroom) {
+        this.storeroom = storeroom;
     }
 
 }

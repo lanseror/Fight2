@@ -125,9 +125,25 @@ public class QuestUtils {
             final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
             final UserProperties userProperties = new UserProperties();
             userProperties.setCoin(responseJson.getInt("coin"));
+            userProperties.setGuildContrib(responseJson.getInt("guildContrib"));
             userProperties.setStamina(responseJson.getInt("stamina"));
             userProperties.setTicket(responseJson.getInt("ticket"));
             return userProperties;
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static boolean useStaminaBottle(final GameActivity activity) {
+        final String url = HttpUtils.HOST_URL + "/quest/usb";
+        try {
+            final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
+            final int status = responseJson.getInt("status");
+            return status == 0;
         } catch (final JSONException e) {
             throw new RuntimeException(e);
         } catch (final ClientProtocolException e) {

@@ -275,6 +275,12 @@ public class GameActivity extends LayoutGameActivity {
         super.onPause();
     }
 
+    @Override
+    public void onGameDestroyed() {
+        ResourceManager.destroy();
+        super.onGameDestroyed();
+    }
+
     public Camera getCamera() {
         return camera;
     }

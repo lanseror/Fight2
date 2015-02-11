@@ -473,6 +473,7 @@ public class BattleScene extends BaseScene {
             final int changePoint = operation.getPoint() * sign;
             final List<BattlePartyFrame> applyParties = this.getApplyParties(actionParty, operation.getSkillApplyParty(), isMyAction);
 
+            boolean isSkillCure = false;
             for (final BattlePartyFrame applyParty : applyParties) {
                 switch (skillType) {
                     case HP:
@@ -488,6 +489,7 @@ public class BattleScene extends BaseScene {
 
                         } else {
                             applyParty.setHp(applyParty.getHp() + changePoint);
+                            isSkillCure = true;
                             useSkillCure(applyParty, isMyAction);
                         }
                         break;
@@ -504,6 +506,9 @@ public class BattleScene extends BaseScene {
                         // TODO
                         break;
                 }
+            }
+            if (isSkillCure) {
+                F2SoundManager.getInstance().play(SoundEnum.BATTLE_CURE);
             }
 
         }

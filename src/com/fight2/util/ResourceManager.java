@@ -37,7 +37,7 @@ import com.fight2.scene.SummonScene;
 import com.fight2.scene.UserStoreroomScene;
 
 public class ResourceManager {
-    private static ResourceManager INSTANCE = new ResourceManager();
+    private static ResourceManager INSTANCE;
     private boolean isResourceLoaded = false;
     private GameActivity activity;
     private TextureManager textureManager;
@@ -56,7 +56,14 @@ public class ResourceManager {
     }
 
     public static ResourceManager getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new ResourceManager();
+        }
         return INSTANCE;
+    }
+
+    public static void destroy() {
+        INSTANCE = null;
     }
 
     public void loadGameResources(final GameActivity activity, final ProgressBar progressBar) throws IOException {
@@ -191,9 +198,9 @@ public class ResourceManager {
                 currentScene = scene;
                 if (sceneEnum != null && currentSceneEnum != sceneEnum) {
                     currentSceneEnum = sceneEnum;
-                }
-                if (!isBack) {
-                    breadcrumbs.push(currentSceneEnum);
+                    if (!isBack) {
+                        breadcrumbs.push(currentSceneEnum);
+                    }
                 }
                 activity.getGameHub().setSmallChatRoomEnabled(true);
 

@@ -33,6 +33,7 @@ public enum TextureEnum {
     COMMON_EXPERIENCE_BOX("images/common_experience_box.png", 267, 67),
     COMMON_EXPERIENCE_BOX_STAR("images/common_experience_box_star.png", 267, 67),
     COMMON_EXPERIENCE_STICK("images/common_experience_stick.png", 205, 67),
+    COMMON_COIN_BOX("images/common_coin_box.png", 208, 52),
     COMMON_BUTTON("images/common_button.png", 129, 49),
     COMMON_INPUT_ICON("images/common_input_icon.png", 54, 53),
     COMMON_CHECKBOX_ON("images/common_checkbox_on.png", 40, 40),
@@ -73,7 +74,7 @@ public enum TextureEnum {
     COMMON_CARD_FRAME("images/common_card_frame.png", 400, 600),
     COMMON_PROGRESS_BAR("images/common_progress_bar.png", 868, 22),
     COMMON_PROGRESS_BAR_RIGHT("images/common_progress_bar_right.png", 9, 22),
-    COMMON_GUILD_CONTRIB_BAR("images/common_guild_contrib_bar.png", 129, 48),
+    COMMON_GUILD_CONTRIB_BAR("images/common_guild_contrib_bar.png", 208, 52),
 
     // Chat room images.
     CHAT_INPUT_BG("images/chat_input_backgroud.png", 850, 82),
