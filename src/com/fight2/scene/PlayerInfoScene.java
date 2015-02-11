@@ -15,6 +15,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnShowListener;
+import android.text.InputFilter;
 import android.view.Gravity;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -149,6 +150,7 @@ public class PlayerInfoScene extends BaseScene {
                 editText.setText(nameText.getText());
                 editText.setSelection(nameText.getText().length());
                 editText.setGravity(Gravity.CENTER_HORIZONTAL);
+                editText.setFilters(new InputFilter[] { new InputFilter.LengthFilter(8) });
                 alert.setView(editText);
                 alert.setPositiveButton("确定", new DialogInterface.OnClickListener() {
                     @Override
