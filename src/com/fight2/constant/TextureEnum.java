@@ -233,6 +233,7 @@ public enum TextureEnum {
     BATTLE_AVATAR_SKILL_FCS("images/battle_avatar_skill_fcs.png", 74, 74),
     BATTLE_RESULT("images/battle_result.png", 730, 551),
     BATTLE_SKILL_REVIVAL("images/battle_skill_revival.png", 400, 78),
+    BATTLE_EFFECT_HIT_RED("images/battle_effect_hit_red.png", 1136, 640),
 
     // PreBattle scene images.
     PREBATTLE_RETREAT_BUTTON("images/prebattle_retreat_button.png", 130, 132),

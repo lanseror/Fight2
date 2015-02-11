@@ -89,6 +89,7 @@ public class BattleScene extends BaseScene {
     private final AnimatedSprite[] confuseEffectSprites = new AnimatedSprite[3];
     private final Sprite battleSkillFrame;
     private final Sprite revivalSkillFrame;
+    private final Sprite hitRedEffect;
     private final Text revivalText;
 
     public BattleScene(final GameActivity activity, final int attackPlayerId, final Party[] opponentParties, final BattleType battleType) throws IOException {
@@ -129,6 +130,10 @@ public class BattleScene extends BaseScene {
         loseImage.setAlpha(0);
         this.attachChild(winImage);
         this.attachChild(loseImage);
+
+        this.hitRedEffect = this.createACImageSprite(TextureEnum.BATTLE_EFFECT_HIT_RED, this.cameraCenterX, this.cameraCenterY);
+        this.attachChild(hitRedEffect);
+        hitRedEffect.setAlpha(0);
 
         switch (battleType) {
             case Arena:
@@ -366,6 +371,22 @@ public class BattleScene extends BaseScene {
                     hpBar.setCurrentPoint(changeHp < 0 ? 0 : changeHp);
                 }
 
+                if (!isMyAction) {
+                    final IEntityModifier hitEffectShowModifier = new AlphaModifier(0.05f, 0, 1);
+                    final IEntityModifier hitEffectHideModifier = new AlphaModifier(0.1f, 1, 0.5f);
+                    final IEntityModifier hitEffectShowModifier2 = new AlphaModifier(0.14f, 0.5f, 1);
+                    final IEntityModifier hitEffectHideModifier2 = new AlphaModifier(0.03f, 1, 0);
+                    final IEntityModifier hitEffectModifier = new SequenceEntityModifier(hitEffectShowModifier, new DelayModifier(0.08f),
+                            hitEffectHideModifier, hitEffectShowModifier2, hitEffectHideModifier2);
+                    activity.runOnUpdateThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            hitRedEffect.clearEntityModifiers();
+                            hitRedEffect.registerEntityModifier(hitEffectModifier);
+                        }
+
+                    });
+                }
                 defencePartyFrame.beenHit();
 
                 // attack140, cure 160.
