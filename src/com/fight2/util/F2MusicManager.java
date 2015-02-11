@@ -86,7 +86,7 @@ public class F2MusicManager {
             // oldMusic.pause();
             // oldMusic.seekTo(0);
             oldMusic.stop();
-            // oldMusic.release();
+            oldMusic.release();
         }
     }
 
@@ -95,7 +95,7 @@ public class F2MusicManager {
             return;
         }
         currentMusic = datas.get(musicEnum);
-        if (currentMusic == null) {
+        if (currentMusic == null || currentMusic.isReleased()) {
             MusicFactory.setAssetBasePath("music/");
             try {
                 final Music music = MusicFactory.createMusicFromAsset(activity.getMusicManager(), activity, musicEnum.getUrl());
