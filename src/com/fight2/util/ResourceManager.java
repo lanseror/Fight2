@@ -191,9 +191,9 @@ public class ResourceManager {
                 currentScene = scene;
                 if (sceneEnum != null && currentSceneEnum != sceneEnum) {
                     currentSceneEnum = sceneEnum;
-                    if (!isBack) {
-                        breadcrumbs.push(currentSceneEnum);
-                    }
+                }
+                if (!isBack) {
+                    breadcrumbs.push(currentSceneEnum);
                 }
                 activity.getGameHub().setSmallChatRoomEnabled(true);
 

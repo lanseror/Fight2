@@ -239,6 +239,27 @@ public abstract class BaseScene extends Scene {
         }
     }
 
+    public void confirm(final String message) {
+        try {
+            final Scene alertScene = new AlertScene(activity, message);
+            final Scene scene = activity.getEngine().getScene();
+            Scene childScene = scene;
+            while (childScene.getChildScene() != null) {
+                childScene = childScene.getChildScene();
+            }
+            if (childScene instanceof LoadingScene) {
+                childScene.back();
+                childScene = scene;
+                while (childScene.getChildScene() != null) {
+                    childScene = childScene.getChildScene();
+                }
+            }
+            childScene.setChildScene(alertScene, false, false, true);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void topAlignEntity(final IEntity entity, final float y) {
         EntityUtils.topAlignEntity(entity, y);
     }
