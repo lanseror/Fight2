@@ -290,6 +290,23 @@ public class PartyEditScene extends BaseCardPackScene {
 
     }
 
+    @Override
+    public boolean sceneBack() {
+        final Card[] cards = parties[0].getCards();
+        if (cards[0] == null) {
+            alert("你必须要有一个领军人物！");
+            return false;
+        } else {
+            final boolean isSaveOk = CardUtils.saveParties(activity);
+            if (isSaveOk) {
+                return true;
+            } else {
+                alert("队伍保存失败！");
+                return false;
+            }
+        }
+    }
+
     private Sprite createCoverSprite(final TextureEnum textureEnum, final float x, final float y) {
         final TextureFactory textureFactory = TextureFactory.getInstance();
         final ITextureRegion texture = textureFactory.getAssetTextureRegion(textureEnum);
@@ -315,17 +332,7 @@ public class PartyEditScene extends BaseCardPackScene {
         backButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                final Card[] cards = parties[0].getCards();
-                if (cards[0] == null) {
-                    alert("你必须要有一个领军人物！");
-                } else {
-                    final boolean isSaveOk = CardUtils.saveParties(activity);
-                    if (isSaveOk) {
-                        ResourceManager.getInstance().setCurrentScene(SceneEnum.Party);
-                    } else {
-                        alert("队伍保存失败！");
-                    }
-                }
+                ResourceManager.getInstance().sceneBack();
             }
         });
         return backButton;

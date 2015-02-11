@@ -94,7 +94,7 @@ public class BattleResultScene extends BaseScene {
         confirmButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                ResourceManager.getInstance().sceneBack(false);
+                ResourceManager.getInstance().unManagedSceneBack();
             }
         });
         this.attachChild(confirmButton);

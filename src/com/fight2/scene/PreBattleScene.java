@@ -191,7 +191,7 @@ public class PreBattleScene extends BaseScene {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 F2MusicManager.getInstance().stopMusic();
-                ResourceManager.getInstance().sceneBack(false);
+                ResourceManager.getInstance().unManagedSceneBack();
             }
         });
         this.attachChild(retreatButton);

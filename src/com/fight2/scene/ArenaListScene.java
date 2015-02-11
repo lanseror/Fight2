@@ -78,7 +78,7 @@ public class ArenaListScene extends BaseScene {
         backButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                ResourceManager.getInstance().setCurrentScene(SceneEnum.Main);
+                ResourceManager.getInstance().sceneBack();
             }
         });
         this.attachChild(backButton);

@@ -328,7 +328,7 @@ public class CardUpgradeScene extends BaseCardPackScene {
         backButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                ResourceManager.getInstance().setCurrentScene(SceneEnum.Party);
+                ResourceManager.getInstance().sceneBack();
             }
         });
         return backButton;

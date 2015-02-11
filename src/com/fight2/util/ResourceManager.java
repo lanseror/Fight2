@@ -138,7 +138,11 @@ public class ResourceManager {
     }
 
     public void setCurrentScene(final SceneEnum sceneEnum) {
-        setCurrentScene(sceneEnum, new IRCallback<BaseScene>() {
+        setCurrentScene(sceneEnum, false);
+    }
+
+    public void setCurrentScene(final SceneEnum sceneEnum, final boolean isBack) {
+        setCurrentScene(sceneEnum, isBack, new IRCallback<BaseScene>() {
             @Override
             public BaseScene onCallback() {
                 return getScene(sceneEnum);
@@ -147,6 +151,10 @@ public class ResourceManager {
     }
 
     public void setCurrentScene(final SceneEnum sceneEnum, final IRCallback<BaseScene> irCallback) {
+        setCurrentScene(sceneEnum, false, irCallback);
+    }
+
+    public void setCurrentScene(final SceneEnum sceneEnum, final boolean isBack, final IRCallback<BaseScene> irCallback) {
         if (currentScene != null) {
             try {
                 final LoadingScene loadingScene = new LoadingScene(activity);
@@ -183,7 +191,9 @@ public class ResourceManager {
                 currentScene = scene;
                 if (sceneEnum != null && currentSceneEnum != sceneEnum) {
                     currentSceneEnum = sceneEnum;
-                    breadcrumbs.push(currentSceneEnum);
+                    if (!isBack) {
+                        breadcrumbs.push(currentSceneEnum);
+                    }
                 }
                 activity.getGameHub().setSmallChatRoomEnabled(true);
 
@@ -233,15 +243,48 @@ public class ResourceManager {
         }
     }
 
-    public void sceneBack(final boolean isManaged) {
-        if (currentScene != null && isManaged) {
-            currentScene.leaveScene();
-        }
-        if (isManaged) {
-            breadcrumbs.pop();
-        }
-        final SceneEnum sceneEnum = breadcrumbs.peek();
+    public void sceneBack() {
+        if (currentScene != null) {
+            try {
+                final LoadingScene loadingScene = new LoadingScene(activity);
+                currentScene.setChildScene(loadingScene, false, false, true);
+                activity.getGameHub().setSmallChatRoomEnabled(false);
 
+                final IAsyncCallback callback = new IAsyncCallback() {
+                    private boolean result;
+
+                    @Override
+                    public void workToDo() {
+                        result = currentScene.sceneBack();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        loadingScene.back();
+                        activity.getGameHub().setSmallChatRoomEnabled(true);
+                        if (result) {
+                            currentScene.leaveScene();
+                            breadcrumbs.pop();
+                            final SceneEnum sceneEnum = breadcrumbs.peek();
+                            setCurrentScene(sceneEnum, true);
+                        }
+                    }
+
+                };
+                activity.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        new AsyncTaskLoader().execute(callback);
+                    }
+                });
+            } catch (final IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public void unManagedSceneBack() {
+        final SceneEnum sceneEnum = breadcrumbs.peek();
         setCurrentScene(sceneEnum);
     }
 

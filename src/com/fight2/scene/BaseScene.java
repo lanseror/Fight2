@@ -83,6 +83,10 @@ public abstract class BaseScene extends Scene {
     protected void playAnimation() {
     }
 
+    public boolean sceneBack() {
+        return true;
+    }
+
     protected abstract void init() throws IOException;
 
     public abstract void updateScene();
@@ -221,6 +225,13 @@ public abstract class BaseScene extends Scene {
             Scene childScene = scene;
             while (childScene.getChildScene() != null) {
                 childScene = childScene.getChildScene();
+            }
+            if (childScene instanceof LoadingScene) {
+                childScene.back();
+                childScene = scene;
+                while (childScene.getChildScene() != null) {
+                    childScene = childScene.getChildScene();
+                }
             }
             childScene.setChildScene(alertScene, false, false, true);
         } catch (final IOException e) {

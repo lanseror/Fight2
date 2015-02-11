@@ -21,7 +21,6 @@ import android.widget.EditText;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
-import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.engine.CardOutFrame;
@@ -77,18 +76,7 @@ public class PlayerInfoScene extends BaseScene {
         backButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                if (!session.getName().equals(nameText.getText().toString())) {
-                    session.setName(nameText.getText().toString());
-                    final boolean isSaveOk = AccountUtils.saveUserInfo();
-                    if (isSaveOk) {
-                        ResourceManager.getInstance().setCurrentScene(SceneEnum.Main);
-                    } else {
-                        alert("用户信息保存失败！");
-                    }
-                } else {
-                    ResourceManager.getInstance().setCurrentScene(SceneEnum.Main);
-                }
-
+                ResourceManager.getInstance().sceneBack();
             }
         });
         this.attachChild(backButton);
@@ -115,6 +103,22 @@ public class PlayerInfoScene extends BaseScene {
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
+    }
+
+    @Override
+    public boolean sceneBack() {
+        if (!session.getName().equals(nameText.getText().toString())) {
+            session.setName(nameText.getText().toString());
+            final boolean isSaveOk = AccountUtils.saveUserInfo();
+            if (isSaveOk) {
+                return true;
+            } else {
+                alert("用户信息保存失败！");
+                return false;
+            }
+        } else {
+            return true;
+        }
     }
 
     @Override

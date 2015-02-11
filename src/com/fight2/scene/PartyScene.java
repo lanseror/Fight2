@@ -126,12 +126,7 @@ public class PartyScene extends BaseScene {
         backButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                final boolean isSaveOk = CardUtils.saveParties(activity);
-                if (isSaveOk) {
-                    ResourceManager.getInstance().setCurrentScene(SceneEnum.Main);
-                } else {
-                    alert("队伍保存失败！");
-                }
+                ResourceManager.getInstance().sceneBack();
             }
         });
         this.attachChild(backButton);
@@ -139,6 +134,17 @@ public class PartyScene extends BaseScene {
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
+    }
+
+    @Override
+    public boolean sceneBack() {
+        final boolean isSaveOk = CardUtils.saveParties(activity);
+        if (isSaveOk) {
+            return true;
+        } else {
+            alert("队伍保存失败！");
+            return false;
+        }
     }
 
     private F2ButtonSprite createEnhanceButton() {

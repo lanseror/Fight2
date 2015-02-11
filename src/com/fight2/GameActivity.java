@@ -256,7 +256,13 @@ public class GameActivity extends LayoutGameActivity {
     public boolean onKeyDown(final int keyCode, final KeyEvent event) {
         final ResourceManager resourceManager = ResourceManager.getInstance();
         if (keyCode == KeyEvent.KEYCODE_BACK && resourceManager.getCurrentSceneEnum() != SceneEnum.Main) {
-            resourceManager.setCurrentScene(SceneEnum.Main);
+            this.runOnUpdateThread(new Runnable() {
+                @Override
+                public void run() {
+                    resourceManager.sceneBack();
+                }
+
+            });
             return true;
         } else {
             return super.onKeyDown(keyCode, event);
