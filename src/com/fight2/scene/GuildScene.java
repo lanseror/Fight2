@@ -897,7 +897,7 @@ public class GuildScene extends BaseScene {
                     if (GuildUtils.joinGuild(guild.getId())) {
                         GuildScene.this.guild = GuildUtils.getUserGuild();
                         inGuild = true;
-                        isAdmin = true;
+                        isAdmin = false;
                         for (int i = 0; i < 7; i++) {
                             final Sprite focusedButton = focusedButtons[i];
                             if (focusedButton != null) {

@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.andengine.engine.handler.timer.ITimerCallback;
-import org.andengine.engine.handler.timer.TimerHandler;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.IOnSceneTouchListener;
@@ -36,7 +34,6 @@ import com.fight2.entity.QuestTask.UserTaskStatus;
 import com.fight2.entity.engine.CardAvatar;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
-import com.fight2.util.ChatUtils;
 import com.fight2.util.ICallback;
 import com.fight2.util.IRCallback;
 import com.fight2.util.ResourceManager;
