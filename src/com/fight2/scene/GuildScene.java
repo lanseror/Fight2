@@ -23,6 +23,7 @@ import android.util.SparseArray;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
+import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Bid;
 import com.fight2.entity.Bid.BidItemType;
@@ -39,6 +40,7 @@ import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.engine.InputText;
 import com.fight2.entity.engine.InputText.OnConfirmListener;
 import com.fight2.util.DateUtils;
+import com.fight2.util.F2SoundManager;
 import com.fight2.util.GuildUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
@@ -125,6 +127,7 @@ public class GuildScene extends BaseScene {
         backButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                F2SoundManager.getInstance().play(SoundEnum.BUTTON_CLICK);
                 ResourceManager.getInstance().sceneBack();
             }
         });

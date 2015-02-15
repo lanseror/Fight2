@@ -22,6 +22,7 @@ import android.util.SparseArray;
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
+import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
@@ -31,6 +32,7 @@ import com.fight2.entity.engine.CardAvatar;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.CardUtils;
+import com.fight2.util.F2SoundManager;
 import com.fight2.util.IRCallback;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
@@ -99,6 +101,7 @@ public class PartyScene extends BaseScene {
         editSprite.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                F2SoundManager.getInstance().play(SoundEnum.BUTTON_CLICK);
                 ResourceManager.getInstance().setCurrentScene(SceneEnum.PartyEdit, new IRCallback<BaseScene>() {
 
                     @Override
@@ -126,6 +129,7 @@ public class PartyScene extends BaseScene {
         backButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                F2SoundManager.getInstance().play(SoundEnum.BUTTON_CLICK);
                 ResourceManager.getInstance().sceneBack();
             }
         });
@@ -153,6 +157,7 @@ public class PartyScene extends BaseScene {
         enhanceButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                F2SoundManager.getInstance().play(SoundEnum.BUTTON_CLICK);
                 ResourceManager.getInstance().setCurrentScene(SceneEnum.CardUpgrade);
             }
         });

@@ -19,6 +19,7 @@ import android.content.DialogInterface.OnClickListener;
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
+import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.ArenaContinuousWin;
 import com.fight2.entity.GameUserSession;
@@ -33,6 +34,7 @@ import com.fight2.util.ArenaUtils;
 import com.fight2.util.BWShaderProgram;
 import com.fight2.util.DateUtils;
 import com.fight2.util.DialogUtils;
+import com.fight2.util.F2SoundManager;
 import com.fight2.util.IRCallback;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.StringUtils;
@@ -213,6 +215,7 @@ public class ArenaScene extends BaseScene {
         backButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                F2SoundManager.getInstance().play(SoundEnum.BUTTON_CLICK);
                 ResourceManager.getInstance().sceneBack();
             }
         });
@@ -224,6 +227,7 @@ public class ArenaScene extends BaseScene {
         refleshButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                F2SoundManager.getInstance().play(SoundEnum.BUTTON_CLICK);
                 ResourceManager.getInstance().setCurrentScene(SceneEnum.Arena, new IRCallback<BaseScene>() {
                     @Override
                     public BaseScene onCallback() {
@@ -241,6 +245,7 @@ public class ArenaScene extends BaseScene {
         rankButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                F2SoundManager.getInstance().play(SoundEnum.BUTTON_CLICK);
                 showArenaRanking();
             }
         });
@@ -252,6 +257,7 @@ public class ArenaScene extends BaseScene {
         rewardButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                F2SoundManager.getInstance().play(SoundEnum.BUTTON_CLICK);
                 showArenaReward();
             }
         });

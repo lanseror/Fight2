@@ -21,6 +21,7 @@ import android.view.MotionEvent;
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
+import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.engine.CardFrame;
@@ -34,6 +35,7 @@ import com.fight2.entity.engine.cardpack.CardUpgradeScrollDetectorListener;
 import com.fight2.entity.engine.cardpack.MoveFinishedListener;
 import com.fight2.input.touch.detector.F2ScrollDetector;
 import com.fight2.util.CardUtils;
+import com.fight2.util.F2SoundManager;
 import com.fight2.util.PartyUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
@@ -328,6 +330,7 @@ public class CardUpgradeScene extends BaseCardPackScene {
         backButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                F2SoundManager.getInstance().play(SoundEnum.BUTTON_CLICK);
                 ResourceManager.getInstance().sceneBack();
             }
         });
@@ -340,6 +343,7 @@ public class CardUpgradeScene extends BaseCardPackScene {
         evolutionButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                F2SoundManager.getInstance().play(SoundEnum.BUTTON_CLICK);
                 ResourceManager.getInstance().setCurrentScene(SceneEnum.CardEvolution);
             }
         });
