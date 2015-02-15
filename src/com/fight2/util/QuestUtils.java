@@ -64,6 +64,7 @@ public class QuestUtils {
                         final QuestTile questTile = new QuestTile();
                         questTile.setRow(questTileJson.getInt("row"));
                         questTile.setCol(questTileJson.getInt("col"));
+                        questTile.setItem(TileItem.valueOf(questTileJson.getString("item")));
                         questTiles.add(questTile);
                     }
                     questTreasureData.setQuestTiles(questTiles);
