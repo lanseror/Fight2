@@ -87,6 +87,8 @@ public class BattleScene extends BaseScene {
     private final AnimatedSprite attackEffectSprite;
     private final AnimatedSprite[] cureEffectSprites = new AnimatedSprite[3];
     private final AnimatedSprite[] confuseEffectSprites = new AnimatedSprite[3];
+    private final AnimatedSprite[] magicEffectSprites = new AnimatedSprite[3];
+    private final AnimatedSprite[] goodEffectSprites = new AnimatedSprite[3];
     private final Sprite battleSkillFrame;
     private final Sprite revivalSkillFrame;
     private final Sprite hitRedEffect;
@@ -204,6 +206,20 @@ public class BattleScene extends BaseScene {
             confuseEffectSprite.setZIndex(1000);
             confuseEffectSprites[i] = confuseEffectSprite;
         }
+        final ITiledTextureRegion magicTiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.BATTLE_MAGIC_ATTACK_EFFECT);
+        for (int i = 0; i < magicEffectSprites.length; i++) {
+            final AnimatedSprite magicEffectSprite = new AnimatedSprite(0, 0, magicTiledTextureRegion, vbom);
+            magicEffectSprite.setVisible(false);
+            magicEffectSprite.setZIndex(1000);
+            magicEffectSprites[i] = magicEffectSprite;
+        }
+        final ITiledTextureRegion goodTiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.BATTLE_SKILL_GOOD);
+        for (int i = 0; i < goodEffectSprites.length; i++) {
+            final AnimatedSprite goodEffectSprite = new AnimatedSprite(0, 0, goodTiledTextureRegion, vbom);
+            goodEffectSprite.setVisible(false);
+            goodEffectSprite.setZIndex(1000);
+            goodEffectSprites[i] = goodEffectSprite;
+        }
 
     }
 
@@ -255,6 +271,12 @@ public class BattleScene extends BaseScene {
         }
         for (int i = 0; i < confuseEffectSprites.length; i++) {
             this.attachChild(confuseEffectSprites[i]);
+        }
+        for (int i = 0; i < magicEffectSprites.length; i++) {
+            this.attachChild(magicEffectSprites[i]);
+        }
+        for (int i = 0; i < goodEffectSprites.length; i++) {
+            this.attachChild(goodEffectSprites[i]);
         }
     }
 
@@ -507,7 +529,7 @@ public class BattleScene extends BaseScene {
                                 final int changeHp = applyParty.getHp() + changeDefence;
                                 applyParty.setHp(changeHp < 0 ? 0 : changeHp);
                             }
-
+                            useSkillMagicAttack(applyParty, isMyAction);
                         } else {
                             applyParty.setHp(applyParty.getHp() + changePoint);
                             isSkillCure = true;
@@ -518,6 +540,8 @@ public class BattleScene extends BaseScene {
                         applyParty.setAtk(applyParty.getAtk() + changePoint);
                         if (changePoint < 0) {
                             useSkillConfuse(applyParty, isMyAction);
+                        } else {
+                            useSkillGoodMagic(applyParty, isMyAction);
                         }
                         break;
                     case Defence:
@@ -610,6 +634,66 @@ public class BattleScene extends BaseScene {
             }
         });
 
+    }
+
+    private void useSkillMagicAttack(final BattlePartyFrame applyParty, final boolean isMyAction) {
+        final AnimatedSprite magicEffectSprite = magicEffectSprites[applyParty.getParty().getPartyNumber() - 1];
+        magicEffectSprite.setVisible(true);
+        final float attackEffectOffsetY = isMyAction ? -50 : 50;
+        magicEffectSprite.setPosition(applyParty.getX(), applyParty.getY() + attackEffectOffsetY);
+        magicEffectSprite.animate(90, false, new IAnimationListener() {
+
+            @Override
+            public void onAnimationStarted(final AnimatedSprite pAnimatedSprite, final int pInitialLoopCount) {
+
+            }
+
+            @Override
+            public void onAnimationFrameChanged(final AnimatedSprite pAnimatedSprite, final int pOldFrameIndex, final int pNewFrameIndex) {
+
+            }
+
+            @Override
+            public void onAnimationLoopFinished(final AnimatedSprite pAnimatedSprite, final int pRemainingLoopCount, final int pInitialLoopCount) {
+
+            }
+
+            @Override
+            public void onAnimationFinished(final AnimatedSprite pAnimatedSprite) {
+                magicEffectSprite.setVisible(false);
+            }
+
+        });
+    }
+
+    private void useSkillGoodMagic(final BattlePartyFrame applyParty, final boolean isMyAction) {
+        final AnimatedSprite effectSprite = goodEffectSprites[applyParty.getParty().getPartyNumber() - 1];
+        effectSprite.setVisible(true);
+        final float attackEffectOffsetY = isMyAction ? 50 : -55;
+        effectSprite.setPosition(applyParty.getX(), applyParty.getY() + attackEffectOffsetY);
+        effectSprite.animate(90, false, new IAnimationListener() {
+
+            @Override
+            public void onAnimationStarted(final AnimatedSprite pAnimatedSprite, final int pInitialLoopCount) {
+
+            }
+
+            @Override
+            public void onAnimationFrameChanged(final AnimatedSprite pAnimatedSprite, final int pOldFrameIndex, final int pNewFrameIndex) {
+
+            }
+
+            @Override
+            public void onAnimationLoopFinished(final AnimatedSprite pAnimatedSprite, final int pRemainingLoopCount, final int pInitialLoopCount) {
+
+            }
+
+            @Override
+            public void onAnimationFinished(final AnimatedSprite pAnimatedSprite) {
+                effectSprite.setVisible(false);
+            }
+
+        });
     }
 
     private void useSkillCure(final BattlePartyFrame applyParty, final boolean isMyAction) {

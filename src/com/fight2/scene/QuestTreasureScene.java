@@ -55,6 +55,14 @@ public class QuestTreasureScene extends BaseScene {
             final TextureEnum coinBagEnum = TextureEnum.COMMON_COIN_BAG;
             final IEntity coinBagImg = createACImageSprite(coinBagEnum, CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f);
             cardFrame.attachChild(coinBagImg);
+        } else if (tileItem == TileItem.SummonCharm) {
+            final TextureEnum itemEnum = TextureEnum.COMMON_SUMMON_CHARM;
+            final IEntity itemImg = createACImageSprite(itemEnum, CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f);
+            cardFrame.attachChild(itemImg);
+        } else if (tileItem == TileItem.Diamon) {
+            final TextureEnum itemEnum = TextureEnum.COMMON_DIAMOND;
+            final IEntity itemImg = createACImageSprite(itemEnum, CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f);
+            cardFrame.attachChild(itemImg);
         }
 
         init();

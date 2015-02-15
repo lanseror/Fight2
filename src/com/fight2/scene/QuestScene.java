@@ -98,6 +98,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     private CommonStick staminaStick;
     private final Font font = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
     private final Text cointText;
+    private final Text diamonText;
     private final Text guildContribText;
     private boolean handlingFailure;
 
@@ -106,6 +107,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         this.mScrollDetector = new SurfaceScrollDetector(this);
         this.getBackground().setColor(ColorUtils.convertABGRPackedIntToColor(0XFF205218));
         cointText = new Text(123, 24, font, "", 8, vbom);
+        diamonText = new Text(123, 24, font, "", 8, vbom);
         guildContribText = new Text(123, 24, font, "", 8, vbom);
         init();
         timerHandler = new TimerHandler(10, new ITimerCallback() {
@@ -254,6 +256,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                 - TextureEnum.PARTY_RECHARGE.getWidth() - 8, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight() - 4);
         this.attachChild(rechargeSprite);
         this.registerTouchArea(rechargeSprite);
+        rechargeSprite.attachChild(diamonText);
 
         cancelButton.setVisible(false);
         this.attachChild(cancelButton);
@@ -723,6 +726,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         staminaStick.setValue(userProps.getStamina(), true);
         cointText.setText(String.valueOf(userProps.getCoin()));
         guildContribText.setText(String.valueOf(userProps.getGuildContrib()));
+        diamonText.setText(String.valueOf(userProps.getDiamon()));
     }
 
     @Override
@@ -735,6 +739,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         final UserProperties userProps = QuestUtils.getUserProperties(activity);
         cointText.setText(String.valueOf(userProps.getCoin()));
         guildContribText.setText(String.valueOf(userProps.getGuildContrib()));
+        diamonText.setText(String.valueOf(userProps.getDiamon()));
     }
 
     private void receiveQuestTreasure(final QuestResult questResult) {
@@ -750,6 +755,10 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             storeroom.setTicket(storeroom.getTicket() + 1);
         } else if (tileItem == TileItem.CoinBag) {
             userProps.setCoin(userProps.getCoin() + 500);
+        } else if (tileItem == TileItem.SummonCharm) {
+            userProps.setSummonCharm(userProps.getSummonCharm() + 50);
+        } else if (tileItem == TileItem.Diamon) {
+            userProps.setDiamon(userProps.getDiamon() + 1);
         }
     }
 

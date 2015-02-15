@@ -78,6 +78,8 @@ public class QuestResult {
         Ticket,
         Stamina,
         CoinBag,
-        Card
+        Card,
+        SummonCharm,
+        Diamon
     }
 }

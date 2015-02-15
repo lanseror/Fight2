@@ -7,6 +7,8 @@ public enum TiledTextureEnum {
     ATTACK_EFFECT("images/attack_effect.png", 3, 4),
     CURE_EFFECT("images/cure_effect.png", 3, 4),
     CONFUSE_EFFECT("images/confuse_effect.png", 3, 4),
+    BATTLE_MAGIC_ATTACK_EFFECT("images/battle_magic_attack_effect.png", 3, 4),
+    BATTLE_SKILL_GOOD("images/battle_skill_good.png", 3, 4),
     HERO2("images/horse2.png", 16, 8),
     HERO("images/horse.png", 9, 8),
     TREASURE_BOX("images/quest_treasure_box.png", 8, 1);

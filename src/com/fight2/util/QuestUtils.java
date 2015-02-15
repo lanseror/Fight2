@@ -128,6 +128,8 @@ public class QuestUtils {
             userProperties.setGuildContrib(responseJson.getInt("guildContrib"));
             userProperties.setStamina(responseJson.getInt("stamina"));
             userProperties.setTicket(responseJson.getInt("ticket"));
+            userProperties.setSummonCharm(responseJson.getInt("summonCharm"));
+            userProperties.setDiamon(responseJson.getInt("diamon"));
             return userProperties;
         } catch (final JSONException e) {
             throw new RuntimeException(e);

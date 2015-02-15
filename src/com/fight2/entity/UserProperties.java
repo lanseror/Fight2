@@ -6,6 +6,8 @@ public class UserProperties {
     private int ticket;
     private int coin;
     private int guildContrib;
+    private int summonCharm;
+    private int diamon;
 
     public int getStamina() {
         return stamina;
@@ -37,6 +39,26 @@ public class UserProperties {
 
     public void setGuildContrib(final int guildContrib) {
         this.guildContrib = guildContrib;
+    }
+
+    public int getSummonCharm() {
+        return summonCharm;
+    }
+
+    public void setSummonCharm(final int summonCharm) {
+        this.summonCharm = summonCharm;
+    }
+
+    public int getDiamon() {
+        return diamon;
+    }
+
+    public void setDiamon(final int diamon) {
+        this.diamon = diamon;
+    }
+
+    public static int getMaxStamina() {
+        return MAX_STAMINA;
     }
 
 }
