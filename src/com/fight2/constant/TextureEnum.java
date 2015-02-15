@@ -282,6 +282,8 @@ public enum TextureEnum {
     QUEST_PATH_TAG_LEFT_TREASURE("images/quest_path_tag_left_treasure.png", 28, 31),
     QUEST_PATH_TAG_RIGHT_END("images/quest_path_tag_right_end.png", 30, 26),
     QUEST_PATH_TAG_RIGHT_TREASURE("images/quest_path_tag_right_treasure.png", 28, 31),
+    QUEST_TREASURE_WOOD("images/quest_treasure_wood.png", 34, 23),
+    QUEST_TREASURE_MINERAL("images/quest_treasure_mineral.png", 34, 22),
 
     // Dialog images.
     DIALOG_FULL("images/dialog_full.png", 902, 602),

@@ -46,10 +46,10 @@ import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Hero;
 import com.fight2.entity.PartyInfo;
 import com.fight2.entity.QuestResult;
-import com.fight2.entity.QuestResult.TileItem;
 import com.fight2.entity.QuestTask;
 import com.fight2.entity.QuestTask.UserTaskStatus;
 import com.fight2.entity.QuestTile;
+import com.fight2.entity.QuestTile.TileItem;
 import com.fight2.entity.QuestTreasureData;
 import com.fight2.entity.User;
 import com.fight2.entity.UserProperties;
@@ -451,13 +451,33 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                     treasureSprites.clear();
                     questTreasureData = newTreasureData;
                     for (final QuestTile treasure : questTreasureData.getQuestTiles()) {
+                        final TileItem item = treasure.getItem();
                         final float treasureX = tmxLayer.getTileX(treasure.getCol()) + 0.5f * tmxTiledMap.getTileWidth();
                         final float treasureY = tmxLayer.getTileY(treasure.getRow()) + 0.5f * tmxTiledMap.getTileHeight();
-                        final ITiledTextureRegion tiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.TREASURE_BOX);
-                        final AnimatedSprite treasureSprite = new AnimatedSprite(treasureX, treasureY, tiledTextureRegion, vbom);
-                        treasureSprite.animate(500, true);
-                        tmxTiledMap.attachChild(treasureSprite);
-                        treasureSprites.add(treasureSprite);
+                        if (item.isInBox()) {
+                            final ITiledTextureRegion tiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.TREASURE_BOX);
+                            final AnimatedSprite treasureSprite = new AnimatedSprite(treasureX, treasureY, tiledTextureRegion, vbom);
+                            treasureSprite.animate(500, true);
+                            tmxTiledMap.attachChild(treasureSprite);
+                            treasureSprites.add(treasureSprite);
+                        } else {
+                            if (item == TileItem.Wood) {
+                                final Sprite treasureSprite = createACImageSprite(TextureEnum.QUEST_TREASURE_WOOD, treasureX, treasureY);
+                                tmxTiledMap.attachChild(treasureSprite);
+                                treasureSprites.add(treasureSprite);
+                            } else if (item == TileItem.Mineral) {
+                                final Sprite treasureSprite = createACImageSprite(TextureEnum.QUEST_TREASURE_MINERAL, treasureX, treasureY);
+                                tmxTiledMap.attachChild(treasureSprite);
+                                treasureSprites.add(treasureSprite);
+                            } else if (item == TileItem.Crystal) {
+                                final ITiledTextureRegion tiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(
+                                        TiledTextureEnum.TREASURE_CRYSTAL);
+                                final AnimatedSprite treasureSprite = new AnimatedSprite(treasureX, treasureY, tiledTextureRegion, vbom);
+                                treasureSprite.animate(500, true);
+                                tmxTiledMap.attachChild(treasureSprite);
+                                treasureSprites.add(treasureSprite);
+                            }
+                        }
                     }
                     tmxTiledMap.sortChildren();
 
@@ -740,6 +760,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         cointText.setText(String.valueOf(userProps.getCoin()));
         guildContribText.setText(String.valueOf(userProps.getGuildContrib()));
         diamonText.setText(String.valueOf(userProps.getDiamon()));
+        GameUserSession.getInstance().setUserProps(userProps);
     }
 
     private void receiveQuestTreasure(final QuestResult questResult) {

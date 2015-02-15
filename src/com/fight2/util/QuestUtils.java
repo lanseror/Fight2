@@ -12,8 +12,8 @@ import org.json.JSONObject;
 import com.fight2.GameActivity;
 import com.fight2.entity.Card;
 import com.fight2.entity.QuestResult;
-import com.fight2.entity.QuestResult.TileItem;
 import com.fight2.entity.QuestTile;
+import com.fight2.entity.QuestTile.TileItem;
 import com.fight2.entity.QuestTreasureData;
 import com.fight2.entity.User;
 import com.fight2.entity.UserProperties;
@@ -93,6 +93,7 @@ public class QuestUtils {
                     final QuestTile questTile = new QuestTile();
                     questTile.setRow(questTileJson.getInt("row"));
                     questTile.setCol(questTileJson.getInt("col"));
+                    questTile.setItem(TileItem.valueOf(questTileJson.getString("item")));
                     questTiles.add(questTile);
                 }
                 questTreasureData.setQuestTiles(questTiles);

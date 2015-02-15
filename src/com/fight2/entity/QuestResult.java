@@ -1,5 +1,7 @@
 package com.fight2.entity;
 
+import com.fight2.entity.QuestTile.TileItem;
+
 public class QuestResult {
     private int status;
     private int treasureIndex;
@@ -74,12 +76,4 @@ public class QuestResult {
         this.stamina = stamina;
     }
 
-    public enum TileItem {
-        Ticket,
-        Stamina,
-        CoinBag,
-        Card,
-        SummonCharm,
-        Diamon
-    }
 }

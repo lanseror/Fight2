@@ -20,7 +20,7 @@ import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.QuestResult;
-import com.fight2.entity.QuestResult.TileItem;
+import com.fight2.entity.QuestTile.TileItem;
 import com.fight2.entity.engine.CardFrame;
 import com.fight2.util.F2SoundManager;
 import com.fight2.util.ResourceManager;

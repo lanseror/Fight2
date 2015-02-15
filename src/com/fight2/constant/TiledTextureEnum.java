@@ -11,7 +11,8 @@ public enum TiledTextureEnum {
     BATTLE_SKILL_GOOD("images/battle_skill_good.png", 3, 4),
     HERO2("images/horse2.png", 16, 8),
     HERO("images/horse.png", 9, 8),
-    TREASURE_BOX("images/quest_treasure_box.png", 8, 1);
+    TREASURE_BOX("images/quest_treasure_box.png", 8, 1),
+    TREASURE_CRYSTAL("images/quest_treasure_crystal.png", 7, 1);
 
     private final String url;
     private final int tileColumns;

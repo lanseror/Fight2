@@ -19,12 +19,12 @@ import android.util.SparseArray;
 import com.fight2.GameActivity;
 import com.fight2.entity.Card;
 import com.fight2.entity.Card.Race;
-import com.fight2.entity.battle.SkillOperation;
 import com.fight2.entity.CardTemplate;
 import com.fight2.entity.ComboSkill;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
+import com.fight2.entity.battle.SkillOperation;
 
 public class CardUtils {
     private final static SparseArray<CardTemplate> cardTemplates = new SparseArray<CardTemplate>();
