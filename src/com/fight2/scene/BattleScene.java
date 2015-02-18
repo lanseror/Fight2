@@ -559,7 +559,20 @@ public class BattleScene extends BaseScene {
         }
 
         final OnFinishedCallback preReviveFinishCallback = createPreReviveCallback(actionParty, isMyAction, onFinishedCallback, afterSkillRevivalRecords);
-        preReviveFinishCallback.onFinished(actionParty);
+
+        final IEntityModifier delayModifier = new DelayModifier(0.75f, new IEntityModifierListener() {
+
+            @Override
+            public void onModifierStarted(final IModifier<IEntity> pModifier, final IEntity pItem) {
+            }
+
+            @Override
+            public void onModifierFinished(final IModifier<IEntity> pModifier, final IEntity pItem) {
+                preReviveFinishCallback.onFinished(actionParty);
+            }
+
+        });
+        actionParty.registerEntityModifier(delayModifier);
     }
 
     private OnFinishedCallback createPreReviveCallback(final BattlePartyFrame actionParty, final boolean isMyAction,
