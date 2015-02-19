@@ -12,7 +12,9 @@ public enum TiledTextureEnum {
     HERO2("images/horse2.png", 16, 8),
     HERO("images/horse.png", 9, 8),
     TREASURE_BOX("images/quest_treasure_box.png", 8, 1),
-    TREASURE_CRYSTAL("images/quest_treasure_crystal.png", 7, 1);
+    TREASURE_CRYSTAL("images/quest_treasure_crystal.png", 7, 1),
+    MINE_CRYSTAL("images/mine/crystal_mine.png", 7, 1),
+    UPGRADE_EFFECT_BG("images/upgrade_effect_bg.png", 4, 4);
 
     private final String url;
     private final int tileColumns;

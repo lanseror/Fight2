@@ -279,6 +279,13 @@ public class CardUpgradeScene extends BaseCardPackScene {
         upgradeButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                // try {
+                // final UpgradeFinishScene finishScene = new UpgradeFinishScene(activity);
+                // setChildScene(finishScene, false, false, true);
+                // finishScene.updateScene();
+                // } catch (final IOException e) {
+                // throw new RuntimeException(e);
+                // }
                 final Card mainCard = inGridCards[0];
                 if (mainCard == null) {
                     return;

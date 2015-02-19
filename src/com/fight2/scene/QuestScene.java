@@ -95,6 +95,9 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     private final IEntity destTouchArea = new Rectangle(0, 0, 60, 60, vbom);
     private final F2ButtonSprite cancelButton = createCancelButton();
     private AnimatedSprite flagSprite;
+    private final AnimatedSprite crystalMineSprite;
+    private final Sprite woodMineSprite;
+    private final Sprite mineralMineSprite;
     private CommonStick staminaStick;
     private final Font font = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
     private final Text cointText;
@@ -110,19 +113,37 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         diamonText = new Text(123, 24, font, "", 8, vbom);
         guildContribText = new Text(123, 24, font, "", 8, vbom);
         init();
+        final ITiledTextureRegion crystalMineTiledTexture = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.MINE_CRYSTAL);
+        this.crystalMineSprite = new AnimatedSprite(0, 0, crystalMineTiledTexture, vbom);
+        crystalMineSprite.animate(500, true);
+        setMapElementPosition(crystalMineSprite, 28, 14);
+        tmxTiledMap.attachChild(crystalMineSprite);
+        this.woodMineSprite = this.createACImageSprite(TextureEnum.QUEST_MINE_WOOD, 0, 0);
+        setMapElementPosition(woodMineSprite, 63, 42);
+        tmxTiledMap.attachChild(woodMineSprite);
+        this.mineralMineSprite = this.createACImageSprite(TextureEnum.QUEST_MINE_MINERAL, 0, 0);
+        setMapElementPosition(mineralMineSprite, 54, 24);
+        tmxTiledMap.attachChild(mineralMineSprite);
         timerHandler = new TimerHandler(10, new ITimerCallback() {
             @Override
-            public void onTimePassed(final TimerHandler pTimerHandler) {
+            public void onTimePassed(final TimerHandler timerHandler) {
                 if (ResourceManager.getInstance().getCurrentSceneEnum() == SceneEnum.Quest) {
                     if (goStatus == QuestGoStatus.Stopped) {
                         final QuestTreasureData newTreasureData = QuestUtils.getQuestTreasure(questTreasureData);
                         refreshTreasureSprites(newTreasureData);
                     }
                 }
-                pTimerHandler.reset();
+                timerHandler.reset();
             }
         });
         activity.getEngine().registerUpdateHandler(timerHandler);
+    }
+
+    private void setMapElementPosition(final IEntity entity, final int tileX, final int tileY) {
+        final TMXLayer tmxLayer = this.tmxTiledMap.getTMXLayers().get(0);
+        final float x = tmxLayer.getTileX(tileX) + 0.5f * entity.getWidth();
+        final float y = tmxLayer.getTileY(tileY) + 0.5f * entity.getHeight();
+        entity.setPosition(x, y);
     }
 
     @Override
