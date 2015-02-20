@@ -2,9 +2,12 @@ package com.fight2.scene;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Queue;
 
 import org.andengine.engine.handler.timer.ITimerCallback;
@@ -42,6 +45,8 @@ import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.constant.TiledTextureEnum;
 import com.fight2.entity.Card;
+import com.fight2.entity.GameMine;
+import com.fight2.entity.GameMine.MineType;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Hero;
 import com.fight2.entity.PartyInfo;
@@ -95,15 +100,14 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     private final IEntity destTouchArea = new Rectangle(0, 0, 60, 60, vbom);
     private final F2ButtonSprite cancelButton = createCancelButton();
     private AnimatedSprite flagSprite;
-    private final AnimatedSprite crystalMineSprite;
-    private final Sprite woodMineSprite;
-    private final Sprite mineralMineSprite;
     private CommonStick staminaStick;
     private final Font font = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
     private final Text cointText;
     private final Text diamonText;
     private final Text guildContribText;
     private boolean handlingFailure;
+    private final List<GameMine> mines = new ArrayList<GameMine>();
+    private final Map<Sprite, GameMine> mineMap = new HashMap<Sprite, GameMine>();
 
     public QuestScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -113,17 +117,12 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         diamonText = new Text(123, 24, font, "", 8, vbom);
         guildContribText = new Text(123, 24, font, "", 8, vbom);
         init();
-        final ITiledTextureRegion crystalMineTiledTexture = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.MINE_CRYSTAL);
-        this.crystalMineSprite = new AnimatedSprite(0, 0, crystalMineTiledTexture, vbom);
-        crystalMineSprite.animate(500, true);
-        setMapElementPosition(crystalMineSprite, 28, 14);
-        tmxTiledMap.attachChild(crystalMineSprite);
-        this.woodMineSprite = this.createACImageSprite(TextureEnum.QUEST_MINE_WOOD, 0, 0);
-        setMapElementPosition(woodMineSprite, 63, 42);
-        tmxTiledMap.attachChild(woodMineSprite);
-        this.mineralMineSprite = this.createACImageSprite(TextureEnum.QUEST_MINE_MINERAL, 0, 0);
-        setMapElementPosition(mineralMineSprite, 54, 24);
-        tmxTiledMap.attachChild(mineralMineSprite);
+
+        mines.add(new GameMine(28, 14, MineType.Crystal));
+        mines.add(new GameMine(63, 42, MineType.Wood));
+        mines.add(new GameMine(54, 24, MineType.Mineral));
+
+        createMine();
         timerHandler = new TimerHandler(10, new ITimerCallback() {
             @Override
             public void onTimePassed(final TimerHandler timerHandler) {
@@ -139,11 +138,46 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         activity.getEngine().registerUpdateHandler(timerHandler);
     }
 
+    private void createMine() {
+        for (final GameMine mine : mines) {
+            final MineType type = mine.getType();
+            if (type == MineType.Crystal) {
+                final ITiledTextureRegion crystalMineTiledTexture = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.MINE_CRYSTAL);
+                final AnimatedSprite mineSprite = new AnimatedSprite(0, 0, crystalMineTiledTexture, vbom);
+                mineSprite.animate(500, true);
+                setMapElementPosition(mineSprite, mine.getCol(), mine.getRow());
+                tmxTiledMap.attachChild(mineSprite);
+                mineMap.put(mineSprite, mine);
+            } else {
+                final TextureEnum textureEnum = (type == MineType.Wood ? TextureEnum.QUEST_MINE_WOOD : TextureEnum.QUEST_MINE_MINERAL);
+                final Sprite mineSprite = this.createACImageSprite(textureEnum, 0, 0);
+                setMapElementPosition(mineSprite, mine.getCol(), mine.getRow());
+                tmxTiledMap.attachChild(mineSprite);
+                mineMap.put(mineSprite, mine);
+            }
+        }
+    }
+
     private void setMapElementPosition(final IEntity entity, final int tileX, final int tileY) {
         final TMXLayer tmxLayer = this.tmxTiledMap.getTMXLayers().get(0);
         final float x = tmxLayer.getTileX(tileX) + 0.5f * entity.getWidth();
         final float y = tmxLayer.getTileY(tileY) + 0.5f * entity.getHeight();
         entity.setPosition(x, y);
+    }
+
+    private TMXTile getTileIfTouchMine(final float x, final float y) {
+        for (final Entry<Sprite, GameMine> mineEntry : mineMap.entrySet()) {
+            final Sprite mineSprite = mineEntry.getKey();
+            if (mineSprite.contains(x, y)) {
+                final GameMine gameMine = mineEntry.getValue();
+                final MineType mineType = gameMine.getType();
+                final int standTileCol = gameMine.getCol() + mineType.getxOffset();
+                final int standTileRow = gameMine.getRow() + mineType.getyOffset();
+                final TMXLayer tmxLayer = this.tmxTiledMap.getTMXLayers().get(0);
+                return tmxLayer.getTMXTile(standTileCol, standTileRow);
+            }
+        }
+        return null;
     }
 
     @Override
@@ -200,7 +234,13 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                     final float sceneX = pSceneTouchEvent.getX();
                     final float sceneY = pSceneTouchEvent.getY();
                     if (goStatus == QuestGoStatus.Stopped) {
-                        destTile = tmxLayer.getTMXTileAt(sceneX, sceneY);
+                        final TMXTile mineStandTile = getTileIfTouchMine(sceneX, sceneY);
+                        if (mineStandTile == null) {
+                            destTile = tmxLayer.getTMXTileAt(sceneX, sceneY);
+                        } else {
+                            destTile = mineStandTile;
+                        }
+
                         if (destTile != null && destTile.getGlobalTileID() == GID) {
                             final float[] playerSceneCordinates = hero.getSceneCenterCoordinates();
                             final TMXTile currentTile = tmxLayer.getTMXTileAt(playerSceneCordinates[Constants.VERTEX_INDEX_X],
