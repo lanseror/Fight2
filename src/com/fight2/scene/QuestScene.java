@@ -792,6 +792,9 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                 public void onCallback(final Object param) {
                     final User mineOwner = (User) param;
                     if (mineOwner != null) {
+                        final UserProperties userProps = GameUserSession.getInstance().getUserProps();
+                        userProps.setDiamon(userProps.getDiamon() - 2);
+                        diamonText.setText(String.valueOf(userProps.getDiamon()));
                         ResourceManager.getInstance().setCurrentScene(null, new IRCallback<BaseScene>() {
                             @Override
                             public BaseScene onCallback() {
