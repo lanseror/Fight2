@@ -42,8 +42,8 @@ public class GameMine {
 
     public enum MineType {
         Wood(2, 0),
-        Mineral(1, 1),
-        Crystal(1,  1);
+        Mineral(1, 0),
+        Crystal(1, 0);
 
         private final int xOffset;
         private final int yOffset;

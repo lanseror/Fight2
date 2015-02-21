@@ -274,6 +274,8 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                                 } catch (final IOException e) {
                                     throw new RuntimeException(e);
                                 }
+                            } else {
+                                alert("精力不够！");
                             }
 
                         }
@@ -687,6 +689,8 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             goStatus = QuestGoStatus.Enemy;
         } else if (questResult.getStatus() == 3) {
             goStatus = QuestGoStatus.Task;
+        } else if (questResult.getStatus() == 5) {
+            goStatus = QuestGoStatus.Mine;
         } else {
             goStatus = QuestGoStatus.Failed;
         }
@@ -775,6 +779,36 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                 }
             });
 
+        } else if (goStatus == QuestGoStatus.Mine) {
+            attackMine();
+        }
+    }
+
+    private void attackMine() {
+        try {
+            activity.getGameHub().setSmallChatRoomEnabled(false);
+            final BaseScene attackMineScene = new AttackMineScene(activity, new IParamCallback() {
+                @Override
+                public void onCallback(final Object param) {
+                    final User mineOwner = (User) param;
+                    if (mineOwner != null) {
+                        ResourceManager.getInstance().setCurrentScene(null, new IRCallback<BaseScene>() {
+                            @Override
+                            public BaseScene onCallback() {
+                                try {
+                                    return new PreBattleScene(activity, mineOwner, BattleType.Mine);
+                                } catch (final IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        });
+                    }
+                    activity.getGameHub().setSmallChatRoomEnabled(true);
+                }
+            });
+            setChildScene(attackMineScene, false, false, true);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -787,6 +821,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         Treasure,
         Enemy,
         Task,
+        Mine,
         Stopped,
         Failed
     }

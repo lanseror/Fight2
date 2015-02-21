@@ -52,6 +52,7 @@ import com.fight2.util.ArenaUtils;
 import com.fight2.util.F2MusicManager;
 import com.fight2.util.F2SoundManager;
 import com.fight2.util.IRCallback;
+import com.fight2.util.MineUtils;
 import com.fight2.util.QuestUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TaskUtils;
@@ -146,6 +147,9 @@ public class BattleScene extends BaseScene {
                 break;
             case Task:
                 battleResult = TaskUtils.attack(activity);
+                break;
+            case Mine:
+                battleResult = MineUtils.attack(activity);
                 break;
             default:
                 battleResult = ArenaUtils.attack(attackPlayerId, activity);
@@ -295,6 +299,18 @@ public class BattleScene extends BaseScene {
                         public BaseScene onCallback() {
                             try {
                                 return new TaskBattleResultScene(battleResult, activity);
+                            } catch (final IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    });
+                } else if (battleType == BattleType.Mine) {
+                    final BaseScene scene = ResourceManager.getInstance().getCurrentScene();
+                    ResourceManager.getInstance().setChildScene(scene, new IRCallback<BaseScene>() {
+                        @Override
+                        public BaseScene onCallback() {
+                            try {
+                                return new MineBattleResultScene(battleResult, activity);
                             } catch (final IOException e) {
                                 throw new RuntimeException(e);
                             }
