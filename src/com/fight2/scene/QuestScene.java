@@ -39,6 +39,7 @@ import org.andengine.util.adt.color.ColorUtils;
 import org.andengine.util.debug.Debug;
 
 import com.fight2.GameActivity;
+import com.fight2.constant.CostConstants;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.SoundEnum;
@@ -116,13 +117,11 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         cointText = new Text(123, 24, font, "", 8, vbom);
         diamonText = new Text(123, 24, font, "", 8, vbom);
         guildContribText = new Text(123, 24, font, "", 8, vbom);
-        init();
-
         mines.add(new GameMine(28, 14, MineType.Crystal));
         mines.add(new GameMine(63, 42, MineType.Wood));
         mines.add(new GameMine(54, 24, MineType.Mineral));
+        init();
 
-        createMine();
         timerHandler = new TimerHandler(10, new ITimerCallback() {
             @Override
             public void onTimePassed(final TimerHandler timerHandler) {
@@ -204,6 +203,8 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         final TmxUtils tmxUtils = new TmxUtils(tmxTiledMap);
         final QuestTreasureData newTreasureData = QuestUtils.getQuestTreasure(questTreasureData);
         refreshTreasureSprites(newTreasureData);
+
+        createMine();
 
         final float playerX = tmxLayer.getTileX(32) + 0.5f * tmxTiledMap.getTileWidth();
         final float playerY = tmxLayer.getTileY(22) + TmxUtils.HERO_OFFSET_Y;
@@ -793,18 +794,22 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                     final User mineOwner = (User) param;
                     if (mineOwner != null) {
                         final UserProperties userProps = GameUserSession.getInstance().getUserProps();
-                        userProps.setDiamon(userProps.getDiamon() - 2);
-                        diamonText.setText(String.valueOf(userProps.getDiamon()));
-                        ResourceManager.getInstance().setCurrentScene(null, new IRCallback<BaseScene>() {
-                            @Override
-                            public BaseScene onCallback() {
-                                try {
-                                    return new PreBattleScene(activity, mineOwner, BattleType.Mine);
-                                } catch (final IOException e) {
-                                    throw new RuntimeException(e);
+                        if (userProps.getDiamon() >= CostConstants.MINE_ATTACK_COST) {
+                            userProps.setDiamon(userProps.getDiamon() - 2);
+                            diamonText.setText(String.valueOf(userProps.getDiamon()));
+                            ResourceManager.getInstance().setChildScene(QuestScene.this, new IRCallback<BaseScene>() {
+                                @Override
+                                public BaseScene onCallback() {
+                                    try {
+                                        return new PreBattleScene(activity, mineOwner, BattleType.Mine);
+                                    } catch (final IOException e) {
+                                        throw new RuntimeException(e);
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        } else {
+                            alert("你的钻石不够！");
+                        }
                     }
                     activity.getGameHub().setSmallChatRoomEnabled(true);
                 }

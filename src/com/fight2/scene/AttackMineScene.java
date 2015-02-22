@@ -2,9 +2,11 @@ package com.fight2.scene;
 
 import java.io.IOException;
 
+import org.andengine.entity.IEntity;
+import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.text.Text;
 import org.andengine.opengl.font.Font;
-import org.andengine.util.adt.color.ColorUtils;
+import org.andengine.util.adt.color.Color;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
@@ -27,7 +29,11 @@ public class AttackMineScene extends BaseScene {
 
     @Override
     protected void init() throws IOException {
-        this.getBackground().setColor(ColorUtils.convertABGRPackedIntToColor(0X55000000));
+        final IEntity bgEntity = new Rectangle(cameraCenterX, cameraCenterY, this.simulatedWidth, this.simulatedHeight, vbom);
+        bgEntity.setColor(Color.BLACK);
+        bgEntity.setAlpha(0.3f);
+        this.setBackgroundEnabled(false);
+        this.attachChild(bgEntity);
 
         final DialogFrame frame = new DialogFrame(cameraCenterX, cameraCenterY, 600, 350, activity);
         frame.bind(this, new IParamCallback() {
@@ -73,7 +79,7 @@ public class AttackMineScene extends BaseScene {
         });
 
         final Font titleFont = ResourceManager.getInstance().newFont(FontEnum.Default, 30);
-        final Text itemText = new Text(255, 280, titleFont, "你要花费2颗钻石攻打这个矿点吗？", vbom);
+        final Text itemText = new Text(frame.getWidth() * 0.5f, 250, titleFont, "你要花费2颗钻石攻打这个矿点吗？", vbom);
         itemText.setColor(0XFF330504);
         frame.attachChild(itemText);
     }

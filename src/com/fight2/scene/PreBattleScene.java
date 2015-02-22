@@ -175,7 +175,7 @@ public class PreBattleScene extends BaseScene {
                         }
                     }
                 };
-                if (battleType == BattleType.Task) {
+                if (battleType == BattleType.Task || battleType == BattleType.Mine) {
                     ResourceManager.getInstance().setChildScene(PreBattleScene.this, irCallback);
                 } else {
                     ResourceManager.getInstance().setCurrentScene(null, irCallback);

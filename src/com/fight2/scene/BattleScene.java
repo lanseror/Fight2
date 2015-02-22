@@ -306,6 +306,7 @@ public class BattleScene extends BaseScene {
                     });
                 } else if (battleType == BattleType.Mine) {
                     final BaseScene scene = ResourceManager.getInstance().getCurrentScene();
+                    scene.clearChildScene();
                     ResourceManager.getInstance().setChildScene(scene, new IRCallback<BaseScene>() {
                         @Override
                         public BaseScene onCallback() {
