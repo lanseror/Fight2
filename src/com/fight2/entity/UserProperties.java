@@ -7,6 +7,7 @@ public class UserProperties {
     private int coin;
     private int guildContrib;
     private int summonCharm;
+    private int summonStone;
     private int diamon;
 
     public int getStamina() {
@@ -47,6 +48,14 @@ public class UserProperties {
 
     public void setSummonCharm(final int summonCharm) {
         this.summonCharm = summonCharm;
+    }
+
+    public int getSummonStone() {
+        return summonStone;
+    }
+
+    public void setSummonStone(final int summonStone) {
+        this.summonStone = summonStone;
     }
 
     public int getDiamon() {

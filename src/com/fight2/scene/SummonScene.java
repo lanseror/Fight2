@@ -13,22 +13,36 @@ import org.andengine.entity.text.TextOptions;
 import org.andengine.opengl.font.Font;
 
 import com.fight2.GameActivity;
+import com.fight2.constant.CostConstants;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
+import com.fight2.entity.GameUserSession;
 import com.fight2.entity.ScrollZone;
+import com.fight2.entity.UserProperties;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.CardUtils;
 import com.fight2.util.F2SoundManager;
+import com.fight2.util.QuestUtils;
 import com.fight2.util.ResourceManager;
 
 public class SummonScene extends BaseScene {
     private static final float FRAME_WIDTH = TextureEnum.SUMMON_FRAME.getWidth();
+    private final Font font = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
+    private final Text summonCharmText;
+    private final Text summonStoneText;
+    private final Text diamonText;
+    private final UserProperties userProps;
 
     public SummonScene(final GameActivity activity) throws IOException {
         super(activity);
+        userProps = QuestUtils.getUserProperties(activity);
+        GameUserSession.getInstance().setUserProps(userProps);
+        this.summonCharmText = new Text(120, 45, font, String.valueOf(userProps.getSummonCharm()), 8, vbom);
+        this.summonStoneText = new Text(315, 45, font, String.valueOf(userProps.getSummonStone()), 8, vbom);
+        this.diamonText = new Text(123, 24, font, String.valueOf(userProps.getDiamon()), 8, vbom);
         init();
     }
 
@@ -55,11 +69,14 @@ public class SummonScene extends BaseScene {
 
         final Sprite topBar = createALBImageSprite(TextureEnum.SUMMON_TOPBAR, this.simulatedLeftX, this.simulatedHeight - TextureEnum.SUMMON_TOPBAR.getHeight());
         this.attachChild(topBar);
+        topBar.attachChild(summonCharmText);
+        topBar.attachChild(summonStoneText);
 
         final Sprite rechargeSprite = createALBF2ButtonSprite(TextureEnum.PARTY_RECHARGE, TextureEnum.PARTY_RECHARGE_PRESSED, this.simulatedRightX
                 - TextureEnum.PARTY_RECHARGE.getWidth() - 8, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight() - 4);
         this.attachChild(rechargeSprite);
         this.registerTouchArea(rechargeSprite);
+        rechargeSprite.attachChild(diamonText);
 
         final F2ButtonSprite backButton = createALBF2ButtonSprite(TextureEnum.COMMON_BACK_BUTTON_NORMAL, TextureEnum.COMMON_BACK_BUTTON_PRESSED,
                 this.simulatedRightX - 135, 50);
@@ -145,6 +162,17 @@ public class SummonScene extends BaseScene {
 
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                if (type == 1) {
+                    if (userProps.getSummonCharm() < CostConstants.BASIC_SUMMON_COST) {
+                        alert("召唤符可从基本召唤中获得卡片。你可以通过野外探险或者打竞技场获得召唤符。");
+                        return;
+                    }
+                } else {
+                    if (userProps.getSummonStone() < CostConstants.HERO_SUMMON_STONE_COST) {
+                        alert("召唤石不够！");
+                        return;
+                    }
+                }
                 final Card card = CardUtils.summon(activity, type);
                 if (card != null) {
                     try {

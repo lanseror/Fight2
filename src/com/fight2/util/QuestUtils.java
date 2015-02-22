@@ -131,6 +131,7 @@ public class QuestUtils {
             userProperties.setStamina(responseJson.getInt("stamina"));
             userProperties.setTicket(responseJson.getInt("ticket"));
             userProperties.setSummonCharm(responseJson.getInt("summonCharm"));
+            userProperties.setSummonStone(responseJson.getInt("summonStone"));
             userProperties.setDiamon(responseJson.getInt("diamon"));
             return userProperties;
         } catch (final JSONException e) {
