@@ -1,9 +1,11 @@
 package com.fight2.entity;
 
 public class GameMine {
+    private int id;
     private int row;
     private int col;
     private MineType type;
+    private User owner;
 
     public GameMine() {
         super();
@@ -14,6 +16,14 @@ public class GameMine {
         this.col = col;
         this.row = row;
         this.type = type;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(final int id) {
+        this.id = id;
     }
 
     public int getRow() {
@@ -38,6 +48,14 @@ public class GameMine {
 
     public void setType(final MineType type) {
         this.type = type;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(final User owner) {
+        this.owner = owner;
     }
 
     public enum MineType {

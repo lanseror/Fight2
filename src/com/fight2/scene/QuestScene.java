@@ -38,6 +38,8 @@ import org.andengine.util.Constants;
 import org.andengine.util.adt.color.ColorUtils;
 import org.andengine.util.debug.Debug;
 
+import android.util.SparseArray;
+
 import com.fight2.GameActivity;
 import com.fight2.constant.CostConstants;
 import com.fight2.constant.FontEnum;
@@ -72,6 +74,7 @@ import com.fight2.util.F2SoundManager;
 import com.fight2.util.IAsyncCallback;
 import com.fight2.util.IParamCallback;
 import com.fight2.util.IRCallback;
+import com.fight2.util.MineUtils;
 import com.fight2.util.QuestUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TaskUtils;
@@ -107,8 +110,8 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     private final Text diamonText;
     private final Text guildContribText;
     private boolean handlingFailure;
-    private final List<GameMine> mines = new ArrayList<GameMine>();
     private final Map<Sprite, GameMine> mineMap = new HashMap<Sprite, GameMine>();
+    private final SparseArray<Text> mineMarkMap = new SparseArray<Text>();
 
     public QuestScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -117,9 +120,6 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         cointText = new Text(123, 24, font, "", 8, vbom);
         diamonText = new Text(123, 24, font, "", 8, vbom);
         guildContribText = new Text(123, 24, font, "", 8, vbom);
-        mines.add(new GameMine(28, 14, MineType.Crystal));
-        mines.add(new GameMine(63, 42, MineType.Wood));
-        mines.add(new GameMine(54, 24, MineType.Mineral));
         init();
 
         timerHandler = new TimerHandler(10, new ITimerCallback() {
@@ -130,6 +130,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                         final QuestTreasureData newTreasureData = QuestUtils.getQuestTreasure(questTreasureData);
                         refreshTreasureSprites(newTreasureData);
                     }
+                    refreshMineStatus();
                 }
                 timerHandler.reset();
             }
@@ -138,19 +139,35 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     }
 
     private void createMine() {
+
+        final List<GameMine> mines = MineUtils.list();
         for (final GameMine mine : mines) {
+            final User owner = mine.getOwner();
             final MineType type = mine.getType();
+            final Sprite mark = createALBImageSprite(TextureEnum.MAIN_TIPS, 0, 0);
+            final Font markFont = ResourceManager.getInstance().newFont(FontEnum.Bold, 20);
+            final Text markText = new Text(mark.getWidth() * 0.5f, mark.getHeight() * 0.5f, markFont, owner.getName(), 15, vbom);
+            markText.setColor(0XFFDFDCD7);
+            mark.attachChild(markText);
+            mineMarkMap.put(mine.getId(), markText);
+            mark.setScale(0.6f);
+            mark.setAlpha(0.7f);
+
             if (type == MineType.Crystal) {
                 final ITiledTextureRegion crystalMineTiledTexture = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.MINE_CRYSTAL);
                 final AnimatedSprite mineSprite = new AnimatedSprite(0, 0, crystalMineTiledTexture, vbom);
                 mineSprite.animate(500, true);
                 setMapElementPosition(mineSprite, mine.getCol(), mine.getRow());
+                mark.setPosition(mineSprite.getWidth() * 0.5f, mineSprite.getHeight() + 5);
+                mineSprite.attachChild(mark);
                 tmxTiledMap.attachChild(mineSprite);
                 mineMap.put(mineSprite, mine);
             } else {
                 final TextureEnum textureEnum = (type == MineType.Wood ? TextureEnum.QUEST_MINE_WOOD : TextureEnum.QUEST_MINE_MINERAL);
                 final Sprite mineSprite = this.createACImageSprite(textureEnum, 0, 0);
                 setMapElementPosition(mineSprite, mine.getCol(), mine.getRow());
+                mark.setPosition(mineSprite.getWidth() * 0.5f, mineSprite.getHeight() + 5);
+                mineSprite.attachChild(mark);
                 tmxTiledMap.attachChild(mineSprite);
                 mineMap.put(mineSprite, mine);
             }
@@ -551,6 +568,15 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
 
         }
 
+    }
+
+    private synchronized void refreshMineStatus() {
+        final List<GameMine> mines = MineUtils.list();
+        for (final GameMine mine : mines) {
+            final User owner = mine.getOwner();
+            final Text mark = mineMarkMap.get(mine.getId());
+            mark.setText(owner.getName());
+        }
     }
 
     private boolean staminaEnough(final Path path) {
