@@ -270,7 +270,6 @@ public class ResourceManager {
                         loadingScene.back();
                         activity.getGameHub().setSmallChatRoomEnabled(true);
                         if (result) {
-                            currentScene.leaveScene();
                             breadcrumbs.pop();
                             final SceneEnum sceneEnum = breadcrumbs.peek();
                             setCurrentScene(sceneEnum, true);
