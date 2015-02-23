@@ -48,6 +48,8 @@ public class QuestUtils {
                 enemy.setId(enymyJson.getInt("id"));
                 enemy.setName(enymyJson.getString("name"));
                 result.setEnemy(enemy);
+            } else if (result.getStatus() == 5) {
+                result.setMineId(responseJson.getInt("mineId"));
             }
             result.setStamina(responseJson.getInt("stamina"));
             final boolean treasureUpdated = responseJson.getBoolean("treasureUpdate");

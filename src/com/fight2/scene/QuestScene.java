@@ -110,7 +110,8 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     private final Text diamonText;
     private final Text guildContribText;
     private boolean handlingFailure;
-    private final Map<Sprite, GameMine> mineMap = new HashMap<Sprite, GameMine>();
+    private final Map<Sprite, GameMine> spriteMineMap = new HashMap<Sprite, GameMine>();
+    private final SparseArray<GameMine> minesMap = new SparseArray<GameMine>();
     private final SparseArray<Text> mineMarkMap = new SparseArray<Text>();
 
     public QuestScene(final GameActivity activity) throws IOException {
@@ -150,6 +151,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             markText.setColor(0XFFDFDCD7);
             mark.attachChild(markText);
             mineMarkMap.put(mine.getId(), markText);
+            minesMap.put(mine.getId(), mine);
             mark.setScale(0.6f);
             mark.setAlpha(0.7f);
 
@@ -161,7 +163,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                 mark.setPosition(mineSprite.getWidth() * 0.5f, mineSprite.getHeight() + 5);
                 mineSprite.attachChild(mark);
                 tmxTiledMap.attachChild(mineSprite);
-                mineMap.put(mineSprite, mine);
+                spriteMineMap.put(mineSprite, mine);
             } else {
                 final TextureEnum textureEnum = (type == MineType.Wood ? TextureEnum.QUEST_MINE_WOOD : TextureEnum.QUEST_MINE_MINERAL);
                 final Sprite mineSprite = this.createACImageSprite(textureEnum, 0, 0);
@@ -169,7 +171,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                 mark.setPosition(mineSprite.getWidth() * 0.5f, mineSprite.getHeight() + 5);
                 mineSprite.attachChild(mark);
                 tmxTiledMap.attachChild(mineSprite);
-                mineMap.put(mineSprite, mine);
+                spriteMineMap.put(mineSprite, mine);
             }
         }
     }
@@ -182,7 +184,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     }
 
     private TMXTile getTileIfTouchMine(final float x, final float y) {
-        for (final Entry<Sprite, GameMine> mineEntry : mineMap.entrySet()) {
+        for (final Entry<Sprite, GameMine> mineEntry : spriteMineMap.entrySet()) {
             final Sprite mineSprite = mineEntry.getKey();
             if (mineSprite.contains(x, y)) {
                 final GameMine gameMine = mineEntry.getValue();
@@ -575,6 +577,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         for (final GameMine mine : mines) {
             final User owner = mine.getOwner();
             final Text mark = mineMarkMap.get(mine.getId());
+            minesMap.put(mine.getId(), mine);
             mark.setText(owner.getName());
         }
     }
@@ -807,14 +810,15 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             });
 
         } else if (goStatus == QuestGoStatus.Mine) {
-            attackMine();
+            attackMine(questResult.getMineId());
         }
     }
 
-    private void attackMine() {
+    private void attackMine(final int id) {
         try {
             activity.getGameHub().setSmallChatRoomEnabled(false);
-            final BaseScene attackMineScene = new AttackMineScene(activity, new IParamCallback() {
+
+            final BaseScene attackMineScene = new AttackMineScene(activity, minesMap.get(id), new IParamCallback() {
                 @Override
                 public void onCallback(final Object param) {
                     final User mineOwner = (User) param;
@@ -834,7 +838,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                                 }
                             });
                         } else {
-                            alert("你的钻石不够！");
+                            QuestScene.this.alert("你的钻石不够！");
                         }
                     }
                     activity.getGameHub().setSmallChatRoomEnabled(true);
@@ -891,11 +895,10 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     }
 
     private void updateQuestPropsBar() {
-        final UserProperties userProps = QuestUtils.getUserProperties(activity);
+        final UserProperties userProps = GameUserSession.getInstance().getUserProps();
         cointText.setText(String.valueOf(userProps.getCoin()));
         guildContribText.setText(String.valueOf(userProps.getGuildContrib()));
         diamonText.setText(String.valueOf(userProps.getDiamon()));
-        GameUserSession.getInstance().setUserProps(userProps);
     }
 
     private void receiveQuestTreasure(final QuestResult questResult) {

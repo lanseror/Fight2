@@ -27,6 +27,7 @@ public class MineUtils {
                 final GameMine mine = new GameMine();
                 mine.setId(responseJson.getInt("id"));
                 mine.setCol(responseJson.getInt("col"));
+                mine.setAmount(responseJson.getInt("amount"));
                 mine.setRow(responseJson.getInt("row"));
                 mine.setType(MineType.valueOf(responseJson.getString("type")));
                 final JSONObject userJson = responseJson.getJSONObject("owner");

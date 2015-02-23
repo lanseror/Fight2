@@ -2,6 +2,7 @@ package com.fight2.entity;
 
 public class GameMine {
     private int id;
+    private int amount;
     private int row;
     private int col;
     private MineType type;
@@ -11,8 +12,9 @@ public class GameMine {
         super();
     }
 
-    public GameMine(final int col, final int row, final MineType type) {
+    public GameMine(final int amount, final int col, final int row, final MineType type) {
         super();
+        this.amount = amount;
         this.col = col;
         this.row = row;
         this.type = type;
@@ -24,6 +26,14 @@ public class GameMine {
 
     public void setId(final int id) {
         this.id = id;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public void setAmount(final int amount) {
+        this.amount = amount;
     }
 
     public int getRow() {
@@ -59,16 +69,18 @@ public class GameMine {
     }
 
     public enum MineType {
-        Wood(2, 0),
-        Mineral(1, 0),
-        Crystal(1, 0);
+        Wood(2, 0, "木"),
+        Mineral(1, 0, "矿石"),
+        Crystal(1, 0, "水晶");
 
         private final int xOffset;
         private final int yOffset;
+        private final String desc;
 
-        private MineType(final int xOffset, final int yOffset) {
+        private MineType(final int xOffset, final int yOffset, final String desc) {
             this.xOffset = xOffset;
             this.yOffset = yOffset;
+            this.desc = desc;
         }
 
         public int getxOffset() {
@@ -77,6 +89,10 @@ public class GameMine {
 
         public int getyOffset() {
             return yOffset;
+        }
+
+        public String getDesc() {
+            return desc;
         }
 
     }

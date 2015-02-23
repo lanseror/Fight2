@@ -98,7 +98,7 @@ public class QuestTreasureScene extends BaseScene {
     @Override
     protected void playAnimation() {
         F2SoundManager.getInstance().play(SoundEnum.SUMMON);
-        final IEntityModifier modifier = new ParallelEntityModifier(new ScaleModifier(0.3f, 0.33f, 1), new RotationByModifier(0.3f, 270));
+        final IEntityModifier modifier = new ParallelEntityModifier(new ScaleModifier(0.15f, 0.33f, 1), new RotationByModifier(0.15f, -90));
         cardFrame.registerEntityModifier(modifier);
     }
 

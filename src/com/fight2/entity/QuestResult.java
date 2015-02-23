@@ -11,6 +11,7 @@ public class QuestResult {
     private QuestTreasureData questTreasureData;
     private User enemy;
     private int stamina;
+    private int mineId;
 
     public int getStatus() {
         return status;
@@ -74,6 +75,14 @@ public class QuestResult {
 
     public void setStamina(final int stamina) {
         this.stamina = stamina;
+    }
+
+    public int getMineId() {
+        return mineId;
+    }
+
+    public void setMineId(final int mineId) {
+        this.mineId = mineId;
     }
 
 }
