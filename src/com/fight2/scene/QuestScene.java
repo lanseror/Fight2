@@ -837,11 +837,14 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                                     }
                                 }
                             });
+                            activity.getGameHub().setSmallChatRoomEnabled(true);
                         } else {
                             QuestScene.this.alert("你的钻石不够！");
                         }
+                    } else {
+                        activity.getGameHub().setSmallChatRoomEnabled(true);
                     }
-                    activity.getGameHub().setSmallChatRoomEnabled(true);
+
                 }
             });
             setChildScene(attackMineScene, false, false, true);

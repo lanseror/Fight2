@@ -219,6 +219,7 @@ public abstract class BaseScene extends Scene {
     }
 
     public void alert(final String message) {
+        activity.getGameHub().setSmallChatRoomEnabled(false);
         try {
             final Scene alertScene = new AlertScene(activity, message);
             final Scene scene = activity.getEngine().getScene();

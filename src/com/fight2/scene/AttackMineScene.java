@@ -62,8 +62,8 @@ public class AttackMineScene extends BaseScene {
                             @Override
                             public void onComplete() {
                                 loadingScene.back();
-                                yesCallback.onCallback(owner);
                                 back();
+                                yesCallback.onCallback(owner);
                             }
                         };
                         activity.runOnUiThread(new Runnable() {
@@ -76,8 +76,8 @@ public class AttackMineScene extends BaseScene {
                         throw new RuntimeException(e);
                     }
                 } else {
-                    yesCallback.onCallback(null);
                     back();
+                    yesCallback.onCallback(null);
                 }
             }
 

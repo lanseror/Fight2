@@ -53,6 +53,7 @@ public class AlertScene extends BaseScene {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 back();
+                activity.getGameHub().setSmallChatRoomEnabled(true);
             }
         });
 
