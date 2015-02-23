@@ -921,6 +921,12 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             userProps.setSummonCharm(userProps.getSummonCharm() + 50);
         } else if (tileItem == TileItem.Diamon) {
             userProps.setDiamon(userProps.getDiamon() + 1);
+        } else if (tileItem == TileItem.Wood) {
+            userProps.setGuildContrib(userProps.getGuildContrib() + 5);
+        } else if (tileItem == TileItem.Mineral) {
+            userProps.setGuildContrib(userProps.getGuildContrib() + 5);
+        } else if (tileItem == TileItem.Crystal) {
+            userProps.setGuildContrib(userProps.getGuildContrib() + 10);
         }
     }
 
