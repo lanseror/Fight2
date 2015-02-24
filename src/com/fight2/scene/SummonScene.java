@@ -25,6 +25,7 @@ import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.CardUtils;
 import com.fight2.util.F2SoundManager;
+import com.fight2.util.IRCallback;
 import com.fight2.util.QuestUtils;
 import com.fight2.util.ResourceManager;
 
@@ -204,31 +205,35 @@ public class SummonScene extends BaseScene {
                         return;
                     }
                 }
-                final Card card = CardUtils.summon(activity, type);
-                if (card != null) {
-                    if (type == 1) {
-                        userProps.setSummonCharm(userProps.getSummonCharm() - CostConstants.BASIC_SUMMON_COST);
-                        summonCharmText.setText(String.valueOf(userProps.getSummonCharm()));
-                    } else if (type == 2) {
-                        userProps.setSummonStone(userProps.getSummonStone() - CostConstants.HERO_SUMMON_STONE_COST);
-                        summonStoneText.setText(String.valueOf(userProps.getSummonStone()));
-                        refreshHeroSummonButton();
-                    } else if (type == 3) {
-                        userProps.setDiamon(userProps.getDiamon() - CostConstants.HERO_SUMMON_DIAMON_COST);
-                        diamonText.setText(String.valueOf(userProps.getDiamon()));
+                ResourceManager.getInstance().setChildScene(SummonScene.this, new IRCallback<BaseScene>() {
+
+                    @Override
+                    public BaseScene onCallback() {
+                        final Card card = CardUtils.summon(activity, type);
+                        if (type == 1) {
+                            userProps.setSummonCharm(userProps.getSummonCharm() - CostConstants.BASIC_SUMMON_COST);
+                            summonCharmText.setText(String.valueOf(userProps.getSummonCharm()));
+                        } else if (type == 2) {
+                            userProps.setSummonStone(userProps.getSummonStone() - CostConstants.HERO_SUMMON_STONE_COST);
+                            summonStoneText.setText(String.valueOf(userProps.getSummonStone()));
+                            refreshHeroSummonButton();
+                        } else if (type == 3) {
+                            userProps.setDiamon(userProps.getDiamon() - CostConstants.HERO_SUMMON_DIAMON_COST);
+                            diamonText.setText(String.valueOf(userProps.getDiamon()));
+                        }
+
+                        try {
+                            final BaseScene summonFinishScene = new SummonFinishScene(card, activity);
+                            setChildScene(summonFinishScene, false, false, true);
+                            summonFinishScene.updateScene();
+                            CardUtils.refreshUserCards();
+                            return summonFinishScene;
+                        } catch (final IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
 
-                    try {
-                        final BaseScene summonFinishScene = new SummonFinishScene(card, activity);
-                        setChildScene(summonFinishScene, false, false, true);
-                        summonFinishScene.updateScene();
-                        CardUtils.refreshUserCards();
-                    } catch (final IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                } else {
-                    alert("可能服务器出错或者你召唤的卡片已经超过100张！");
-                }
+                });
 
             }
 
