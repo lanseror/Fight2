@@ -184,16 +184,23 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         entity.setPosition(x, y);
     }
 
-    private TMXTile getTileIfTouchMine(final float x, final float y) {
+    private TMXTile getTileByMineSprite(final Sprite mineSprite) {
+        if (mineSprite == null) {
+            return null;
+        }
+        final GameMine gameMine = spriteMineMap.get(mineSprite);
+        final MineType mineType = gameMine.getType();
+        final int standTileCol = gameMine.getCol() + mineType.getxOffset();
+        final int standTileRow = gameMine.getRow() + mineType.getyOffset();
+        final TMXLayer tmxLayer = this.tmxTiledMap.getTMXLayers().get(0);
+        return tmxLayer.getTMXTile(standTileCol, standTileRow);
+    }
+
+    private Sprite getMineSpriteIfTouch(final float x, final float y) {
         for (final Entry<Sprite, GameMine> mineEntry : spriteMineMap.entrySet()) {
             final Sprite mineSprite = mineEntry.getKey();
             if (mineSprite.contains(x, y)) {
-                final GameMine gameMine = mineEntry.getValue();
-                final MineType mineType = gameMine.getType();
-                final int standTileCol = gameMine.getCol() + mineType.getxOffset();
-                final int standTileRow = gameMine.getRow() + mineType.getyOffset();
-                final TMXLayer tmxLayer = this.tmxTiledMap.getTMXLayers().get(0);
-                return tmxLayer.getTMXTile(standTileCol, standTileRow);
+                return mineSprite;
             }
         }
         return null;
@@ -255,8 +262,9 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                     final float sceneX = pSceneTouchEvent.getX();
                     final float sceneY = pSceneTouchEvent.getY();
                     if (goStatus == QuestGoStatus.Stopped) {
-                        final TMXTile mineStandTile = getTileIfTouchMine(sceneX, sceneY);
-                        if (mineStandTile == null) {
+                        final Sprite mineSprite = getMineSpriteIfTouch(sceneX, sceneY);
+                        final TMXTile mineStandTile = getTileByMineSprite(mineSprite);
+                        if (mineSprite == null) {
                             destTile = tmxLayer.getTMXTileAt(sceneX, sceneY);
                         } else {
                             destTile = mineStandTile;
@@ -271,6 +279,9 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                                 showPathTags(path);
                                 goStatus = QuestGoStatus.Ready;
                                 return true;
+                            } else if (currentTile == mineStandTile) {
+                                final GameMine curentMine = spriteMineMap.get(mineSprite);
+                                handleMine(curentMine);
                             }
                         }
                     } else if (goStatus == QuestGoStatus.Ready && destTouchArea.contains(sceneX, sceneY)) {
@@ -573,16 +584,6 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
 
     }
 
-    private synchronized void refreshMineStatus() {
-        final List<GameMine> mines = MineUtils.list();
-        for (final GameMine mine : mines) {
-            final User owner = mine.getOwner();
-            final Text mark = mineMarkMap.get(mine.getId());
-            minesMap.put(mine.getId(), mine);
-            mark.setText(owner.getName());
-        }
-    }
-
     private boolean staminaEnough(final Path path) {
         final int availStamina = GameUserSession.getInstance().getUserProps().getStamina();
         return path.getSize() - 1 <= availStamina;
@@ -812,12 +813,15 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
 
         } else if (goStatus == QuestGoStatus.Mine) {
             final GameMine curentMine = minesMap.get(questResult.getMineId());
-            if (curentMine.getOwner().getId() != GameUserSession.getInstance().getId()) {
-                attackMine(questResult.getMineId());
-            } else {
-                gatherMine(questResult.getMineId());
-            }
+            handleMine(curentMine);
+        }
+    }
 
+    private void handleMine(final GameMine curentMine) {
+        if (curentMine.getOwner().getId() != GameUserSession.getInstance().getId()) {
+            attackMine(curentMine.getId());
+        } else {
+            gatherMine(curentMine.getId());
         }
     }
 
@@ -886,6 +890,16 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             }
 
         });
+    }
+
+    private synchronized void refreshMineStatus() {
+        final List<GameMine> mines = MineUtils.list();
+        for (final GameMine mine : mines) {
+            final User owner = mine.getOwner();
+            minesMap.get(mine.getId()).update(mine);
+            final Text mark = mineMarkMap.get(mine.getId());
+            mark.setText(owner.getName());
+        }
     }
 
     public enum QuestGoStatus {

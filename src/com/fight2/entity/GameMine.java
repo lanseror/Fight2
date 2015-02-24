@@ -12,12 +12,23 @@ public class GameMine {
         super();
     }
 
-    public GameMine(final int amount, final int col, final int row, final MineType type) {
+    public GameMine(final GameMine mine) {
         super();
-        this.amount = amount;
-        this.col = col;
-        this.row = row;
-        this.type = type;
+        this.id = mine.getId();
+        this.amount = mine.getAmount();
+        this.row = mine.getRow();
+        this.col = mine.getCol();
+        this.type = mine.getType();
+        this.owner = mine.getOwner();
+    }
+
+    public void update(final GameMine mine) {
+        this.id = mine.getId();
+        this.amount = mine.getAmount();
+        this.row = mine.getRow();
+        this.col = mine.getCol();
+        this.type = mine.getType();
+        this.owner = mine.getOwner();
     }
 
     public int getId() {
