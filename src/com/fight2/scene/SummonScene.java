@@ -216,7 +216,6 @@ public class SummonScene extends BaseScene {
                     } else if (type == 3) {
                         userProps.setDiamon(userProps.getDiamon() - CostConstants.HERO_SUMMON_DIAMON_COST);
                         diamonText.setText(String.valueOf(userProps.getDiamon()));
-                        refreshHeroSummonButton();
                     }
 
                     try {
