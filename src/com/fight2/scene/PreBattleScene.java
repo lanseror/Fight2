@@ -191,7 +191,12 @@ public class PreBattleScene extends BaseScene {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 F2MusicManager.getInstance().stopMusic();
-                ResourceManager.getInstance().unManagedSceneBack();
+                if (battleType == BattleType.Task || battleType == BattleType.Mine) {
+                    back();
+                    activity.getGameHub().needSmallChatRoom(true);
+                } else {
+                    ResourceManager.getInstance().unManagedSceneBack();
+                }
             }
         });
         this.attachChild(retreatButton);

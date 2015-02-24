@@ -21,11 +21,11 @@ import com.fight2.util.IParamCallback;
 import com.fight2.util.MineUtils;
 import com.fight2.util.ResourceManager;
 
-public class AttackMineScene extends BaseScene {
+public class MineAttackScene extends BaseScene {
     private final IParamCallback yesCallback;
     private final GameMine mine;
 
-    public AttackMineScene(final GameActivity activity, final GameMine mine, final IParamCallback yesCallback) throws IOException {
+    public MineAttackScene(final GameActivity activity, final GameMine mine, final IParamCallback yesCallback) throws IOException {
         super(activity);
         this.yesCallback = yesCallback;
         this.mine = mine;

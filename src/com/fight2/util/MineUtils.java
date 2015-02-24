@@ -73,4 +73,18 @@ public class MineUtils {
             throw new RuntimeException(e);
         }
     }
+
+    public static int gather(final GameActivity activity) {
+        final String url = HttpUtils.HOST_URL + "/mine/gather";
+        try {
+            final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
+            return responseJson.getInt("status");
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -130,8 +130,9 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                     if (goStatus == QuestGoStatus.Stopped) {
                         final QuestTreasureData newTreasureData = QuestUtils.getQuestTreasure(questTreasureData);
                         refreshTreasureSprites(newTreasureData);
+                        refreshMineStatus();
                     }
-                    refreshMineStatus();
+
                 }
                 timerHandler.reset();
             }
@@ -810,47 +811,81 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             });
 
         } else if (goStatus == QuestGoStatus.Mine) {
-            attackMine(questResult.getMineId());
+            final GameMine curentMine = minesMap.get(questResult.getMineId());
+            if (curentMine.getOwner().getId() != GameUserSession.getInstance().getId()) {
+                attackMine(questResult.getMineId());
+            } else {
+                gatherMine(questResult.getMineId());
+            }
+
         }
     }
 
     private void attackMine(final int id) {
-        try {
-            activity.getGameHub().setSmallChatRoomEnabled(false);
-
-            final BaseScene attackMineScene = new AttackMineScene(activity, minesMap.get(id), new IParamCallback() {
-                @Override
-                public void onCallback(final Object param) {
-                    final User mineOwner = (User) param;
-                    if (mineOwner != null) {
-                        final UserProperties userProps = GameUserSession.getInstance().getUserProps();
-                        if (userProps.getDiamon() >= CostConstants.MINE_ATTACK_COST) {
-                            userProps.setDiamon(userProps.getDiamon() - 2);
-                            diamonText.setText(String.valueOf(userProps.getDiamon()));
-                            ResourceManager.getInstance().setChildScene(QuestScene.this, new IRCallback<BaseScene>() {
-                                @Override
-                                public BaseScene onCallback() {
-                                    try {
-                                        return new PreBattleScene(activity, mineOwner, BattleType.Mine);
-                                    } catch (final IOException e) {
-                                        throw new RuntimeException(e);
-                                    }
+        activity.getGameHub().setSmallChatRoomEnabled(false);
+        ResourceManager.getInstance().setChildScene(this, new IRCallback<BaseScene>() {
+            @Override
+            public BaseScene onCallback() {
+                try {
+                    final BaseScene attackMineScene = new MineAttackScene(activity, minesMap.get(id), new IParamCallback() {
+                        @Override
+                        public void onCallback(final Object param) {
+                            final User mineOwner = (User) param;
+                            if (mineOwner != null) {
+                                final UserProperties userProps = GameUserSession.getInstance().getUserProps();
+                                if (userProps.getDiamon() >= CostConstants.MINE_ATTACK_COST) {
+                                    userProps.setDiamon(userProps.getDiamon() - 2);
+                                    diamonText.setText(String.valueOf(userProps.getDiamon()));
+                                    ResourceManager.getInstance().setChildScene(QuestScene.this, new IRCallback<BaseScene>() {
+                                        @Override
+                                        public BaseScene onCallback() {
+                                            try {
+                                                return new PreBattleScene(activity, mineOwner, BattleType.Mine);
+                                            } catch (final IOException e) {
+                                                throw new RuntimeException(e);
+                                            }
+                                        }
+                                    });
+                                    activity.getGameHub().setSmallChatRoomEnabled(true);
+                                } else {
+                                    QuestScene.this.alert("你的钻石不够！");
                                 }
-                            });
-                            activity.getGameHub().setSmallChatRoomEnabled(true);
-                        } else {
-                            QuestScene.this.alert("你的钻石不够！");
-                        }
-                    } else {
-                        activity.getGameHub().setSmallChatRoomEnabled(true);
-                    }
+                            } else {
+                                activity.getGameHub().setSmallChatRoomEnabled(true);
+                            }
 
+                        }
+                    });
+                    return attackMineScene;
+                } catch (final IOException e) {
+                    throw new RuntimeException(e);
                 }
-            });
-            setChildScene(attackMineScene, false, false, true);
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
+            }
+
+        });
+    }
+
+    private void gatherMine(final int id) {
+        activity.getGameHub().setSmallChatRoomEnabled(false);
+
+        ResourceManager.getInstance().setChildScene(this, new IRCallback<BaseScene>() {
+            @Override
+            public BaseScene onCallback() {
+                try {
+                    final BaseScene gatherMineScene = new MineGatherScene(activity, minesMap.get(id), new IParamCallback() {
+                        @Override
+                        public void onCallback(final Object param) {
+                            activity.getGameHub().setSmallChatRoomEnabled(true);
+                            updateQuestPropsBar();
+                        }
+                    });
+                    return gatherMineScene;
+                } catch (final IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+        });
     }
 
     public enum QuestGoStatus {
