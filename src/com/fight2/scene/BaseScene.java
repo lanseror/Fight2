@@ -20,8 +20,10 @@ import com.fight2.entity.GameUserSession;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.engine.F2CommonButton;
+import com.fight2.util.AsyncTaskLoader;
 import com.fight2.util.ConfigHelper;
 import com.fight2.util.EntityUtils;
+import com.fight2.util.IAsyncCallback;
 import com.fight2.util.TextureFactory;
 
 public abstract class BaseScene extends Scene {
@@ -235,6 +237,40 @@ public abstract class BaseScene extends Scene {
                 }
             }
             childScene.setChildScene(alertScene, false, false, true);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void exeAsyncTask(final IAsyncCallback callback) {
+        try {
+            final LoadingScene loadingScene = new LoadingScene(activity);
+            final Scene scene = activity.getEngine().getScene();
+            Scene childScene = scene;
+            while (childScene.getChildScene() != null) {
+                childScene = childScene.getChildScene();
+            }
+            childScene.setChildScene(loadingScene, false, false, true);
+
+            final IAsyncCallback task = new IAsyncCallback() {
+
+                @Override
+                public void workToDo() {
+                    callback.workToDo();
+                }
+
+                @Override
+                public void onComplete() {
+                    loadingScene.back();
+                    callback.onComplete();
+                }
+            };
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    new AsyncTaskLoader().execute(task);
+                }
+            });
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }

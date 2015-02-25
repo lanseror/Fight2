@@ -23,6 +23,7 @@ import com.fight2.entity.engine.CardFrame;
 import com.fight2.entity.engine.CommonDialogFrame;
 import com.fight2.entity.engine.DialogFrame;
 import com.fight2.entity.engine.TextDialogFrame;
+import com.fight2.util.IAsyncCallback;
 import com.fight2.util.ICallback;
 import com.fight2.util.IParamCallback;
 import com.fight2.util.ResourceManager;
@@ -87,11 +88,24 @@ public class TaskGuideScene extends BaseScene {
 
             @Override
             public void onCallback(final Object param) {
-                if (TaskUtils.accept()) {
-                    dialog.unbind(TaskGuideScene.this);
-                    task.setStatus(UserTaskStatus.Started);
-                    createTipsFrame(task);
-                }
+                exeAsyncTask(new IAsyncCallback() {
+                    private boolean accepted;
+
+                    @Override
+                    public void workToDo() {
+                        accepted = TaskUtils.accept();
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        if (accepted) {
+                            dialog.unbind(TaskGuideScene.this);
+                            task.setStatus(UserTaskStatus.Started);
+                            createTipsFrame(task);
+                        }
+                    }
+                });
+
             }
 
         });
@@ -125,11 +139,21 @@ public class TaskGuideScene extends BaseScene {
 
             @Override
             public void onCallback(final Object param) {
-                if (TaskUtils.complete()) {
-                    TaskUtils.refresh();
-                }
-                back();
-                iLeaveCallback.onCallback();
+                exeAsyncTask(new IAsyncCallback() {
+
+                    @Override
+                    public void workToDo() {
+                        if (TaskUtils.complete()) {
+                            TaskUtils.refresh();
+                        }
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        back();
+                        iLeaveCallback.onCallback();
+                    }
+                });
             }
 
         });
