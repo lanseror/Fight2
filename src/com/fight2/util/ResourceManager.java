@@ -216,10 +216,10 @@ public class ResourceManager {
 
     }
 
-    public void setChildScene(final BaseScene scene, final IRCallback<BaseScene> irCallback) {
+    public void setChildScene(final BaseScene scene, final IRCallback<BaseScene> irCallback, final boolean parentDisabled) {
         try {
             final LoadingScene loadingScene = new LoadingScene(activity);
-            scene.setChildScene(loadingScene, false, false, true);
+            scene.setChildScene(loadingScene, false, parentDisabled, true);
             activity.getGameHub().setSmallChatRoomEnabled(false);
 
             final IAsyncCallback callback = new IAsyncCallback() {
@@ -234,7 +234,7 @@ public class ResourceManager {
                 @Override
                 public void onComplete() {
                     loadingScene.back();
-                    scene.setChildScene(childScene, false, false, true);
+                    scene.setChildScene(childScene, false, parentDisabled, true);
                     activity.getGameHub().setSmallChatRoomEnabled(true);
                 }
 
@@ -248,6 +248,10 @@ public class ResourceManager {
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void setChildScene(final BaseScene scene, final IRCallback<BaseScene> irCallback) {
+        setChildScene(scene, irCallback, true);
     }
 
     public void sceneBack() {

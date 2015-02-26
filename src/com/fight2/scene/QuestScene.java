@@ -48,8 +48,6 @@ import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.constant.TiledTextureEnum;
 import com.fight2.entity.Card;
-import com.fight2.entity.Dialog;
-import com.fight2.entity.Dialog.Speaker;
 import com.fight2.entity.GameMine;
 import com.fight2.entity.GameMine.MineType;
 import com.fight2.entity.GameUserSession;
@@ -772,40 +770,16 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             }
             removeTreasureSprite();
         } else if (goStatus == QuestGoStatus.Enemy) {
-            final Dialog dialog = questResult.getDialog();
-            final User enemy = questResult.getEnemy();
-            final PartyInfo dialogPartyInfo;
-            if (dialog.getSpeaker() == Speaker.Self) {
-                dialogPartyInfo = GameUserSession.getInstance().getPartyInfo();
-            } else {
-                dialogPartyInfo = CardUtils.getPartyByUserId(activity, enemy.getId());
-            }
-            final Card dialogLeader = dialogPartyInfo.getParties()[0].getCards()[0];
-            final String speakerName;
-            if (dialog.getSpeaker() == Speaker.Self) {
-                speakerName = dialogLeader.getName();
-            } else {
-                speakerName = enemy.getName();
-            }
-
-            final DialogFrame dialogFrame = new HeroDialogFrame(cameraCenterX, cameraCenterY, 600, 300, activity, dialogLeader, speakerName,
-                    dialog.getContent());
-            dialogFrame.bind(QuestScene.this, new IParamCallback() {
+            ResourceManager.getInstance().setChildScene(QuestScene.this, new IRCallback<BaseScene>() {
                 @Override
-                public void onCallback(final Object param) {
-                    dialogFrame.unbind(QuestScene.this);
-                    ResourceManager.getInstance().setChildScene(QuestScene.this, new IRCallback<BaseScene>() {
-                        @Override
-                        public BaseScene onCallback() {
-                            try {
-                                return new PreBattleScene(activity, enemy, BattleType.Quest);
-                            } catch (final IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                        }
-                    });
+                public BaseScene onCallback() {
+                    try {
+                        return new QuestEnemyScene(activity, questResult);
+                    } catch (final IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-            });
+            }, true);
         } else if (goStatus == QuestGoStatus.Task) {
             final QuestTask task = TaskUtils.getTask();
             final User boss = questResult.getEnemy();

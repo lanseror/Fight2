@@ -38,6 +38,7 @@ import com.fight2.entity.engine.cardpack.MoveFinishedListener;
 import com.fight2.input.touch.detector.F2ScrollDetector;
 import com.fight2.util.CardUtils;
 import com.fight2.util.F2SoundManager;
+import com.fight2.util.IAsyncCallback;
 import com.fight2.util.PartyUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
@@ -258,38 +259,49 @@ public class CardEvolutionScene extends BaseCardPackScene {
                 for (final Card card : inGridCards) {
                     cardIdsJson.put(card.getId());
                 }
+                CardEvolutionScene.this.exeAsyncTask(new IAsyncCallback() {
+                    private int result;
 
-                final int result = CardUtils.evolution(cardIdsJson, inGridCards);
-                if (result == 0 || result == 1) {
-                    cardPack.revertCardToCardPack(inGridCardSprites[result]);
-                    for (int i = 0; i < inGridCards.length; i++) {
-                        inGridCards[i] = null;
-                        final IEntity inGridCardSprite = inGridCardSprites[i];
-                        inGridCardSprites[i] = null;
-                        if (inGridCardSprite != null) {
-                            activity.runOnUpdateThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    inGridCardSprite.detachSelf();
+                    @Override
+                    public void workToDo() {
+                        result = CardUtils.evolution(cardIdsJson, inGridCards);
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        if (result == 0 || result == 1) {
+                            cardPack.revertCardToCardPack(inGridCardSprites[result]);
+                            for (int i = 0; i < inGridCards.length; i++) {
+                                inGridCards[i] = null;
+                                final IEntity inGridCardSprite = inGridCardSprites[i];
+                                inGridCardSprites[i] = null;
+                                if (inGridCardSprite != null) {
+                                    activity.runOnUpdateThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            inGridCardSprite.detachSelf();
+                                        }
+
+                                    });
+
                                 }
-
-                            });
-
+                            }
+                            hpText.setText("");
+                            atkText.setText("");
+                            cardPackCards.clear();
+                            CardUtils.refreshUserCards();
+                            final List<Card> userEvoCards = CardUtils.getEvocards();
+                            for (final Card userEvoCard : userEvoCards) {
+                                cardPackCards.add(userEvoCard);
+                            }
+                            updateCardPack();
+                            PartyUtils.refreshPartyHpAtk();
+                        } else {
+                            CardEvolutionScene.this.alert("出错了。");
                         }
                     }
-                    hpText.setText("");
-                    atkText.setText("");
-                    cardPackCards.clear();
-                    CardUtils.refreshUserCards();
-                    final List<Card> userEvoCards = CardUtils.getEvocards();
-                    for (final Card userEvoCard : userEvoCards) {
-                        cardPackCards.add(userEvoCard);
-                    }
-                    updateCardPack();
-                    PartyUtils.refreshPartyHpAtk();
-                } else {
-                    alert("出错了。");
-                }
+
+                });
 
             }
         });

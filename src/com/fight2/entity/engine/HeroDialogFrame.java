@@ -36,7 +36,7 @@ public class HeroDialogFrame extends DialogFrame {
 
         final Font detailFont = ResourceManager.getInstance().newFont(FontEnum.Default, 24);
         final Text contentText = new TickerText(width * 0.5f, height * 0.5f, detailFont, content, new TickerTextOptions(AutoWrap.LETTERS, width - 185,
-                HorizontalAlign.LEFT, 15), vbom);
+                HorizontalAlign.LEFT, 25), vbom);
         contentText.setColor(0XFF330504);
         this.attachChild(contentText);
         EntityUtils.leftAlignEntity(contentText, 160);
