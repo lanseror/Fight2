@@ -11,8 +11,11 @@ import org.json.JSONObject;
 
 import com.fight2.GameActivity;
 import com.fight2.entity.Card;
+import com.fight2.entity.Dialog;
+import com.fight2.entity.Dialog.Speaker;
 import com.fight2.entity.QuestResult;
 import com.fight2.entity.QuestTile;
+import com.fight2.entity.Dialog.OrderType;
 import com.fight2.entity.QuestTile.TileItem;
 import com.fight2.entity.QuestTreasureData;
 import com.fight2.entity.User;
@@ -51,6 +54,11 @@ public class QuestUtils {
             } else if (result.getStatus() == 5) {
                 result.setMineId(responseJson.getInt("mineId"));
             }
+            if (responseJson.has("dialog")) {
+                final Dialog dialog = dialogFromJson(responseJson.getJSONObject("dialog"));
+                result.setDialog(dialog);
+            }
+
             result.setStamina(responseJson.getInt("stamina"));
             final boolean treasureUpdated = responseJson.getBoolean("treasureUpdate");
             result.setTreasureUpdated(treasureUpdated);
@@ -80,6 +88,19 @@ public class QuestUtils {
         } catch (final JSONException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private static Dialog dialogFromJson(final JSONObject json) {
+        final Dialog dialog = new Dialog();
+        try {
+            dialog.setId(json.getInt("id"));
+            dialog.setContent(json.getString("content"));
+            dialog.setOrderType(OrderType.valueOf(json.getString("orderType")));
+            dialog.setSpeaker(Speaker.valueOf(json.getString("speaker")));
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        }
+        return dialog;
     }
 
     public static QuestTreasureData getQuestTreasure(final QuestTreasureData oldData) {

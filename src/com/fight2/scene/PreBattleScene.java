@@ -175,7 +175,7 @@ public class PreBattleScene extends BaseScene {
                         }
                     }
                 };
-                if (battleType == BattleType.Task || battleType == BattleType.Mine) {
+                if (battleType == BattleType.Task || battleType == BattleType.Mine || battleType == BattleType.Quest) {
                     ResourceManager.getInstance().setChildScene(PreBattleScene.this, irCallback);
                 } else {
                     ResourceManager.getInstance().setCurrentScene(null, irCallback);
@@ -191,7 +191,7 @@ public class PreBattleScene extends BaseScene {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 F2MusicManager.getInstance().stopMusic();
-                if (battleType == BattleType.Task || battleType == BattleType.Mine) {
+                if (battleType == BattleType.Task || battleType == BattleType.Mine || battleType == BattleType.Quest) {
                     back();
                     activity.getGameHub().needSmallChatRoom(true);
                 } else {

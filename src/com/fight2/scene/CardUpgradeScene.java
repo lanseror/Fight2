@@ -37,6 +37,7 @@ import com.fight2.entity.engine.cardpack.MoveFinishedListener;
 import com.fight2.input.touch.detector.F2ScrollDetector;
 import com.fight2.util.CardUtils;
 import com.fight2.util.F2SoundManager;
+import com.fight2.util.IAsyncCallback;
 import com.fight2.util.PartyUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
@@ -301,33 +302,45 @@ public class CardUpgradeScene extends BaseCardPackScene {
                 if (cardIdsJson.length() < 2) {
                     return;
                 }
+                CardUpgradeScene.this.exeAsyncTask(new IAsyncCallback() {
+                    private boolean isOk;
 
-                final boolean isOk = CardUtils.upgrade(cardIdsJson, mainCard);
-                if (isOk) {
-                    for (int i = 1; i < inGridCards.length; i++) {
-                        inGridCards[i] = null;
-                        final IEntity inGridCardSprite = inGridCardSprites[i];
-                        inGridCardSprites[i] = null;
-                        if (inGridCardSprite != null) {
-                            activity.runOnUpdateThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    inGridCardSprite.detachSelf();
-                                }
-
-                            });
-
-                        }
+                    @Override
+                    public void workToDo() {
+                        isOk = CardUtils.upgrade(cardIdsJson, mainCard);
                     }
-                    final CardFrame mainCardSprite = (CardFrame) inGridCardSprites[0];
-                    mainCardSprite.revertCardAttributes();
-                    GameUserSession.getInstance().getCards().add(mainCard);
-                    CardUtils.refreshUserCards();
-                    PartyUtils.refreshPartyHpAtk();
-                    GameUserSession.getInstance().getCards().remove(mainCard);
-                } else {
-                    alert("出错了。");
-                }
+
+                    @Override
+                    public void onComplete() {
+                        if (isOk) {
+                            for (int i = 1; i < inGridCards.length; i++) {
+                                inGridCards[i] = null;
+                                final IEntity inGridCardSprite = inGridCardSprites[i];
+                                inGridCardSprites[i] = null;
+                                if (inGridCardSprite != null) {
+                                    activity.runOnUpdateThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            inGridCardSprite.detachSelf();
+                                        }
+
+                                    });
+
+                                }
+                            }
+                            final CardFrame mainCardSprite = (CardFrame) inGridCardSprites[0];
+                            mainCardSprite.revertCardAttributes();
+                            GameUserSession.getInstance().getCards().add(mainCard);
+                            CardUtils.refreshUserCards();
+                            PartyUtils.refreshPartyHpAtk();
+                            GameUserSession.getInstance().getCards().remove(mainCard);
+                        } else {
+                            CardUpgradeScene.this.alert("出错了。");
+                        }
+
+                    }
+
+                });
 
             }
         });

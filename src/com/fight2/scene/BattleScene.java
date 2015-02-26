@@ -317,6 +317,19 @@ public class BattleScene extends BaseScene {
                             }
                         }
                     });
+                } else if (battleType == BattleType.Quest) {
+                    final BaseScene scene = ResourceManager.getInstance().getCurrentScene();
+                    scene.clearChildScene();
+                    ResourceManager.getInstance().setChildScene(scene, new IRCallback<BaseScene>() {
+                        @Override
+                        public BaseScene onCallback() {
+                            try {
+                                return new QuestBattleResultScene(battleResult, activity);
+                            } catch (final IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    });
                 } else {
                     ResourceManager.getInstance().setCurrentScene(null, new IRCallback<BaseScene>() {
                         @Override

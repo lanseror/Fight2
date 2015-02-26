@@ -12,6 +12,7 @@ public class QuestResult {
     private User enemy;
     private int stamina;
     private int mineId;
+    private Dialog dialog;
 
     public int getStatus() {
         return status;
@@ -83,6 +84,14 @@ public class QuestResult {
 
     public void setMineId(final int mineId) {
         this.mineId = mineId;
+    }
+
+    public Dialog getDialog() {
+        return dialog;
+    }
+
+    public void setDialog(final Dialog dialog) {
+        this.dialog = dialog;
     }
 
 }

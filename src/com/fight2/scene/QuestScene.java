@@ -48,6 +48,8 @@ import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.constant.TiledTextureEnum;
 import com.fight2.entity.Card;
+import com.fight2.entity.Dialog;
+import com.fight2.entity.Dialog.Speaker;
 import com.fight2.entity.GameMine;
 import com.fight2.entity.GameMine.MineType;
 import com.fight2.entity.GameUserSession;
@@ -731,6 +733,11 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     private void handleResult(final float playerBackX, final float playerBackY, final QuestResult questResult) {
         staminaStick.setValue(questResult.getStamina());
         GameUserSession.getInstance().getUserProps().setStamina(questResult.getStamina());
+        if (goStatus != QuestGoStatus.Failed) {
+            if (questResult.isTreasureUpdated()) {
+                refreshTreasureSprites(questResult.getQuestTreasureData());
+            }
+        }
         if (goStatus == QuestGoStatus.Failed) {
             goStatus = QuestGoStatus.Stopped;
             cancelButton.setVisible(false);
@@ -746,13 +753,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
 
             });
         } else if (goStatus == QuestGoStatus.Arrived) {
-            if (questResult.isTreasureUpdated()) {
-                refreshTreasureSprites(questResult.getQuestTreasureData());
-            }
         } else if (goStatus == QuestGoStatus.Treasure) {
-            if (questResult.isTreasureUpdated()) {
-                refreshTreasureSprites(questResult.getQuestTreasureData());
-            }
             receiveQuestTreasure(questResult);
             updateQuestPropsBar();
             if (questResult.getItem().isInBox()) {
@@ -771,23 +772,41 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             }
             removeTreasureSprite();
         } else if (goStatus == QuestGoStatus.Enemy) {
-            if (questResult.isTreasureUpdated()) {
-                refreshTreasureSprites(questResult.getQuestTreasureData());
+            final Dialog dialog = questResult.getDialog();
+            final User enemy = questResult.getEnemy();
+            final PartyInfo dialogPartyInfo;
+            if (dialog.getSpeaker() == Speaker.Self) {
+                dialogPartyInfo = GameUserSession.getInstance().getPartyInfo();
+            } else {
+                dialogPartyInfo = CardUtils.getPartyByUserId(activity, enemy.getId());
             }
-            ResourceManager.getInstance().setCurrentScene(null, new IRCallback<BaseScene>() {
+            final Card dialogLeader = dialogPartyInfo.getParties()[0].getCards()[0];
+            final String speakerName;
+            if (dialog.getSpeaker() == Speaker.Self) {
+                speakerName = dialogLeader.getName();
+            } else {
+                speakerName = enemy.getName();
+            }
+
+            final DialogFrame dialogFrame = new HeroDialogFrame(cameraCenterX, cameraCenterY, 600, 300, activity, dialogLeader, speakerName,
+                    dialog.getContent());
+            dialogFrame.bind(QuestScene.this, new IParamCallback() {
                 @Override
-                public BaseScene onCallback() {
-                    try {
-                        return new PreBattleScene(activity, questResult.getEnemy(), BattleType.Quest);
-                    } catch (final IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                public void onCallback(final Object param) {
+                    dialogFrame.unbind(QuestScene.this);
+                    ResourceManager.getInstance().setChildScene(QuestScene.this, new IRCallback<BaseScene>() {
+                        @Override
+                        public BaseScene onCallback() {
+                            try {
+                                return new PreBattleScene(activity, enemy, BattleType.Quest);
+                            } catch (final IOException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    });
                 }
             });
         } else if (goStatus == QuestGoStatus.Task) {
-            if (questResult.isTreasureUpdated()) {
-                refreshTreasureSprites(questResult.getQuestTreasureData());
-            }
             final QuestTask task = TaskUtils.getTask();
             final User boss = questResult.getEnemy();
             final PartyInfo bossPartyInfo = CardUtils.getPartyByUserId(activity, boss.getId());
