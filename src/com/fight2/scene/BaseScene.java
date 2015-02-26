@@ -24,6 +24,7 @@ import com.fight2.util.AsyncTaskLoader;
 import com.fight2.util.ConfigHelper;
 import com.fight2.util.EntityUtils;
 import com.fight2.util.IAsyncCallback;
+import com.fight2.util.IParamCallback;
 import com.fight2.util.TextureFactory;
 
 public abstract class BaseScene extends Scene {
@@ -221,9 +222,13 @@ public abstract class BaseScene extends Scene {
     }
 
     public void alert(final String message) {
+        alert(message, null);
+    }
+
+    public void alert(final String message, final IParamCallback callback) {
         activity.getGameHub().setSmallChatRoomEnabled(false);
         try {
-            final Scene alertScene = new AlertScene(activity, message);
+            final Scene alertScene = new AlertScene(activity, message, callback);
             final Scene scene = activity.getEngine().getScene();
             Scene childScene = scene;
             while (childScene.getChildScene() != null) {

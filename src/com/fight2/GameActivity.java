@@ -42,6 +42,7 @@ import com.fight2.util.ConfigHelper;
 import com.fight2.util.EntityFactory;
 import com.fight2.util.F2MusicManager;
 import com.fight2.util.F2SoundManager;
+import com.fight2.util.IParamCallback;
 import com.fight2.util.ImageOpenHelper;
 import com.fight2.util.LogUtils;
 import com.fight2.util.ResourceManager;
@@ -63,6 +64,7 @@ public class GameActivity extends LayoutGameActivity {
     private ProgressBar progressBar;
     private ImageOpenHelper dbHelper;
     private EditText chatText;
+    private boolean pause = false;
 
     @Override
     protected int getLayoutID() {
@@ -277,12 +279,30 @@ public class GameActivity extends LayoutGameActivity {
         F2SoundManager.getInstance().destroy();
         F2MusicManager.getInstance().pause();
         super.onPause();
+        pause = true;
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         F2MusicManager.getInstance().resume();
+        if (pause) {
+            final TimerHandler getTimerHandler = new TimerHandler(0.5f, new ITimerCallback() {
+                @Override
+                public void onTimePassed(final TimerHandler pTimerHandler) {
+                    if (!AccountUtils.checkSession()) {
+                        ResourceManager.getInstance().getCurrentScene().alert("会话已过期，请重新登录！", new IParamCallback() {
+                            @Override
+                            public void onCallback(final Object param) {
+                                finish();
+                            }
+                        });
+                    }
+                }
+            });
+            getEngine().registerUpdateHandler(getTimerHandler);
+        }
+        pause = false;
     }
 
     @Override

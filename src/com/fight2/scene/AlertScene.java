@@ -16,14 +16,21 @@ import com.fight2.constant.FontEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
+import com.fight2.util.IParamCallback;
 import com.fight2.util.ResourceManager;
 
 public class AlertScene extends BaseScene {
     private final String msg;
+    private final IParamCallback callback;
 
     public AlertScene(final GameActivity activity, final String msg) throws IOException {
+        this(activity, msg, null);
+    }
+
+    public AlertScene(final GameActivity activity, final String msg, final IParamCallback callback) throws IOException {
         super(activity);
         this.msg = msg;
+        this.callback = callback;
         init();
     }
 
@@ -53,6 +60,9 @@ public class AlertScene extends BaseScene {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 back();
+                if (callback != null) {
+                    callback.onCallback(true);
+                }
                 activity.getGameHub().setSmallChatRoomEnabled(true);
             }
         });

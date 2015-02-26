@@ -76,6 +76,21 @@ public class AccountUtils {
 
     }
 
+    public static boolean checkSession() {
+        try {
+            final String url = HttpUtils.HOST_URL + "/user/session";
+            final JSONObject json = HttpUtils.getJSONFromUrl(url);
+            final int status = json.getInt("status");
+            return status == 0;
+        } catch (final ClientProtocolException e) {
+            throw new RuntimeException(e);
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        } catch (final JSONException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public static void login(final String installUUID, final GameActivity activity) throws IOException {
         final String loginUrl = HttpUtils.HOST_URL + "/user/login.action?installUUID=" + installUUID;
         final String cardUrl = HttpUtils.HOST_URL + "/card/my-cards";
