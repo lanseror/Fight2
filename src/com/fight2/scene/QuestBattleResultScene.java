@@ -7,14 +7,11 @@ import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
-import com.fight2.entity.QuestTask;
-import com.fight2.entity.QuestTask.UserTaskStatus;
 import com.fight2.entity.battle.BattleResult;
 import com.fight2.entity.engine.DialogFrame;
 import com.fight2.entity.engine.HeroDialogFrame;
 import com.fight2.util.IParamCallback;
 import com.fight2.util.ResourceManager;
-import com.fight2.util.TaskUtils;
 
 public class QuestBattleResultScene extends BaseScene {
     private final PartyInfo myPartyInfo = GameUserSession.getInstance().getPartyInfo();
@@ -34,8 +31,6 @@ public class QuestBattleResultScene extends BaseScene {
         String dialog = null;
         if (battleResult.isWinner()) {
             dialog = "战斗胜利！";
-            final QuestTask task = TaskUtils.getTask();
-            task.setStatus(UserTaskStatus.Finished);
         } else {
             dialog = "战斗失败！";
         }
