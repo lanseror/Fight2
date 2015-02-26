@@ -259,6 +259,10 @@ public class CardEvolutionScene extends BaseCardPackScene {
                 for (final Card card : inGridCards) {
                     cardIdsJson.put(card.getId());
                 }
+                if (inGridCards[0].getId() == inGridCards[1].getId()) {
+                    alert("重复的卡牌！");
+                    return;
+                }
                 CardEvolutionScene.this.exeAsyncTask(new IAsyncCallback() {
                     private int result;
 

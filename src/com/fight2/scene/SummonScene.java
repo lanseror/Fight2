@@ -40,6 +40,9 @@ public class SummonScene extends BaseScene {
     private final UserProperties userProps;
     private final Font costFont = ResourceManager.getInstance().getFont(FontEnum.Default, 26);
     private final Sprite heroSummonFrame;
+    private final Sprite championSummonFrame;
+    private final F2ButtonSprite championSummonStoneButton;
+    private final F2ButtonSprite championSummonDiamonButton;
 
     public SummonScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -49,7 +52,7 @@ public class SummonScene extends BaseScene {
         this.summonStoneText = new Text(315, 45, font, String.valueOf(userProps.getSummonStone()), 8, vbom);
         this.diamonText = new Text(123, 24, font, String.valueOf(userProps.getDiamon()), 8, vbom);
 
-        // create summonFram;
+        // create summonFrame;
         this.heroSummonFrame = this.createALBImageSprite(TextureEnum.SUMMON_FRAME, this.simulatedLeftX + 100, 130);
         this.heroSummonStoneButton = createSummonSprite(2);
         final Sprite buttonSummonStone = createACImageSprite(TextureEnum.COMMON_SUMMON_STONE, 40, TextureEnum.SUMMON_BUTTON.getHeight() * 0.5f);
@@ -64,6 +67,21 @@ public class SummonScene extends BaseScene {
         final Text summonDiamonCostText = new Text(80, TextureEnum.SUMMON_BUTTON.getHeight() * 0.5f, costFont,
                 String.valueOf(CostConstants.HERO_SUMMON_DIAMON_COST), vbom);
         heroSummonDiamonButton.attachChild(summonDiamonCostText);
+
+        championSummonFrame = this.createALBImageSprite(TextureEnum.SUMMON_FRAME, this.simulatedLeftX + 100, 130);
+        this.championSummonStoneButton = createSummonSprite(4);
+        final Sprite buttonChampionSummonStone = createACImageSprite(TextureEnum.COMMON_SUMMON_STONE, 40, TextureEnum.SUMMON_BUTTON.getHeight() * 0.5f);
+        championSummonStoneButton.attachChild(buttonChampionSummonStone);
+        final Text championSummonStoneCostText = new Text(80, TextureEnum.SUMMON_BUTTON.getHeight() * 0.5f, costFont,
+                String.valueOf(CostConstants.HERO_SUMMON_STONE_COST * 10), vbom);
+        championSummonStoneButton.attachChild(championSummonStoneCostText);
+
+        this.championSummonDiamonButton = createSummonSprite(5);
+        final Sprite buttonChampionSummonDiamon = createACImageSprite(TextureEnum.COMMON_DIAMOND, 40, TextureEnum.SUMMON_BUTTON.getHeight() * 0.5f);
+        championSummonDiamonButton.attachChild(buttonChampionSummonDiamon);
+        final Text championSummonDiamonCostText = new Text(80, TextureEnum.SUMMON_BUTTON.getHeight() * 0.5f, costFont,
+                String.valueOf(CostConstants.HERO_SUMMON_DIAMON_COST * 10), vbom);
+        championSummonDiamonButton.attachChild(championSummonDiamonCostText);
 
         init();
     }
@@ -87,6 +105,11 @@ public class SummonScene extends BaseScene {
         scrollZone.attachRow(space);
         final Sprite heroSummonFrame = createHeroSummonFrame();
         scrollZone.attachRow(heroSummonFrame);
+        final IEntity space2 = new Rectangle(0, 0, FRAME_WIDTH, 5, vbom);
+        space2.setAlpha(0);
+        scrollZone.attachRow(space2);
+        final Sprite championSummonFrame = createChampionSummonFrame();
+        scrollZone.attachRow(championSummonFrame);
         this.registerTouchArea(touchArea);
 
         final Sprite topBar = createALBImageSprite(TextureEnum.SUMMON_TOPBAR, this.simulatedLeftX, this.simulatedHeight - TextureEnum.SUMMON_TOPBAR.getHeight());
@@ -183,6 +206,42 @@ public class SummonScene extends BaseScene {
         });
     }
 
+    private Sprite createChampionSummonFrame() {
+        final Font titleFont = ResourceManager.getInstance().newFont(FontEnum.Default, 30);
+        final Text titleText = new Text(95, championSummonFrame.getHeight() - 35, titleFont, "冠军召唤", vbom);
+        titleText.setColor(0XFFFAB103);
+        championSummonFrame.attachChild(titleText);
+
+        final Sprite stars = this.createACImageSprite(TextureEnum.COMMON_STAR_3, 500, championSummonFrame.getHeight() - 35);
+        championSummonFrame.attachChild(stars);
+        final Text subTitleText = new Text(590, championSummonFrame.getHeight() - 35, titleFont, "星以上", vbom);
+        subTitleText.setColor(0XFFFAB103);
+        championSummonFrame.attachChild(subTitleText);
+
+        final Font descFont = ResourceManager.getInstance().newFont(FontEnum.Default, 26);
+        final TextOptions textOptions = new TextOptions(AutoWrap.LETTERS, 265);
+        final Text descText = new Text(540, 170, descFont, "使用召唤石或钻石召唤十张卡片！钻石可在商店购买。", textOptions, vbom);
+        this.topAlignEntity(descText, championSummonFrame.getHeight() - 100);
+        championSummonFrame.attachChild(descText);
+        refreshChampionSummonButton();
+        return championSummonFrame;
+    }
+
+    private void refreshChampionSummonButton() {
+        final boolean summonStoneEnough = userProps.getSummonStone() >= CostConstants.HERO_SUMMON_STONE_COST * 10;
+        final F2ButtonSprite oldSummonButton = summonStoneEnough ? championSummonDiamonButton : championSummonStoneButton;
+        final F2ButtonSprite newSummonButton = summonStoneEnough ? championSummonStoneButton : championSummonDiamonButton;
+        unregisterTouchArea(oldSummonButton);
+        registerTouchArea(newSummonButton);
+        activity.runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                oldSummonButton.detachSelf();
+                championSummonFrame.attachChild(newSummonButton);
+            }
+        });
+    }
+
     private F2ButtonSprite createSummonSprite(final int type) {
         final F2ButtonSprite summonButton = this.createACF2ButtonSprite(TextureEnum.SUMMON_BUTTON, TextureEnum.SUMMON_BUTTON_FCS, 540, 55);
         summonButton.setOnClickListener(new F2OnClickListener() {
@@ -204,6 +263,16 @@ public class SummonScene extends BaseScene {
                         alert("钻石不够！");
                         return;
                     }
+                } else if (type == 4) {
+                    if (userProps.getSummonStone() < CostConstants.HERO_SUMMON_STONE_COST * 10) {
+                        alert("召唤石不够！");
+                        return;
+                    }
+                } else if (type == 5) {
+                    if (userProps.getDiamon() < CostConstants.HERO_SUMMON_DIAMON_COST * 10) {
+                        alert("钻石不够！");
+                        return;
+                    }
                 }
                 ResourceManager.getInstance().setChildScene(SummonScene.this, new IRCallback<BaseScene>() {
 
@@ -219,6 +288,13 @@ public class SummonScene extends BaseScene {
                             refreshHeroSummonButton();
                         } else if (type == 3) {
                             userProps.setDiamon(userProps.getDiamon() - CostConstants.HERO_SUMMON_DIAMON_COST);
+                            diamonText.setText(String.valueOf(userProps.getDiamon()));
+                        } else if (type == 4) {
+                            userProps.setSummonStone(userProps.getSummonStone() - CostConstants.HERO_SUMMON_STONE_COST * 10);
+                            summonStoneText.setText(String.valueOf(userProps.getSummonStone()));
+                            refreshChampionSummonButton();
+                        } else if (type == 5) {
+                            userProps.setDiamon(userProps.getDiamon() - CostConstants.HERO_SUMMON_DIAMON_COST * 10);
                             diamonText.setText(String.valueOf(userProps.getDiamon()));
                         }
 

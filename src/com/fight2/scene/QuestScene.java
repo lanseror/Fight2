@@ -141,7 +141,6 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     }
 
     private void createMine() {
-
         final List<GameMine> mines = MineUtils.list();
         for (final GameMine mine : mines) {
             final User owner = mine.getOwner();
@@ -175,6 +174,13 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                 spriteMineMap.put(mineSprite, mine);
             }
         }
+    }
+
+    private void createTown() {
+        final Sprite townSprite = this.createACImageSprite(TextureEnum.QUEST_TOWN_BIG, 0, 0);
+        setMapElementPosition(townSprite, 30, 20);
+        final TMXLayer tmxLayer = this.tmxTiledMap.getTMXLayers().get(4);
+        tmxLayer.attachChild(townSprite);
     }
 
     private void setMapElementPosition(final IEntity entity, final int tileX, final int tileY) {
@@ -230,7 +236,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         final TmxUtils tmxUtils = new TmxUtils(tmxTiledMap);
         final QuestTreasureData newTreasureData = QuestUtils.getQuestTreasure(questTreasureData);
         refreshTreasureSprites(newTreasureData);
-
+        createTown();
         createMine();
 
         final float playerX = tmxLayer.getTileX(32) + 0.5f * tmxTiledMap.getTileWidth();

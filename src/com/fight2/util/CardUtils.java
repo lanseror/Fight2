@@ -202,10 +202,23 @@ public class CardUtils {
             final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
             final int status = responseJson.getInt("status");
             if (status == 0) {
-                final JSONObject cardJson = responseJson.getJSONObject("card");
-                final Card card = CardUtils.cardFromJson(cardJson);
-                cards.add(card);
-                return card;
+                final List<Card> newCards = new ArrayList<Card>();
+                if (responseJson.has("card")) {
+                    final JSONObject cardJson = responseJson.getJSONObject("card");
+                    final Card card = CardUtils.cardFromJson(cardJson);
+                    cards.add(card);
+                    newCards.add(card);
+                } else if (responseJson.has("cards")) {
+                    final JSONArray cardJsonArray = responseJson.getJSONArray("cards");
+                    for (int cardIndex = 0; cardIndex < cardJsonArray.length(); cardIndex++) {
+                        final JSONObject cardJson = cardJsonArray.getJSONObject(cardIndex);
+                        final Card card = CardUtils.cardFromJson(cardJson);
+                        cards.add(card);
+                        newCards.add(card);
+                    }
+                }
+
+                return newCards.get(0);
             } else {
                 return null;
             }
