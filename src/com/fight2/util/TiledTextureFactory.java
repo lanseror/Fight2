@@ -39,11 +39,11 @@ public class TiledTextureFactory {
             final ITiledTextureRegion tiledTextureRegion = TextureRegionFactory.extractTiledFromTexture(texture, textureEnum.getTileColumns(),
                     textureEnum.getTileRows());
             texture.load();
+            datas.put(textureEnum, tiledTextureRegion);
             return tiledTextureRegion;
         } catch (final IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
 }

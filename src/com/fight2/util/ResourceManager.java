@@ -134,7 +134,8 @@ public class ResourceManager {
                 case Arena:
                     return new ArenaScene(activity);
                 case Quest:
-                    return scenes.get(sceneEnum);
+                    // return scenes.get(sceneEnum);
+                    return new QuestScene(activity);
                 default:
                     throw new RuntimeException("No Scene");
             }
@@ -374,13 +375,17 @@ public class ResourceManager {
     }
 
     private void loadScenes() {
-        try {
-            final BaseScene scene = new QuestScene(activity);
-            scenes.put(SceneEnum.Quest, scene);
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        }
+        // try {
+        // final BaseScene scene = new QuestScene(activity);
+        // scenes.put(SceneEnum.Quest, scene);
+        // } catch (final IOException e) {
+        // throw new RuntimeException(e);
+        // }
 
+    }
+
+    public Stack<SceneEnum> getBreadcrumbs() {
+        return breadcrumbs;
     }
 
 }
