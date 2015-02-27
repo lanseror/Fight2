@@ -129,9 +129,21 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             public void onTimePassed(final TimerHandler timerHandler) {
                 if (ResourceManager.getInstance().getCurrentSceneEnum() == SceneEnum.Quest) {
                     if (goStatus == QuestGoStatus.Stopped) {
-                        final QuestTreasureData newTreasureData = QuestUtils.getQuestTreasure(questTreasureData);
-                        refreshTreasureSprites(newTreasureData);
-                        refreshMineStatus();
+                        final IAsyncCallback callback = new IAsyncCallback() {
+
+                            @Override
+                            public void workToDo() {
+                                final QuestTreasureData newTreasureData = QuestUtils.getQuestTreasure(questTreasureData);
+                                refreshTreasureSprites(newTreasureData);
+                                refreshMineStatus();
+                            }
+
+                            @Override
+                            public void onComplete() {
+                            }
+
+                        };
+                        QuestScene.this.exeAsyncTask(callback);
                     }
                 }
                 timerHandler.reset();
