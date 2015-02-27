@@ -117,7 +117,7 @@ public abstract class AsyncHttpResponseHandler implements ResponseHandlerInterfa
      *
      * @param looper The looper to work with
      */
-    public AsyncHttpResponseHandler(Looper looper) {
+    public AsyncHttpResponseHandler(final Looper looper) {
         this.looper = looper == null ? Looper.myLooper() : looper;
 
         // Use asynchronous mode by default.
@@ -133,7 +133,7 @@ public abstract class AsyncHttpResponseHandler implements ResponseHandlerInterfa
      *
      * @param usePoolThread Whether to use the pool's thread to fire callbacks
      */
-    public AsyncHttpResponseHandler(boolean usePoolThread) {
+    public AsyncHttpResponseHandler(final boolean usePoolThread) {
         // Whether to use the pool's thread to fire callbacks.
         setUsePoolThread(usePoolThread);
 
@@ -158,12 +158,12 @@ public abstract class AsyncHttpResponseHandler implements ResponseHandlerInterfa
     }
 
     @Override
-    public void setRequestURI(URI requestURI) {
+    public void setRequestURI(final URI requestURI) {
         this.requestURI = requestURI;
     }
 
     @Override
-    public void setRequestHeaders(Header[] requestHeaders) {
+    public void setRequestHeaders(final Header[] requestHeaders) {
         this.requestHeaders = requestHeaders;
     }
 
@@ -173,13 +173,13 @@ public abstract class AsyncHttpResponseHandler implements ResponseHandlerInterfa
     private static class ResponderHandler extends Handler {
         private final AsyncHttpResponseHandler mResponder;
 
-        ResponderHandler(AsyncHttpResponseHandler mResponder, Looper looper) {
+        ResponderHandler(final AsyncHttpResponseHandler mResponder, final Looper looper) {
             super(looper);
             this.mResponder = mResponder;
         }
 
         @Override
-        public void handleMessage(Message msg) {
+        public void handleMessage(final Message msg) {
             mResponder.handleMessage(msg);
         }
     }
@@ -215,7 +215,7 @@ public abstract class AsyncHttpResponseHandler implements ResponseHandlerInterfa
     }
 
     @Override
-    public void setUsePoolThread(boolean pool) {
+    public void setUsePoolThread(final boolean pool) {
         // If pool thread is to be used, there's no point in keeping a reference
         // to the looper and no need for a handler.
         if (pool) {
@@ -246,8 +246,8 @@ public abstract class AsyncHttpResponseHandler implements ResponseHandlerInterfa
      * @param bytesWritten offset from start of file
      * @param totalSize    total size of file
      */
-    public void onProgress(int bytesWritten, int totalSize) {
-        Log.v(LOG_TAG, String.format("Progress %d from %d (%2.0f%%)", bytesWritten, totalSize, (totalSize > 0) ? (bytesWritten * 1.0 / totalSize) * 100 : -1));
+    public void onProgress(final int bytesWritten, final int totalSize) {
+//        Log.v(LOG_TAG, String.format("Progress %d from %d (%2.0f%%)", bytesWritten, totalSize, (totalSize > 0) ? (bytesWritten * 1.0 / totalSize) * 100 : -1));
     }
 
     /**
@@ -266,12 +266,12 @@ public abstract class AsyncHttpResponseHandler implements ResponseHandlerInterfa
     }
 
     @Override
-    public void onPreProcessResponse(ResponseHandlerInterface instance, HttpResponse response) {
+    public void onPreProcessResponse(final ResponseHandlerInterface instance, final HttpResponse response) {
         // default action is to do nothing...
     }
 
     @Override
-    public void onPostProcessResponse(ResponseHandlerInterface instance, HttpResponse response) {
+    public void onPostProcessResponse(final ResponseHandlerInterface instance, final HttpResponse response) {
         // default action is to do nothing...
     }
 
@@ -299,7 +299,7 @@ public abstract class AsyncHttpResponseHandler implements ResponseHandlerInterfa
      *
      * @param retryNo number of retry
      */
-    public void onRetry(int retryNo) {
+    public void onRetry(final int retryNo) {
         Log.d(LOG_TAG, String.format("Request retry no. %d", retryNo));
     }
 
@@ -307,23 +307,23 @@ public abstract class AsyncHttpResponseHandler implements ResponseHandlerInterfa
         Log.d(LOG_TAG, "Request got cancelled");
     }
 
-    public void onUserException(Throwable error) {
+    public void onUserException(final Throwable error) {
         Log.e(LOG_TAG, "User-space exception detected!", error);
         throw new RuntimeException(error);
     }
 
     @Override
-    final public void sendProgressMessage(int bytesWritten, int bytesTotal) {
+    final public void sendProgressMessage(final int bytesWritten, final int bytesTotal) {
         sendMessage(obtainMessage(PROGRESS_MESSAGE, new Object[]{bytesWritten, bytesTotal}));
     }
 
     @Override
-    final public void sendSuccessMessage(int statusCode, Header[] headers, byte[] responseBytes) {
+    final public void sendSuccessMessage(final int statusCode, final Header[] headers, final byte[] responseBytes) {
         sendMessage(obtainMessage(SUCCESS_MESSAGE, new Object[]{statusCode, headers, responseBytes}));
     }
 
     @Override
-    final public void sendFailureMessage(int statusCode, Header[] headers, byte[] responseBody, Throwable throwable) {
+    final public void sendFailureMessage(final int statusCode, final Header[] headers, final byte[] responseBody, final Throwable throwable) {
         sendMessage(obtainMessage(FAILURE_MESSAGE, new Object[]{statusCode, headers, responseBody, throwable}));
     }
 
@@ -338,7 +338,7 @@ public abstract class AsyncHttpResponseHandler implements ResponseHandlerInterfa
     }
 
     @Override
-    final public void sendRetryMessage(int retryNo) {
+    final public void sendRetryMessage(final int retryNo) {
         sendMessage(obtainMessage(RETRY_MESSAGE, new Object[]{retryNo}));
     }
 
@@ -348,7 +348,7 @@ public abstract class AsyncHttpResponseHandler implements ResponseHandlerInterfa
     }
 
     // Methods which emulate android's Handler and Message methods
-    protected void handleMessage(Message message) {
+    protected void handleMessage(final Message message) {
         Object[] response;
 
         try {
@@ -380,7 +380,7 @@ public abstract class AsyncHttpResponseHandler implements ResponseHandlerInterfa
                     if (response != null && response.length >= 2) {
                         try {
                             onProgress((Integer) response[0], (Integer) response[1]);
-                        } catch (Throwable t) {
+                        } catch (final Throwable t) {
                             Log.e(LOG_TAG, "custom onProgress contains an error", t);
                         }
                     } else {
@@ -399,12 +399,12 @@ public abstract class AsyncHttpResponseHandler implements ResponseHandlerInterfa
                     onCancel();
                     break;
             }
-        } catch(Throwable error) {
+        } catch(final Throwable error) {
             onUserException(error);
         }
     }
 
-    protected void sendMessage(Message msg) {
+    protected void sendMessage(final Message msg) {
         if (getUseSynchronousMode() || handler == null) {
             handleMessage(msg);
         } else if (!Thread.currentThread().isInterrupted()) { // do not send messages if request has been cancelled
@@ -418,7 +418,7 @@ public abstract class AsyncHttpResponseHandler implements ResponseHandlerInterfa
      *
      * @param runnable runnable instance, can be null
      */
-    protected void postRunnable(Runnable runnable) {
+    protected void postRunnable(final Runnable runnable) {
         if (runnable != null) {
             if (getUseSynchronousMode() || handler == null) {
                 // This response handler is synchronous, run on current thread
@@ -437,15 +437,15 @@ public abstract class AsyncHttpResponseHandler implements ResponseHandlerInterfa
      * @param responseMessageData object to be passed to message receiver
      * @return Message instance, should not be null
      */
-    protected Message obtainMessage(int responseMessageId, Object responseMessageData) {
+    protected Message obtainMessage(final int responseMessageId, final Object responseMessageData) {
         return Message.obtain(handler, responseMessageId, responseMessageData);
     }
 
     @Override
-    public void sendResponseMessage(HttpResponse response) throws IOException {
+    public void sendResponseMessage(final HttpResponse response) throws IOException {
         // do not process if request has been cancelled
         if (!Thread.currentThread().isInterrupted()) {
-            StatusLine status = response.getStatusLine();
+            final StatusLine status = response.getStatusLine();
             byte[] responseBody;
             responseBody = getResponseData(response.getEntity());
             // additional cancellation check as getResponseData() can take non-zero time to process
@@ -466,20 +466,20 @@ public abstract class AsyncHttpResponseHandler implements ResponseHandlerInterfa
      * @return response entity body or null
      * @throws java.io.IOException if reading entity or creating byte array failed
      */
-    byte[] getResponseData(HttpEntity entity) throws IOException {
+    byte[] getResponseData(final HttpEntity entity) throws IOException {
         byte[] responseBody = null;
         if (entity != null) {
-            InputStream instream = entity.getContent();
+            final InputStream instream = entity.getContent();
             if (instream != null) {
-                long contentLength = entity.getContentLength();
+                final long contentLength = entity.getContentLength();
                 if (contentLength > Integer.MAX_VALUE) {
                     throw new IllegalArgumentException("HTTP entity too large to be buffered in memory");
                 }
-                int buffersize = (contentLength <= 0) ? BUFFER_SIZE : (int) contentLength;
+                final int buffersize = (contentLength <= 0) ? BUFFER_SIZE : (int) contentLength;
                 try {
-                    ByteArrayBuffer buffer = new ByteArrayBuffer(buffersize);
+                    final ByteArrayBuffer buffer = new ByteArrayBuffer(buffersize);
                     try {
-                        byte[] tmp = new byte[BUFFER_SIZE];
+                        final byte[] tmp = new byte[BUFFER_SIZE];
                         int l, count = 0;
                         // do not send messages if request has been cancelled
                         while ((l = instream.read(tmp)) != -1 && !Thread.currentThread().isInterrupted()) {
@@ -492,7 +492,7 @@ public abstract class AsyncHttpResponseHandler implements ResponseHandlerInterfa
                         AsyncHttpClient.endEntityViaReflection(entity);
                     }
                     responseBody = buffer.toByteArray();
-                } catch (OutOfMemoryError e) {
+                } catch (final OutOfMemoryError e) {
                     System.gc();
                     throw new IOException("File too large to fit into available memory");
                 }
