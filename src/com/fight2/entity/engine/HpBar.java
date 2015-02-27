@@ -33,7 +33,7 @@ public class HpBar extends Rectangle {
     private ClipEntity mainClipEntity;
     private ClipEntity rightClipEntity;
     private Sprite rightHpSprite;
-    private final Font font = ResourceManager.getInstance().newFont(FontEnum.Main);
+    private final Font font = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
     private final Text hpText;
 
     public HpBar(final float pX, final float pY, final GameActivity activity, final int fullHp) {
@@ -49,6 +49,7 @@ public class HpBar extends Rectangle {
         this.currentPoint = fullHp;
         this.bigFullPoint = BigDecimal.valueOf(fullHp);
         hpText = new Text(WIDTH * 0.5f, HEIGHT * 0.5f + 1, font, "0123456789", vbom);
+        hpText.setScale(0.714285f);
         hpText.setText(String.valueOf(fullHp));
 
         if (isGreenHp) {

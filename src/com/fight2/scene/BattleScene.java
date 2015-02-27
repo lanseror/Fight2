@@ -433,7 +433,6 @@ public class BattleScene extends BaseScene {
                     activity.runOnUpdateThread(new Runnable() {
                         @Override
                         public void run() {
-                            hitRedEffect.clearEntityModifiers();
                             hitRedEffect.registerEntityModifier(hitEffectModifier);
                         }
 
@@ -492,15 +491,10 @@ public class BattleScene extends BaseScene {
 
                                 @Override
                                 public void run() {
-                                    skillText.clearEntityModifiers();
                                     skillText.registerEntityModifier(new SequenceEntityModifier(showModifier, delayModifier, hideModifier));
-                                    skillTextTitle.clearEntityModifiers();
                                     skillTextTitle.registerEntityModifier(new SequenceEntityModifier(showModifier, delayModifier, hideModifier));
-                                    skillEffectText.clearEntityModifiers();
                                     skillEffectText.registerEntityModifier(new SequenceEntityModifier(showModifier, delayModifier, hideModifier));
-                                    skillEffectTextTitle.clearEntityModifiers();
                                     skillEffectTextTitle.registerEntityModifier(new SequenceEntityModifier(showModifier, delayModifier, hideModifier));
-                                    battleSkillFrame.clearEntityModifiers();
                                     battleSkillFrame.registerEntityModifier(new SequenceEntityModifier(showModifier, delayModifier, hideModifier));
                                 }
 
@@ -669,9 +663,7 @@ public class BattleScene extends BaseScene {
         activity.runOnUpdateThread(new Runnable() {
             @Override
             public void run() {
-                revivalText.clearEntityModifiers();
                 revivalText.registerEntityModifier(new SequenceEntityModifier(showModifier, delayModifier, new AlphaModifier(0.6f, 1, 0)));
-                revivalSkillFrame.clearEntityModifiers();
                 revivalSkillFrame.registerEntityModifier(new SequenceEntityModifier(showModifier, delayModifier, hideModifier, finishDelayModifier));
                 applyParty.registerEntityModifier(hpDelayModifier);
             }
@@ -912,7 +904,6 @@ public class BattleScene extends BaseScene {
             activity.runOnUpdateThread(new Runnable() {
                 @Override
                 public void run() {
-                    partyFrame.clearEntityModifiers();
                     partyFrame.registerEntityModifier(modifier);
                 }
             });
@@ -986,7 +977,6 @@ public class BattleScene extends BaseScene {
             activity.runOnUpdateThread(new Runnable() {
                 @Override
                 public void run() {
-                    partyFrame.clearEntityModifiers();
                     partyFrame.registerEntityModifier(modifier);
                 }
             });

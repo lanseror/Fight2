@@ -46,7 +46,7 @@ public class BattlePartyFrame extends Rectangle {
     private final float initY;
     private final VertexBufferObjectManager vbom;
     private HpBar hpBar;
-    private final Font font = ResourceManager.getInstance().newFont(FontEnum.Main);
+    private final Font font = ResourceManager.getInstance().getFont(FontEnum.Default, 28);
     private final Text atkText;
     private int atk;
     private int defence;
@@ -86,6 +86,7 @@ public class BattlePartyFrame extends Rectangle {
             final ITextureRegion textureFcs = TEXTURE_FACTORY.getAssetTextureRegion(TextureEnum.BATTLE_AVATAR_SKILL_FCS);
             fcsSprite = new Sprite(AVATAR_WIDTH * 0.5f, AVATAR_HEIGHT * 0.5f, textureFcs, vbom);
         }
+        atkText.setScale(0.714285f);
         fcsSprite.setVisible(false);
         this.attachChild(fcsSprite);
         this.initX = this.getX();
