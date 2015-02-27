@@ -28,6 +28,7 @@ import com.fight2.util.ResourceManager;
 public class SmallChatRoom extends Rectangle {
     private boolean enabled = true;
     private boolean isNeeded = false;
+    private boolean getMsgStarted = true;
     private final VertexBufferObjectManager vbom;
     private final F2ButtonSprite openButton;
     private final Text chatText;
@@ -39,7 +40,8 @@ public class SmallChatRoom extends Rectangle {
     private final static String TEST_CHAT_TIME_STRING = "16:30\n16:30";
     private final StringBuffer chatStringBuffer = new StringBuffer(SAMPLE_CHAT_STRING);
     private final StringBuffer chatTimeString = new StringBuffer(SAMPLE_CHAT_TIME_STRING);
-    private final TimerHandler timerHandler;
+    private final TimerHandler displayTimerHandler;
+    private final TimerHandler getTimerHandler;
 
     public SmallChatRoom(final float pX, final float pY, final float pWidth, final float pHeight, final GameActivity activity) {
         super(pX, pY, pWidth, pHeight, activity.getVertexBufferObjectManager());
@@ -90,15 +92,17 @@ public class SmallChatRoom extends Rectangle {
 
         chatTimeText.setPosition(this.getWidth() - chatTimeTextWidth * 0.5f - 10, chatTimeTextHeight * 0.5f + 5);
         this.attachChild(chatTimeText);
-        final TimerHandler getTimerHandler = new TimerHandler(0.75f, new ITimerCallback() {
+        getTimerHandler = new TimerHandler(1.5f, new ITimerCallback() {
             @Override
             public void onTimePassed(final TimerHandler pTimerHandler) {
                 ChatUtils.get(activity);
-                // pTimerHandler.reset();
+                if (isNeeded && getMsgStarted) {
+                    pTimerHandler.reset();
+                }
             }
         });
         activity.getEngine().registerUpdateHandler(getTimerHandler);
-        timerHandler = new TimerHandler(0.2f, new ITimerCallback() {
+        displayTimerHandler = new TimerHandler(0.2f, new ITimerCallback() {
             @Override
             public void onTimePassed(final TimerHandler pTimerHandler) {
                 if (isNeeded) {
@@ -157,7 +161,7 @@ public class SmallChatRoom extends Rectangle {
                 }
             }
         });
-        activity.getEngine().registerUpdateHandler(timerHandler);
+        activity.getEngine().registerUpdateHandler(displayTimerHandler);
     }
 
     public F2ButtonSprite getOpenButton() {
@@ -178,7 +182,8 @@ public class SmallChatRoom extends Rectangle {
     public void setNeeded(final boolean isNeeded) {
         this.isNeeded = isNeeded;
         if (isNeeded) {
-            timerHandler.reset();
+            displayTimerHandler.reset();
+            getTimerHandler.reset();
         }
 
     }
@@ -191,4 +196,16 @@ public class SmallChatRoom extends Rectangle {
         this.enabled = enabled;
     }
 
+    public void startGetMsg() {
+        if (!this.getMsgStarted) {
+            this.getMsgStarted = true;
+            getTimerHandler.reset();
+        }
+    }
+
+    public void stopGetMsg() {
+        if (this.getMsgStarted) {
+            this.getMsgStarted = false;
+        }
+    }
 }

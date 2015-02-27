@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.http.Header;
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,6 +29,7 @@ import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
 import com.fight2.entity.UserStoreroom;
+import com.loopj.android.http.AsyncHttpResponseHandler;
 
 public class AccountUtils {
     private static final String INSTALLATION = "INSTALLATION";
@@ -186,6 +188,27 @@ public class AccountUtils {
         } catch (final JSONException e) {
             throw new RuntimeException(e);
         }
+
+        activity.runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                AsyncHttpUtils.get("/user/chat-login?installUUID=" + installUUID, null, new AsyncHttpResponseHandler() {
+
+                    @Override
+                    public void onFailure(final int arg0, final Header[] arg1, final byte[] arg2, final Throwable arg3) {
+                        throw new RuntimeException("failed");
+                    }
+
+                    @Override
+                    public void onSuccess(final int arg0, final Header[] arg1, final byte[] arg2) {
+                        // TODO Auto-generated method stub
+
+                    }
+                });
+            }
+
+        });
 
     }
 

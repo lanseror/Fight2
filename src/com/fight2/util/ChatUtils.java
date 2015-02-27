@@ -4,9 +4,8 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
 
+import org.apache.http.Header;
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -16,12 +15,15 @@ import android.util.SparseArray;
 
 import com.fight2.GameActivity;
 import com.fight2.entity.ChatMessage;
+import com.fight2.entity.engine.SmallChatRoom;
+import com.loopj.android.http.JsonHttpResponseHandler;
 
 public class ChatUtils {
     public static int msgIndex = -1;
     private static int containMsgSize = 0;
     public static int displayedMiniMsg = 0;
     public static int displayedFullMsg = 0;
+    public static boolean isGetting = false;
     private static SparseArray<ChatMessage> CHAT_MESSAGES = new SparseArray<ChatMessage>();
 
     public static boolean send(final String msg) {
@@ -39,32 +41,41 @@ public class ChatUtils {
         return false;
     }
 
-    public static List<ChatMessage> get(final GameActivity activity) {
-        final String url = HttpUtils.HOST_URL + "/chat/get.action?index=" + msgIndex;
-        final List<ChatMessage> messages = new ArrayList<ChatMessage>();
-        try {
-            final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
-            final int index = responseJson.getInt("index");
-            msgIndex = index;
-            final JSONArray messageJsonArray = responseJson.getJSONArray("msg");
-            for (int i = 0; i < messageJsonArray.length(); i++) {
-                final JSONObject messageJson = messageJsonArray.getJSONObject(i);
-                final ChatMessage message = new ChatMessage();
-                message.setSender(messageJson.getString("sender"));
-                message.setContent(URLDecoder.decode(messageJson.getString("content"), "UTF-8"));
-                message.setDate(messageJson.getString("date"));
-                messages.add(message);
-                CHAT_MESSAGES.put(++containMsgSize, message);
-            }
-        } catch (final ClientProtocolException e) {
-            throw new RuntimeException(e);
-        } catch (final IOException e) {
-            throw new RuntimeException(e);
-        } catch (final JSONException e) {
-            throw new RuntimeException(e);
+    public static void get(final GameActivity activity) {
+        if (isGetting) {
+            return;
         }
+        isGetting = true;
+        final String url = "/chat/get.action?index=" + msgIndex;
+        activity.runOnUiThread(new Runnable() {
 
-        return messages;
+            @Override
+            public void run() {
+                AsyncHttpUtils.get(url, null, new JsonHttpResponseHandler() {
+                    @Override
+                    public void onSuccess(final int statusCode, final Header[] headers, final JSONObject responseJson) {
+                        try {
+                            final int index = responseJson.getInt("index");
+                            msgIndex = index;
+                            final JSONArray messageJsonArray = responseJson.getJSONArray("msg");
+                            for (int i = 0; i < messageJsonArray.length(); i++) {
+                                final JSONObject messageJson = messageJsonArray.getJSONObject(i);
+                                final ChatMessage message = new ChatMessage();
+                                message.setSender(messageJson.getString("sender"));
+                                message.setContent(URLDecoder.decode(messageJson.getString("content"), "UTF-8"));
+                                message.setDate(messageJson.getString("date"));
+                                CHAT_MESSAGES.put(++containMsgSize, message);
+                            }
+                        } catch (final JSONException | UnsupportedEncodingException e) {
+                            throw new RuntimeException(e);
+                        }
+                        isGetting = false;
+                    }
+                });
+            }
+
+        });
+
     }
 
     public static synchronized void updateFullChatMessage() {
@@ -97,5 +108,15 @@ public class ChatUtils {
     public enum DisplayChannel {
         MiniChatRoom,
         FullChatRoom;
+    }
+
+    public static void startGetMsg(final GameActivity activity) {
+        final SmallChatRoom smallChatRoom = activity.getGameHub().getSmallChatRoom();
+        smallChatRoom.startGetMsg();
+    }
+
+    public static void stopGetMsg(final GameActivity activity) {
+        final SmallChatRoom smallChatRoom = activity.getGameHub().getSmallChatRoom();
+        smallChatRoom.stopGetMsg();
     }
 }

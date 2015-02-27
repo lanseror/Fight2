@@ -47,7 +47,6 @@ import com.fight2.util.ImageOpenHelper;
 import com.fight2.util.LogUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
-import com.fight2.util.TiledTextureFactory;
 
 public class GameActivity extends LayoutGameActivity {
     public static final int CAMERA_WIDTH = 1136;
@@ -178,14 +177,6 @@ public class GameActivity extends LayoutGameActivity {
 
     @Override
     public void onPopulateScene(final Scene pScene, final OnPopulateSceneCallback pOnPopulateSceneCallback) {
-        mEngine.registerUpdateHandler(new TimerHandler(1f, new ITimerCallback() {
-            @Override
-            public void onTimePassed(final TimerHandler pTimerHandler) {
-                mEngine.unregisterUpdateHandler(pTimerHandler);
-
-            }
-        }));
-
         pOnPopulateSceneCallback.onPopulateSceneFinished();
     }
 

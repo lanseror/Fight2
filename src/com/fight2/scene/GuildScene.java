@@ -87,6 +87,7 @@ public class GuildScene extends BaseScene {
     private boolean isAdmin;
     private IEntity currentBoard;
     private final Set<User> selectedArenaUsers = new HashSet<User>();
+    private TimerHandler timerHandler;
 
     public GuildScene(final GameActivity activity) throws IOException {
         super(activity);
@@ -629,7 +630,7 @@ public class GuildScene extends BaseScene {
             countDown.setColor(0XFFF8B451);
             countDown.setX((HBW_GUILD_BID[0] + HBW_GUILD_BID[1] + HBW_GUILD_BID[2] * 0.5f) * SCROLL_ZONE_WIDTH);
             row.attachChild(countDown);
-            final TimerHandler timerHandler = new TimerHandler(1.0f, new ITimerCallback() {
+            timerHandler = new TimerHandler(1.0f, new ITimerCallback() {
                 @Override
                 public void onTimePassed(final TimerHandler pTimerHandler) {
                     final int remainTime = bid.getRemainTime();
@@ -969,6 +970,9 @@ public class GuildScene extends BaseScene {
 
     @Override
     public void leaveScene() {
+        if (timerHandler != null) {
+            activity.getEngine().unregisterUpdateHandler(timerHandler);
+        }
     }
 
     private enum GuildTapEnum {

@@ -390,7 +390,7 @@ public class ArenaScene extends BaseScene {
 
     @Override
     public void leaveScene() {
-
+        activity.getEngine().unregisterUpdateHandler(timerHandler);
     }
 
 }

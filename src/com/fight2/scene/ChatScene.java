@@ -103,6 +103,7 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
             @Override
             public void onTimePassed(final TimerHandler pTimerHandler) {
                 if (shouldDisplay) {
+                    ChatUtils.get(activity);
                     displayChat(true);
                     pTimerHandler.reset();
                 }
@@ -302,6 +303,7 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
     @Override
     public void leaveScene() {
         shouldDisplay = false;
+        activity.getEngine().unregisterUpdateHandler(timerHandler);
     }
 
     @Override
