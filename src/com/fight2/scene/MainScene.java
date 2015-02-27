@@ -49,7 +49,7 @@ public class MainScene extends BaseScene {
     private static final float[] MAIL_VERTICES = { 753, 1, 877, 152, 1027, 129, 1131, 186, 1131, 1 };
     private static final float[] SUMMON_VERTICES = { 414, 1, 572, 106, 675, 60, 745, 1 };
     private static final float[] HOTEL_VERTICES = { 196, 303, 440, 311, 456, 172, 352, 109, 202, 121 };
-    private static final float[] BILLBOARD_VERTICES = { 425, 91, 485, 258, 616, 238, 609, 94, 570, 132, 525, 89 };
+    // private static final float[] BILLBOARD_VERTICES = { 425, 91, 485, 258, 616, 238, 609, 94, 570, 132, 525, 89 };
     private static final float[] STOREROOM_VERTICES = { 0, 420, 50, 360, 150, 190, 150, 90, 0, 90 };
 
     private final Map<Sprite, Sprite> buttonSprites = new HashMap<Sprite, Sprite>();
@@ -201,16 +201,16 @@ public class MainScene extends BaseScene {
         this.registerTouchArea(guildSprite);
         buttonSprites.put(guildSprite, guildFcsSprite);
 
-        final Sprite billboardSprite = createALBImageSprite(TextureEnum.MAIN_BILLBOARD, 419, 70);
-        this.attachChild(billboardSprite);
-        final Sprite billboardFcsSprite = createALBImageSprite(TextureEnum.MAIN_BILLBOARD_FCS, 419, 70);
-        billboardFcsSprite.setVisible(false);
-        this.attachChild(billboardFcsSprite);
-        this.registerTouchArea(billboardSprite);
-        buttonSprites.put(billboardSprite, billboardFcsSprite);
+        // final Sprite billboardSprite = createALBImageSprite(TextureEnum.MAIN_BILLBOARD, 419, 70);
+        // this.attachChild(billboardSprite);
+        // final Sprite billboardFcsSprite = createALBImageSprite(TextureEnum.MAIN_BILLBOARD_FCS, 419, 70);
+        // billboardFcsSprite.setVisible(false);
+        // this.attachChild(billboardFcsSprite);
+        // this.registerTouchArea(billboardSprite);
+        // buttonSprites.put(billboardSprite, billboardFcsSprite);
 
-        final Sprite peopleSprite = createALBImageSprite(TextureEnum.MAIN_PEOPLE, 0, 0);
-        this.attachChild(peopleSprite);
+        // final Sprite peopleSprite = createALBImageSprite(TextureEnum.MAIN_PEOPLE, 0, 0);
+        // this.attachChild(peopleSprite);
 
         final Sprite summonStoneSprite = createALBImageSprite(TextureEnum.MAIN_SUMMON_STONE, 412, 0);
         this.attachChild(summonStoneSprite);
@@ -294,8 +294,8 @@ public class MainScene extends BaseScene {
                         focusSprite(mailBoxSprite);
                     } else if (checkContains(SUMMON_VERTICES, x, y)) {
                         focusSprite(summonStoneSprite);
-                    } else if (checkContains(BILLBOARD_VERTICES, x, y)) {
-                        focusSprite(billboardSprite);
+                        // } else if (checkContains(BILLBOARD_VERTICES, x, y)) {
+                        // focusSprite(billboardSprite);
                     } else if (checkContains(GUILD_VERTICES, x, y)) {
                         focusSprite(guildSprite);
                     } else if (checkContains(CAMP_VERTICES, x, y)) {
@@ -322,8 +322,8 @@ public class MainScene extends BaseScene {
                     } else if (checkContains(SUMMON_VERTICES, x, y)) {
                         unfocusSprite(summonStoneSprite);
                         ResourceManager.getInstance().setCurrentScene(SceneEnum.Summon);
-                    } else if (checkContains(BILLBOARD_VERTICES, x, y)) {
-                        unfocusSprite(billboardSprite);
+                        // } else if (checkContains(BILLBOARD_VERTICES, x, y)) {
+                        // unfocusSprite(billboardSprite);
                     } else if (checkContains(GUILD_VERTICES, x, y)) {
                         unfocusSprite(guildSprite);
                         ResourceManager.getInstance().setCurrentScene(SceneEnum.Guild);
@@ -358,7 +358,7 @@ public class MainScene extends BaseScene {
             private void resetButtons() {
                 unfocusSprite(mailBoxSprite);
                 unfocusSprite(summonStoneSprite);
-                unfocusSprite(billboardSprite);
+                // unfocusSprite(billboardSprite);
                 unfocusSprite(guildSprite);
                 unfocusSprite(trainingCampSprite);
                 unfocusSprite(hotelSprite);

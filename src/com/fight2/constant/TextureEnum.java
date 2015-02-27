@@ -87,7 +87,7 @@ public enum TextureEnum {
     MAIN_ARENA("images/main_arena.png", 422, 252),
     MAIN_ARENA_FCS("images/main_arena_fcs.png", 422, 252),
     MAIN_BILLBOARD("images/main_billboard.png", 264, 228),
-    MAIN_BILLBOARD_FCS("images/main_billboard_fcs.png", 264, 228),
+    // MAIN_BILLBOARD_FCS("images/main_billboard_fcs.png", 264, 228),
     MAIN_CONGRESS("images/main_congress.png", 513, 483),
     MAIN_CONGRESS_FCS("images/main_congress_fcs.png", 513, 483),
     MAIN_GATE("images/main_gate.png", 1136, 198),
