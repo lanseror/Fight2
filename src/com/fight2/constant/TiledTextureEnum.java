@@ -1,7 +1,6 @@
 package com.fight2.constant;
 
 public enum TiledTextureEnum {
-    MAIN_SUMMON_STONE_EFFECT("images/main_summon_stone_effect.png", 8, 1),
     PLAYER("images/player.png", 3, 4),
     QUEST_FLAG("images/quest_flag.png", 4, 2),
     ATTACK_EFFECT("images/attack_effect.png", 3, 4),
@@ -14,6 +13,7 @@ public enum TiledTextureEnum {
     TREASURE_BOX("images/quest_treasure_box.png", 8, 1),
     TREASURE_CRYSTAL("images/quest_treasure_crystal.png", 7, 1),
     MINE_CRYSTAL("images/mine/crystal_mine.png", 7, 1),
+    MINE_DIAMON("images/mine/diamon_mine.png", 7, 1),
     UPGRADE_EFFECT_BG("images/upgrade_effect_bg.png", 4, 4);
 
     private final String url;

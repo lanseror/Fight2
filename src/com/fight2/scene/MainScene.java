@@ -6,7 +6,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.andengine.entity.Entity;
 import org.andengine.entity.IEntity;
+import org.andengine.entity.particle.BatchedPseudoSpriteParticleSystem;
+import org.andengine.entity.particle.emitter.PointParticleEmitter;
+import org.andengine.entity.particle.initializer.AccelerationParticleInitializer;
+import org.andengine.entity.particle.initializer.AlphaParticleInitializer;
+import org.andengine.entity.particle.initializer.ColorParticleInitializer;
+import org.andengine.entity.particle.initializer.ExpireParticleInitializer;
+import org.andengine.entity.particle.initializer.ScaleParticleInitializer;
+import org.andengine.entity.particle.initializer.VelocityParticleInitializer;
+import org.andengine.entity.particle.modifier.AlphaParticleModifier;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
@@ -18,7 +28,10 @@ import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
 import org.andengine.opengl.texture.region.ITiledTextureRegion;
+import org.andengine.util.adt.color.ColorUtils;
 import org.andengine.util.algorithm.collision.BaseCollisionChecker;
+
+import android.opengl.GLES20;
 
 import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
@@ -38,6 +51,7 @@ import com.fight2.util.ICallback;
 import com.fight2.util.IRCallback;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TaskUtils;
+import com.fight2.util.TextureFactory;
 import com.fight2.util.TiledTextureFactory;
 
 public class MainScene extends BaseScene {
@@ -240,10 +254,10 @@ public class MainScene extends BaseScene {
         final Sprite pigeonSprite = createALBImageSprite(TextureEnum.MAIN_PIGEON, 0, 0);
         this.attachChild(pigeonSprite);
 
-        final ITiledTextureRegion summonEffect = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.MAIN_SUMMON_STONE_EFFECT);
-        final AnimatedSprite summonStoneEffect = new AnimatedSprite(560, 120, summonEffect, vbom);
-        summonStoneEffect.animate(125);
-        this.attachChild(summonStoneEffect);
+        // final ITiledTextureRegion summonEffect = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.MAIN_SUMMON_STONE_EFFECT);
+        // final AnimatedSprite summonStoneEffect = new AnimatedSprite(560, 120, summonEffect, vbom);
+        // summonStoneEffect.animate(125);
+        // this.attachChild(summonStoneEffect);
 
         final Sprite rechargeSprite = createALBF2ButtonSprite(TextureEnum.PARTY_RECHARGE, TextureEnum.PARTY_RECHARGE_PRESSED, this.simulatedRightX
                 - TextureEnum.PARTY_RECHARGE.getWidth() - 8, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight() - 4);
@@ -371,6 +385,77 @@ public class MainScene extends BaseScene {
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
+        createSummonAnimation();
+    }
+
+    private void createSummonAnimation() {
+        {
+            final BatchedPseudoSpriteParticleSystem particleSystem = new BatchedPseudoSpriteParticleSystem(
+                    new PointParticleEmitter(this.cameraCenterX + 5, 100), 0.45f, 0.45f, 5, TextureFactory.getInstance().getAssetTextureRegion(
+                            TextureEnum.COMMON_PARTICLE_POINT), vbom);
+            particleSystem.setBlendFunction(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE);
+            particleSystem.addParticleInitializer(new VelocityParticleInitializer<Entity>(12, 16, 16, 18));
+            particleSystem.addParticleInitializer(new AccelerationParticleInitializer<Entity>(-5f, 0));
+            // particleSystem.addParticleInitializer(new RotationParticleInitializer<Entity>(0.0f, 360.0f));color="#ffe679"color="#ffe679"
+            particleSystem.addParticleInitializer(new ScaleParticleInitializer<Entity>(0.8f));
+            particleSystem.addParticleInitializer(new ColorParticleInitializer<Entity>(1f, 0.9f, 0.5f));
+            particleSystem.addParticleInitializer(new AlphaParticleInitializer<Entity>(0.3f));
+            particleSystem.addParticleInitializer(new ExpireParticleInitializer<Entity>(6f));
+
+            particleSystem.addParticleModifier(new AlphaParticleModifier<Entity>(0, 0.5f, 0.3f, 1f));
+            particleSystem.addParticleModifier(new AlphaParticleModifier<Entity>(0.5f, 1.25f, 1f, 0.7f));
+            particleSystem.addParticleModifier(new AlphaParticleModifier<Entity>(2f, 2.75f, 0.7f, 1f));
+            particleSystem.addParticleModifier(new AlphaParticleModifier<Entity>(3.25f, 4f, 1f, 0.7f));
+            particleSystem.addParticleModifier(new AlphaParticleModifier<Entity>(4f, 4.5f, 0.7f, 1f));
+            // particleSystem.addParticleModifier(new ColorParticleModifier<Entity>(2.5f, 5.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f));
+            particleSystem.addParticleModifier(new AlphaParticleModifier<Entity>(4.5f, 6f, 1.0f, 0.0f));
+
+            this.attachChild(particleSystem);
+        }
+        {
+            final BatchedPseudoSpriteParticleSystem particleSystem = new BatchedPseudoSpriteParticleSystem(
+                    new PointParticleEmitter(this.cameraCenterX - 5, 100), 0.45f, 0.45f, 5, TextureFactory.getInstance().getAssetTextureRegion(
+                            TextureEnum.COMMON_PARTICLE_POINT), vbom);
+            particleSystem.setBlendFunction(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE);
+            particleSystem.addParticleInitializer(new VelocityParticleInitializer<Entity>(-16, -12, 16, 18));
+            particleSystem.addParticleInitializer(new AccelerationParticleInitializer<Entity>(5f, 0));
+            // particleSystem.addParticleInitializer(new RotationParticleInitializer<Entity>(0.0f, 360.0f));color="#ffe679"color="#ffe679"
+            particleSystem.addParticleInitializer(new ScaleParticleInitializer<Entity>(0.8f));
+            particleSystem.addParticleInitializer(new ColorParticleInitializer<Entity>(1f, 0.9f, 0.5f));
+            particleSystem.addParticleInitializer(new AlphaParticleInitializer<Entity>(0.3f));
+            particleSystem.addParticleInitializer(new ExpireParticleInitializer<Entity>(6f));
+
+            particleSystem.addParticleModifier(new AlphaParticleModifier<Entity>(0, 0.5f, 0.3f, 1f));
+            particleSystem.addParticleModifier(new AlphaParticleModifier<Entity>(0.5f, 1.25f, 1f, 0.7f));
+            particleSystem.addParticleModifier(new AlphaParticleModifier<Entity>(2f, 2.75f, 0.7f, 1f));
+            particleSystem.addParticleModifier(new AlphaParticleModifier<Entity>(3.25f, 4f, 1f, 0.7f));
+            particleSystem.addParticleModifier(new AlphaParticleModifier<Entity>(4f, 4.5f, 0.7f, 1f));
+            // particleSystem.addParticleModifier(new ColorParticleModifier<Entity>(2.5f, 5.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f));
+            particleSystem.addParticleModifier(new AlphaParticleModifier<Entity>(4.5f, 6f, 1.0f, 0.0f));
+            this.attachChild(particleSystem);
+        }
+
+        {
+            final BatchedPseudoSpriteParticleSystem particleSystem = new BatchedPseudoSpriteParticleSystem(new PointParticleEmitter(this.cameraCenterX, 110),
+                    0.4f, 0.4f, 5, TextureFactory.getInstance().getAssetTextureRegion(TextureEnum.COMMON_PARTICLE_POINT), vbom);
+            particleSystem.setBlendFunction(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE);
+            particleSystem.addParticleInitializer(new VelocityParticleInitializer<Entity>(0,0, 17, 19));
+//            particleSystem.addParticleInitializer(new AccelerationParticleInitializer<Entity>(5f, 0));
+            // particleSystem.addParticleInitializer(new RotationParticleInitializer<Entity>(0.0f, 360.0f));color="#ffe679"color="#ffe679"
+            particleSystem.addParticleInitializer(new ScaleParticleInitializer<Entity>(0.8f));
+            particleSystem.addParticleInitializer(new ColorParticleInitializer<Entity>(1f, 0.9f, 0.5f));
+            particleSystem.addParticleInitializer(new AlphaParticleInitializer<Entity>(0.3f));
+            particleSystem.addParticleInitializer(new ExpireParticleInitializer<Entity>(6f));
+
+            particleSystem.addParticleModifier(new AlphaParticleModifier<Entity>(0, 0.5f, 0.3f, 1f));
+            particleSystem.addParticleModifier(new AlphaParticleModifier<Entity>(0.5f, 1.25f, 1f, 0.7f));
+            particleSystem.addParticleModifier(new AlphaParticleModifier<Entity>(2f, 2.75f, 0.7f, 1f));
+            particleSystem.addParticleModifier(new AlphaParticleModifier<Entity>(3.25f, 4f, 1f, 0.7f));
+            particleSystem.addParticleModifier(new AlphaParticleModifier<Entity>(4f, 4.5f, 0.7f, 1f));
+            // particleSystem.addParticleModifier(new ColorParticleModifier<Entity>(2.5f, 5.5f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 1.0f));
+            particleSystem.addParticleModifier(new AlphaParticleModifier<Entity>(4.5f, 6f, 1.0f, 0.0f));
+            this.attachChild(particleSystem);
+        }
     }
 
     private void createMsgSprite() {

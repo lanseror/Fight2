@@ -75,6 +75,7 @@ public enum TextureEnum {
     COMMON_PROGRESS_BAR("images/common_progress_bar.png", 868, 22),
     COMMON_PROGRESS_BAR_RIGHT("images/common_progress_bar_right.png", 9, 22),
     COMMON_GUILD_CONTRIB_BAR("images/common_guild_contrib_bar.png", 208, 52),
+    COMMON_PARTICLE_POINT("images/particle_point.png", 32, 32),
 
     // Chat room images.
     CHAT_INPUT_BG("images/chat_input_backgroud.png", 850, 82),

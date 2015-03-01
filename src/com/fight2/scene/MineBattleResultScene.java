@@ -34,8 +34,6 @@ public class MineBattleResultScene extends BaseScene {
         String dialog = null;
         if (battleResult.isWinner()) {
             dialog = "你已经占有此矿！";
-            final QuestTask task = TaskUtils.getTask();
-            task.setStatus(UserTaskStatus.Finished);
         } else {
             dialog = "我们的力量还不够，加强卡牌再来试试吧！";
         }

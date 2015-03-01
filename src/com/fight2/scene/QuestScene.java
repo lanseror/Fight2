@@ -176,6 +176,15 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                 mineSprite.attachChild(mark);
                 tmxTiledMap.attachChild(mineSprite);
                 spriteMineMap.put(mineSprite, mine);
+            } else if (type == MineType.Diamon) {
+                final ITiledTextureRegion diamonMineTiledTexture = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.MINE_DIAMON);
+                final AnimatedSprite mineSprite = new AnimatedSprite(0, 0, diamonMineTiledTexture, vbom);
+                mineSprite.animate(500, true);
+                setMapElementPosition(mineSprite, mine.getCol(), mine.getRow());
+                mark.setPosition(mineSprite.getWidth() * 0.5f, mineSprite.getHeight() + 5);
+                mineSprite.attachChild(mark);
+                tmxTiledMap.attachChild(mineSprite);
+                spriteMineMap.put(mineSprite, mine);
             } else {
                 final TextureEnum textureEnum = (type == MineType.Wood ? TextureEnum.QUEST_MINE_WOOD : TextureEnum.QUEST_MINE_MINERAL);
                 final Sprite mineSprite = this.createACImageSprite(textureEnum, 0, 0);

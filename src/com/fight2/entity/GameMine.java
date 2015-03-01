@@ -82,7 +82,8 @@ public class GameMine {
     public enum MineType {
         Wood(2, 0, "木"),
         Mineral(1, 0, "矿石"),
-        Crystal(1, 0, "水晶");
+        Crystal(1, 0, "水晶"),
+        Diamon(1, 0, "钻石");
 
         private final int xOffset;
         private final int yOffset;
