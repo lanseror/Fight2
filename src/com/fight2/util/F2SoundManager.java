@@ -67,6 +67,7 @@ public class F2SoundManager {
             }
             datas.put(soundEnum, currentSound);
         }
+        currentSound.seekTo(0);
         currentSound.setLooping(looping);
         currentSound.play();
     }

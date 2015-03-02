@@ -286,6 +286,7 @@ public class BattleScene extends BaseScene {
 
     private void showBattleResult() {
         skipSprite.setVisible(false);
+        battleSkillFrame.setVisible(false);
         F2MusicManager.getInstance().stopMusic();
         F2SoundManager.getInstance().play(isWinner ? SoundEnum.BATTLE_WIN : SoundEnum.BATTLE_LOSE);
         final IEntityModifierListener hideFinishListener = new ModifierFinishedListener(new OnFinishedCallback() {
@@ -541,6 +542,9 @@ public class BattleScene extends BaseScene {
             final List<BattlePartyFrame> applyParties = this.getApplyParties(actionParty, operation.getSkillApplyParty(), isMyAction);
 
             boolean isSkillCure = false;
+            boolean isSkillAttack = false;
+            boolean isSkillConfuse = false;
+            boolean isSkillGood = false;
             for (final BattlePartyFrame applyParty : applyParties) {
                 switch (skillType) {
                     case HP:
@@ -554,6 +558,7 @@ public class BattleScene extends BaseScene {
                                 applyParty.setHp(changeHp < 0 ? 0 : changeHp);
                             }
                             useSkillMagicAttack(applyParty, isMyAction);
+                            isSkillAttack = true;
                         } else {
                             applyParty.setHp(applyParty.getHp() + changePoint);
                             isSkillCure = true;
@@ -564,8 +569,10 @@ public class BattleScene extends BaseScene {
                         applyParty.setAtk(applyParty.getAtk() + changePoint);
                         if (changePoint < 0) {
                             useSkillConfuse(applyParty, isMyAction);
+                            isSkillConfuse = true;
                         } else {
                             useSkillGoodMagic(applyParty, isMyAction);
+                            isSkillGood = true;
                         }
                         break;
                     case Defence:
@@ -578,6 +585,12 @@ public class BattleScene extends BaseScene {
             }
             if (isSkillCure) {
                 F2SoundManager.getInstance().play(SoundEnum.BATTLE_CURE);
+            } else if (isSkillAttack) {
+                F2SoundManager.getInstance().play(SoundEnum.BATTLE_SKILL_ATTACK);
+            } else if (isSkillConfuse) {
+                F2SoundManager.getInstance().play(SoundEnum.BATTLE_SKILL_CONFUSE);
+            } else if (isSkillGood) {
+                F2SoundManager.getInstance().play(SoundEnum.BATTLE_SKILL_GOOD);
             }
 
         }

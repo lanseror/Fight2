@@ -307,6 +307,7 @@ public class ArenaScene extends BaseScene {
                     if (ArenaUtils.getSelectedArena().isGuildArena() && !ArenaUtils.checkAttack()) {
                         alert("你需要公会授权才能战斗！");
                     } else {
+                        F2SoundManager.getInstance().play(SoundEnum.BUTTON_SMALL);
                         final User player = players[index];
                         ResourceManager.getInstance().setCurrentScene(null, new IRCallback<BaseScene>() {
                             @Override

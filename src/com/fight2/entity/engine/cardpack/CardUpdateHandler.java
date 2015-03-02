@@ -6,10 +6,13 @@ import java.math.RoundingMode;
 import org.andengine.engine.handler.BaseEntityUpdateHandler;
 import org.andengine.entity.IEntity;
 
+import com.fight2.constant.SoundEnum;
 import com.fight2.scene.BaseCardPackScene;
+import com.fight2.util.F2SoundManager;
 
 public class CardUpdateHandler extends BaseEntityUpdateHandler {
     public static float SCALE_FACTOR = 0.6f;
+    private boolean beeped;
     /**
      * 
      */
@@ -62,8 +65,13 @@ public class CardUpdateHandler extends BaseEntityUpdateHandler {
                     cardLeft += adjustWidth + BaseCardPackScene.CARD_GAP * adjustCard.getScaleX();
                 }
             }
+            if (diff < 10 && !beeped) {
+                F2SoundManager.getInstance().play(SoundEnum.CARDPACK);
+                beeped = true;
+            }
 
         } else {
+            beeped = false;
             currentCard.setScale(1);
         }
     }

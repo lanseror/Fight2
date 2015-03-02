@@ -163,6 +163,7 @@ public class GuildScene extends BaseScene {
             @Override
             public boolean onAreaTouched(final TouchEvent pSceneTouchEvent, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 if (pSceneTouchEvent.isActionUp()) {
+                    F2SoundManager.getInstance().play(SoundEnum.BUTTON_SMALL);
                     focusButton(index);
                     return true;
                 }
