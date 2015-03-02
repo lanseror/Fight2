@@ -22,13 +22,10 @@ import org.andengine.entity.scene.IOnSceneTouchListener;
 import org.andengine.entity.scene.Scene;
 import org.andengine.entity.scene.background.Background;
 import org.andengine.entity.scene.background.SpriteBackground;
-import org.andengine.entity.sprite.AnimatedSprite;
 import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.Text;
 import org.andengine.input.touch.TouchEvent;
 import org.andengine.opengl.font.Font;
-import org.andengine.opengl.texture.region.ITiledTextureRegion;
-import org.andengine.util.adt.color.ColorUtils;
 import org.andengine.util.algorithm.collision.BaseCollisionChecker;
 
 import android.opengl.GLES20;
@@ -37,22 +34,22 @@ import com.fight2.GameActivity;
 import com.fight2.constant.FontEnum;
 import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
-import com.fight2.constant.TiledTextureEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
 import com.fight2.entity.QuestTask;
 import com.fight2.entity.QuestTask.UserTaskStatus;
+import com.fight2.entity.UserProperties;
 import com.fight2.entity.engine.CardAvatar;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.ICallback;
 import com.fight2.util.IRCallback;
+import com.fight2.util.QuestUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TaskUtils;
 import com.fight2.util.TextureFactory;
-import com.fight2.util.TiledTextureFactory;
 
 public class MainScene extends BaseScene {
     private static final float[] GATE_VERTICES = { 350, 468, 548, 475, 506, 382, 451, 338, 350, 344 };
@@ -263,6 +260,11 @@ public class MainScene extends BaseScene {
                 - TextureEnum.PARTY_RECHARGE.getWidth() - 8, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight() - 4);
         this.attachChild(rechargeSprite);
         this.registerTouchArea(rechargeSprite);
+        final UserProperties userProps = QuestUtils.getUserProperties(activity);
+        GameUserSession.getInstance().setUserProps(userProps);
+        final Font font = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
+        final Text diamonText = new Text(123, 24, font, String.valueOf(userProps.getDiamon()), 8, vbom);
+        rechargeSprite.attachChild(diamonText);
 
         final TextureEnum playerInfoEnum = TextureEnum.MAIN_PLAYER_INFO;
         avatarBox = new Rectangle(this.simulatedLeftX + avatarHalfSize + 18, this.simulatedHeight - avatarHalfSize - 20, avatarSize, avatarSize, vbom) {
@@ -439,8 +441,8 @@ public class MainScene extends BaseScene {
             final BatchedPseudoSpriteParticleSystem particleSystem = new BatchedPseudoSpriteParticleSystem(new PointParticleEmitter(this.cameraCenterX, 110),
                     0.4f, 0.4f, 5, TextureFactory.getInstance().getAssetTextureRegion(TextureEnum.COMMON_PARTICLE_POINT), vbom);
             particleSystem.setBlendFunction(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE);
-            particleSystem.addParticleInitializer(new VelocityParticleInitializer<Entity>(0,0, 17, 19));
-//            particleSystem.addParticleInitializer(new AccelerationParticleInitializer<Entity>(5f, 0));
+            particleSystem.addParticleInitializer(new VelocityParticleInitializer<Entity>(0, 0, 17, 19));
+            // particleSystem.addParticleInitializer(new AccelerationParticleInitializer<Entity>(5f, 0));
             // particleSystem.addParticleInitializer(new RotationParticleInitializer<Entity>(0.0f, 360.0f));color="#ffe679"color="#ffe679"
             particleSystem.addParticleInitializer(new ScaleParticleInitializer<Entity>(0.8f));
             particleSystem.addParticleInitializer(new ColorParticleInitializer<Entity>(1f, 0.9f, 0.5f));

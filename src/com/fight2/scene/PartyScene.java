@@ -28,6 +28,7 @@ import com.fight2.entity.Card;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Party;
 import com.fight2.entity.PartyInfo;
+import com.fight2.entity.UserProperties;
 import com.fight2.entity.engine.CardAvatar;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
@@ -62,7 +63,6 @@ public class PartyScene extends BaseScene {
         final float partyTextTop = frameTop - 82;
         final float partyTextGap = gridHeight + 15;
         for (int partyIndex = 0; partyIndex < 3; partyIndex++) {
-
             final Text partyHp = new Text(this.simulatedLeftX + 110, partyTextTop - partyTextGap * partyIndex, mFont, "0123456789", vbom);
             final Text partyAtk = new Text(this.simulatedLeftX + 110, partyTextTop - 43 - partyTextGap * partyIndex, mFont, "0123456789", vbom);
             partyHps[partyIndex] = partyHp;
@@ -87,6 +87,10 @@ public class PartyScene extends BaseScene {
                 - TextureEnum.PARTY_RECHARGE.getWidth() - 8, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight() - 4);
         this.attachChild(rechargeSprite);
         this.registerTouchArea(rechargeSprite);
+        final UserProperties userProps = GameUserSession.getInstance().getUserProps();
+        final Font font = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
+        final Text diamonText = new Text(123, 24, font, String.valueOf(userProps.getDiamon()), 8, vbom);
+        rechargeSprite.attachChild(diamonText);
 
         final Sprite frameSprite = createALBImageSprite(TextureEnum.PARTY_FRAME, this.simulatedLeftX, frameY);
         this.attachChild(frameSprite);

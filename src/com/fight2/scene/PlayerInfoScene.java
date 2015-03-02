@@ -25,6 +25,8 @@ import com.fight2.constant.FontEnum;
 import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.Card;
+import com.fight2.entity.GameUserSession;
+import com.fight2.entity.UserProperties;
 import com.fight2.entity.engine.CardOutFrame;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
@@ -73,6 +75,10 @@ public class PlayerInfoScene extends BaseScene {
                 - TextureEnum.PARTY_RECHARGE.getWidth() - 8, cameraHeight - TextureEnum.PARTY_RECHARGE.getHeight() - 4);
         this.attachChild(rechargeSprite);
         this.registerTouchArea(rechargeSprite);
+        final UserProperties userProps = GameUserSession.getInstance().getUserProps();
+        final Font font = ResourceManager.getInstance().getFont(FontEnum.Default, 24);
+        final Text diamonText = new Text(123, 24, font, String.valueOf(userProps.getDiamon()), 8, vbom);
+        rechargeSprite.attachChild(diamonText);
 
         final F2ButtonSprite backButton = createALBF2ButtonSprite(TextureEnum.COMMON_BACK_BUTTON_NORMAL, TextureEnum.COMMON_BACK_BUTTON_PRESSED,
                 this.simulatedRightX - 135, 50);
