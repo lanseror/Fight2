@@ -1,9 +1,12 @@
-package com.fight2.entity;
+package com.fight2.entity.quest;
 
-import com.fight2.entity.QuestTile.TileItem;
+import com.fight2.entity.Card;
+import com.fight2.entity.Dialog;
+import com.fight2.entity.User;
+import com.fight2.entity.quest.QuestTile.TileItem;
 
 public class QuestResult {
-    private int status;
+    private QuestGoStatus status;
     private int treasureIndex;
     private TileItem item;
     private Card card;
@@ -14,11 +17,11 @@ public class QuestResult {
     private int mineId;
     private Dialog dialog;
 
-    public int getStatus() {
+    public QuestGoStatus getStatus() {
         return status;
     }
 
-    public void setStatus(final int status) {
+    public void setStatus(final QuestGoStatus status) {
         this.status = status;
     }
 

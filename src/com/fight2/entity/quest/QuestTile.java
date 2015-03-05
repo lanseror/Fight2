@@ -1,4 +1,4 @@
-package com.fight2.entity;
+package com.fight2.entity.quest;
 
 public class QuestTile {
     private int row;

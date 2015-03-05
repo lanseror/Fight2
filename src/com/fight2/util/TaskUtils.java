@@ -11,12 +11,12 @@ import org.json.JSONObject;
 
 import com.fight2.GameActivity;
 import com.fight2.entity.Card;
-import com.fight2.entity.QuestTask;
-import com.fight2.entity.QuestTask.UserTaskStatus;
 import com.fight2.entity.Reward;
 import com.fight2.entity.RewardItem;
 import com.fight2.entity.RewardItem.RewardItemType;
 import com.fight2.entity.battle.BattleResult;
+import com.fight2.entity.quest.QuestTask;
+import com.fight2.entity.quest.QuestTask.UserTaskStatus;
 
 public class TaskUtils {
     private static QuestTask TASK;

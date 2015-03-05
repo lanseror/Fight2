@@ -53,12 +53,6 @@ import com.fight2.entity.GameMine.MineType;
 import com.fight2.entity.GameUserSession;
 import com.fight2.entity.Hero;
 import com.fight2.entity.PartyInfo;
-import com.fight2.entity.QuestResult;
-import com.fight2.entity.QuestTask;
-import com.fight2.entity.QuestTask.UserTaskStatus;
-import com.fight2.entity.QuestTile;
-import com.fight2.entity.QuestTile.TileItem;
-import com.fight2.entity.QuestTreasureData;
 import com.fight2.entity.User;
 import com.fight2.entity.UserProperties;
 import com.fight2.entity.UserStoreroom;
@@ -68,6 +62,14 @@ import com.fight2.entity.engine.DialogFrame;
 import com.fight2.entity.engine.F2ButtonSprite;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.entity.engine.HeroDialogFrame;
+import com.fight2.entity.quest.QuestGoStatus;
+import com.fight2.entity.quest.QuestHeroStatus;
+import com.fight2.entity.quest.QuestResult;
+import com.fight2.entity.quest.QuestTask;
+import com.fight2.entity.quest.QuestTask.UserTaskStatus;
+import com.fight2.entity.quest.QuestTile;
+import com.fight2.entity.quest.QuestTile.TileItem;
+import com.fight2.entity.quest.QuestTreasureData;
 import com.fight2.util.AsyncTaskLoader;
 import com.fight2.util.CardUtils;
 import com.fight2.util.ChatUtils;
@@ -92,7 +94,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     private boolean isScroolling;
     private final TimerHandler timerHandler;
     private TMXTiledMap tmxTiledMap;
-    private QuestGoStatus goStatus = QuestGoStatus.Stopped;
+    private QuestHeroStatus heroStatus = QuestHeroStatus.Stopped;
     private QuestResult questResult;
     private final List<Sprite> treasureSprites = new ArrayList<Sprite>();
     private QuestTreasureData questTreasureData = new QuestTreasureData();
@@ -128,7 +130,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             @Override
             public void onTimePassed(final TimerHandler timerHandler) {
                 if (ResourceManager.getInstance().getCurrentSceneEnum() == SceneEnum.Quest) {
-                    if (goStatus == QuestGoStatus.Stopped) {
+                    if (heroStatus == QuestHeroStatus.Stopped) {
                         final IAsyncCallback callback = new IAsyncCallback() {
 
                             @Override
@@ -288,7 +290,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                 if (pSceneTouchEvent.isActionUp()) {
                     final float sceneX = pSceneTouchEvent.getX();
                     final float sceneY = pSceneTouchEvent.getY();
-                    if (goStatus == QuestGoStatus.Stopped) {
+                    if (heroStatus == QuestHeroStatus.Stopped) {
                         final Sprite mineSprite = getMineSpriteIfTouch(sceneX, sceneY);
                         final TMXTile mineStandTile = getTileByMineSprite(mineSprite);
                         if (mineSprite == null) {
@@ -304,14 +306,14 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                             if (destTile != currentTile) {
                                 path = tmxUtils.findPath(currentTile, destTile, tmxLayer);
                                 showPathTags(path);
-                                changeGoStatus(QuestGoStatus.Ready);
+                                changeHeroStatus(QuestHeroStatus.Ready);
                                 return true;
                             } else if (currentTile == mineStandTile) {
                                 final GameMine curentMine = spriteMineMap.get(mineSprite);
                                 handleMine(curentMine);
                             }
                         }
-                    } else if (goStatus == QuestGoStatus.Ready && destTouchArea.contains(sceneX, sceneY)) {
+                    } else if (heroStatus == QuestHeroStatus.Ready && destTouchArea.contains(sceneX, sceneY)) {
                         if (staminaEnough(path)) {
                             go(tmxUtils.getPathTiles(), path);
                         } else {
@@ -392,9 +394,9 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         tmxTiledMap.attachChild(flagSprite);
     }
 
-    private void changeGoStatus(final QuestGoStatus goStatus) {
-        this.goStatus = goStatus;
-        if (goStatus == QuestGoStatus.Stopped) {
+    private void changeHeroStatus(final QuestHeroStatus heroStatus) {
+        this.heroStatus = heroStatus;
+        if (heroStatus == QuestHeroStatus.Stopped) {
             ChatUtils.startGetMsg(activity);
         } else {
             ChatUtils.stopGetMsg(activity);
@@ -407,9 +409,9 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         cancelButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                if (goStatus == QuestGoStatus.Ready) {
+                if (heroStatus == QuestHeroStatus.Ready) {
                     clearPathTages();
-                    changeGoStatus(QuestGoStatus.Stopped);
+                    changeHeroStatus(QuestHeroStatus.Stopped);
                     cancelButton.setVisible(false);
                 }
             }
@@ -638,7 +640,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             @Override
             public void onPathWaypointStarted(final PathModifier pPathModifier, final IEntity pEntity, final int waypointIndex) {
                 if (waypointIndex % 5 == 0 && !handlingFailure) {
-                    changeGoStatus(QuestGoStatus.Started);
+                    changeHeroStatus(QuestHeroStatus.Started);
                     final int startTileIndex = waypointIndex;
                     final int targetTileIndex = waypointIndex + 5 >= pathTiles.size() ? pathTiles.size() - 1 : waypointIndex + 5;
                     final int endTargetFlag = (targetTileIndex == pathTiles.size() - 1) ? 0 : 1;
@@ -662,7 +664,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                 if ((waypointIndex + 1) % 5 == 0 || waypointIndex == path.getSize() - 2) {
                     // F2SoundManager.getInstance().stop();
 
-                    if (goStatus == QuestGoStatus.Started) {
+                    if (heroStatus == QuestHeroStatus.Started) {
                         handleWait();
                     } else {
                         final int backStep = waypointIndex > 4 ? waypointIndex - 4 : 0;
@@ -671,8 +673,8 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
 
                 }
 
-                if (waypointIndex == path.getSize() - 2 && goStatus != QuestGoStatus.Waitting) {
-                    changeGoStatus(QuestGoStatus.Stopped);
+                if (waypointIndex == path.getSize() - 2 && heroStatus != QuestHeroStatus.Waitting) {
+                    changeHeroStatus(QuestHeroStatus.Stopped);
                     cancelButton.setVisible(false);
                     hero.stopAnimation();
                     F2SoundManager.getInstance().play(SoundEnum.HORSE8);
@@ -688,7 +690,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     }
 
     private void handleWait() {
-        changeGoStatus(QuestGoStatus.Waitting);
+        changeHeroStatus(QuestHeroStatus.Waitting);
         cancelButton.setVisible(false);
         try {
             final LoadingScene loadingScene = new LoadingScene(activity);
@@ -725,9 +727,9 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
 
             @Override
             public void onComplete() {
-                if (goStatus == QuestGoStatus.Started) {
+                if (heroStatus == QuestHeroStatus.Started) {
                     changeQuestStatus(questResult);
-                } else if (goStatus == QuestGoStatus.Waitting) {
+                } else if (heroStatus == QuestHeroStatus.Waitting) {
                     handleCatchUp();
                     changeQuestStatus(questResult);
                     final TMXLayer tmxLayer = tmxTiledMap.getTMXLayers().get(0);
@@ -735,7 +737,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                     final float playerBackY = tmxLayer.getTileY(startTile.getTileRow()) + TmxUtils.HERO_OFFSET_Y;
                     Debug.e("Waitting!");
                     handleResult(playerBackX, playerBackY, questResult);
-                    changeGoStatus(QuestGoStatus.Stopped);
+                    changeHeroStatus(QuestHeroStatus.Stopped);
                 }
 
             }
@@ -749,31 +751,31 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     }
 
     private void changeQuestStatus(final QuestResult questResult) {
-        if (questResult.getStatus() == 0) {
-            changeGoStatus(QuestGoStatus.Arrived);
-        } else if (questResult.getStatus() == 1) {
-            changeGoStatus(QuestGoStatus.Treasure);
-        } else if (questResult.getStatus() == 2) {
-            changeGoStatus(QuestGoStatus.Enemy);
-        } else if (questResult.getStatus() == 3) {
-            changeGoStatus(QuestGoStatus.Task);
-        } else if (questResult.getStatus() == 5) {
-            changeGoStatus(QuestGoStatus.Mine);
+        if (questResult.getStatus() == QuestGoStatus.Arrived) {
+            changeHeroStatus(QuestHeroStatus.Arrived);
+        } else if (questResult.getStatus() == QuestGoStatus.Treasure) {
+            changeHeroStatus(QuestHeroStatus.Treasure);
+        } else if (questResult.getStatus() == QuestGoStatus.Enemy) {
+            changeHeroStatus(QuestHeroStatus.Enemy);
+        } else if (questResult.getStatus() == QuestGoStatus.Task) {
+            changeHeroStatus(QuestHeroStatus.Task);
+        } else if (questResult.getStatus() == QuestGoStatus.Mine) {
+            changeHeroStatus(QuestHeroStatus.Mine);
         } else {
-            changeGoStatus(QuestGoStatus.Failed);
+            changeHeroStatus(QuestHeroStatus.Failed);
         }
     }
 
     private void handleResult(final float playerBackX, final float playerBackY, final QuestResult questResult) {
         staminaStick.setValue(questResult.getStamina());
         GameUserSession.getInstance().getUserProps().setStamina(questResult.getStamina());
-        if (goStatus != QuestGoStatus.Failed) {
+        if (heroStatus != QuestHeroStatus.Failed) {
             if (questResult.isTreasureUpdated()) {
                 refreshTreasureSprites(questResult.getQuestTreasureData());
             }
         }
-        if (goStatus == QuestGoStatus.Failed) {
-            changeGoStatus(QuestGoStatus.Stopped);
+        if (heroStatus == QuestHeroStatus.Failed) {
+            changeHeroStatus(QuestHeroStatus.Stopped);
             cancelButton.setVisible(false);
             handlingFailure = true;
             hero.stopAnimation();
@@ -786,8 +788,8 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                 }
 
             });
-        } else if (goStatus == QuestGoStatus.Arrived) {
-        } else if (goStatus == QuestGoStatus.Treasure) {
+        } else if (heroStatus == QuestHeroStatus.Arrived) {
+        } else if (heroStatus == QuestHeroStatus.Treasure) {
             receiveQuestTreasure(questResult);
             updateQuestPropsBar();
             if (questResult.getItem().isInBox()) {
@@ -805,7 +807,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                 });
             }
             removeTreasureSprite();
-        } else if (goStatus == QuestGoStatus.Enemy) {
+        } else if (heroStatus == QuestHeroStatus.Enemy) {
             ResourceManager.getInstance().setChildScene(QuestScene.this, new IRCallback<BaseScene>() {
                 @Override
                 public BaseScene onCallback() {
@@ -816,7 +818,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                     }
                 }
             }, true);
-        } else if (goStatus == QuestGoStatus.Task) {
+        } else if (heroStatus == QuestHeroStatus.Task) {
             final QuestTask task = TaskUtils.getTask();
             final User boss = questResult.getEnemy();
             final PartyInfo bossPartyInfo = CardUtils.getPartyByUserId(activity, boss.getId());
@@ -840,7 +842,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                 }
             });
 
-        } else if (goStatus == QuestGoStatus.Mine) {
+        } else if (heroStatus == QuestHeroStatus.Mine) {
             final GameMine curentMine = minesMap.get(questResult.getMineId());
             handleMine(curentMine);
         }
@@ -929,20 +931,6 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
             final Text mark = mineMarkMap.get(mine.getId());
             mark.setText(owner.getName());
         }
-    }
-
-    public enum QuestGoStatus {
-        Ready,
-        Started,
-        Waitting,
-        Timeout,
-        Arrived,
-        Treasure,
-        Enemy,
-        Task,
-        Mine,
-        Stopped,
-        Failed
     }
 
     @Override

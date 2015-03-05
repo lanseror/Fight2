@@ -1,4 +1,4 @@
-package com.fight2.entity;
+package com.fight2.entity.quest;
 
 import java.util.List;
 
