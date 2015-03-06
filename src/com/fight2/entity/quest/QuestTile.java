@@ -36,6 +36,7 @@ public class QuestTile {
         Card(true),
         SummonCharm(true),
         Diamon(true),
+        PileOfDiamon(false),
         Wood(false),
         Mineral(false),
         Crystal(false);

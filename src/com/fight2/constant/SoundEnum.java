@@ -8,7 +8,7 @@ public enum SoundEnum {
     BATTLE_SKILL_ATTACK("battle_skill_attack.ogg"),
     BATTLE_SKILL_CONFUSE("battle_skill_confuse.ogg"),
     BATTLE_SKILL_GOOD("battle_skill_good.ogg"),
-    BATTLE_WIN("battle_win.ogg"),
+    BATTLE_WIN("battle_win.mp3"),
     BATTLE_LOSE("battle_lose.ogg"),
     DOOR("door.mp3"),
     BUTTON_CLICK("BigButtonClick.wav"),

@@ -609,6 +609,10 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                                 treasureSprite.animate(500, true);
                                 tmxTiledMap.attachChild(treasureSprite);
                                 treasureSprites.add(treasureSprite);
+                            } else if (item == TileItem.PileOfDiamon) {
+                                final Sprite treasureSprite = createACImageSprite(TextureEnum.QUEST_TREASURE_PILE_DIAMON, treasureX, treasureY);
+                                tmxTiledMap.attachChild(treasureSprite);
+                                treasureSprites.add(treasureSprite);
                             }
                         }
                     }

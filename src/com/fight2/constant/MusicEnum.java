@@ -1,7 +1,7 @@
 package com.fight2.constant;
 
 public enum MusicEnum {
-    MAIN_BG("Mainmenu.mp3"),
+    MAIN_BG("Mainmenu.ogg"),
     QuestBattle("QuestBattle.ogg"),
     ArenaBattle("ArenaBattle.ogg");
 
