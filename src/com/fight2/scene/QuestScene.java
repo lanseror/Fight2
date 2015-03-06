@@ -305,7 +305,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                                     playerSceneCordinates[Constants.VERTEX_INDEX_Y]);
                             if (destTile != currentTile) {
                                 path = tmxUtils.findPath(currentTile, destTile, tmxLayer);
-                                showPathTags(path);
+                                showPathTags(path, destTile);
                                 changeHeroStatus(QuestHeroStatus.Ready);
                                 return true;
                             } else if (currentTile == mineStandTile) {
@@ -419,7 +419,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         return cancelButton;
     }
 
-    private void showPathTags(final Path path) {
+    private void showPathTags(final Path path, final TMXTile destTile) {
         activity.runOnUpdateThread(new Runnable() {
             @Override
             public void run() {
@@ -427,7 +427,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                 for (int i = 1; i < path.getSize(); i++) {
                     Sprite tag = null;
                     if (i == pathSize - 1) {
-                        tag = createPathEndTag(path);
+                        tag = createPathEndTag(path, destTile);
                     } else {
                         tag = createPathTage(i, path);
                     }
@@ -529,7 +529,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         });
     }
 
-    private Sprite createPathEndTag(final Path path) {
+    private Sprite createPathEndTag(final Path path, final TMXTile destTile) {
         final float[] xs = path.getCoordinatesX();
         final float[] ys = path.getCoordinatesY();
         final int endIndex = path.getSize() - 1;
@@ -538,22 +538,40 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         final float x2 = xs[endIndex];
         final float y2 = ys[endIndex];
         TextureEnum textureEnum = TextureEnum.QUEST_PATH_TAG_RIGHT_END;
+        boolean isTreasure = false;
+        for (final QuestTile treasure : questTreasureData.getQuestTiles()) {
+            if (treasure.getCol() == destTile.getTileColumn() && treasure.getRow() == destTile.getTileRow()) {
+                isTreasure = true;
+                break;
+            }
+        }
+        if (!isTreasure) {
+            for (int i = 0; i < minesMap.size(); i++) {
+                final GameMine mine = minesMap.valueAt(i);
+                final MineType mineType = mine.getType();
+                if ((mine.getCol() + mineType.getxOffset()) == destTile.getTileColumn() && (mine.getRow() + mineType.getyOffset()) == destTile.getTileRow()) {
+                    isTreasure = true;
+                    break;
+                }
+            }
+        }
+
         if (x1 > x2 && y1 < y2) { // left up
-            textureEnum = TextureEnum.QUEST_PATH_TAG_LEFT_END;
+            textureEnum = isTreasure ? TextureEnum.QUEST_PATH_TAG_LEFT_TREASURE : TextureEnum.QUEST_PATH_TAG_LEFT_END;
         } else if (x1 == x2 && y1 < y2) { // up
-            textureEnum = TextureEnum.QUEST_PATH_TAG_RIGHT_END;
+            textureEnum = isTreasure ? TextureEnum.QUEST_PATH_TAG_RIGHT_TREASURE : TextureEnum.QUEST_PATH_TAG_RIGHT_END;
         } else if (x1 < x2 && y1 < y2) { // right up
-            textureEnum = TextureEnum.QUEST_PATH_TAG_RIGHT_END;
+            textureEnum = isTreasure ? TextureEnum.QUEST_PATH_TAG_RIGHT_TREASURE : TextureEnum.QUEST_PATH_TAG_RIGHT_END;
         } else if (x1 > x2 && y1 == y2) {// left
-            textureEnum = TextureEnum.QUEST_PATH_TAG_LEFT_END;
+            textureEnum = isTreasure ? TextureEnum.QUEST_PATH_TAG_LEFT_TREASURE : TextureEnum.QUEST_PATH_TAG_LEFT_END;
         } else if (x1 < x2 && y1 == y2) {// right
-            textureEnum = TextureEnum.QUEST_PATH_TAG_RIGHT_END;
+            textureEnum = isTreasure ? TextureEnum.QUEST_PATH_TAG_RIGHT_TREASURE : TextureEnum.QUEST_PATH_TAG_RIGHT_END;
         } else if (x1 > x2 && y1 > y2) {// left down
-            textureEnum = TextureEnum.QUEST_PATH_TAG_LEFT_END;
+            textureEnum = isTreasure ? TextureEnum.QUEST_PATH_TAG_LEFT_TREASURE : TextureEnum.QUEST_PATH_TAG_LEFT_END;
         } else if (x1 == x2 && y1 > y2) {// down
-            textureEnum = TextureEnum.QUEST_PATH_TAG_RIGHT_END;
+            textureEnum = isTreasure ? TextureEnum.QUEST_PATH_TAG_RIGHT_TREASURE : TextureEnum.QUEST_PATH_TAG_RIGHT_END;
         } else if (x1 < x2 && y1 > y2) {// right down
-            textureEnum = TextureEnum.QUEST_PATH_TAG_RIGHT_END;
+            textureEnum = isTreasure ? TextureEnum.QUEST_PATH_TAG_RIGHT_TREASURE : TextureEnum.QUEST_PATH_TAG_RIGHT_END;
         }
         final Sprite tag = createACImageSprite(textureEnum, x2, y2 - 5);
         destTouchArea.setPosition(tag);
