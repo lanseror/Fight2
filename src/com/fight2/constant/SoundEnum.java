@@ -18,6 +18,8 @@ public enum SoundEnum {
     HORSE("HORSE01.ogg"),
     HORSE8("HORSE08.ogg"),
     TREASURE1("treasure1.ogg"),
+    TREASURE2("treasure2.ogg"),
+    TREASURE3("treasure3.ogg"),
     LOADING("Loading.ogg");
 
     private final String url;

@@ -129,7 +129,8 @@ public class QuestTreasureScene extends BaseScene {
 
     @Override
     protected void playAnimation() {
-        F2SoundManager.getInstance().play(SoundEnum.TREASURE1);
+        final SoundEnum soundEnum = questResult.getItem().isInBox()? SoundEnum.TREASURE3 : SoundEnum.TREASURE1;
+        F2SoundManager.getInstance().play(soundEnum);
     }
 
     @Override
