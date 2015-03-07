@@ -60,50 +60,57 @@ public class QuestTreasureScene extends BaseScene {
         final float treasureY = 180;
 
         final TileItem tileItem = questResult.getItem();
-
         final IEntity itemSprite;
         if (tileItem == TileItem.Card) {
             final Card card = questResult.getCard();
             itemSprite = new CardFrame(treasureX, treasureY, CARD_WIDTH, CARD_HEIGHT, card, activity);
-        } else if (tileItem == TileItem.Crystal) {
-            final ITiledTextureRegion tiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.TREASURE_CRYSTAL);
-            final AnimatedSprite treasureSprite = new AnimatedSprite(treasureX, treasureY, tiledTextureRegion, vbom);
-            treasureSprite.animate(500, true);
-            itemSprite = treasureSprite;
         } else {
-            final TextureEnum textureEnum;
-            switch (tileItem) {
-                case Stamina:
-                    textureEnum = TextureEnum.COMMON_STAMINA;
-                    break;
-                case Ticket:
-                    textureEnum = TextureEnum.COMMON_ARENA_TICKET;
-                    break;
-                case CoinBag:
-                    textureEnum = TextureEnum.COMMON_COIN_BAG;
-                    break;
-                case SummonCharm:
-                    textureEnum = TextureEnum.COMMON_SUMMON_CHARM;
-                    break;
-                case Diamon:
-                    textureEnum = TextureEnum.COMMON_DIAMOND;
-                    break;
-                case PileOfDiamon:
-                    textureEnum = TextureEnum.QUEST_TREASURE_PILE_DIAMON;
-                    break;
-                case Wood:
-                    textureEnum = TextureEnum.QUEST_TREASURE_WOOD;
-                    break;
-                case Mineral:
-                    textureEnum = TextureEnum.QUEST_TREASURE_MINERAL;
-                    break;
-                default:
-                    textureEnum = null;
-                    break;
+            if (tileItem == TileItem.Crystal) {
+                final ITiledTextureRegion tiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.TREASURE_CRYSTAL);
+                final AnimatedSprite treasureSprite = new AnimatedSprite(treasureX, treasureY, tiledTextureRegion, vbom);
+                treasureSprite.animate(500, true);
+                itemSprite = treasureSprite;
+            } else {
+                final TextureEnum textureEnum;
+                switch (tileItem) {
+                    case Stamina:
+                        textureEnum = TextureEnum.COMMON_STAMINA;
+                        break;
+                    case Ticket:
+                        textureEnum = TextureEnum.COMMON_ARENA_TICKET;
+                        break;
+                    case CoinBag:
+                        textureEnum = TextureEnum.COMMON_COIN_BAG;
+                        break;
+                    case SummonCharm:
+                        textureEnum = TextureEnum.COMMON_SUMMON_CHARM;
+                        break;
+                    case Diamon:
+                        textureEnum = TextureEnum.COMMON_DIAMOND;
+                        break;
+                    case PileOfDiamon:
+                        textureEnum = TextureEnum.QUEST_TREASURE_PILE_DIAMON;
+                        break;
+                    case Wood:
+                        textureEnum = TextureEnum.QUEST_TREASURE_WOOD_BIG;
+                        break;
+                    case Mineral:
+                        textureEnum = TextureEnum.QUEST_TREASURE_MINERAL_BIG;
+                        break;
+                    default:
+                        textureEnum = null;
+                        break;
+                }
+                itemSprite = createACImageSprite(textureEnum, treasureX, treasureY);
             }
-            itemSprite = createACImageSprite(textureEnum, treasureX, treasureY);
         }
         frame.attachChild(itemSprite);
+
+        final Font amountFont = ResourceManager.getInstance().newFont(FontEnum.Default, 28, 128);
+        final Text amountText = new Text(treasureX, treasureY, amountFont, String.format("×%s", 1), vbom);
+        amountText.setColor(0XFF330504);
+        amountText.setX(treasureX + itemSprite.getWidth() * 0.5f + 50);
+        frame.attachChild(amountText);
 
         final Font detailFont = ResourceManager.getInstance().newFont(FontEnum.Default, 24);
         final TextOptions textOptions = new TextOptions(AutoWrap.LETTERS, 430);
