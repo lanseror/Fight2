@@ -281,7 +281,7 @@ public class ArenaRewardScene extends BaseScene implements IScrollDetectorListen
     }
 
     private void insertRewardItems(final List<RewardItem> rewardItems, final IEntity rewardGrid) {
-        final TextureEnum itemGridEnum = TextureEnum.ARENA_REWARD_ITEM_GRID;
+        final TextureEnum itemGridEnum = TextureEnum.COMMON_ITEM_GRID;
         final TextureEnum ticketEnum = TextureEnum.COMMON_ARENA_TICKET;
         final TextureEnum staminaEnum = TextureEnum.COMMON_STAMINA;
         final TextureEnum guildContributionEnum = TextureEnum.COMMON_GUILD_CONTRIBUTION;

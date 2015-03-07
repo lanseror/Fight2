@@ -814,20 +814,18 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         } else if (heroStatus == QuestHeroStatus.Treasure) {
             receiveQuestTreasure(questResult);
             updateQuestPropsBar();
-            if (questResult.getItem().isInBox()) {
-                ResourceManager.getInstance().setCurrentScene(SceneEnum.QuestTreasure, new IRCallback<BaseScene>() {
+            ResourceManager.getInstance().setChildScene(QuestScene.this, new IRCallback<BaseScene>() {
 
-                    @Override
-                    public BaseScene onCallback() {
-                        try {
-                            return new QuestTreasureScene(questResult, activity);
-                        } catch (final IOException e) {
-                            throw new RuntimeException(e);
-                        }
+                @Override
+                public BaseScene onCallback() {
+                    try {
+                        return new QuestTreasureScene(questResult, activity);
+                    } catch (final IOException e) {
+                        throw new RuntimeException(e);
                     }
+                }
 
-                });
-            }
+            });
             removeTreasureSprite();
         } else if (heroStatus == QuestHeroStatus.Enemy) {
             ResourceManager.getInstance().setChildScene(QuestScene.this, new IRCallback<BaseScene>() {

@@ -116,7 +116,7 @@ public class ChatScene extends BaseScene implements IScrollDetectorListener {
     }
 
     private void goBack() {
-        F2SoundManager.getInstance().play(SoundEnum.BUTTON_SMALL);
+        F2SoundManager.getInstance().play(SoundEnum.BUTTON_CLICK2);
         final InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(editText.getWindowToken(), 0);
         back();

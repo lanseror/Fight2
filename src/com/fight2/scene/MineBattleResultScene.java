@@ -10,11 +10,8 @@ import com.fight2.entity.PartyInfo;
 import com.fight2.entity.battle.BattleResult;
 import com.fight2.entity.engine.DialogFrame;
 import com.fight2.entity.engine.HeroDialogFrame;
-import com.fight2.entity.quest.QuestTask;
-import com.fight2.entity.quest.QuestTask.UserTaskStatus;
 import com.fight2.util.IParamCallback;
 import com.fight2.util.ResourceManager;
-import com.fight2.util.TaskUtils;
 
 public class MineBattleResultScene extends BaseScene {
     private final PartyInfo myPartyInfo = GameUserSession.getInstance().getPartyInfo();

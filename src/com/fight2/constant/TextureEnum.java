@@ -34,7 +34,7 @@ public enum TextureEnum {
     COMMON_EXPERIENCE_BOX_STAR("images/common_experience_box_star.png", 267, 67),
     COMMON_EXPERIENCE_STICK("images/common_experience_stick.png", 205, 67),
     COMMON_COIN_BOX("images/common_coin_box.png", 208, 52),
-    COMMON_BUTTON("images/common_button.png", 129, 49),
+    COMMON_BUTTON("images/common_button.png", 129, 60),
     COMMON_INPUT_ICON("images/common_input_icon.png", 54, 53),
     COMMON_CHECKBOX_ON("images/common_checkbox_on.png", 40, 40),
     COMMON_CARD_FRAME_HUMAN("images/common_card_frame_human.png", 299, 450),
@@ -76,6 +76,7 @@ public enum TextureEnum {
     COMMON_PROGRESS_BAR_RIGHT("images/common_progress_bar_right.png", 9, 22),
     COMMON_GUILD_CONTRIB_BAR("images/common_guild_contrib_bar.png", 208, 52),
     COMMON_PARTICLE_POINT("images/particle_point.png", 32, 32),
+    COMMON_ITEM_GRID("images/common_item_grid.png", 135, 138),
 
     // Chat room images.
     CHAT_INPUT_BG("images/chat_input_backgroud.png", 850, 82),
@@ -212,7 +213,6 @@ public enum TextureEnum {
     ARENA_REWARD_DESC("images/arena_reward_desc.png", 582, 181),
     ARENA_REWARD_GRID("images/arena_reward_grid.png", 582, 344),
     ARENA_REWARD_MIGHT_POINT("images/arena_reward_might_point.png", 88, 87),
-    ARENA_REWARD_ITEM_GRID("images/arena_reward_item_grid.png", 135, 138),
 
     // Arena ranking scene images.
     ARENA_RANKING_BG("images/arena_ranking_backgroud.png", 605, 555),

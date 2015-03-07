@@ -135,6 +135,7 @@ public class UserStoreroomScene extends BaseScene {
             receiveButton.setOnClickListener(new F2OnClickListener() {
                 @Override
                 public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                    F2SoundManager.getInstance().play(SoundEnum.BUTTON_CLICK2);
                     final int size = AccountUtils.receiveCardFromUserStoreroom(activity, card.getId());
                     if (size == 0) {
                         alert("你的卡组已满！");
@@ -175,6 +176,10 @@ public class UserStoreroomScene extends BaseScene {
     public void updateScene() {
         activity.getGameHub().needSmallChatRoom(true);
         createBoards();
+    }
+
+    @Override
+    protected void playAnimation() {
         F2SoundManager.getInstance().play(SoundEnum.DOOR);
     }
 

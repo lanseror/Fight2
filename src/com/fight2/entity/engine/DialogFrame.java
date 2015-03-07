@@ -8,9 +8,11 @@ import org.andengine.entity.sprite.Sprite;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 
 import com.fight2.GameActivity;
+import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
 import com.fight2.entity.engine.F2ButtonSprite.F2OnClickListener;
 import com.fight2.util.EntityFactory;
+import com.fight2.util.F2SoundManager;
 import com.fight2.util.IParamCallback;
 
 public class DialogFrame extends Rectangle {
@@ -69,6 +71,7 @@ public class DialogFrame extends Rectangle {
         confirmButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
+                F2SoundManager.getInstance().play(SoundEnum.BUTTON_CLICK2);
                 iCallback.onCallback(true);
             }
         });

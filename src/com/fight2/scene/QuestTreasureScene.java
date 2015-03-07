@@ -3,87 +3,114 @@ package com.fight2.scene;
 import java.io.IOException;
 
 import org.andengine.entity.IEntity;
-import org.andengine.entity.modifier.IEntityModifier;
-import org.andengine.entity.modifier.ParallelEntityModifier;
-import org.andengine.entity.modifier.RotationByModifier;
-import org.andengine.entity.modifier.ScaleModifier;
 import org.andengine.entity.primitive.Rectangle;
-import org.andengine.entity.scene.IOnSceneTouchListener;
-import org.andengine.entity.scene.Scene;
-import org.andengine.entity.scene.background.Background;
-import org.andengine.entity.scene.background.SpriteBackground;
-import org.andengine.entity.sprite.Sprite;
-import org.andengine.input.touch.TouchEvent;
+import org.andengine.entity.sprite.AnimatedSprite;
+import org.andengine.entity.text.AutoWrap;
+import org.andengine.entity.text.Text;
+import org.andengine.entity.text.TextOptions;
+import org.andengine.opengl.font.Font;
+import org.andengine.opengl.texture.region.ITiledTextureRegion;
+import org.andengine.util.adt.color.Color;
 
 import com.fight2.GameActivity;
+import com.fight2.constant.FontEnum;
 import com.fight2.constant.SoundEnum;
 import com.fight2.constant.TextureEnum;
+import com.fight2.constant.TiledTextureEnum;
 import com.fight2.entity.Card;
 import com.fight2.entity.engine.CardFrame;
+import com.fight2.entity.engine.DialogFrame;
 import com.fight2.entity.quest.QuestResult;
 import com.fight2.entity.quest.QuestTile.TileItem;
 import com.fight2.util.F2SoundManager;
+import com.fight2.util.IParamCallback;
 import com.fight2.util.ResourceManager;
+import com.fight2.util.TiledTextureFactory;
 
 public class QuestTreasureScene extends BaseScene {
-    private final static int CARD_WIDTH = 300;
-    private final static int CARD_HEIGHT = 450;
-    private final IEntity cardFrame;
+    private final static int CARD_WIDTH = 100;
+    private final static int CARD_HEIGHT = 150;
+    private final QuestResult questResult;
+    private static final String MSG1 = "找到一个宝箱，你打开宝箱，发现了一些财宝。";
+    private static final String MSG2 = "仔细搜索之后，你发现了一些资源。";
 
     public QuestTreasureScene(final QuestResult questResult, final GameActivity activity) throws IOException {
         super(activity);
-        this.cardFrame = new Rectangle(cameraCenterX, cameraCenterY, CARD_WIDTH, CARD_HEIGHT, vbom);
-        cardFrame.setRotation(90);
-        cardFrame.setAlpha(0);
-        cardFrame.setScale(0.33f);
-        final TileItem tileItem = questResult.getItem();
-
-        this.attachChild(cardFrame);
-        if (tileItem == TileItem.Card) {
-            final Card card = questResult.getCard();
-            final IEntity cardSprite = new CardFrame(CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f, CARD_WIDTH, CARD_HEIGHT, card, activity);
-            cardFrame.attachChild(cardSprite);
-        } else if (tileItem == TileItem.Stamina) {
-            final TextureEnum staminaEnum = TextureEnum.COMMON_STAMINA;
-            final IEntity staminaImg = createACImageSprite(staminaEnum, CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f);
-            cardFrame.attachChild(staminaImg);
-        } else if (tileItem == TileItem.Ticket) {
-            final TextureEnum ticketEnum = TextureEnum.COMMON_ARENA_TICKET;
-            final IEntity ticketImg = createACImageSprite(ticketEnum, CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f);
-            cardFrame.attachChild(ticketImg);
-        } else if (tileItem == TileItem.CoinBag) {
-            final TextureEnum coinBagEnum = TextureEnum.COMMON_COIN_BAG;
-            final IEntity coinBagImg = createACImageSprite(coinBagEnum, CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f);
-            cardFrame.attachChild(coinBagImg);
-        } else if (tileItem == TileItem.SummonCharm) {
-            final TextureEnum itemEnum = TextureEnum.COMMON_SUMMON_CHARM;
-            final IEntity itemImg = createACImageSprite(itemEnum, CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f);
-            cardFrame.attachChild(itemImg);
-        } else if (tileItem == TileItem.Diamon) {
-            final TextureEnum itemEnum = TextureEnum.COMMON_DIAMOND;
-            final IEntity itemImg = createACImageSprite(itemEnum, CARD_WIDTH * 0.5f, CARD_HEIGHT * 0.5f);
-            cardFrame.attachChild(itemImg);
-        }
-
+        this.questResult = questResult;
         init();
     }
 
     @Override
     protected void init() throws IOException {
-        final Sprite bgSprite = createALBImageSprite(TextureEnum.COMMON_BG, 0, 0);
-        final Background background = new SpriteBackground(bgSprite);
-        this.setBackground(background);
-        this.setOnSceneTouchListener(new IOnSceneTouchListener() {
+        final IEntity bgEntity = new Rectangle(cameraCenterX, cameraCenterY, this.simulatedWidth, this.simulatedHeight, vbom);
+        bgEntity.setColor(Color.BLACK);
+        bgEntity.setAlpha(0.3f);
+        this.setBackgroundEnabled(false);
+        this.attachChild(bgEntity);
 
+        final DialogFrame frame = new DialogFrame(cameraCenterX, cameraCenterY, 600, 350, activity);
+        frame.bind(this, new IParamCallback() {
             @Override
-            public boolean onSceneTouchEvent(final Scene pScene, final TouchEvent pSceneTouchEvent) {
-                if (pSceneTouchEvent.isActionUp()) {
-                    ResourceManager.getInstance().sceneBack();
-                }
-                return true;
+            public void onCallback(final Object param) {
+                back();
             }
-
         });
+
+        final float treasureX = 300;
+        final float treasureY = 180;
+
+        final TileItem tileItem = questResult.getItem();
+
+        final IEntity itemSprite;
+        if (tileItem == TileItem.Card) {
+            final Card card = questResult.getCard();
+            itemSprite = new CardFrame(treasureX, treasureY, CARD_WIDTH, CARD_HEIGHT, card, activity);
+        } else if (tileItem == TileItem.Crystal) {
+            final ITiledTextureRegion tiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.TREASURE_CRYSTAL);
+            final AnimatedSprite treasureSprite = new AnimatedSprite(treasureX, treasureY, tiledTextureRegion, vbom);
+            treasureSprite.animate(500, true);
+            itemSprite = treasureSprite;
+        } else {
+            final TextureEnum textureEnum;
+            switch (tileItem) {
+                case Stamina:
+                    textureEnum = TextureEnum.COMMON_STAMINA;
+                    break;
+                case Ticket:
+                    textureEnum = TextureEnum.COMMON_ARENA_TICKET;
+                    break;
+                case CoinBag:
+                    textureEnum = TextureEnum.COMMON_COIN_BAG;
+                    break;
+                case SummonCharm:
+                    textureEnum = TextureEnum.COMMON_SUMMON_CHARM;
+                    break;
+                case Diamon:
+                    textureEnum = TextureEnum.COMMON_DIAMOND;
+                    break;
+                case PileOfDiamon:
+                    textureEnum = TextureEnum.QUEST_TREASURE_PILE_DIAMON;
+                    break;
+                case Wood:
+                    textureEnum = TextureEnum.QUEST_TREASURE_WOOD;
+                    break;
+                case Mineral:
+                    textureEnum = TextureEnum.QUEST_TREASURE_MINERAL;
+                    break;
+                default:
+                    textureEnum = null;
+                    break;
+            }
+            itemSprite = createACImageSprite(textureEnum, treasureX, treasureY);
+        }
+        frame.attachChild(itemSprite);
+
+        final Font detailFont = ResourceManager.getInstance().newFont(FontEnum.Default, 24);
+        final TextOptions textOptions = new TextOptions(AutoWrap.LETTERS, 430);
+        final String msg = tileItem.isInBox() ? MSG1 : MSG2;
+        final Text descText = new Text(frame.getWidth() * 0.5f, 270, detailFont, msg, textOptions, vbom);
+        descText.setColor(0XFF330504);
+        frame.attachChild(descText);
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
@@ -91,20 +118,15 @@ public class QuestTreasureScene extends BaseScene {
 
     @Override
     public void updateScene() {
-        // playAnimation();
-        activity.getGameHub().needSmallChatRoom(false);
     }
 
     @Override
     protected void playAnimation() {
-        F2SoundManager.getInstance().play(SoundEnum.SUMMON);
-        final IEntityModifier modifier = new ParallelEntityModifier(new ScaleModifier(0.15f, 0.33f, 1), new RotationByModifier(0.15f, -90));
-        cardFrame.registerEntityModifier(modifier);
+        F2SoundManager.getInstance().play(SoundEnum.TREASURE1);
     }
 
     @Override
     public void leaveScene() {
-        // TODO Auto-generated method stub
 
     }
 

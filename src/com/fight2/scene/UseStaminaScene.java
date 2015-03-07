@@ -90,7 +90,7 @@ public class UseStaminaScene extends BaseScene {
 
         });
 
-        final TextureEnum itemGridEnum = TextureEnum.ARENA_REWARD_ITEM_GRID;
+        final TextureEnum itemGridEnum = TextureEnum.COMMON_ITEM_GRID;
         final IEntity staminaGrid = createALBImageSprite(itemGridEnum, 45, 160);
         final IEntity staminaImg = createACImageSprite(TextureEnum.COMMON_STAMINA, itemGridEnum.getWidth() * 0.5f, itemGridEnum.getHeight() * 0.5f - 5);
         staminaGrid.attachChild(staminaImg);

@@ -91,7 +91,7 @@ public class ArenaListScene extends BaseScene {
         enterButton.setOnClickListener(new F2OnClickListener() {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
-                F2SoundManager.getInstance().play(SoundEnum.BUTTON_SMALL);
+                F2SoundManager.getInstance().play(SoundEnum.BUTTON_CLICK2);
                 ResourceManager.getInstance().setCurrentScene(SceneEnum.Arena);
             }
         });

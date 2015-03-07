@@ -191,6 +191,7 @@ public class PreBattleScene extends BaseScene {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 F2MusicManager.getInstance().stopMusic();
+                F2SoundManager.getInstance().play(SoundEnum.BUTTON_CLICK);
                 if (battleType == BattleType.Task || battleType == BattleType.Mine || battleType == BattleType.Quest) {
                     back();
                     activity.getGameHub().needSmallChatRoom(true);

@@ -66,7 +66,7 @@ public class SmallChatRoom extends Rectangle {
             @Override
             public void onClick(final Sprite pButtonSprite, final float pTouchAreaLocalX, final float pTouchAreaLocalY) {
                 if (isEnabled()) {
-                    F2SoundManager.getInstance().play(SoundEnum.BUTTON_SMALL);
+                    F2SoundManager.getInstance().play(SoundEnum.BUTTON_CLICK2);
                     final BaseScene chatScene = ResourceManager.getInstance().getScene(SceneEnum.Chat);
                     final Scene scene = activity.getEngine().getScene();
                     Scene childScene = scene;
