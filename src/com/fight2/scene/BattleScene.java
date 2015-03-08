@@ -72,7 +72,7 @@ public class BattleScene extends BaseScene {
 
     private final BattlePartyFrame[] myPartyFrames = new BattlePartyFrame[3];
     private final BattlePartyFrame[] opponentPartyFrames = new BattlePartyFrame[3];
-    private final Font font = ResourceManager.getInstance().newFont(FontEnum.Default, 32, 256);
+    private final Font font = ResourceManager.getInstance().newFont(FontEnum.Default, 32, 512);
     private final Text skillTextTitle;
     private final Text skillEffectTextTitle;
     private final Text skillText;

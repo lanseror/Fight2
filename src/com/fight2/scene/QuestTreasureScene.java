@@ -82,6 +82,7 @@ public class QuestTreasureScene extends BaseScene {
             if (tileItem == TileItem.Card) {
                 final Card card = questResult.getCard();
                 itemSprite = new CardFrame(treasureX, treasureY, CARD_WIDTH, CARD_HEIGHT, card, activity);
+                this.registerTouchArea(itemSprite);
             } else {
                 if (tileItem == TileItem.Crystal) {
                     final ITiledTextureRegion tiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.TREASURE_CRYSTAL);
