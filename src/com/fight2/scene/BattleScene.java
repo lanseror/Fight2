@@ -581,6 +581,9 @@ public class BattleScene extends BaseScene {
                     case Skip:
                         // TODO
                         break;
+                    case Revival:
+                        // Nothing to do here
+                        break;
                 }
             }
             if (isSkillCure) {

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.andengine.opengl.texture.ITexture;
 import org.andengine.opengl.texture.TextureManager;
@@ -19,7 +18,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.fight2.GameActivity;
-import com.fight2.constant.SceneEnum;
 import com.fight2.constant.TextureEnum;
 
 public class TextureFactory {
