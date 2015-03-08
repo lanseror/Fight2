@@ -780,15 +780,18 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
     }
 
     private void changeQuestStatus(final QuestResult questResult) {
-        if (questResult.getStatus() == QuestGoStatus.Arrived) {
+        final QuestGoStatus goStatus = questResult.getStatus();
+        if (goStatus == QuestGoStatus.Arrived) {
             changeHeroStatus(QuestHeroStatus.Arrived);
-        } else if (questResult.getStatus() == QuestGoStatus.Treasure) {
+        } else if (goStatus == QuestGoStatus.Treasure) {
             changeHeroStatus(QuestHeroStatus.Treasure);
-        } else if (questResult.getStatus() == QuestGoStatus.Enemy) {
+        } else if (goStatus == QuestGoStatus.InvalidTreasure) {
+            changeHeroStatus(QuestHeroStatus.InvalidTreasure);
+        } else if (goStatus == QuestGoStatus.Enemy) {
             changeHeroStatus(QuestHeroStatus.Enemy);
-        } else if (questResult.getStatus() == QuestGoStatus.Task) {
+        } else if (goStatus == QuestGoStatus.Task) {
             changeHeroStatus(QuestHeroStatus.Task);
-        } else if (questResult.getStatus() == QuestGoStatus.Mine) {
+        } else if (goStatus == QuestGoStatus.Mine) {
             changeHeroStatus(QuestHeroStatus.Mine);
         } else {
             changeHeroStatus(QuestHeroStatus.Failed);
@@ -818,6 +821,19 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
 
             });
         } else if (heroStatus == QuestHeroStatus.Arrived) {
+        } else if (heroStatus == QuestHeroStatus.InvalidTreasure) {
+            ResourceManager.getInstance().setChildScene(QuestScene.this, new IRCallback<BaseScene>() {
+
+                @Override
+                public BaseScene onCallback() {
+                    try {
+                        return new QuestTreasureScene(questResult, true, activity);
+                    } catch (final IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+            });
         } else if (heroStatus == QuestHeroStatus.Treasure) {
             receiveQuestTreasure(questResult);
             updateQuestPropsBar();
@@ -826,7 +842,7 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                 @Override
                 public BaseScene onCallback() {
                     try {
-                        return new QuestTreasureScene(questResult, activity);
+                        return new QuestTreasureScene(questResult, false, activity);
                     } catch (final IOException e) {
                         throw new RuntimeException(e);
                     }

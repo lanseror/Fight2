@@ -7,6 +7,7 @@ public enum QuestHeroStatus {
     Timeout,
     Arrived,
     Treasure,
+    InvalidTreasure,
     Enemy,
     Task,
     Mine,

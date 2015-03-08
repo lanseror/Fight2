@@ -30,8 +30,9 @@ public class QuestUtils {
         try {
             final QuestResult result = new QuestResult();
             final JSONObject responseJson = HttpUtils.getJSONFromUrl(url);
-            result.setStatus(QuestGoStatus.valueOf(responseJson.getString("goStatus")));
-            if (result.getStatus() == QuestGoStatus.Treasure) {
+            final QuestGoStatus goStatus = QuestGoStatus.valueOf(responseJson.getString("goStatus"));
+            result.setStatus(goStatus);
+            if (goStatus == QuestGoStatus.Treasure) {
                 result.setTreasureIndex(responseJson.getInt("treasureIndex"));
                 final TileItem tileItem = TileItem.valueOf(responseJson.getString("treasureItem"));
                 result.setItem(tileItem);
@@ -40,19 +41,19 @@ public class QuestUtils {
                     final Card card = CardUtils.cardFromJson(cardJson);
                     result.setCard(card);
                 }
-            } else if (result.getStatus() == QuestGoStatus.Enemy) {
+            } else if (goStatus == QuestGoStatus.Enemy) {
                 final JSONObject enymyJson = responseJson.getJSONObject("enemy");
                 final User enemy = new User();
                 enemy.setId(enymyJson.getInt("id"));
                 enemy.setName(enymyJson.getString("name"));
                 result.setEnemy(enemy);
-            } else if (result.getStatus() == QuestGoStatus.Task) {
+            } else if (goStatus == QuestGoStatus.Task) {
                 final JSONObject enymyJson = responseJson.getJSONObject("enemy");
                 final User enemy = new User();
                 enemy.setId(enymyJson.getInt("id"));
                 enemy.setName(enymyJson.getString("name"));
                 result.setEnemy(enemy);
-            } else if (result.getStatus() == QuestGoStatus.Mine) {
+            } else if (goStatus== QuestGoStatus.Mine) {
                 result.setMineId(responseJson.getInt("mineId"));
             }
             if (responseJson.has("dialog")) {

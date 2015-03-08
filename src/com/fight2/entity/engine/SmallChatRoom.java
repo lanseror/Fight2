@@ -73,7 +73,7 @@ public class SmallChatRoom extends Rectangle {
                     while (childScene.getChildScene() != null) {
                         childScene = childScene.getChildScene();
                     }
-                    childScene.setChildScene(chatScene, false, false, true);
+                    childScene.setChildScene(chatScene, false, true, true);
                     chatScene.updateScene();
                     activity.runOnUiThread(new Runnable() {
                         @Override
