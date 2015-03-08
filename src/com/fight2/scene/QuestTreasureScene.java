@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.andengine.entity.IEntity;
 import org.andengine.entity.primitive.Rectangle;
 import org.andengine.entity.sprite.AnimatedSprite;
+import org.andengine.entity.sprite.Sprite;
 import org.andengine.entity.text.AutoWrap;
 import org.andengine.entity.text.Text;
 import org.andengine.entity.text.TextOptions;
@@ -32,7 +33,7 @@ public class QuestTreasureScene extends BaseScene {
     private final static int CARD_HEIGHT = 150;
     private final QuestResult questResult;
     private static final String MSG1 = "找到一个宝箱，你打开宝箱，发现了一些财宝。";
-    private static final String MSG2 = "仔细搜索之后，你发现了一些资源。";
+    private static final String MSG2 = "你为公会找到了一些资源，为表感谢，公会奖励了你%2s公会贡献币。(        +%s)";
 
     public QuestTreasureScene(final QuestResult questResult, final GameActivity activity) throws IOException {
         super(activity);
@@ -58,6 +59,7 @@ public class QuestTreasureScene extends BaseScene {
 
         final float treasureX = 300;
         final float treasureY = 180;
+        int guildContrib = 0;
 
         final TileItem tileItem = questResult.getItem();
         final IEntity itemSprite;
@@ -70,6 +72,13 @@ public class QuestTreasureScene extends BaseScene {
                 final AnimatedSprite treasureSprite = new AnimatedSprite(treasureX, treasureY, tiledTextureRegion, vbom);
                 treasureSprite.animate(500, true);
                 itemSprite = treasureSprite;
+                guildContrib = 10;
+            } else if (tileItem == TileItem.PileOfDiamon) {
+                final ITiledTextureRegion tiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(TiledTextureEnum.TREASURE_PILE_DIAMON);
+                final AnimatedSprite treasureSprite = new AnimatedSprite(treasureX, treasureY, tiledTextureRegion, vbom);
+                treasureSprite.animate(600, true);
+                itemSprite = treasureSprite;
+                guildContrib = 10;
             } else {
                 final TextureEnum textureEnum;
                 switch (tileItem) {
@@ -88,14 +97,13 @@ public class QuestTreasureScene extends BaseScene {
                     case Diamon:
                         textureEnum = TextureEnum.COMMON_DIAMOND;
                         break;
-                    case PileOfDiamon:
-                        textureEnum = TextureEnum.QUEST_TREASURE_PILE_DIAMON;
-                        break;
                     case Wood:
                         textureEnum = TextureEnum.QUEST_TREASURE_WOOD_BIG;
+                        guildContrib = 5;
                         break;
                     case Mineral:
                         textureEnum = TextureEnum.QUEST_TREASURE_MINERAL_BIG;
+                        guildContrib = 5;
                         break;
                     default:
                         textureEnum = null;
@@ -113,11 +121,16 @@ public class QuestTreasureScene extends BaseScene {
         frame.attachChild(amountText);
 
         final Font detailFont = ResourceManager.getInstance().newFont(FontEnum.Default, 24);
-        final TextOptions textOptions = new TextOptions(AutoWrap.LETTERS, 430);
-        final String msg = tileItem.isInBox() ? MSG1 : MSG2;
-        final Text descText = new Text(frame.getWidth() * 0.5f, 270, detailFont, msg, textOptions, vbom);
+        final TextOptions textOptions = new TextOptions(AutoWrap.LETTERS, 450);
+        final String msg = tileItem.isInBox() ? MSG1 : String.format(MSG2, guildContrib, guildContrib);
+        final Text descText = new Text(frame.getWidth() * 0.5f, 275, detailFont, msg, textOptions, vbom);
         descText.setColor(0XFF330504);
         frame.attachChild(descText);
+
+        if (!tileItem.isInBox()) {
+            final Sprite guildContribImg = createACImageSprite(TextureEnum.COMMON_GUILD_CONTRIBUTION, 393, 260);
+            frame.attachChild(guildContribImg);
+        }
 
         this.setTouchAreaBindingOnActionDownEnabled(true);
         this.setTouchAreaBindingOnActionMoveEnabled(true);
@@ -129,7 +142,7 @@ public class QuestTreasureScene extends BaseScene {
 
     @Override
     protected void playAnimation() {
-        final SoundEnum soundEnum = questResult.getItem().isInBox()? SoundEnum.TREASURE3 : SoundEnum.TREASURE1;
+        final SoundEnum soundEnum = questResult.getItem().isInBox() ? SoundEnum.TREASURE3 : SoundEnum.TREASURE1;
         F2SoundManager.getInstance().play(soundEnum);
     }
 

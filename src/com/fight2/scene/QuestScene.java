@@ -613,11 +613,13 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                             treasureSprites.add(treasureSprite);
                         } else {
                             if (item == TileItem.Wood) {
-                                final Sprite treasureSprite = createACImageSprite(TextureEnum.QUEST_TREASURE_WOOD, treasureX, treasureY);
+                                final Sprite treasureSprite = createACImageSprite(TextureEnum.QUEST_TREASURE_WOOD_BIG, treasureX, treasureY);
+                                treasureSprite.setScale(0.6f);
                                 tmxTiledMap.attachChild(treasureSprite);
                                 treasureSprites.add(treasureSprite);
                             } else if (item == TileItem.Mineral) {
-                                final Sprite treasureSprite = createACImageSprite(TextureEnum.QUEST_TREASURE_MINERAL, treasureX, treasureY);
+                                final Sprite treasureSprite = createACImageSprite(TextureEnum.QUEST_TREASURE_MINERAL_BIG, treasureX, treasureY);
+                                treasureSprite.setScale(0.6f);
                                 tmxTiledMap.attachChild(treasureSprite);
                                 treasureSprites.add(treasureSprite);
                             } else if (item == TileItem.Crystal) {
@@ -625,10 +627,15 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
                                         TiledTextureEnum.TREASURE_CRYSTAL);
                                 final AnimatedSprite treasureSprite = new AnimatedSprite(treasureX, treasureY, tiledTextureRegion, vbom);
                                 treasureSprite.animate(500, true);
+                                treasureSprite.setScale(0.6f);
                                 tmxTiledMap.attachChild(treasureSprite);
                                 treasureSprites.add(treasureSprite);
                             } else if (item == TileItem.PileOfDiamon) {
-                                final Sprite treasureSprite = createACImageSprite(TextureEnum.QUEST_TREASURE_PILE_DIAMON, treasureX, treasureY);
+                                final ITiledTextureRegion tiledTextureRegion = TiledTextureFactory.getInstance().getIextureRegion(
+                                        TiledTextureEnum.TREASURE_PILE_DIAMON);
+                                final AnimatedSprite treasureSprite = new AnimatedSprite(treasureX, treasureY, tiledTextureRegion, vbom);
+                                treasureSprite.animate(600, true);
+                                treasureSprite.setScale(0.6f);
                                 tmxTiledMap.attachChild(treasureSprite);
                                 treasureSprites.add(treasureSprite);
                             }
@@ -1012,6 +1019,8 @@ public class QuestScene extends BaseScene implements IScrollDetectorListener {
         } else if (tileItem == TileItem.Mineral) {
             userProps.setGuildContrib(userProps.getGuildContrib() + 5);
         } else if (tileItem == TileItem.Crystal) {
+            userProps.setGuildContrib(userProps.getGuildContrib() + 10);
+        } else if (tileItem == TileItem.PileOfDiamon) {
             userProps.setGuildContrib(userProps.getGuildContrib() + 10);
         }
     }
