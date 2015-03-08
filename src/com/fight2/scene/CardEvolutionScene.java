@@ -92,32 +92,38 @@ public class CardEvolutionScene extends BaseCardPackScene {
 
     public void updateCardPack() {
         // Insert cards to card pack.
-        cardPack.detachChildren();
-        for (final CardUpdateHandler cardUpdateHandler : cardUpdateHandlers) {
-            this.unregisterUpdateHandler(cardUpdateHandler);
-        }
-        cardUpdateHandlers.clear();
-        final float initCardX = cardZoom.getX() - (cardPack.getX() - 0.5f * cardPack.getWidth());
-        float appendX = initCardX;
-        for (int i = 0; i < cardPackCards.size(); i++) {
-            final Card cardPackCard = cardPackCards.get(i);
-            final IEntity card = new CardFrame(appendX, CARD_Y, CARD_WIDTH, CARD_HEIGHT, cardPackCard, activity);
-            card.setTag(i);
-            card.setWidth(CARD_WIDTH);
-            card.setHeight(CARD_HEIGHT);
-            card.setPosition(appendX, CARD_Y);
-            card.setUserData(cardPackCard);
-            cardPack.attachChild(card);
-            if (i == 0) {
-                appendX += 1.5 * (CARD_GAP + CARD_WIDTH);
-                cardZoom.setUserData(card);
-            } else {
-                appendX += CARD_GAP + CARD_WIDTH;
+        activity.runOnUpdateThread(new Runnable() {
+            @Override
+            public void run() {
+                cardPack.detachChildren();
+                for (final CardUpdateHandler cardUpdateHandler : cardUpdateHandlers) {
+                    unregisterUpdateHandler(cardUpdateHandler);
+                }
+                cardUpdateHandlers.clear();
+                final float initCardX = cardZoom.getX() - (cardPack.getX() - 0.5f * cardPack.getWidth());
+                float appendX = initCardX;
+                for (int i = 0; i < cardPackCards.size(); i++) {
+                    final Card cardPackCard = cardPackCards.get(i);
+                    final IEntity card = new CardFrame(appendX, CARD_Y, CARD_WIDTH, CARD_HEIGHT, cardPackCard, activity);
+                    card.setTag(i);
+                    card.setWidth(CARD_WIDTH);
+                    card.setHeight(CARD_HEIGHT);
+                    card.setPosition(appendX, CARD_Y);
+                    card.setUserData(cardPackCard);
+                    cardPack.attachChild(card);
+                    if (i == 0) {
+                        appendX += 1.5 * (CARD_GAP + CARD_WIDTH);
+                        cardZoom.setUserData(card);
+                    } else {
+                        appendX += CARD_GAP + CARD_WIDTH;
+                    }
+                    final CardUpdateHandler cardUpdateHandler = new CardUpdateHandler(cardZoom, card);
+                    cardUpdateHandlers.add(cardUpdateHandler);
+                    registerUpdateHandler(cardUpdateHandler);
+                }
             }
-            final CardUpdateHandler cardUpdateHandler = new CardUpdateHandler(cardZoom, card);
-            cardUpdateHandlers.add(cardUpdateHandler);
-            this.registerUpdateHandler(cardUpdateHandler);
-        }
+
+        });
     }
 
     @Override
