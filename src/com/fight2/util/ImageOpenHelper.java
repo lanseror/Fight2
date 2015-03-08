@@ -7,11 +7,12 @@ import android.util.Log;
 
 public class ImageOpenHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "Fight2";
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     public static final String TABLE_NAME = "image";
     public static final String KEY = "web";
     public static final String VALUE = "local";
-    private static final String TABLE_CREATE = "CREATE TABLE " + TABLE_NAME + " (" + KEY + " TEXT, " + VALUE + " TEXT);";
+    public static final String STATUS = "status";
+    private static final String TABLE_CREATE = "CREATE TABLE " + TABLE_NAME + " (" + KEY + " TEXT, " + VALUE + " TEXT, " + STATUS + " INTEGER);";
 
     public ImageOpenHelper(final Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

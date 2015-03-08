@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -22,12 +21,19 @@ public class ImageUtils {
 
         if (localString == null || localString.equals("")) {
             localString = downloadAndSave(webUrl, activity);
-            final ContentValues values = new ContentValues();
-            values.put(ImageOpenHelper.KEY, webUrl);
-            values.put(ImageOpenHelper.VALUE, localString);
             final ImageOpenHelper dbHelper = activity.getDbHelper();
             final SQLiteDatabase database = dbHelper.getWritableDatabase();
-            database.insert(ImageOpenHelper.TABLE_NAME, null, values);
+            final ContentValues updateValues = new ContentValues();
+            updateValues.put(ImageOpenHelper.STATUS, 1);
+            final int updatedRow = database.update(ImageOpenHelper.TABLE_NAME, updateValues, "web=?", new String[] { webUrl });
+            if (updatedRow == 0) {
+                final ContentValues insertValues = new ContentValues();
+                insertValues.put(ImageOpenHelper.KEY, webUrl);
+                insertValues.put(ImageOpenHelper.VALUE, localString);
+                insertValues.put(ImageOpenHelper.STATUS, 1);
+                database.insert(ImageOpenHelper.TABLE_NAME, null, insertValues);
+            }
+
             database.close();
             imageDatas.put(webUrl, localString);
         }
@@ -40,24 +46,14 @@ public class ImageUtils {
         return imageDatas.containsKey(webUrl);
     }
 
-    public static void reDownloadImage(final String localUrl, final GameActivity activity) throws IOException {
-        String webUrl = null;
-        final Map<String, String> imageDatas = TextureFactory.getInstance().getImageDatas();
-        for (final Entry<String, String> entry : imageDatas.entrySet()) {
-            if (entry.getValue().equals(localUrl)) {
-                webUrl = entry.getKey();
-            }
-        }
+    public static void invalidImage(final String webUrl, final GameActivity activity) throws IOException {
         if (webUrl != null) {
-            imageDatas.remove(webUrl);
-            final String newLocalString = downloadAndSave(webUrl, activity);
             final ContentValues values = new ContentValues();
-            values.put(ImageOpenHelper.VALUE, newLocalString);
+            values.put(ImageOpenHelper.STATUS, 0);
             final ImageOpenHelper dbHelper = activity.getDbHelper();
             final SQLiteDatabase database = dbHelper.getWritableDatabase();
             database.update(ImageOpenHelper.TABLE_NAME, values, "web=?", new String[] { webUrl });
             database.close();
-            imageDatas.put(webUrl, newLocalString);
         }
     }
 

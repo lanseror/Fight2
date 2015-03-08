@@ -1,9 +1,12 @@
 package com.fight2.util;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.andengine.opengl.texture.ITexture;
 import org.andengine.opengl.texture.TextureManager;
@@ -11,8 +14,7 @@ import org.andengine.opengl.texture.bitmap.AssetBitmapTexture;
 import org.andengine.opengl.texture.bitmap.BitmapTexture;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.texture.region.TextureRegionFactory;
-import org.andengine.util.adt.io.in.IInputStreamOpener;
-import org.andengine.util.exception.NullBitmapException;
+import org.andengine.util.adt.io.in.ActivityLocalInputStreamOpener;
 
 import android.content.res.AssetManager;
 import android.database.Cursor;
@@ -66,7 +68,7 @@ public class TextureFactory {
 
     public void initImageData(final GameActivity activity) throws IOException {
         final ImageOpenHelper dbHelper = activity.getDbHelper();
-        final String selectQuery = "SELECT * FROM " + ImageOpenHelper.TABLE_NAME;
+        final String selectQuery = "SELECT * FROM " + ImageOpenHelper.TABLE_NAME + " WHERE status=1";
         this.activity = activity;
         final SQLiteDatabase db = dbHelper.getReadableDatabase();
         final Cursor cursor = db.rawQuery(selectQuery, null);
@@ -77,6 +79,20 @@ public class TextureFactory {
         }
         cursor.close();
         db.close();
+        final Set<String> fileSet = new HashSet<String>();
+        for (final String fileName : activity.fileList()) {
+            fileSet.add(fileName);
+        }
+        final Iterator<Entry<String, String>> it = imageDatas.entrySet().iterator();
+        while (it.hasNext()) {
+            final Entry<String, String> entry = it.next();
+            final String webUrl = entry.getKey();
+            final String localUrl = entry.getValue();
+            if (!fileSet.contains(localUrl)) {
+                ImageUtils.invalidImage(webUrl, activity);
+                it.remove();
+            }
+        }
     }
 
     public Map<String, String> getImageDatas() {
@@ -118,30 +134,10 @@ public class TextureFactory {
     }
 
     private ITextureRegion createIextureRegion(final GameActivity activity, final String image) throws IOException {
-        ITextureRegion textureRegion = null;
-        try {
-            final ITexture mTexture = new BitmapTexture(activity.getTextureManager(), new IInputStreamOpener() {
-                @Override
-                public InputStream open() throws IOException {
-                    return activity.openFileInput(image);
-                }
-            });
-
-            mTexture.load();
-            textureRegion = TextureRegionFactory.extractFromTexture(mTexture);
-        } catch (final NullBitmapException e) {
-            // Try re-download the image to local.
-            ImageUtils.reDownloadImage(image, activity);
-            final ITexture mTexture = new BitmapTexture(activity.getTextureManager(), new IInputStreamOpener() {
-                @Override
-                public InputStream open() throws IOException {
-                    return activity.openFileInput(image);
-                }
-            });
-
-            mTexture.load();
-            textureRegion = TextureRegionFactory.extractFromTexture(mTexture);
-        }
+        final ITexture mTexture = new BitmapTexture(activity.getTextureManager(), new ActivityLocalInputStreamOpener(activity, image));
+        mTexture.load();
+        final ITextureRegion textureRegion = TextureRegionFactory.extractFromTexture(mTexture);
         return textureRegion;
     }
+
 }
