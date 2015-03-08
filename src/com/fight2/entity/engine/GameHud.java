@@ -8,7 +8,6 @@ import com.fight2.util.ConfigHelper;
 
 public class GameHud extends HUD {
     private final float simulatedLeftX;
-
     private final SmallChatRoom smallChatRoom;
 
     public GameHud(final GameActivity activity) {

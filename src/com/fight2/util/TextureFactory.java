@@ -12,6 +12,7 @@ import org.andengine.opengl.texture.bitmap.BitmapTexture;
 import org.andengine.opengl.texture.region.ITextureRegion;
 import org.andengine.opengl.texture.region.TextureRegionFactory;
 import org.andengine.util.adt.io.in.IInputStreamOpener;
+import org.andengine.util.exception.NullBitmapException;
 
 import android.content.res.AssetManager;
 import android.database.Cursor;
@@ -117,14 +118,30 @@ public class TextureFactory {
     }
 
     private ITextureRegion createIextureRegion(final GameActivity activity, final String image) throws IOException {
-        final ITexture mTexture = new BitmapTexture(activity.getTextureManager(), new IInputStreamOpener() {
-            @Override
-            public InputStream open() throws IOException {
-                return activity.openFileInput(image);
-            }
-        });
+        ITextureRegion textureRegion = null;
+        try {
+            final ITexture mTexture = new BitmapTexture(activity.getTextureManager(), new IInputStreamOpener() {
+                @Override
+                public InputStream open() throws IOException {
+                    return activity.openFileInput(image);
+                }
+            });
 
-        mTexture.load();
-        return TextureRegionFactory.extractFromTexture(mTexture);
+            mTexture.load();
+            textureRegion = TextureRegionFactory.extractFromTexture(mTexture);
+        } catch (final NullBitmapException e) {
+            // Try re-download the image to local.
+            ImageUtils.reDownloadImage(image, activity);
+            final ITexture mTexture = new BitmapTexture(activity.getTextureManager(), new IInputStreamOpener() {
+                @Override
+                public InputStream open() throws IOException {
+                    return activity.openFileInput(image);
+                }
+            });
+
+            mTexture.load();
+            textureRegion = TextureRegionFactory.extractFromTexture(mTexture);
+        }
+        return textureRegion;
     }
 }
