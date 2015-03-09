@@ -24,8 +24,11 @@ import org.andengine.opengl.util.GLState;
 import org.andengine.opengl.vbo.VertexBufferObjectManager;
 import org.andengine.ui.activity.LayoutGameActivity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.res.AssetManager;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -47,6 +50,7 @@ import com.fight2.util.ImageOpenHelper;
 import com.fight2.util.LogUtils;
 import com.fight2.util.ResourceManager;
 import com.fight2.util.TextureFactory;
+import com.fight2.util.VersionUtils;
 
 public class GameActivity extends LayoutGameActivity {
     public static final int CAMERA_WIDTH = 1136;
@@ -65,6 +69,7 @@ public class GameActivity extends LayoutGameActivity {
     private ImageOpenHelper dbHelper;
     private EditText chatText;
     private boolean pause = false;
+    private boolean gameCreated = false;
 
     @Override
     protected int getLayoutID() {
@@ -200,6 +205,7 @@ public class GameActivity extends LayoutGameActivity {
                 splashScene.detachSelf();
                 splashTexture.unload();
                 splashTexture = null;
+                gameCreated = true;
             }
 
         }).start();
@@ -225,7 +231,32 @@ public class GameActivity extends LayoutGameActivity {
         }
         initProgressBar(this.getVertexBufferObjectManager());
         F2SoundManager.getInstance().play(SoundEnum.LOADING, true);
-        loadAdditionResources();
+        final int status = VersionUtils.checkVersion();
+        if (status == 0) {
+            loadAdditionResources();
+        } else {
+            this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    final AlertDialog.Builder alert = new AlertDialog.Builder(GameActivity.this);
+                    final String title = status == 1 ? "版本太旧" : "出错了";
+                    final String message = status == 1 ? "请更新游戏：http://42.96.195.194/m/Fight2.apk" : "检查版本出错！";
+                    alert.setTitle(title);
+                    final EditText editText = new EditText(GameActivity.this);
+                    editText.setText(message);
+                    editText.setGravity(Gravity.CENTER_HORIZONTAL);
+                    alert.setView(editText);
+                    alert.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(final DialogInterface dialog, final int whichButton) {
+                            finish();
+                        }
+                    });
+                    final AlertDialog dialog = alert.create();
+                    dialog.show();
+                }
+            });
+        }
     }
 
     private void loadResources1() {
@@ -278,7 +309,7 @@ public class GameActivity extends LayoutGameActivity {
     protected void onResume() {
         super.onResume();
         F2MusicManager.getInstance().resume();
-        if (pause) {
+        if (gameCreated && pause) {
             final TimerHandler getTimerHandler = new TimerHandler(0.5f, new ITimerCallback() {
                 @Override
                 public void onTimePassed(final TimerHandler pTimerHandler) {

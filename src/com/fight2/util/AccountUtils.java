@@ -94,7 +94,7 @@ public class AccountUtils {
     }
 
     public static void login(final String installUUID, final GameActivity activity) throws IOException {
-        final String loginUrl = HttpUtils.HOST_URL + "/user/login.action?installUUID=" + installUUID;
+        final String loginUrl = HttpUtils.HOST_URL + "/user/newlogin.action?installUUID=" + installUUID;
         final String cardUrl = HttpUtils.HOST_URL + "/card/my-cards";
         final String partyUrl = HttpUtils.HOST_URL + "/party/my-parties";
 
